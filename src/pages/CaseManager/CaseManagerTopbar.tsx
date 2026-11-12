@@ -50,7 +50,7 @@ export default function CaseManagerTopbar() {
 
       <div className="hidden items-center gap-3 md:flex">
 
-        {/* OPERATIONAL AREA */}
+    
 
         <button className="flex items-center gap-3 border-r border-[#d5e3e9] pr-4">
 
