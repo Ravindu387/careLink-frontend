@@ -15,10 +15,7 @@ import {
   MapPin,
   Users,
   ShieldCheck,
-  FileText,
-  Globe,
   Eye,
-  Pencil,
   Ban,
 } from "lucide-react";
 
@@ -173,11 +170,6 @@ export default function OrganisationManagement() {
   );
   const [administrativeRationale, setAdministrativeRationale] = useState("");
 
-  const [newName, setNewName] = useState("");
-  const [newType, setNewType] = useState("Local NGO");
-  const [newScope, setNewScope] = useState("");
-  const [newMembers, setNewMembers] = useState("1");
-
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
@@ -220,10 +212,6 @@ export default function OrganisationManagement() {
     currentPage * pageSize
   );
 
-  const activeCount = organisations.filter(
-    (org) => org.status === "Active"
-  ).length;
-
   const pendingCount = organisations.filter(
     (org) => org.verification === "Pending Review"
   ).length;
@@ -231,39 +219,6 @@ export default function OrganisationManagement() {
   const suspendedCount = organisations.filter(
     (org) => org.status === "Suspended"
   ).length;
-
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const newOrganisation: Organisation = {
-      id: `ORG-${String(
-        Math.floor(100 + Math.random() * 900)
-      )}`,
-      name: newName.trim(),
-      type: newType,
-      scope: newScope.trim(),
-      members: Math.max(1, Number(newMembers)),
-      verification: "Pending Review",
-      status: "Pending",
-    };
-
-    setOrganisations((previous) => [
-      ...previous,
-      newOrganisation,
-    ]);
-
-    setSearch("");
-    setTypeFilter("All organisation types");
-    setRegionFilter("All regions");
-    setVerificationFilter("All verification states");
-    setCurrentPage(Math.ceil((organisations.length + 1) / pageSize));
-
-    setShowRegisterModal(false);
-    setNewName("");
-    setNewType("Local NGO");
-    setNewScope("");
-    setNewMembers("1");
-  };
 
   const handleAdministrativeAction = (
     e: React.FormEvent<HTMLFormElement>
