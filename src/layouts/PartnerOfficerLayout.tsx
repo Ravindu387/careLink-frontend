@@ -10,14 +10,12 @@ const PartnerOfficerLayout = () => {
 
   return (
     <div className="min-h-screen bg-[#eff5f7]">
-
       <PartnerOfficerSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
       <div className="min-h-screen min-w-0 lg:ml-[264px]">
-
         <PartnerOfficerTopbar
           onMenuClick={() => setSidebarOpen(true)}
         />
@@ -25,7 +23,6 @@ const PartnerOfficerLayout = () => {
         <main className="min-h-[calc(100vh-66px)] min-w-0 bg-[#eff5f7]">
           <Outlet />
         </main>
-
       </div>
     </div>
   );
