@@ -1,12 +1,8 @@
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Activity,
   Search,
   Globe,
-  HelpCircle,
   Bell,
-  User,
   ChevronRight,
   X,
   Download,
@@ -14,31 +10,21 @@ import {
   KeyRound,
   Database,
   Link2,
-  Mail,
-  MessageSquare,
   MoreHorizontal,
   ShieldCheck,
-  AlertTriangle,
   CheckCircle2,
-  Clock,
-  RefreshCw,
-  FileText,
-  Server,
   Zap,
+  RefreshCw,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
-
-type HealthStatus = "Operational" | "Degraded" | "Unavailable";
-
-type Integration = {
-  id: string;
-  name: string;
-  type: string;
-  availability: string;
-  latency: string;
-  health: HealthStatus;
-  lastCheck: string;
-  icon: typeof KeyRound;
-};
+import { integrationService } from "../../services/integrationService";
+import type {
+  Integration,
+  HealthStatus,
+  IntegrationLog,
+  PlatformHealthOverview,
+} from "../../types/integration";
 
 type ModalType =
   | "report"
@@ -48,68 +34,18 @@ type ModalType =
   | "retry"
   | null;
 
-const initialIntegrations: Integration[] = [
-  {
-    id: "INT-001",
-    name: "Identity & Access Service",
-    type: "Authentication",
-    availability: "99.99%",
-    latency: "42 ms",
-    health: "Operational",
-    lastCheck: "Just now",
-    icon: KeyRound,
-  },
-  {
-    id: "INT-004",
-    name: "SMS Delivery Gateway",
-    type: "Communications",
-    availability: "97.42%",
-    latency: "1.8 s",
-    health: "Degraded",
-    lastCheck: "1 min ago",
-    icon: Bell,
-  },
-  {
-    id: "INT-008",
-    name: "Email Delivery Service",
-    type: "Communications",
-    availability: "99.94%",
-    latency: "284 ms",
-    health: "Operational",
-    lastCheck: "Just now",
-    icon: Database,
-  },
-  {
-    id: "INT-012",
-    name: "Mapping & Geocoding",
-    type: "Location",
-    availability: "99.87%",
-    latency: "640 ms",
-    health: "Operational",
-    lastCheck: "2 min ago",
-    icon: Link2,
-  },
-  {
-    id: "INT-016",
-    name: "AI Decision Support",
-    type: "AI Service",
-    availability: "99.91%",
-    latency: "1.2 s",
-    health: "Operational",
-    lastCheck: "Just now",
-    icon: Zap,
-  },
-  {
-    id: "INT-021",
-    name: "Government Alert Feed",
-    type: "External API",
-    availability: "94.10%",
-    latency: "—",
-    health: "Unavailable",
-    lastCheck: "18 min ago",
-    icon: Globe,
-  },
-];
+const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  KeyRound,
+  Bell,
+  Database,
+  Link2,
+  Zap,
+  Globe,
+};
+
+function getIconComponent(iconName: string) {
+  return iconMap[iconName] || KeyRound;
+}
 
 const healthStyles: Record<HealthStatus, string> = {
   Operational: "bg-[#E5F6F0] text-[#13856A]",
@@ -120,7 +56,7 @@ const healthStyles: Record<HealthStatus, string> = {
 function StatusBadge({ status }: { status: HealthStatus }) {
   return (
     <span
-      className={`inline-flex whitespace-nowrap rounded-md px-2.5 py-1.5 text-[9px] font-semibold ${healthStyles[status]}`}
+      className={`inline-flex whitespace-nowrap rounded-md px-2.5 py-1.5 text-[9px] font-semibold ${healthStyles[status] || healthStyles.Operational}`}
     >
       {status}
     </span>
@@ -140,7 +76,7 @@ function IntegrationHealthModal({
 }) {
   const [title, setTitle] = useState(
     type === "health-check"
-      ? "Run Health Check"
+      ? "Run Platform Health Check"
       : type === "details"
         ? `Integration Details: ${integration?.name ?? ""}`
         : type === "retry"
@@ -153,10 +89,26 @@ function IntegrationHealthModal({
   const [approval, setApproval] = useState("Standard administrator approval");
   const [rationale, setRationale] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // For logs
+  const [logs, setLogs] = useState<IntegrationLog[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+
+  useEffect(() => {
+    if (type === "logs" && integration?.id) {
+      setLoadingLogs(true);
+      integrationService
+        .getLogs(integration.id)
+        .then((data) => setLogs(data))
+        .catch(() => setLogs([]))
+        .finally(() => setLoadingLogs(false));
+    }
+  }, [type, integration]);
 
   if (!type) return null;
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!title.trim()) {
       setError("Action title is required.");
       return;
@@ -167,12 +119,41 @@ function IntegrationHealthModal({
       return;
     }
 
-    onConfirm(
-      `${title} recorded successfully for ${environment} environment.`
-    );
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      if (type === "retry" && integration) {
+        await integrationService.retryIntegration(integration.id, {
+          actionTitle: title,
+          environment,
+          scope,
+          approvalType: approval,
+          administrativeRationale: rationale,
+        });
+        onConfirm(`Recovery recorded for ${integration.name} (${environment}).`);
+      } else {
+        await integrationService.recordAction(
+          {
+            actionTitle: title,
+            environment,
+            scope,
+            approvalType: approval,
+            administrativeRationale: rationale,
+          },
+          integration?.id
+        );
+        onConfirm(`${title} recorded successfully for ${environment} environment.`);
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to complete administrative action.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isLogs = type === "logs";
+  const isDetails = type === "details";
 
   return (
     <div
@@ -195,7 +176,7 @@ function IntegrationHealthModal({
                 ? `Integration Logs: ${integration?.name}`
                 : type === "health-check"
                   ? "Run Health Check"
-                  : type === "details"
+                  : isDetails
                     ? `Integration Details: ${integration?.name}`
                     : type === "retry"
                       ? `Retry Integration: ${integration?.name}`
@@ -218,35 +199,84 @@ function IntegrationHealthModal({
             <div className="space-y-3">
               <div className="rounded-lg bg-[#F2F7F9] p-4">
                 <p className="text-xs font-semibold text-[#183D59]">
-                  Recent activity
+                  Recorded Telemetry Events
                 </p>
                 <p className="mt-1 text-[10px] text-slate-500">
-                  Latest recorded integration events.
+                  Live backend diagnostics and administrative actions for {integration?.name}.
                 </p>
               </div>
 
-              {[
-                ["Health check completed", "Connection status checked successfully.", "Just now"],
-                ["API response received", "Service returned a valid response.", "2 minutes ago"],
-                ["Authentication verified", "Connection credentials validated.", "5 minutes ago"],
-                ["Scheduled monitoring", "Automatic monitoring event recorded.", "10 minutes ago"],
-              ].map(([heading, description, time]) => (
-                <div
-                  key={heading}
-                  className="flex items-start gap-3 border-b border-slate-100 pb-3"
-                >
-                  <div className="mt-1 h-2 w-2 rounded-full bg-[#55BBA3]" />
-                  <div className="flex-1">
-                    <p className="text-[11px] font-semibold text-[#183D59]">
-                      {heading}
-                    </p>
-                    <p className="mt-1 text-[10px] text-slate-500">
-                      {description}
-                    </p>
-                  </div>
-                  <span className="text-[9px] text-slate-400">{time}</span>
+              {loadingLogs ? (
+                <div className="flex items-center justify-center py-10 text-slate-400">
+                  <Loader2 size={20} className="animate-spin text-[#2785B2]" />
+                  <span className="ml-2 text-xs">Loading telemetry records...</span>
                 </div>
-              ))}
+              ) : logs.length === 0 ? (
+                <p className="py-6 text-center text-xs text-slate-400">
+                  No log entries recorded for this service.
+                </p>
+              ) : (
+                logs.map((log) => (
+                  <div
+                    key={log.id}
+                    className="flex items-start gap-3 border-b border-slate-100 pb-3"
+                  >
+                    <div
+                      className={`mt-1 h-2 w-2 rounded-full ${
+                        log.status === "Error"
+                          ? "bg-red-500"
+                          : log.status === "Warning"
+                          ? "bg-amber-500"
+                          : "bg-[#55BBA3]"
+                      }`}
+                    />
+                    <div className="flex-1">
+                      <p className="text-[11px] font-semibold text-[#183D59]">
+                        {log.heading}
+                      </p>
+                      <p className="mt-1 text-[10px] text-slate-500">
+                        {log.description}
+                      </p>
+                    </div>
+                    <span className="text-[9px] text-slate-400">{log.timeAgo}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : isDetails && integration ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 rounded-lg bg-[#F2F7F9] p-4">
+                <div>
+                  <span className="text-[9px] font-bold tracking-wider text-slate-400">SERVICE ID</span>
+                  <p className="text-xs font-semibold text-[#183D59]">{integration.id}</p>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold tracking-wider text-slate-400">CURRENT HEALTH</span>
+                  <div className="mt-1">
+                    <StatusBadge status={integration.health} />
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold tracking-wider text-slate-400">AVAILABILITY</span>
+                  <p className="text-xs font-semibold text-[#183D59]">{integration.availability}</p>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold tracking-wider text-slate-400">LATENCY</span>
+                  <p className="text-xs font-semibold text-[#183D59]">{integration.latency}</p>
+                </div>
+                {integration.endpoint && (
+                  <div className="col-span-2">
+                    <span className="text-[9px] font-bold tracking-wider text-slate-400">ENDPOINT</span>
+                    <p className="break-all font-mono text-[11px] text-slate-700">{integration.endpoint}</p>
+                  </div>
+                )}
+                {integration.description && (
+                  <div className="col-span-2">
+                    <span className="text-[9px] font-bold tracking-wider text-slate-400">DESCRIPTION</span>
+                    <p className="text-xs text-slate-600">{integration.description}</p>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <>
@@ -328,17 +358,16 @@ function IntegrationHealthModal({
                     setError("");
                   }}
                   rows={4}
-                  placeholder="Explain the authorised reason for this change..."
+                  placeholder="Explain the authorised reason for this administrative intervention..."
                   className="w-full resize-y rounded-lg border border-[#D6E5EC] p-3 text-[11px] outline-none placeholder:text-slate-400 focus:border-[#2785B2]"
                 />
               </div>
 
               {/* WARNING */}
-              <div className="flex items-center gap-3 rounded-lg bg-[#FFF7E5] px-4 py-4 text-[#95620D]">
-                <ShieldCheck size={20} className="shrink-0" />
+              <div className="flex items-center gap-3 rounded-lg bg-sky-50 px-4 py-3.5 text-[#185374]">
+                <ShieldCheck size={20} className="shrink-0 text-[#2785B2]" />
                 <p className="text-[10px] leading-5">
-                  This operation is performed locally for demonstration.
-                  In production it requires backend permission enforcement.
+                  This operation is enforced by the ASP.NET Core backend and recorded in the permanent audit trail.
                 </p>
               </div>
             </>
@@ -354,17 +383,26 @@ function IntegrationHealthModal({
           <div className="flex flex-col-reverse justify-end gap-2 border-t border-[#E1E9ED] pt-4 sm:flex-row">
             <button
               onClick={onClose}
+              disabled={isSubmitting}
               className="rounded-lg border border-[#BCD0DA] px-5 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
             >
-              {isLogs ? "Close" : "Cancel"}
+              {isLogs || isDetails ? "Close" : "Cancel"}
             </button>
 
-            {!isLogs && (
+            {!isLogs && !isDetails && (
               <button
                 onClick={handleConfirm}
-                className="rounded-lg bg-[#2785B2] px-5 py-3 text-[10px] font-semibold text-white shadow-sm transition hover:bg-[#1D6F98]"
+                disabled={isSubmitting}
+                className="flex items-center justify-center gap-2 rounded-lg bg-[#2785B2] px-5 py-3 text-[10px] font-semibold text-white shadow-sm transition hover:bg-[#1D6F98] disabled:opacity-60"
               >
-                Confirm &amp; record
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={13} className="animate-spin" />
+                    Recording...
+                  </>
+                ) : (
+                  "Confirm & record"
+                )}
               </button>
             )}
           </div>
@@ -375,8 +413,11 @@ function IntegrationHealthModal({
 }
 
 export default function IntegrationHealth() {
-  const [integrations, setIntegrations] =
-    useState<Integration[]>(initialIntegrations);
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [overview, setOverview] = useState<PlatformHealthOverview | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All service types");
@@ -389,7 +430,37 @@ export default function IntegrationHealth() {
 
   const [modal, setModal] = useState<ModalType>(null);
   const [notice, setNotice] = useState("");
-  const [lastChecked, setLastChecked] = useState("Just now");
+
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    setApiError(null);
+    try {
+      const [integrationsData, overviewData] = await Promise.all([
+        integrationService.getIntegrations({
+          type: typeFilter !== "All service types" ? typeFilter : undefined,
+          health: healthFilter !== "All health states" ? healthFilter : undefined,
+          search: search || undefined,
+        }),
+        integrationService.getOverview(),
+      ]);
+
+      if (integrationsData) {
+        setIntegrations(integrationsData);
+      }
+      if (overviewData) {
+        setOverview(overviewData);
+      }
+    } catch (err: any) {
+      console.warn("Failed to reach backend integration health endpoint:", err);
+      setApiError(err.message || "Unable to reach the CareLink server. Please ensure the backend API is running.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [typeFilter, healthFilter, search]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const filteredIntegrations = useMemo(() => {
     return integrations.filter((item) => {
@@ -405,30 +476,25 @@ export default function IntegrationHealth() {
         healthFilter === "All health states" ||
         item.health === healthFilter;
 
-      const latencyValue = parseFloat(item.latency);
+      const latencyValue = item.latencyMs;
 
       const latencyMatch =
         latencyFilter === "Any latency" ||
-        (latencyFilter === "Below 500 ms" &&
-          !Number.isNaN(latencyValue) &&
-          latencyValue < 500 &&
-          item.latency.includes("ms")) ||
-        (latencyFilter === "500 ms or above" &&
-          (!Number.isNaN(latencyValue) &&
-            latencyValue >= 500 &&
-            item.latency.includes("ms") ||
-            item.latency.includes("s")));
+        (latencyFilter === "Below 500 ms" && latencyValue < 500 && latencyValue > 0) ||
+        (latencyFilter === "500 ms or above" && latencyValue >= 500);
 
       return searchMatch && typeMatch && healthMatch && latencyMatch;
     });
   }, [integrations, search, typeFilter, healthFilter, latencyFilter]);
 
-  const operationalCount = integrations.filter(
+  const operationalCount = overview?.operationalCount ?? integrations.filter(
     (item) => item.health === "Operational"
   ).length;
 
-  const healthyPercentage = Math.round(
-    (operationalCount / integrations.length) * 100
+  const healthyPercentage = overview?.servicesHealthyPercentage ?? (
+    integrations.length > 0
+      ? Math.round((operationalCount / integrations.length) * 100)
+      : 100
   );
 
   const exportCSV = () => {
@@ -465,43 +531,36 @@ export default function IntegrationHealth() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "integration-health-report.csv";
+    link.download = `integration-health-${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
-  const runHealthCheck = () => {
-    setIntegrations((previous) =>
-      previous.map((item) => ({
-        ...item,
-        lastCheck: "Just now",
-      }))
-    );
-    setLastChecked("Just now");
+  const handleRunHealthCheck = async () => {
+    setIsChecking(true);
+    setApiError(null);
+    try {
+      const updated = await integrationService.runHealthCheck();
+      if (updated) {
+        setIntegrations(updated);
+      }
+      const refreshedOverview = await integrationService.getOverview();
+      if (refreshedOverview) {
+        setOverview(refreshedOverview);
+      }
+      setNotice("Health check completed across all endpoints.");
+      setTimeout(() => setNotice(""), 4000);
+    } catch (err: any) {
+      setApiError(err.message || "Failed to trigger live health checks.");
+    } finally {
+      setIsChecking(false);
+    }
   };
 
   const handleModalConfirm = (message: string) => {
-    if (modal === "retry" && selectedIntegration) {
-      setIntegrations((previous) =>
-        previous.map((item) =>
-          item.id === selectedIntegration.id
-            ? {
-                ...item,
-                health: "Operational",
-                lastCheck: "Just now",
-              }
-            : item
-        )
-      );
-    }
-
-    if (modal === "health-check") {
-      runHealthCheck();
-    }
-
     setModal(null);
     setNotice(message);
-
+    loadData();
     window.setTimeout(() => setNotice(""), 4000);
   };
 
@@ -523,9 +582,9 @@ export default function IntegrationHealth() {
           Integration Health
         </span>
 
-        <span className="ml-auto flex items-center gap-1">
+        <span className="ml-auto flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-[#55BBA3]" />
-          Live data · Updated just now
+          <span>Live telemetry · Updated {overview?.lastChecked || "Just now"}</span>
         </span>
       </div>
 
@@ -543,44 +602,81 @@ export default function IntegrationHealth() {
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => openModal("report")}
-              className="rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+              onClick={() => loadData()}
+              disabled={isLoading}
+              title="Refresh integrations"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#B9D1DD] bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50"
             >
+              <RefreshCw size={14} className={isLoading ? "animate-spin text-[#2785B2]" : ""} />
+            </button>
+
+            <button
+              onClick={exportCSV}
+              className="flex items-center gap-1.5 rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+            >
+              <Download size={13} />
               Export status
             </button>
 
             <button
-              onClick={() => openModal("health-check")}
-              className="flex items-center gap-2 rounded-lg bg-[#2785B2] px-4 py-3 text-[10px] font-semibold text-white shadow-sm hover:bg-[#1D6F98]"
+              onClick={handleRunHealthCheck}
+              disabled={isChecking}
+              className="flex items-center gap-2 rounded-lg bg-[#2785B2] px-4 py-3 text-[10px] font-semibold text-white shadow-sm hover:bg-[#1D6F98] disabled:opacity-60"
             >
-              <Play size={13} />
-              Run health check
+              {isChecking ? (
+                <>
+                  <Loader2 size={13} className="animate-spin" />
+                  Checking...
+                </>
+              ) : (
+                <>
+                  <Play size={13} />
+                  Run health check
+                </>
+              )}
             </button>
           </div>
         </div>
+
+        {/* ERROR BANNER */}
+        {apiError && (
+          <div className="flex items-start justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-3.5 text-xs text-red-700 shadow-sm">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle size={16} className="shrink-0 text-red-600" />
+              <span>{apiError}</span>
+            </div>
+            <button onClick={() => setApiError(null)} className="text-red-500 hover:text-red-800">
+              <X size={15} />
+            </button>
+          </div>
+        )}
 
         {/* CORE PLATFORM STATUS */}
         <section className="grid grid-cols-1 gap-4 rounded-xl bg-[#153F60] p-4 text-white md:grid-cols-[2fr_0.8fr_0.8fr_0.8fr] md:items-center md:px-5">
           <div>
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#55BBA3]" />
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  overview?.corePlatformStatus === "Unavailable"
+                    ? "bg-red-400"
+                    : overview?.corePlatformStatus === "Degraded"
+                    ? "bg-amber-400"
+                    : "bg-[#55BBA3]"
+                }`}
+              />
               <p className="text-[9px] font-semibold text-[#8DDAC6]">
                 CORE PLATFORM
               </p>
             </div>
 
             <h2 className="mt-1 text-sm font-bold">
-              {operationalCount === integrations.length
-                ? "Operational"
-                : operationalCount >= integrations.length - 2
-                  ? "Operational"
-                  : "Degraded"}
+              {overview?.corePlatformStatus || "Operational"}
             </h2>
 
             <p className="mt-1 text-[9px] text-slate-300">
-              Last checked {lastChecked}
+              Last checked {overview?.lastChecked || "Just now"}
             </p>
           </div>
 
@@ -590,12 +686,12 @@ export default function IntegrationHealth() {
           </div>
 
           <div className="border-l border-white/15 pl-4">
-            <h3 className="text-lg font-bold">99.94%</h3>
+            <h3 className="text-lg font-bold">{overview?.apiAvailability || "99.94%"}</h3>
             <p className="text-[9px] text-slate-300">API availability</p>
           </div>
 
           <div className="border-l border-white/15 pl-4">
-            <h3 className="text-lg font-bold">248 ms</h3>
+            <h3 className="text-lg font-bold">{overview?.medianLatency || "248 ms"}</h3>
             <p className="text-[9px] text-slate-300">Median latency</p>
           </div>
         </section>
@@ -620,6 +716,7 @@ export default function IntegrationHealth() {
             >
               <option>All service types</option>
               <option>Authentication</option>
+              <option>Database</option>
               <option>Communications</option>
               <option>Location</option>
               <option>AI Service</option>
@@ -729,6 +826,7 @@ export default function IntegrationHealth() {
                       <button
                         onClick={() => openModal("details", item)}
                         className="rounded-md p-1 text-slate-500 hover:bg-slate-100"
+                        title="Actions"
                       >
                         <MoreHorizontal size={17} />
                       </button>
@@ -736,13 +834,22 @@ export default function IntegrationHealth() {
                   </tr>
                 ))}
 
-                {filteredIntegrations.length === 0 && (
+                {filteredIntegrations.length === 0 && !isLoading && (
                   <tr>
                     <td
                       colSpan={8}
                       className="py-10 text-center text-xs text-slate-400"
                     >
                       No integrations found.
+                    </td>
+                  </tr>
+                )}
+
+                {isLoading && (
+                  <tr>
+                    <td colSpan={8} className="py-8 text-center text-xs text-slate-400">
+                      <Loader2 size={18} className="mx-auto animate-spin text-[#2785B2]" />
+                      <span className="mt-2 block">Loading integration telemetry...</span>
                     </td>
                   </tr>
                 )}
@@ -754,7 +861,7 @@ export default function IntegrationHealth() {
         {/* SERVICE SUMMARY CARDS */}
         <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {integrations.slice(0, 4).map((item) => {
-            const Icon = item.icon;
+            const Icon = getIconComponent(item.icon);
 
             return (
               <div
