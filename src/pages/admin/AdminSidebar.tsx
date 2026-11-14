@@ -2,7 +2,6 @@
 import {
   Heart,
   LayoutDashboard,
-  ClipboardList,
   Users,
   ShieldCheck,
   Building2,
@@ -16,9 +15,11 @@ import {
   X,
   Check,
   ChartNoAxesCombined,
+  LogOut,
 } from "lucide-react";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const groups = [
   {
@@ -86,6 +87,24 @@ type Props = {
 };
 
 export default function AdminSidebar({ open, onClose }: Props) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
   return (
     <>
       {/* MOBILE OVERLAY */}
@@ -98,7 +117,7 @@ export default function AdminSidebar({ open, onClose }: Props) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[230px] flex-col bg-[#153E5D] text-white transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[230px] flex-col overflow-hidden bg-[#153E5D] text-white transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -155,7 +174,10 @@ export default function AdminSidebar({ open, onClose }: Props) {
         </div>
 
         {/* NAVIGATION */}
-        <div className="flex-1 overflow-y-auto px-2 py-4 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div 
+          className="flex-1 overflow-y-auto px-2 py-4 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
 
           {groups.map((group) => (
             <div key={group.title} className="mb-4">
@@ -253,31 +275,37 @@ export default function AdminSidebar({ open, onClose }: Props) {
           <NavLink
             to="/"
             onClick={onClose}
-            className="mb-5 flex items-center gap-2 text-[11px] font-semibold text-slate-200 transition hover:text-white"
+            className="mb-4 flex items-center gap-2 text-[11px] font-semibold text-slate-200 transition hover:text-white"
           >
             <Globe size={15} />
             Citizen portal
           </NavLink>
 
-          <div className="flex items-center gap-2">
+          <div className="mb-3 flex items-center gap-2">
 
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2785B2] text-[10px] font-bold">
-              AM
+              {getInitials(user?.fullName)}
             </div>
 
-            <div>
-              <p className="text-[10px] font-semibold">
-                Amina Mensah
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[10px] font-semibold">
+                {user?.fullName || "Authenticated User"}
               </p>
 
-              <p className="mt-1 text-[9px] text-slate-300">
-                System Administrator
+              <p className="truncate text-[9px] text-slate-300">
+                {user?.roles?.[0] || "Authorized Officer"}
               </p>
             </div>
-
-            <ChevronRight size={13} className="ml-auto" />
 
           </div>
+
+          <button
+            onClick={handleSignOut}
+            className="flex w-full items-center justify-center gap-2 rounded-md bg-white/5 py-1.5 text-[10px] font-medium text-red-200 transition hover:bg-red-500/20 hover:text-red-100"
+          >
+            <LogOut size={13} />
+            Sign out
+          </button>
         </div>
 
       </aside>
