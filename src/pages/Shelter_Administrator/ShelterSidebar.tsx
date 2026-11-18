@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   HeartPulse,
@@ -17,6 +18,7 @@ import {
   ChevronRight,
   X,
 } from "lucide-react";
+import { notificationService } from "../../services/notificationService";
 
 import type { LucideIcon } from "lucide-react";
 
@@ -49,6 +51,21 @@ const navItems: NavItem[] = [
 ];
 
 export default function AdminSidebar({ onClose }: AdminSidebarProps) {
+  const [unreadCount, setUnreadCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    notificationService
+      .getUnreadCount("ShelterAdmin")
+      .then((count) => {
+        if (isMounted) setUnreadCount(count);
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   return (
     <aside className="flex h-full w-[222px] shrink-0 flex-col bg-[#153f5e] text-white">
       {/* LOGO */}
@@ -117,11 +134,22 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
 
               <span className="flex-1 text-[10px] font-medium">{item.name}</span>
 
-              {item.badge && (
-                <span className="flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
-                  {item.badge}
-                </span>
-              )}
+              {(() => {
+                const badge =
+                  item.name === "Notifications" && unreadCount !== null
+                    ? unreadCount > 0
+                      ? String(unreadCount)
+                      : null
+                    : item.badge;
+
+                if (!badge) return null;
+
+                return (
+                  <span className="flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+                    {badge}
+                  </span>
+                );
+              })()}
             </NavLink>
           );
         })}

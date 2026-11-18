@@ -1,10 +1,6 @@
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Search,
-  Globe,
-  Bell,
-  CircleHelp,
   ChevronRight,
   ChevronDown,
   Plus,
@@ -16,122 +12,19 @@ import {
   CheckCircle2,
   Clock,
   AlertTriangle,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
+import { accommodationService } from "../../services/accommodationService";
+import type {
+  AccommodationRequest,
+  Priority,
+  RequestCounts,
+  RequestStatus,
+  Shelter,
+} from "../../types/accommodation";
 
-
-type RequestStatus =
-  | "Pending"
-  | "Under Review"
-  | "Approved"
-  | "Assigned";
-
-type Priority = "Critical" | "High" | "Medium" | "Low";
-
-type AccommodationRequest = {
-  id: string;
-  applicant: string;
-  familyMembers: number;
-  currentLocation: string;
-  requestedShelter: string;
-  shelterId: string;
-  priority: Priority;
-  requestDate: string;
-  status: RequestStatus;
-};
-
-
-const initialRequests: AccommodationRequest[] = [
-  {
-    id: "AR-2841",
-    applicant: "D. Jayawardena",
-    familyMembers: 6,
-    currentLocation: "Riverside, Ward 2",
-    requestedShelter: "Riverton Central",
-    shelterId: "SH-001",
-    priority: "Critical",
-    requestDate: "22 Jun · 12:48",
-    status: "Under Review",
-  },
-  {
-    id: "AR-2839",
-    applicant: "M. Rasheed",
-    familyMembers: 3,
-    currentLocation: "Eastbank, Sector 4",
-    requestedShelter: "North Community",
-    shelterId: "SH-002",
-    priority: "High",
-    requestDate: "22 Jun · 12:31",
-    status: "Pending",
-  },
-  {
-    id: "AR-2832",
-    applicant: "S. Fernando",
-    familyMembers: 4,
-    currentLocation: "Old Town",
-    requestedShelter: "Lakeside Sports",
-    shelterId: "SH-004",
-    priority: "Medium",
-    requestDate: "22 Jun · 11:52",
-    status: "Approved",
-  },
-  {
-    id: "AR-2821",
-    applicant: "P. Nadarajah",
-    familyMembers: 2,
-    currentLocation: "North Ward",
-    requestedShelter: "North Community",
-    shelterId: "SH-002",
-    priority: "High",
-    requestDate: "22 Jun · 10:46",
-    status: "Assigned",
-  },
-  {
-    id: "AR-2741",
-    applicant: "D. Jayawardena",
-    familyMembers: 6,
-    currentLocation: "Riverside, Ward 2",
-    requestedShelter: "Riverton Central",
-    shelterId: "SH-001",
-    priority: "Critical",
-    requestDate: "22 Jun · 12:48",
-    status: "Under Review",
-  },
-  {
-    id: "AR-2739",
-    applicant: "M. Rasheed",
-    familyMembers: 3,
-    currentLocation: "Eastbank, Sector 4",
-    requestedShelter: "North Community",
-    shelterId: "SH-002",
-    priority: "High",
-    requestDate: "22 Jun · 12:31",
-    status: "Pending",
-  },
-  {
-    id: "AR-2732",
-    applicant: "S. Fernando",
-    familyMembers: 4,
-    currentLocation: "Old Town",
-    requestedShelter: "Lakeside Sports",
-    shelterId: "SH-004",
-    priority: "Medium",
-    requestDate: "22 Jun · 11:52",
-    status: "Approved",
-  },
-  {
-    id: "AR-2721",
-    applicant: "P. Nadarajah",
-    familyMembers: 2,
-    currentLocation: "North Ward",
-    requestedShelter: "North Community",
-    shelterId: "SH-002",
-    priority: "High",
-    requestDate: "22 Jun · 10:46",
-    status: "Assigned",
-  },
-];
-
-const shelters = [
+const fallbackShelters: Shelter[] = [
   { id: "SH-001", name: "Riverton Central" },
   { id: "SH-002", name: "North Community" },
   { id: "SH-003", name: "St. Mary Civic Centre" },
@@ -148,12 +41,20 @@ const tabs = [
 
 type TabName = (typeof tabs)[number];
 
+const initialCounts: RequestCounts = {
+  "All requests": 0,
+  Pending: 0,
+  "Under Review": 0,
+  Approved: 0,
+  Assigned: 0,
+};
 
 export default function AccommodationRequestsPage() {
-  const [requests, setRequests] = useState(initialRequests);
+  const [requests, setRequests] = useState<AccommodationRequest[]>([]);
+  const [shelters, setShelters] = useState<Shelter[]>(fallbackShelters);
+  const [counts, setCounts] = useState<RequestCounts>(initialCounts);
 
   const [activeTab, setActiveTab] = useState<TabName>("All requests");
-
   const [search, setSearch] = useState("");
   const [priority, setPriority] = useState("All priorities");
   const [status, setStatus] = useState("All statuses");
@@ -161,20 +62,25 @@ export default function AccommodationRequestsPage() {
   const [dateRange, setDateRange] = useState("Date range");
 
   const [moreFilters, setMoreFilters] = useState(false);
-
   const [minFamily, setMinFamily] = useState("");
   const [maxFamily, setMaxFamily] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 8;
+
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const [selectedRequest, setSelectedRequest] =
     useState<AccommodationRequest | null>(null);
-
   const [newRequestOpen, setNewRequestOpen] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [newRequest, setNewRequest] = useState({
     applicant: "",
@@ -184,83 +90,82 @@ export default function AccommodationRequestsPage() {
     priority: "Medium" as Priority,
   });
 
-  /* ================= COUNTS ================= */
-
-  const counts = {
-    "All requests": 48,
-    Pending: 12,
-    "Under Review": 8,
-    Approved: 16,
-    Assigned: 9,
-  };
-
   const getTabStatus = (tab: TabName): RequestStatus | null => {
     return tab === "All requests" ? null : tab;
   };
 
-  /* ================= FILTERING ================= */
+  /* ================= FETCH COUNTS & SHELTERS ================= */
 
-  const filteredRequests = useMemo(() => {
-    return requests.filter((request) => {
-      const matchesSearch =
-        request.id.toLowerCase().includes(search.toLowerCase()) ||
-        request.applicant.toLowerCase().includes(search.toLowerCase()) ||
-        request.currentLocation.toLowerCase().includes(search.toLowerCase()) ||
-        request.requestedShelter.toLowerCase().includes(search.toLowerCase());
+  const fetchCounts = useCallback(async () => {
+    try {
+      const data = await accommodationService.getRequestCounts();
+      setCounts(data);
+    } catch (err: any) {
+      console.error("Failed to fetch request counts:", err);
+    }
+  }, []);
 
+  const fetchShelters = useCallback(async () => {
+    try {
+      const data = await accommodationService.getShelters();
+      if (data && data.length > 0) {
+        setShelters(data);
+        if (!newRequest.requestedShelter) {
+          setNewRequest((prev) => ({
+            ...prev,
+            requestedShelter: data[0].id,
+          }));
+        }
+      }
+    } catch (err: any) {
+      console.error("Failed to fetch shelters:", err);
+    }
+  }, [newRequest.requestedShelter]);
+
+  /* ================= FETCH REQUESTS ================= */
+
+  const fetchRequests = useCallback(async () => {
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
       const tabStatus = getTabStatus(activeTab);
+      const effectiveStatus = tabStatus
+        ? tabStatus
+        : status !== "All statuses"
+        ? status
+        : undefined;
 
-      const matchesTab =
-        !tabStatus || request.status === tabStatus;
+      const result = await accommodationService.getRequests({
+        search: search.trim() || undefined,
+        status: effectiveStatus,
+        priority: priority !== "All priorities" ? priority : undefined,
+        shelterId: shelter !== "All shelters" ? shelter : undefined,
+        dateRange:
+          dateRange !== "Date range" && dateRange !== "All dates"
+            ? dateRange
+            : undefined,
+        minFamilyMembers: minFamily ? Number(minFamily) : undefined,
+        maxFamilyMembers: maxFamily ? Number(maxFamily) : undefined,
+        location: locationFilter.trim() || undefined,
+        page: currentPage,
+        pageSize: itemsPerPage,
+      });
 
-      const matchesPriority =
-        priority === "All priorities" ||
-        request.priority === priority;
-
-      const matchesStatus =
-        status === "All statuses" ||
-        request.status === status;
-
-      const matchesShelter =
-        shelter === "All shelters" ||
-        request.shelterId === shelter;
-
-      const matchesMin =
-        !minFamily ||
-        request.familyMembers >= Number(minFamily);
-
-      const matchesMax =
-        !maxFamily ||
-        request.familyMembers <= Number(maxFamily);
-
-      const matchesLocation =
-        !locationFilter ||
-        request.currentLocation
-          .toLowerCase()
-          .includes(locationFilter.toLowerCase());
-
-      // Sample data uses 22 Jun for all records.
-      const matchesDate =
-        dateRange === "Date range" ||
-        dateRange === "All dates" ||
-        dateRange === "Last 7 days";
-
-      return (
-        matchesSearch &&
-        matchesTab &&
-        matchesPriority &&
-        matchesStatus &&
-        matchesShelter &&
-        matchesMin &&
-        matchesMax &&
-        matchesLocation &&
-        matchesDate
+      setRequests(result.items || []);
+      setTotalCount(result.totalCount || 0);
+      setTotalPages(Math.max(1, result.totalPages || 1));
+    } catch (err: any) {
+      console.error("Error fetching accommodation requests:", err);
+      setErrorMessage(
+        err.message || "Failed to load accommodation requests from server."
       );
-    });
+    } finally {
+      setLoading(false);
+    }
   }, [
-    requests,
-    search,
     activeTab,
+    search,
     priority,
     status,
     shelter,
@@ -268,19 +173,25 @@ export default function AccommodationRequestsPage() {
     minFamily,
     maxFamily,
     locationFilter,
+    currentPage,
   ]);
 
-  /* ================= PAGINATION ================= */
+  // Initial load: shelters & counts
+  useEffect(() => {
+    fetchCounts();
+    fetchShelters();
+  }, [fetchCounts, fetchShelters]);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredRequests.length / itemsPerPage)
-  );
+  // Fetch requests whenever filters or pagination change
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchRequests();
+    }, 200);
 
-  const currentRequests = filteredRequests.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    return () => clearTimeout(handler);
+  }, [fetchRequests]);
+
+  /* ================= TAB & FILTER ACTIONS ================= */
 
   const changeTab = (tab: TabName) => {
     setActiveTab(tab);
@@ -302,86 +213,102 @@ export default function AccommodationRequestsPage() {
 
   /* ================= CREATE REQUEST ================= */
 
-  const handleCreateRequest = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateRequest = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const familyMembers = Number(newRequest.familyMembers);
 
-    if (!newRequest.applicant.trim() || familyMembers < 1) return;
+    if (!newRequest.applicant.trim() || familyMembers < 1) {
+      setErrorMessage("Please enter an applicant name and at least 1 family member.");
+      return;
+    }
 
-    const selectedShelter = shelters.find(
-      (s) => s.id === newRequest.requestedShelter
-    );
+    setIsSubmitting(true);
+    setErrorMessage("");
 
-    const request: AccommodationRequest = {
-      id: `AR-${Date.now().toString().slice(-4)}`,
-      applicant: newRequest.applicant,
-      familyMembers,
-      currentLocation: newRequest.currentLocation,
-      requestedShelter: selectedShelter?.name || "Not selected",
-      shelterId: newRequest.requestedShelter,
-      priority: newRequest.priority,
-      requestDate: new Date().toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }),
-      status: "Pending",
-    };
+    try {
+      const created = await accommodationService.createRequest({
+        applicant: newRequest.applicant.trim(),
+        familyMembers,
+        currentLocation: newRequest.currentLocation.trim(),
+        requestedShelter: newRequest.requestedShelter,
+        priority: newRequest.priority,
+      });
 
-    setRequests((prev) => [request, ...prev]);
+      // Reset form
+      setNewRequest({
+        applicant: "",
+        familyMembers: "1",
+        currentLocation: "",
+        requestedShelter: shelters[0]?.id || "SH-001",
+        priority: "Medium",
+      });
 
-    setActiveTab("All requests");
-    setCurrentPage(1);
+      setNewRequestOpen(false);
+      setSuccessMessage(
+        `Request ${created.id} for ${created.applicant} created successfully.`
+      );
 
-    setNewRequest({
-      applicant: "",
-      familyMembers: "1",
-      currentLocation: "",
-      requestedShelter: "SH-001",
-      priority: "Medium",
-    });
-
-    setNewRequestOpen(false);
-    setSuccessMessage("New accommodation request created successfully.");
+      // Refresh list & counts
+      setActiveTab("All requests");
+      setCurrentPage(1);
+      await fetchCounts();
+      await fetchRequests();
+    } catch (err: any) {
+      console.error("Error creating accommodation request:", err);
+      setErrorMessage(err.message || "Failed to create accommodation request.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   /* ================= UPDATE REQUEST STATUS ================= */
 
-  const updateRequestStatus = (newStatus: RequestStatus) => {
+  const updateRequestStatus = async (newStatus: RequestStatus) => {
     if (!selectedRequest) return;
 
     const requestId = selectedRequest.id;
+    setIsUpdatingStatus(true);
+    setErrorMessage("");
 
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.id === requestId
-          ? { ...request, status: newStatus }
-          : request
-      )
-    );
+    try {
+      await accommodationService.updateRequestStatus(
+        requestId,
+        newStatus
+      );
 
-    setSelectedRequest({
-      ...selectedRequest,
-      status: newStatus,
-    });
+      // Update in local requests list
+      setRequests((prev) =>
+        prev.map((r) => (r.id === requestId ? { ...r, status: newStatus } : r))
+      );
 
-    setSuccessMessage(
-      `Request ${requestId} updated to ${newStatus}.`
-    );
+      // Update selected request in drawer
+      setSelectedRequest((prev) =>
+        prev && prev.id === requestId ? { ...prev, status: newStatus } : prev
+      );
+
+      setSuccessMessage(
+        `Request ${requestId} status updated to ${newStatus}.`
+      );
+
+      // Refresh counts
+      await fetchCounts();
+    } catch (err: any) {
+      console.error("Error updating accommodation request status:", err);
+      setErrorMessage(
+        err.message || "Failed to update accommodation request status."
+      );
+    } finally {
+      setIsUpdatingStatus(false);
+    }
   };
 
   /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-[#eef5f7] text-[#123e60] font-sans">
-
       {/* ================= MAIN CONTENT ================= */}
-
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
-
         {/* BREADCRUMB */}
         <div className="flex items-center gap-2 text-[9px] mb-7">
           <span className="text-slate-400">CareLink</span>
@@ -393,7 +320,6 @@ export default function AccommodationRequestsPage() {
 
         {/* PAGE HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-
           <div>
             <h1 className="text-[23px] md:text-[25px] font-normal">
               Accommodation Requests
@@ -404,19 +330,47 @@ export default function AccommodationRequestsPage() {
             </p>
           </div>
 
-          <button
-            onClick={() => setNewRequestOpen(true)}
-            className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
-          >
-            <Plus size={14} />
-            New request
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                fetchRequests();
+                fetchCounts();
+              }}
+              title="Refresh requests"
+              className="h-9 px-3 bg-white border border-[#aac4d2] text-[#1c638a] rounded-lg text-[10px] font-semibold flex items-center justify-center gap-1.5 hover:bg-slate-50"
+            >
+              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+              Refresh
+            </button>
+
+            <button
+              onClick={() => setNewRequestOpen(true)}
+              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
+            >
+              <Plus size={14} />
+              New request
+            </button>
+          </div>
         </div>
 
+        {/* ERROR BANNER */}
+        {errorMessage && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-xs flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={16} className="shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              onClick={() => setErrorMessage("")}
+              className="text-red-500 hover:text-red-800"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        )}
+
         {/* ================= TABS ================= */}
-
         <div className="flex items-center gap-5 md:gap-7 overflow-x-auto border-b border-[#d5e3e9] mb-3">
-
           {tabs.map((tab) => (
             <button
               key={tab}
@@ -429,21 +383,21 @@ export default function AccommodationRequestsPage() {
             >
               {tab}
 
-              <span className={`px-1.5 py-0.5 rounded-full text-[8px] ${
-                activeTab === tab
-                  ? "bg-[#e5eff5] text-[#21638d]"
-                  : "bg-[#edf2f5] text-slate-500"
-              }`}>
-                {counts[tab]}
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-[8px] ${
+                  activeTab === tab
+                    ? "bg-[#e5eff5] text-[#21638d]"
+                    : "bg-[#edf2f5] text-slate-500"
+                }`}
+              >
+                {counts[tab] ?? 0}
               </span>
             </button>
           ))}
         </div>
 
         {/* ================= SEARCH + FILTERS ================= */}
-
         <section className="flex flex-col xl:flex-row gap-2 mb-3">
-
           <div className="relative flex-1 min-w-0">
             <Search
               size={15}
@@ -462,7 +416,6 @@ export default function AccommodationRequestsPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 xl:flex gap-2">
-
             <FilterSelect
               value={priority}
               options={[
@@ -504,11 +457,7 @@ export default function AccommodationRequestsPage() {
 
             <FilterSelect
               value={dateRange}
-              options={[
-                "Date range",
-                "All dates",
-                "Last 7 days",
-              ]}
+              options={["Date range", "All dates", "Last 7 days"]}
               onChange={(v) => {
                 setDateRange(v);
                 setCurrentPage(1);
@@ -532,22 +481,18 @@ export default function AccommodationRequestsPage() {
         {/* MORE FILTERS */}
         {moreFilters && (
           <section className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3">
-
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold">
-                Advanced filters
-              </h3>
+              <h3 className="text-xs font-semibold">Advanced filters</h3>
 
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#267ca6] font-semibold"
+                className="text-[10px] text-[#267ca6] font-semibold hover:underline"
               >
                 Clear all
               </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-
               <FormInput
                 label="Minimum family members"
                 type="number"
@@ -584,15 +529,19 @@ export default function AccommodationRequestsPage() {
         )}
 
         {/* ================= REQUESTS TABLE ================= */}
-
         <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
-
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto relative">
+            {loading && (
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+                <div className="flex items-center gap-2 text-[#1c638a] text-xs font-semibold">
+                  <Loader2 size={18} className="animate-spin" />
+                  <span>Loading requests...</span>
+                </div>
+              </div>
+            )}
 
             <table className="w-full min-w-[950px] text-left">
-
               <thead className="bg-[#f5f9fa] border-b border-slate-200">
-
                 <tr className="text-[8px] text-slate-500">
                   <th className="px-3 py-3 font-medium">Request ID</th>
                   <th className="px-3 py-3 font-medium">Applicant</th>
@@ -607,34 +556,23 @@ export default function AccommodationRequestsPage() {
               </thead>
 
               <tbody>
-
-                {currentRequests.map((request) => (
-
+                {requests.map((request) => (
                   <tr
                     key={request.id}
                     onClick={() => setSelectedRequest(request)}
                     className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
                   >
-
                     <td className="px-3 py-4 font-semibold text-[#174f75]">
                       {request.id}
                     </td>
 
-                    <td className="px-3 py-4">
-                      {request.applicant}
-                    </td>
+                    <td className="px-3 py-4">{request.applicant}</td>
 
-                    <td className="px-3 py-4">
-                      {request.familyMembers}
-                    </td>
+                    <td className="px-3 py-4">{request.familyMembers}</td>
 
-                    <td className="px-3 py-4">
-                      {request.currentLocation}
-                    </td>
+                    <td className="px-3 py-4">{request.currentLocation}</td>
 
-                    <td className="px-3 py-4">
-                      {request.requestedShelter}
-                    </td>
+                    <td className="px-3 py-4">{request.requestedShelter}</td>
 
                     <td className="px-3 py-4">
                       <PriorityBadge priority={request.priority} />
@@ -649,15 +587,12 @@ export default function AccommodationRequestsPage() {
                     </td>
 
                     <td className="px-3 py-4">
-                      <ChevronRight
-                        size={13}
-                        className="text-slate-400"
-                      />
+                      <ChevronRight size={13} className="text-slate-400" />
                     </td>
                   </tr>
                 ))}
 
-                {currentRequests.length === 0 && (
+                {!loading && requests.length === 0 && (
                   <tr>
                     <td
                       colSpan={9}
@@ -673,26 +608,18 @@ export default function AccommodationRequestsPage() {
 
           {/* PAGINATION */}
           <div className="px-3.5 py-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-
             <p className="text-[9px] text-slate-400">
               Showing{" "}
-              {filteredRequests.length === 0
+              {totalCount === 0
                 ? 0
-                : (currentPage - 1) * itemsPerPage + 1}
-              {" "}
-              to{" "}
-              {Math.min(
-                currentPage * itemsPerPage,
-                filteredRequests.length
-              )}
-              {" of "}
-              {filteredRequests.length}
+                : (currentPage - 1) * itemsPerPage + 1}{" "}
+              to {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
+              {totalCount}
             </p>
 
             <div className="flex items-center gap-1">
-
               <button
-                disabled={currentPage === 1}
+                disabled={currentPage === 1 || loading}
                 onClick={() => setCurrentPage((p) => p - 1)}
                 className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
               >
@@ -716,7 +643,7 @@ export default function AccommodationRequestsPage() {
               )}
 
               <button
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || loading}
                 onClick={() => setCurrentPage((p) => p + 1)}
                 className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
               >
@@ -728,18 +655,16 @@ export default function AccommodationRequestsPage() {
       </main>
 
       {/* ================= REQUEST DETAILS PANEL ================= */}
-
       {selectedRequest && (
         <div className="fixed inset-0 z-40 bg-black/30 flex justify-end">
-
           <div className="bg-white w-full max-w-md h-full shadow-2xl p-6 overflow-y-auto">
-
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">
-                Request details
-              </h2>
+              <h2 className="text-lg font-semibold">Request details</h2>
 
-              <button onClick={() => setSelectedRequest(null)}>
+              <button
+                onClick={() => setSelectedRequest(null)}
+                className="text-slate-500 hover:text-slate-800"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -760,7 +685,6 @@ export default function AccommodationRequestsPage() {
             </div>
 
             <div className="mt-7 space-y-4">
-
               <DetailRow
                 icon={<Users size={15} />}
                 label="Family members"
@@ -774,7 +698,7 @@ export default function AccommodationRequestsPage() {
               />
 
               <DetailRow
-                icon={<HomeIcon />}
+                icon={<Users size={15} />}
                 label="Requested shelter"
                 value={selectedRequest.requestedShelter}
               />
@@ -793,37 +717,60 @@ export default function AccommodationRequestsPage() {
             </div>
 
             <div className="mt-8 border-t border-slate-100 pt-5">
-
-              <h3 className="text-xs font-semibold mb-3">
-                Update request status
-              </h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-semibold">Update request status</h3>
+                {isUpdatingStatus && (
+                  <span className="text-[10px] text-[#2785b7] flex items-center gap-1">
+                    <Loader2 size={12} className="animate-spin" /> Saving...
+                  </span>
+                )}
+              </div>
 
               <div className="grid grid-cols-2 gap-2">
-
                 <button
+                  disabled={isUpdatingStatus}
                   onClick={() => updateRequestStatus("Under Review")}
-                  className="border border-slate-200 rounded-lg py-2.5 text-[10px] font-semibold hover:bg-slate-50"
+                  className={`border border-slate-200 rounded-lg py-2.5 text-[10px] font-semibold hover:bg-slate-50 disabled:opacity-50 ${
+                    selectedRequest.status === "Under Review"
+                      ? "ring-2 ring-[#ad7413]"
+                      : ""
+                  }`}
                 >
                   Under Review
                 </button>
 
                 <button
+                  disabled={isUpdatingStatus}
                   onClick={() => updateRequestStatus("Approved")}
-                  className="bg-[#e5f8f1] text-[#269a77] rounded-lg py-2.5 text-[10px] font-semibold hover:bg-[#d5f1e7]"
+                  className={`bg-[#e5f8f1] text-[#269a77] rounded-lg py-2.5 text-[10px] font-semibold hover:bg-[#d5f1e7] disabled:opacity-50 ${
+                    selectedRequest.status === "Approved"
+                      ? "ring-2 ring-[#269a77]"
+                      : ""
+                  }`}
                 >
                   Approve
                 </button>
 
                 <button
+                  disabled={isUpdatingStatus}
                   onClick={() => updateRequestStatus("Assigned")}
-                  className="bg-[#1c638a] text-white rounded-lg py-2.5 text-[10px] font-semibold hover:bg-[#144665]"
+                  className={`bg-[#1c638a] text-white rounded-lg py-2.5 text-[10px] font-semibold hover:bg-[#144665] disabled:opacity-50 ${
+                    selectedRequest.status === "Assigned"
+                      ? "ring-2 ring-[#1c638a]"
+                      : ""
+                  }`}
                 >
                   Assign shelter
                 </button>
 
                 <button
+                  disabled={isUpdatingStatus}
                   onClick={() => updateRequestStatus("Pending")}
-                  className="border border-slate-200 rounded-lg py-2.5 text-[10px] font-semibold hover:bg-slate-50"
+                  className={`border border-slate-200 rounded-lg py-2.5 text-[10px] font-semibold hover:bg-slate-50 disabled:opacity-50 ${
+                    selectedRequest.status === "Pending"
+                      ? "ring-2 ring-slate-400"
+                      : ""
+                  }`}
                 >
                   Set Pending
                 </button>
@@ -834,14 +781,10 @@ export default function AccommodationRequestsPage() {
       )}
 
       {/* ================= NEW REQUEST MODAL ================= */}
-
       {newRequestOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
           <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-
             <div className="flex justify-between items-center mb-5">
-
               <div>
                 <h2 className="text-lg font-semibold">
                   New accommodation request
@@ -852,13 +795,15 @@ export default function AccommodationRequestsPage() {
                 </p>
               </div>
 
-              <button onClick={() => setNewRequestOpen(false)}>
+              <button
+                onClick={() => setNewRequestOpen(false)}
+                className="text-slate-500 hover:text-slate-800"
+              >
                 <X size={19} />
               </button>
             </div>
 
             <form onSubmit={handleCreateRequest} className="space-y-4">
-
               <FormInput
                 label="Applicant name"
                 placeholder="Enter applicant name"
@@ -916,20 +861,22 @@ export default function AccommodationRequestsPage() {
               />
 
               <div className="flex gap-3 pt-2">
-
                 <button
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => setNewRequestOpen(false)}
-                  className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold"
+                  className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold disabled:opacity-50"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665] disabled:opacity-50 flex items-center justify-center gap-1.5"
                 >
-                  Create request
+                  {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+                  {isSubmitting ? "Creating..." : "Create request"}
                 </button>
               </div>
             </form>
@@ -938,15 +885,14 @@ export default function AccommodationRequestsPage() {
       )}
 
       {/* ================= SUCCESS MESSAGE ================= */}
-
       {successMessage && (
         <div className="fixed bottom-5 right-5 z-[60] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3">
-
-          <CheckCircle2 size={17} className="shrink-0" />
-
-          <p className="text-xs">{successMessage}</p>
-
-          <button onClick={() => setSuccessMessage("")}>
+          <CheckCircle2 size={17} className="shrink-0 text-emerald-400" />
+          <p className="text-xs flex-1">{successMessage}</p>
+          <button
+            onClick={() => setSuccessMessage("")}
+            className="text-white/70 hover:text-white"
+          >
             <X size={15} />
           </button>
         </div>
@@ -997,7 +943,11 @@ function PriorityBadge({ priority }: { priority: Priority }) {
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[priority]}`}>
+    <span
+      className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${
+        styles[priority] || styles.Medium
+      }`}
+    >
       {priority}
     </span>
   );
@@ -1012,7 +962,11 @@ function StatusBadge({ status }: { status: RequestStatus }) {
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+    <span
+      className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${
+        styles[status] || styles.Pending
+      }`}
+    >
       {status}
     </span>
   );
@@ -1033,9 +987,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
 
       <input
         required
@@ -1063,9 +1015,7 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
 
       <select
         value={value}
@@ -1101,8 +1051,4 @@ function DetailRow({
       </div>
     </div>
   );
-}
-
-function HomeIcon() {
-  return <Users size={15} />;
 }

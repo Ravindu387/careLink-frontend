@@ -1,11 +1,7 @@
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import {
   Search,
-  Globe,
-  Bell,
-  CircleHelp,
   ChevronRight,
   Plus,
   X,
@@ -13,147 +9,53 @@ import {
   BellRing,
   Megaphone,
   Archive,
-  Phone,
   ShieldAlert,
   Clock,
   MapPin,
   UserRound,
   CheckCircle2,
   FileText,
-  Eye,
   Send,
   Trash2,
   RotateCcw,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
+import { disasterUpdateService } from "../../services/disasterUpdateService";
+import type {
+  DisasterUpdate,
+  DisasterUpdateSummary,
+  EmergencyContact,
+  UpdateType,
+} from "../../types/disasterUpdate";
 
-/* ================= TYPES ================= */
-
-type UpdateType =
-  | "Critical"
-  | "Warning"
-  | "Announcement"
-  | "Update";
-
-type DisasterUpdate = {
-  id: string;
-  type: UpdateType;
-  title: string;
-  description: string;
-  source: string;
-  date: string;
-  time: string;
-  location: string;
-  publishedBy: string;
-  instructions: string;
-  archived: boolean;
-};
-
-/* ================= SAMPLE DATA ================= */
-
-const initialUpdates: DisasterUpdate[] = [
-  {
-    id: "DU-101",
-    type: "Critical",
-    title: "Flood warning upgraded for North Ward",
-    description:
-      "Water levels expected to rise another 0.5m by 18:00. Begin priority evacuation procedures.",
-    source: "National Disaster Authority",
-    date: "22 Jun",
-    time: "13:15",
-    location: "North Ward",
-    publishedBy: "National Disaster Authority",
-    instructions:
-      "Residents in low-lying areas must move to designated safe shelters immediately. Follow evacuation routes and listen to emergency personnel.",
-    archived: false,
-  },
-  {
-    id: "DU-102",
-    type: "Warning",
-    title: "Station Road access restricted",
-    description:
-      "The eastern approach to Riverton Central is closed. Use Lake Road entrance.",
-    source: "Municipal Operations",
-    date: "22 Jun",
-    time: "12:40",
-    location: "Riverton Central",
-    publishedBy: "Municipal Operations",
-    instructions:
-      "Avoid Station Road. Emergency vehicles should use Lake Road entrance until further notice.",
-    archived: false,
-  },
-  {
-    id: "DU-103",
-    type: "Update",
-    title: "New clean water distribution point",
-    description:
-      "A verified distribution point is operational at Central Market from 14:00.",
-    source: "CareLink Coordination",
-    date: "22 Jun",
-    time: "11:30",
-    location: "Central Market",
-    publishedBy: "CareLink Coordination",
-    instructions:
-      "Residents can collect clean drinking water at the Central Market distribution point. Bring personal water containers.",
-    archived: false,
-  },
-  {
-    id: "DU-104",
-    type: "Update",
-    title: "Weather outlook for the next 24 hours",
-    description:
-      "Heavy rainfall is expected to reduce after midnight. Continue monitoring official alerts.",
-    source: "Meteorological Service",
-    date: "22 Jun",
-    time: "09:00",
-    location: "Greater Riverton",
-    publishedBy: "Meteorological Service",
-    instructions:
-      "Continue monitoring official weather announcements. Avoid unnecessary travel during heavy rainfall.",
-    archived: false,
-  },
-  {
-    id: "DU-105",
-    type: "Announcement",
-    title: "Emergency medical support available",
-    description:
-      "Additional medical support teams are available at North Community Hall.",
-    source: "CareLink Coordination",
-    date: "22 Jun",
-    time: "08:30",
-    location: "North Community",
-    publishedBy: "CareLink Coordination",
-    instructions:
-      "Residents requiring urgent medical assistance should contact the emergency medical team at North Community Hall.",
-    archived: false,
-  },
+const fallbackContacts: EmergencyContact[] = [
+  { id: 1, name: "Disaster Management Centre", number: "117" },
+  { id: 2, name: "Emergency Medical", number: "1990" },
+  { id: 3, name: "Police Emergency", number: "119" },
+  { id: 4, name: "CareLink Coordination", number: "011 234 8800" },
 ];
-
-const emergencyContacts = [
-  { name: "Disaster Management Centre", number: "117" },
-  { name: "Emergency Medical", number: "1990" },
-  { name: "Police Emergency", number: "119" },
-  { name: "CareLink Coordination", number: "011 234 8800" },
-];
-
-/* ================= MAIN COMPONENT ================= */
 
 export default function DisasterUpdatesPage() {
-  const [updates, setUpdates] =
-    useState<DisasterUpdate[]>(initialUpdates);
+  const [updates, setUpdates] = useState<DisasterUpdate[]>([]);
+  const [drafts, setDrafts] = useState<DisasterUpdate[]>([]);
+  const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>(fallbackContacts);
+  const [summary, setSummary] = useState<DisasterUpdateSummary | null>(null);
 
   const [activeTab, setActiveTab] = useState("All updates");
   const [search, setSearch] = useState("");
+
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
   const [showDrafts, setShowDrafts] = useState(false);
 
-  const [selectedUpdate, setSelectedUpdate] =
-    useState<DisasterUpdate | null>(null);
-
+  const [selectedUpdate, setSelectedUpdate] = useState<DisasterUpdate | null>(null);
   const [notification, setNotification] = useState("");
-
-  const [drafts, setDrafts] = useState<DisasterUpdate[]>([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [newUpdate, setNewUpdate] = useState({
     title: "",
@@ -164,29 +66,51 @@ export default function DisasterUpdatesPage() {
     instructions: "",
   });
 
-  /* ================= FILTER COUNTS ================= */
+  /* ================= FETCH DATA ================= */
 
-  const activeUpdates = updates.filter((item) => !item.archived);
-  const archivedUpdates = updates.filter((item) => item.archived);
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setErrorMessage("");
 
-  const criticalCount = activeUpdates.filter(
-    (item) => item.type === "Critical"
-  ).length;
+    try {
+      const [allUpdates, allDrafts, summaryData, contacts] = await Promise.all([
+        disasterUpdateService.getUpdates({ archived: showArchive, isDraft: false }),
+        disasterUpdateService.getUpdates({ isDraft: true }),
+        disasterUpdateService.getSummary(),
+        disasterUpdateService.getEmergencyContacts(),
+      ]);
 
-  const warningCount = activeUpdates.filter(
-    (item) => item.type === "Warning"
-  ).length;
+      setUpdates(allUpdates || []);
+      setDrafts(allDrafts || []);
+      setSummary(summaryData);
+      if (contacts && contacts.length > 0) {
+        setEmergencyContacts(contacts);
+      }
+    } catch (err: any) {
+      console.error("Error loading disaster updates:", err);
+      setErrorMessage(
+        err.message || "Failed to load disaster updates from server."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [showArchive]);
 
-  const announcementCount = activeUpdates.filter(
-    (item) => item.type === "Announcement"
-  ).length;
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  /* ================= COUNTS ================= */
+
+  const criticalCount = summary?.criticalCount ?? updates.filter((i) => !i.archived && i.type === "Critical").length;
+  const warningCount = summary?.warningCount ?? updates.filter((i) => !i.archived && i.type === "Warning").length;
+  const announcementCount = summary?.announcementCount ?? updates.filter((i) => !i.archived && i.type === "Announcement").length;
+  const totalActiveCount = summary?.totalActive ?? updates.filter((i) => !i.archived).length;
 
   /* ================= FILTER UPDATES ================= */
 
   const filteredUpdates = useMemo(() => {
-    let result = updates.filter((item) =>
-      showArchive ? item.archived : !item.archived
-    );
+    let result = updates;
 
     if (!showArchive) {
       if (activeTab === "Critical") {
@@ -194,15 +118,12 @@ export default function DisasterUpdatesPage() {
       } else if (activeTab === "Warnings") {
         result = result.filter((item) => item.type === "Warning");
       } else if (activeTab === "Announcements") {
-        result = result.filter(
-          (item) => item.type === "Announcement"
-        );
+        result = result.filter((item) => item.type === "Announcement");
       }
     }
 
     if (search.trim()) {
       const term = search.toLowerCase();
-
       result = result.filter((item) =>
         [
           item.id,
@@ -219,171 +140,186 @@ export default function DisasterUpdatesPage() {
 
   /* ================= CREATE ANNOUNCEMENT ================= */
 
-  const handleCreateAnnouncement = (
-    e: FormEvent<HTMLFormElement>
-  ) => {
+  const handleCreateAnnouncement = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const nextId =
-      Math.max(
-        0,
-        ...updates.map(
-          (item) => Number(item.id.replace("DU-", "")) || 0
-        )
-      ) + 1;
+    if (!newUpdate.title.trim() || !newUpdate.description.trim()) {
+      setErrorMessage("Please enter both title and description.");
+      return;
+    }
 
-    const announcement: DisasterUpdate = {
-      id: `DU-${String(nextId).padStart(3, "0")}`,
-      type: newUpdate.type,
-      title: newUpdate.title.trim(),
-      description: newUpdate.description.trim(),
-      source: newUpdate.source,
-      date: "22 Jun",
-      time: new Date().toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      location: newUpdate.location,
-      publishedBy: "Sanjana A.",
-      instructions:
-        newUpdate.instructions.trim() ||
-        newUpdate.description.trim(),
-      archived: false,
-    };
+    setIsSubmitting(true);
+    setErrorMessage("");
 
-    setUpdates((prev) => [announcement, ...prev]);
+    try {
+      const created = await disasterUpdateService.createUpdate({
+        title: newUpdate.title.trim(),
+        type: newUpdate.type,
+        description: newUpdate.description.trim(),
+        location: newUpdate.location.trim() || "Greater Riverton",
+        source: newUpdate.source.trim() || "CareLink Coordination",
+        instructions:
+          newUpdate.instructions.trim() || newUpdate.description.trim(),
+        isDraft: false,
+      });
 
-    setActiveTab("All updates");
-    setShowArchive(false);
-    setShowCreateModal(false);
+      setActiveTab("All updates");
+      setShowArchive(false);
+      setShowCreateModal(false);
 
-    setNewUpdate({
-      title: "",
-      type: "Announcement",
-      description: "",
-      location: "Greater Riverton",
-      source: "CareLink Coordination",
-      instructions: "",
-    });
+      setNewUpdate({
+        title: "",
+        type: "Announcement",
+        description: "",
+        location: "Greater Riverton",
+        source: "CareLink Coordination",
+        instructions: "",
+      });
 
-    setNotification("Announcement published successfully.");
+      setNotification(`Announcement ${created.id} published successfully.`);
+      await loadData();
+    } catch (err: any) {
+      console.error("Error creating announcement:", err);
+      setErrorMessage(err.message || "Failed to publish announcement.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   /* ================= SAVE DRAFT ================= */
 
-  const saveDraft = () => {
+  const saveDraft = async () => {
     if (!newUpdate.title.trim()) {
       setNotification("Enter an announcement title first.");
       return;
     }
 
-    const draft: DisasterUpdate = {
-      id: `DRAFT-${Date.now()}`,
-      type: newUpdate.type,
-      title: newUpdate.title.trim(),
-      description: newUpdate.description.trim(),
-      source: newUpdate.source,
-      date: "22 Jun",
-      time: "--:--",
-      location: newUpdate.location,
-      publishedBy: "Sanjana A.",
-      instructions: newUpdate.instructions,
-      archived: false,
-    };
+    setIsSubmitting(true);
+    setErrorMessage("");
 
-    setDrafts((prev) => [...prev, draft]);
-    setShowCreateModal(false);
+    try {
+      await disasterUpdateService.createUpdate({
+        title: newUpdate.title.trim(),
+        type: newUpdate.type,
+        description: newUpdate.description.trim(),
+        location: newUpdate.location.trim() || "Greater Riverton",
+        source: newUpdate.source.trim() || "CareLink Coordination",
+        instructions: newUpdate.instructions.trim(),
+        isDraft: true,
+      });
 
-    setNewUpdate({
-      title: "",
-      type: "Announcement",
-      description: "",
-      location: "Greater Riverton",
-      source: "CareLink Coordination",
-      instructions: "",
-    });
+      setShowCreateModal(false);
 
-    setNotification("Draft saved successfully.");
+      setNewUpdate({
+        title: "",
+        type: "Announcement",
+        description: "",
+        location: "Greater Riverton",
+        source: "CareLink Coordination",
+        instructions: "",
+      });
+
+      setNotification("Draft saved successfully.");
+      await loadData();
+    } catch (err: any) {
+      console.error("Error saving draft:", err);
+      setErrorMessage(err.message || "Failed to save draft.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   /* ================= ARCHIVE / RESTORE ================= */
 
-  const toggleArchive = (id: string) => {
-    setUpdates((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, archived: !item.archived }
-          : item
-      )
-    );
+  const toggleArchive = async (id: string) => {
+    setIsArchiving(true);
+    setErrorMessage("");
 
-    setSelectedUpdate(null);
-    setNotification("Update archive status changed.");
+    try {
+      const updated = await disasterUpdateService.toggleArchive(id);
+      setSelectedUpdate(null);
+      setNotification(
+        updated.archived
+          ? `Update ${id} moved to archive.`
+          : `Update ${id} restored to active updates.`
+      );
+      await loadData();
+    } catch (err: any) {
+      console.error("Error changing archive status:", err);
+      setErrorMessage(err.message || "Failed to change archive status.");
+    } finally {
+      setIsArchiving(false);
+    }
   };
 
   /* ================= PUBLISH DRAFT ================= */
 
-  const publishDraft = (draft: DisasterUpdate) => {
-    const published: DisasterUpdate = {
-      ...draft,
-      id: `DU-${String(
-        Math.max(
-          0,
-          ...updates.map(
-            (item) =>
-              Number(item.id.replace("DU-", "")) || 0
-          )
-        ) + 1
-      ).padStart(3, "0")}`,
-      date: "22 Jun",
-      time: new Date().toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-
-    setUpdates((prev) => [published, ...prev]);
-    setDrafts((prev) => prev.filter((item) => item.id !== draft.id));
-    setShowDrafts(false);
-    setNotification("Draft published successfully.");
+  const publishDraft = async (draft: DisasterUpdate) => {
+    try {
+      const published = await disasterUpdateService.publishDraft(draft.id);
+      setShowDrafts(false);
+      setNotification(`Draft published successfully as ${published.id}.`);
+      await loadData();
+    } catch (err: any) {
+      console.error("Error publishing draft:", err);
+      setErrorMessage(err.message || "Failed to publish draft.");
+    }
   };
+
+  /* ================= DELETE DRAFT ================= */
+
+  const deleteDraft = async (id: string) => {
+    try {
+      await disasterUpdateService.deleteUpdate(id);
+      setDrafts((prev) => prev.filter((item) => item.id !== id));
+      setNotification("Draft deleted.");
+      await loadData();
+    } catch (err: any) {
+      console.error("Error deleting draft:", err);
+      setErrorMessage(err.message || "Failed to delete draft.");
+    }
+  };
+
+  /* ================= CRITICAL ALERT FOR BANNER ================= */
+
+  const activeCriticalAlert =
+    summary?.latestCriticalAlert ||
+    updates.find((item) => !item.archived && item.type === "Critical");
 
   /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-[#eef5f7] text-[#123e60] font-sans">
-
       {/* MAIN CONTENT */}
-
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-4 pb-8">
-
         {/* BREADCRUMB */}
-
         <div className="flex items-center gap-2 text-[8px] mb-6">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={10} className="text-slate-400" />
-          <span className="text-slate-400">
-            Shelter Administration
-          </span>
+          <span className="text-slate-400">Shelter Administration</span>
           <ChevronRight size={10} className="text-slate-400" />
           <span className="font-semibold">Disaster Updates</span>
         </div>
 
         {/* PAGE HEADER */}
-
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-
           <div>
-            <h1 className="text-[21px] font-normal">
-              Disaster Updates
-            </h1>
+            <h1 className="text-[21px] font-normal">Disaster Updates</h1>
 
             <p className="text-[9px] text-slate-500 mt-1.5">
               Publish and monitor verified disaster alerts, safety guidance, and announcements.
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => loadData()}
+              title="Refresh updates"
+              className="h-[31px] px-3 bg-white border border-[#aac4d2] text-[#1c638a] rounded-md text-[9px] font-semibold flex items-center gap-1.5 hover:bg-slate-50"
+            >
+              <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
+              Refresh
+            </button>
 
             <button
               onClick={() => {
@@ -408,43 +344,50 @@ export default function DisasterUpdatesPage() {
           </div>
         </div>
 
+        {/* ERROR BANNER */}
+        {errorMessage && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-3 text-xs flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={16} className="shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              onClick={() => setErrorMessage("")}
+              className="text-red-500 hover:text-red-800"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        )}
+
         {/* CRITICAL ALERT BANNER */}
-
-        {!showArchive && (
+        {!showArchive && activeCriticalAlert && (
           <section className="bg-[#fff7f7] border border-[#ffb8be] border-l-[3px] border-l-[#ef4755] rounded-lg p-3 flex items-center gap-3 mb-3">
-
             <div className="w-9 h-9 bg-[#ffebed] text-[#ef4755] rounded-lg flex items-center justify-center shrink-0">
               <AlertTriangle size={20} />
             </div>
 
             <div className="flex-1 min-w-0">
-
               <span className="inline-flex bg-[#fdebed] text-[#d83d4b] rounded px-2 py-1 text-[7px] font-bold mb-1">
                 CRITICAL ALERT
               </span>
 
               <h2 className="text-[11px] font-semibold">
-                Immediate evacuation order - Riverside North
+                {activeCriticalAlert.title}
               </h2>
 
               <p className="text-[8px] text-slate-500 mt-1">
-                Residents in low-lying zones N2 and N3 must move to assigned shelters before 16:00.
+                {activeCriticalAlert.description}
               </p>
 
               <p className="text-[7px] text-slate-400 mt-2">
-                Published by National Disaster Authority · 22 Jun, 13:28
+                Published by {activeCriticalAlert.publishedBy} ·{" "}
+                {activeCriticalAlert.date}, {activeCriticalAlert.time}
               </p>
             </div>
 
             <button
-              onClick={() => {
-                const critical = activeUpdates.find(
-                  (item) => item.type === "Critical"
-                );
-
-                if (critical) setSelectedUpdate(critical);
-                else setNotification("No active critical alert found.");
-              }}
+              onClick={() => setSelectedUpdate(activeCriticalAlert)}
               className="h-[30px] px-3 bg-white border border-[#aac4d2] rounded-md text-[8px] font-semibold whitespace-nowrap hover:bg-slate-50"
             >
               View instructions
@@ -453,27 +396,21 @@ export default function DisasterUpdatesPage() {
         )}
 
         {/* MAIN TWO COLUMN AREA */}
-
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3.5fr)_minmax(230px,0.9fr)] gap-2.5">
-
           {/* LEFT SIDE */}
-
           <section className="min-w-0">
-
             {/* TABS */}
-
             <div className="flex items-center gap-1.5 mb-2 overflow-x-auto">
-
               {["All updates", "Critical", "Warnings", "Announcements"].map(
                 (tab) => {
                   const count =
                     tab === "Critical"
                       ? criticalCount
                       : tab === "Warnings"
-                        ? warningCount
-                        : tab === "Announcements"
-                          ? announcementCount
-                          : activeUpdates.length;
+                      ? warningCount
+                      : tab === "Announcements"
+                      ? announcementCount
+                      : totalActiveCount;
 
                   return (
                     <button
@@ -489,9 +426,7 @@ export default function DisasterUpdatesPage() {
                       }`}
                     >
                       {tab}
-                      <span className="ml-1 opacity-70">
-                        {count}
-                      </span>
+                      <span className="ml-1 opacity-70">{count}</span>
                     </button>
                   );
                 }
@@ -499,7 +434,6 @@ export default function DisasterUpdatesPage() {
             </div>
 
             {/* SEARCH */}
-
             <div className="relative mb-2">
               <Search
                 size={13}
@@ -515,28 +449,27 @@ export default function DisasterUpdatesPage() {
             </div>
 
             {/* UPDATE LIST */}
+            <div className="space-y-2 relative">
+              {loading && (
+                <div className="bg-white/80 border border-[#d5e3e9] rounded-lg py-12 text-center flex items-center justify-center gap-2 text-[#1c638a] text-xs font-semibold">
+                  <Loader2 size={18} className="animate-spin" />
+                  <span>Loading disaster updates...</span>
+                </div>
+              )}
 
-            <div className="space-y-2">
-
-              {filteredUpdates.map((item) => (
-                <UpdateCard
-                  key={item.id}
-                  update={item}
-                  onClick={() => setSelectedUpdate(item)}
-                />
-              ))}
-
-              {filteredUpdates.length === 0 && (
-                <div className="bg-white border border-[#d5e3e9] rounded-lg py-14 text-center">
-                  <BellRing
-                    size={28}
-                    className="mx-auto text-slate-300"
+              {!loading &&
+                filteredUpdates.map((item) => (
+                  <UpdateCard
+                    key={item.id}
+                    update={item}
+                    onClick={() => setSelectedUpdate(item)}
                   />
+                ))}
 
-                  <p className="text-xs font-semibold mt-3">
-                    No updates found
-                  </p>
-
+              {!loading && filteredUpdates.length === 0 && (
+                <div className="bg-white border border-[#d5e3e9] rounded-lg py-14 text-center">
+                  <BellRing size={28} className="mx-auto text-slate-300" />
+                  <p className="text-xs font-semibold mt-3">No updates found</p>
                   <p className="text-[9px] text-slate-400 mt-1">
                     Try changing your search or selected tab.
                   </p>
@@ -546,17 +479,13 @@ export default function DisasterUpdatesPage() {
           </section>
 
           {/* RIGHT SIDE PANEL */}
-
           <aside className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm p-3 h-fit">
-
             {/* EMERGENCY CONTACTS */}
-
             <h2 className="text-[10px] font-semibold mb-3">
               Emergency contacts
             </h2>
 
             <div className="divide-y divide-slate-200">
-
               {emergencyContacts.map((contact) => (
                 <div
                   key={contact.name}
@@ -577,9 +506,7 @@ export default function DisasterUpdatesPage() {
             </div>
 
             {/* PUBLISHING CONTROLS */}
-
             <div className="mt-3 pt-3 border-t border-slate-200">
-
               <h2 className="text-[10px] font-semibold mb-3">
                 Publishing controls
               </h2>
@@ -598,12 +525,8 @@ export default function DisasterUpdatesPage() {
             </div>
 
             {/* QUICK SUMMARY */}
-
             <div className="mt-4 pt-3 border-t border-slate-200">
-
-              <h2 className="text-[10px] font-semibold mb-3">
-                Update summary
-              </h2>
+              <h2 className="text-[10px] font-semibold mb-3">Update summary</h2>
 
               <SummaryItem
                 icon={<AlertTriangle size={12} />}
@@ -631,36 +554,24 @@ export default function DisasterUpdatesPage() {
       </main>
 
       {/* CREATE ANNOUNCEMENT MODAL */}
-
       {showCreateModal && (
         <Modal
           title="Create announcement"
           subtitle="Publish a verified disaster update or safety announcement."
           onClose={() => setShowCreateModal(false)}
         >
-          <form
-            onSubmit={handleCreateAnnouncement}
-            className="space-y-4"
-          >
-
+          <form onSubmit={handleCreateAnnouncement} className="space-y-4">
             <FormInput
               label="Announcement title"
               placeholder="Enter announcement title"
               value={newUpdate.title}
-              onChange={(v) =>
-                setNewUpdate({ ...newUpdate, title: v })
-              }
+              onChange={(v) => setNewUpdate({ ...newUpdate, title: v })}
             />
 
             <FormSelect
               label="Update type"
               value={newUpdate.type}
-              options={[
-                "Critical",
-                "Warning",
-                "Announcement",
-                "Update",
-              ]}
+              options={["Critical", "Warning", "Announcement", "Update"]}
               onChange={(v) =>
                 setNewUpdate({
                   ...newUpdate,
@@ -673,9 +584,7 @@ export default function DisasterUpdatesPage() {
               label="Location / Area"
               placeholder="Example: North Ward"
               value={newUpdate.location}
-              onChange={(v) =>
-                setNewUpdate({ ...newUpdate, location: v })
-              }
+              onChange={(v) => setNewUpdate({ ...newUpdate, location: v })}
             />
 
             <FormSelect
@@ -687,9 +596,7 @@ export default function DisasterUpdatesPage() {
                 "Municipal Operations",
                 "Meteorological Service",
               ]}
-              onChange={(v) =>
-                setNewUpdate({ ...newUpdate, source: v })
-              }
+              onChange={(v) => setNewUpdate({ ...newUpdate, source: v })}
             />
 
             <FormTextarea
@@ -717,29 +624,35 @@ export default function DisasterUpdatesPage() {
             />
 
             <div className="flex gap-2 pt-2">
-
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => setShowCreateModal(false)}
-                className="flex-1 h-10 border border-slate-200 rounded-lg text-xs font-semibold"
+                className="flex-1 h-10 border border-slate-200 rounded-lg text-xs font-semibold disabled:opacity-50"
               >
                 Cancel
               </button>
 
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={saveDraft}
-                className="flex-1 h-10 border border-[#aac4d2] rounded-lg text-xs font-semibold"
+                className="flex-1 h-10 border border-[#aac4d2] rounded-lg text-xs font-semibold disabled:opacity-50"
               >
                 Save draft
               </button>
 
               <button
                 type="submit"
-                className="flex-1 h-10 bg-[#1c638a] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1"
+                disabled={isSubmitting}
+                className="flex-1 h-10 bg-[#1c638a] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1 hover:bg-[#144665] disabled:opacity-50"
               >
-                <Send size={13} />
-                Publish
+                {isSubmitting ? (
+                  <Loader2 size={13} className="animate-spin" />
+                ) : (
+                  <Send size={13} />
+                )}
+                {isSubmitting ? "Publishing..." : "Publish"}
               </button>
             </div>
           </form>
@@ -747,24 +660,21 @@ export default function DisasterUpdatesPage() {
       )}
 
       {/* UPDATE DETAILS PANEL */}
-
       {selectedUpdate && (
         <div className="fixed inset-0 z-40 bg-black/30 flex justify-end">
-
           <div className="bg-white w-full max-w-md h-full shadow-2xl p-6 overflow-y-auto">
-
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">
-                Update details
-              </h2>
+              <h2 className="text-lg font-semibold">Update details</h2>
 
-              <button onClick={() => setSelectedUpdate(null)}>
+              <button
+                onClick={() => setSelectedUpdate(null)}
+                className="text-slate-500 hover:text-slate-800"
+              >
                 <X size={20} />
               </button>
             </div>
 
             <div className="mt-7">
-
               <div className="w-14 h-14 bg-[#eaf3f8] text-[#287da7] rounded-xl flex items-center justify-center">
                 {selectedUpdate.type === "Critical" ? (
                   <AlertTriangle size={25} />
@@ -789,7 +699,6 @@ export default function DisasterUpdatesPage() {
             </div>
 
             <div className="mt-7 space-y-4">
-
               <DetailRow
                 icon={<MapPin size={15} />}
                 label="Location"
@@ -816,9 +725,7 @@ export default function DisasterUpdatesPage() {
             </div>
 
             <div className="mt-7">
-              <h3 className="text-xs font-semibold mb-2">
-                Update description
-              </h3>
+              <h3 className="text-xs font-semibold mb-2">Update description</h3>
 
               <p className="bg-[#f5f9fa] rounded-lg p-3 text-xs text-slate-600 leading-relaxed">
                 {selectedUpdate.description}
@@ -826,9 +733,7 @@ export default function DisasterUpdatesPage() {
             </div>
 
             <div className="mt-6">
-              <h3 className="text-xs font-semibold mb-2">
-                Safety instructions
-              </h3>
+              <h3 className="text-xs font-semibold mb-2">Safety instructions</h3>
 
               <p className="bg-[#fff8ed] border border-[#f5dfb9] rounded-lg p-3 text-xs text-slate-600 leading-relaxed">
                 {selectedUpdate.instructions}
@@ -836,14 +741,16 @@ export default function DisasterUpdatesPage() {
             </div>
 
             <div className="mt-7 space-y-2">
-
               <button
+                disabled={isArchiving}
                 onClick={() => {
                   toggleArchive(selectedUpdate.id);
                 }}
-                className="w-full h-10 border border-slate-200 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 hover:bg-slate-50"
+                className="w-full h-10 border border-slate-200 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 hover:bg-slate-50 disabled:opacity-50"
               >
-                {selectedUpdate.archived ? (
+                {isArchiving ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : selectedUpdate.archived ? (
                   <>
                     <RotateCcw size={14} />
                     Restore update
@@ -858,7 +765,7 @@ export default function DisasterUpdatesPage() {
 
               <button
                 onClick={() => setSelectedUpdate(null)}
-                className="w-full h-10 bg-[#1c638a] text-white rounded-lg text-xs font-semibold"
+                className="w-full h-10 bg-[#1c638a] text-white rounded-lg text-xs font-semibold hover:bg-[#144665]"
               >
                 Close
               </button>
@@ -868,7 +775,6 @@ export default function DisasterUpdatesPage() {
       )}
 
       {/* DRAFTS MODAL */}
-
       {showDrafts && (
         <Modal
           title="Draft announcements"
@@ -876,16 +782,10 @@ export default function DisasterUpdatesPage() {
           onClose={() => setShowDrafts(false)}
         >
           <div className="space-y-3">
-
             {drafts.length === 0 && (
               <div className="text-center py-10">
-                <FileText
-                  size={28}
-                  className="mx-auto text-slate-300"
-                />
-                <p className="text-xs font-semibold mt-3">
-                  No saved drafts
-                </p>
+                <FileText size={28} className="mx-auto text-slate-300" />
+                <p className="text-xs font-semibold mt-3">No saved drafts</p>
               </div>
             )}
 
@@ -894,31 +794,27 @@ export default function DisasterUpdatesPage() {
                 key={draft.id}
                 className="border border-slate-200 rounded-lg p-3"
               >
-                <h3 className="text-xs font-semibold">
-                  {draft.title}
-                </h3>
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-xs font-semibold">{draft.title}</h3>
+                  <TypeBadge type={draft.type} />
+                </div>
 
                 <p className="text-[9px] text-slate-500 mt-1">
                   {draft.description}
                 </p>
 
                 <div className="flex items-center gap-2 mt-3">
-
                   <button
                     onClick={() => publishDraft(draft)}
-                    className="flex-1 bg-[#1c638a] text-white rounded-md py-2 text-[9px] font-semibold"
+                    className="flex-1 bg-[#1c638a] text-white rounded-md py-2 text-[9px] font-semibold hover:bg-[#144665]"
                   >
                     Publish
                   </button>
 
                   <button
-                    onClick={() => {
-                      setDrafts((prev) =>
-                        prev.filter((item) => item.id !== draft.id)
-                      );
-                      setNotification("Draft deleted.");
-                    }}
-                    className="px-3 border border-slate-200 rounded-md text-slate-500"
+                    onClick={() => deleteDraft(draft.id)}
+                    className="px-3 py-2 border border-slate-200 rounded-md text-slate-500 hover:text-red-600 hover:bg-red-50"
+                    title="Delete draft"
                   >
                     <Trash2 size={13} />
                   </button>
@@ -929,16 +825,15 @@ export default function DisasterUpdatesPage() {
         </Modal>
       )}
 
-      {/* NOTIFICATION */}
-
+      {/* NOTIFICATION TOAST */}
       {notification && (
         <div className="fixed bottom-5 right-5 z-[70] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3">
-
-          <CheckCircle2 size={16} />
-
-          <p className="text-xs">{notification}</p>
-
-          <button onClick={() => setNotification("")}>
+          <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
+          <p className="text-xs flex-1">{notification}</p>
+          <button
+            onClick={() => setNotification("")}
+            className="text-white/70 hover:text-white"
+          >
             <X size={14} />
           </button>
         </div>
@@ -968,8 +863,11 @@ function UpdateCard({
       onClick={onClick}
       className="w-full bg-white border border-[#d5e3e9] rounded-lg shadow-sm p-3 flex items-center gap-2.5 text-left hover:border-[#45b99b] hover:shadow-md transition min-h-[98px]"
     >
-
-      <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${iconStyles[update.type]}`}>
+      <div
+        className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${
+          iconStyles[update.type] || iconStyles.Announcement
+        }`}
+      >
         {update.type === "Critical" || update.type === "Warning" ? (
           <AlertTriangle size={16} />
         ) : (
@@ -978,9 +876,7 @@ function UpdateCard({
       </div>
 
       <div className="flex-1 min-w-0">
-
         <div className="flex items-center justify-between gap-2">
-
           <TypeBadge type={update.type} />
 
           <span className="text-[7px] text-slate-400 whitespace-nowrap">
@@ -992,19 +888,14 @@ function UpdateCard({
           {update.title}
         </h3>
 
-        <p className="text-[8px] text-slate-500 mt-1 leading-relaxed">
+        <p className="text-[8px] text-slate-500 mt-1 leading-relaxed line-clamp-2">
           {update.description}
         </p>
 
-        <p className="text-[7px] text-slate-400 mt-2">
-          Source: {update.source}
-        </p>
+        <p className="text-[7px] text-slate-400 mt-2">Source: {update.source}</p>
       </div>
 
-      <ChevronRight
-        size={14}
-        className="text-slate-400 shrink-0"
-      />
+      <ChevronRight size={14} className="text-slate-400 shrink-0" />
     </button>
   );
 }
@@ -1020,7 +911,11 @@ function TypeBadge({ type }: { type: UpdateType }) {
   };
 
   return (
-    <span className={`inline-flex px-2 py-1 rounded text-[7px] font-semibold whitespace-nowrap ${styles[type]}`}>
+    <span
+      className={`inline-flex px-2 py-1 rounded text-[7px] font-semibold whitespace-nowrap ${
+        styles[type] || styles.Announcement
+      }`}
+    >
       {type}
     </span>
   );
@@ -1047,20 +942,17 @@ function SummaryItem({
 
   return (
     <div className="flex items-center justify-between py-2">
-
       <div className="flex items-center gap-2">
-        <div className={`w-6 h-6 rounded-md flex items-center justify-center ${styles[color]}`}>
+        <div
+          className={`w-6 h-6 rounded-md flex items-center justify-center ${styles[color]}`}
+        >
           {icon}
         </div>
 
-        <span className="text-[8px] text-slate-600">
-          {label}
-        </span>
+        <span className="text-[8px] text-slate-600">{label}</span>
       </div>
 
-      <span className="text-[9px] font-semibold">
-        {value}
-      </span>
+      <span className="text-[9px] font-semibold">{value}</span>
     </div>
   );
 }
@@ -1080,9 +972,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
 
       <input
         required
@@ -1108,9 +998,7 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
 
       <select
         value={value}
@@ -1118,7 +1006,9 @@ function FormSelect({
         className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </select>
     </div>
@@ -1138,9 +1028,7 @@ function FormTextarea({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
 
       <textarea
         required
@@ -1169,15 +1057,11 @@ function Modal({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
       <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
-              {subtitle}
-            </p>
+            <p className="text-[10px] text-slate-400 mt-1">{subtitle}</p>
           </div>
 
           <button
@@ -1208,14 +1092,11 @@ function DetailRow({
 }) {
   return (
     <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-
       <div className="text-[#2785b7]">{icon}</div>
 
       <div className="flex-1 min-w-0">
         <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">
-          {value}
-        </p>
+        <p className="text-xs font-semibold mt-1 break-words">{value}</p>
       </div>
     </div>
   );

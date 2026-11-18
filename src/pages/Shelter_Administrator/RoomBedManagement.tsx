@@ -1,11 +1,6 @@
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import {
-  Search,
-  Globe,
-  Bell,
-  CircleHelp,
   ChevronRight,
   ChevronDown,
   Plus,
@@ -15,37 +10,24 @@ import {
   Check,
   Clock,
   Building2,
-  Settings2,
   Trash2,
-  Users,
-  Save,
   CheckCircle2,
+  Loader2,
+  RefreshCw,
+  AlertCircle,
+  Search,
 } from "lucide-react";
+import { roomBedService } from "../../services/roomBedService";
+import type {
+  BedStatus,
+  Room,
+  RoomBedSummary,
+} from "../../types/roomBed";
+import type { Shelter } from "../../types/accommodation";
 
-/* ================= TYPES ================= */
+/* ================= FALLBACK DATA ================= */
 
-type BedStatus =
-  | "Available"
-  | "Occupied"
-  | "Reserved"
-  | "Unavailable";
-
-type Room = {
-  id: string;
-  name: string;
-  shelter: string;
-  floor: string;
-  type: string;
-  beds: {
-    id: string;
-    status: BedStatus;
-    resident?: string;
-  }[];
-};
-
-/* ================= SAMPLE DATA ================= */
-
-const initialRooms: Room[] = [
+const fallbackRooms: Room[] = [
   {
     id: "RM-001",
     name: "Room A-01",
@@ -101,7 +83,7 @@ const initialRooms: Room[] = [
   },
 ];
 
-const shelters = [
+const fallbackShelters = [
   "Riverton Central School",
   "North Community Hall",
   "St. Mary Civic Centre",
@@ -132,35 +114,39 @@ const bedStatuses: BedStatus[] = [
 /* ================= MAIN COMPONENT ================= */
 
 export default function RoomBedManagementPage() {
-  const [rooms, setRooms] = useState<Room[]>(initialRooms);
+  const [rooms, setRooms] = useState<Room[]>(fallbackRooms);
+  const [shelterList, setShelterList] = useState<string[]>(fallbackShelters);
+  const [summary, setSummary] = useState<RoomBedSummary | null>(null);
 
-  const [selectedShelter, setSelectedShelter] =
-    useState("Riverton Central School");
-
-  const [selectedFloor, setSelectedFloor] =
-    useState("All floors");
-
-  const [selectedType, setSelectedType] =
-    useState("All room types");
-
+  // Filters & Search
+  const [selectedShelter, setSelectedShelter] = useState("All shelters");
+  const [selectedFloor, setSelectedFloor] = useState("All floors");
+  const [selectedType, setSelectedType] = useState("All room types");
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  // Modals
   const [roomModal, setRoomModal] = useState(false);
   const [bedModal, setBedModal] = useState(false);
   const [manageModal, setManageModal] = useState(false);
 
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-
   const [selectedBed, setSelectedBed] = useState<{
     roomId: string;
     bedId: string;
   } | null>(null);
 
+  // Feedback State
+  const [loading, setLoading] = useState(true);
+  const [isSubmittingRoom, setIsSubmittingRoom] = useState(false);
+  const [isAddingBeds, setIsAddingBeds] = useState(false);
+  const [isDeletingRoom, setIsDeletingRoom] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [newRoom, setNewRoom] = useState({
     name: "",
-    shelter: "Riverton Central School",
+    shelter: fallbackShelters[0],
     floor: "Ground floor",
     type: "Family Room",
     bedCount: "4",
@@ -171,207 +157,199 @@ export default function RoomBedManagementPage() {
     count: "2",
   });
 
-  /* ================= SUMMARY ================= */
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [search]);
 
-  const totalRooms = rooms.length;
+  // Load shelters
+  useEffect(() => {
+    const loadShelters = async () => {
+      try {
+        const data: Shelter[] = await roomBedService.getShelters();
+        if (data && data.length > 0) {
+          const names = data.map((s) => s.name);
+          setShelterList(names);
+          setNewRoom((prev) => ({
+            ...prev,
+            shelter: prev.shelter || names[0],
+          }));
+        }
+      } catch (err) {
+        console.warn("Could not load shelters from API, using fallback shelters:", err);
+      }
+    };
+    loadShelters();
+  }, []);
 
-  const allBeds = rooms.flatMap((room) => room.beds);
+  // Fetch Summary KPIs
+  const fetchSummary = useCallback(async () => {
+    try {
+      const data = await roomBedService.getRoomSummary();
+      setSummary(data);
+    } catch (err) {
+      console.warn("Could not load room/bed summary:", err);
+    }
+  }, []);
 
-  const totalBeds = allBeds.length;
+  // Fetch Rooms from Backend
+  const fetchRooms = useCallback(async () => {
+    setLoading(true);
+    setErrorMessage("");
+    try {
+      const data = await roomBedService.getRooms({
+        shelter: selectedShelter !== "All shelters" ? selectedShelter : undefined,
+        floor: selectedFloor !== "All floors" ? selectedFloor : undefined,
+        type: selectedType !== "All room types" ? selectedType : undefined,
+        search: debouncedSearch || undefined,
+      });
 
-  const availableBeds = allBeds.filter(
-    (bed) => bed.status === "Available"
-  ).length;
-
-  const reservedBeds = allBeds.filter(
-    (bed) => bed.status === "Reserved"
-  ).length;
-
-  const unavailableBeds = allBeds.filter(
-    (bed) => bed.status === "Unavailable"
-  ).length;
-
-  const occupiedBeds = allBeds.filter(
-    (bed) => bed.status === "Occupied"
-  ).length;
-
-  /* ================= FILTERING ================= */
-
-  const filteredRooms = useMemo(() => {
-    return rooms.filter((room) => {
-      const matchesShelter =
-        selectedShelter === "All shelters" ||
-        room.shelter === selectedShelter;
-
-      const matchesFloor =
-        selectedFloor === "All floors" ||
-        room.floor === selectedFloor;
-
-      const matchesType =
-        selectedType === "All room types" ||
-        room.type === selectedType;
-
-      const matchesSearch =
-        room.name.toLowerCase().includes(search.toLowerCase()) ||
-        room.shelter.toLowerCase().includes(search.toLowerCase()) ||
-        room.id.toLowerCase().includes(search.toLowerCase());
-
-      return (
-        matchesShelter &&
-        matchesFloor &&
-        matchesType &&
-        matchesSearch
+      setRooms(data || []);
+      if (data && data.length > 0 && !newBed.roomId) {
+        setNewBed((prev) => ({ ...prev, roomId: data[0].id }));
+      }
+    } catch (err: any) {
+      console.error("Error fetching rooms:", err);
+      setErrorMessage(
+        err.message || "Failed to load rooms from backend. Check that the API is running."
       );
-    });
-  }, [
-    rooms,
-    selectedShelter,
-    selectedFloor,
-    selectedType,
-    search,
-  ]);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedShelter, selectedFloor, selectedType, debouncedSearch, newBed.roomId]);
+
+  // Refetch when filters change
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
+
+  // Refetch summary on mount
+  useEffect(() => {
+    fetchSummary();
+  }, [fetchSummary]);
 
   /* ================= BED STATUS UPDATE ================= */
 
-  const updateBedStatus = (
+  const updateBedStatus = async (
     roomId: string,
     bedId: string,
-    status: BedStatus
+    status: BedStatus,
+    residentName?: string
   ) => {
-    setRooms((prev) =>
-      prev.map((room) =>
-        room.id === roomId
-          ? {
-              ...room,
-              beds: room.beds.map((bed) =>
-                bed.id === bedId
-                  ? {
-                      ...bed,
-                      status,
-                      resident:
-                        status === "Occupied"
-                          ? bed.resident || "New resident"
-                          : undefined,
-                    }
-                  : bed
-              ),
-            }
-          : room
-      )
-    );
+    setErrorMessage("");
+    try {
+      const updatedRoom = await roomBedService.updateBedStatus(roomId, bedId, {
+        status,
+        resident: residentName,
+      });
 
-    setSelectedBed(null);
-    setSuccessMessage(`${bedId} updated to ${status}.`);
+      setRooms((prev) =>
+        prev.map((r) => (r.id === roomId ? updatedRoom : r))
+      );
 
-    setSelectedRoom((prev) => {
-      if (!prev || prev.id !== roomId) return prev;
+      if (selectedRoom && selectedRoom.id === roomId) {
+        setSelectedRoom(updatedRoom);
+      }
 
-      return {
-        ...prev,
-        beds: prev.beds.map((bed) =>
-          bed.id === bedId
-            ? {
-                ...bed,
-                status,
-                resident:
-                  status === "Occupied"
-                    ? bed.resident || "New resident"
-                    : undefined,
-              }
-            : bed
-        ),
-      };
-    });
+      setSelectedBed(null);
+      setSuccessMessage(`${bedId} updated to ${status}.`);
+      await fetchSummary();
+    } catch (err: any) {
+      console.error("Error updating bed status:", err);
+      setErrorMessage(err.message || "Failed to update bed status.");
+    }
   };
 
   /* ================= ADD ROOM ================= */
 
-  const handleAddRoom = (e: FormEvent<HTMLFormElement>) => {
+  const handleAddRoom = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const count = Number(newRoom.bedCount);
 
     if (!newRoom.name.trim() || count < 1 || count > 100) return;
 
-    const room: Room = {
-      id: `RM-${Date.now().toString().slice(-5)}`,
-      name: newRoom.name,
-      shelter: newRoom.shelter,
-      floor: newRoom.floor,
-      type: newRoom.type,
-      beds: Array.from({ length: count }, (_, index) => ({
-        id: `B-${String(index + 1).padStart(2, "0")}`,
-        status: "Available" as BedStatus,
-      })),
-    };
+    setIsSubmittingRoom(true);
+    setErrorMessage("");
 
-    setRooms((prev) => [...prev, room]);
+    try {
+      const created = await roomBedService.createRoom({
+        name: newRoom.name.trim(),
+        shelter: newRoom.shelter,
+        floor: newRoom.floor,
+        type: newRoom.type,
+        bedCount: count,
+      });
 
-    setSelectedShelter("All shelters");
-    setSelectedFloor("All floors");
-    setSelectedType("All room types");
-    setSearch("");
+      setSuccessMessage(`Room "${created.name}" (${created.id}) added successfully with ${count} beds.`);
+      setRoomModal(false);
 
-    setNewRoom({
-      name: "",
-      shelter: "Riverton Central School",
-      floor: "Ground floor",
-      type: "Family Room",
-      bedCount: "4",
-    });
+      // Reset form
+      setNewRoom({
+        name: "",
+        shelter: shelterList[0] || fallbackShelters[0],
+        floor: "Ground floor",
+        type: "Family Room",
+        bedCount: "4",
+      });
 
-    setRoomModal(false);
-    setSuccessMessage("New room added successfully.");
+      await fetchRooms();
+      await fetchSummary();
+    } catch (err: any) {
+      console.error("Error adding room:", err);
+      setErrorMessage(err.message || "Failed to add room.");
+    } finally {
+      setIsSubmittingRoom(false);
+    }
   };
 
   /* ================= ADD BEDS ================= */
 
-  const handleAddBeds = (e: FormEvent<HTMLFormElement>) => {
+  const handleAddBeds = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const count = Number(newBed.count);
 
     if (count < 1 || count > 100) return;
 
-    const room = rooms.find((r) => r.id === newBed.roomId);
-    if (!room) return;
+    setIsAddingBeds(true);
+    setErrorMessage("");
 
-    const existingNumbers = room.beds
-      .map((bed) => Number(bed.id.split("-")[1]))
-      .filter(Number.isFinite);
+    try {
+      const updated = await roomBedService.addBeds({
+        roomId: newBed.roomId,
+        count,
+      });
 
-    const lastNumber = Math.max(0, ...existingNumbers);
+      setRooms((prev) =>
+        prev.map((r) => (r.id === updated.id ? updated : r))
+      );
 
-    setRooms((prev) =>
-      prev.map((r) =>
-        r.id === newBed.roomId
-          ? {
-              ...r,
-              beds: [
-                ...r.beds,
-                ...Array.from({ length: count }, (_, index) => ({
-                  id: `B-${String(lastNumber + index + 1).padStart(2, "0")}`,
-                  status: "Available" as BedStatus,
-                })),
-              ],
-            }
-          : r
-      )
-    );
+      setBedModal(false);
+      setNewBed({
+        roomId: rooms[0]?.id || "RM-001",
+        count: "2",
+      });
 
-    setBedModal(false);
-    setNewBed({ roomId: "RM-001", count: "2" });
-    setSuccessMessage(`${count} new beds added successfully.`);
+      setSuccessMessage(`${count} new beds added to ${updated.name}.`);
+      await fetchSummary();
+    } catch (err: any) {
+      console.error("Error adding beds:", err);
+      setErrorMessage(err.message || "Failed to add beds.");
+    } finally {
+      setIsAddingBeds(false);
+    }
   };
 
-  /* ================= MANAGE ROOM ================= */
+  /* ================= MANAGE / DELETE ROOM ================= */
 
   const openManageRoom = (room: Room) => {
     setSelectedRoom(room);
     setManageModal(true);
   };
 
-  const deleteRoom = () => {
+  const deleteRoom = async () => {
     if (!selectedRoom) return;
 
     if (
@@ -379,32 +357,51 @@ export default function RoomBedManagementPage() {
         (bed) => bed.status === "Occupied" || bed.status === "Reserved"
       )
     ) {
-      setSuccessMessage(
-        "Cannot delete a room containing occupied or reserved beds."
-      );
+      setErrorMessage("Cannot delete a room containing occupied or reserved beds.");
       return;
     }
 
-    setRooms((prev) =>
-      prev.filter((room) => room.id !== selectedRoom.id)
-    );
+    setIsDeletingRoom(true);
+    setErrorMessage("");
 
-    setManageModal(false);
-    setSelectedRoom(null);
-    setSuccessMessage("Room deleted successfully.");
+    try {
+      await roomBedService.deleteRoom(selectedRoom.id);
+
+      setRooms((prev) => prev.filter((r) => r.id !== selectedRoom.id));
+      setManageModal(false);
+      setSelectedRoom(null);
+      setSuccessMessage("Room deleted successfully.");
+      await fetchSummary();
+    } catch (err: any) {
+      console.error("Error deleting room:", err);
+      setErrorMessage(err.message || "Failed to delete room.");
+    } finally {
+      setIsDeletingRoom(false);
+    }
   };
 
-  /* ================= UI ================= */
+  // Metrics from summary or fallback calculation
+  const allBeds = rooms.flatMap((room) => room.beds);
+  const totalRooms = summary?.totalRooms ?? rooms.length;
+  const totalBeds = summary?.totalBeds ?? allBeds.length;
+  const availableBeds =
+    summary?.availableBeds ??
+    allBeds.filter((bed) => bed.status === "Available").length;
+  const reservedBeds =
+    summary?.reservedBeds ??
+    allBeds.filter((bed) => bed.status === "Reserved").length;
+  const unavailableBeds =
+    summary?.unavailableBeds ??
+    allBeds.filter((bed) => bed.status === "Unavailable").length;
+  const occupiedBeds =
+    summary?.occupiedBeds ??
+    allBeds.filter((bed) => bed.status === "Occupied").length;
 
   return (
     <div className="min-h-screen bg-[#eef5f7] text-[#123e60] font-sans">
-
       {/* ================= MAIN CONTENT ================= */}
-
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
-
         {/* BREADCRUMB */}
-
         <div className="flex items-center gap-2 text-[9px] mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
@@ -413,21 +410,48 @@ export default function RoomBedManagementPage() {
           <span className="font-semibold">Room & Bed Management</span>
         </div>
 
+        {/* ERROR BANNER */}
+        {errorMessage && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-800 rounded-lg p-3 text-xs flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle size={16} className="text-red-500 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              onClick={() => {
+                fetchRooms();
+                fetchSummary();
+              }}
+              className="text-xs font-semibold underline text-red-700 hover:text-red-900"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* PAGE HEADER */}
-
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-
           <div>
             <h1 className="text-[23px] md:text-[25px] font-normal">
               Room & Bed Management
             </h1>
-
             <p className="text-[11px] text-slate-500 mt-2">
               Visually manage rooms, beds, reservations, and safe accommodation assignments.
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                fetchRooms();
+                fetchSummary();
+              }}
+              title="Refresh room records"
+              className="h-9 px-3 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold flex items-center gap-1.5 hover:bg-slate-50 text-slate-600"
+            >
+              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+              Refresh
+            </button>
 
             <button
               onClick={() => setRoomModal(true)}
@@ -447,9 +471,7 @@ export default function RoomBedManagementPage() {
         </div>
 
         {/* ================= KPI CARDS ================= */}
-
         <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-3">
-
           <KpiCard
             icon={<Home size={19} />}
             color="blue"
@@ -484,14 +506,24 @@ export default function RoomBedManagementPage() {
         </section>
 
         {/* ================= FILTERS + LEGEND ================= */}
-
         <section className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 mb-3">
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 flex-1">
+            <div className="relative">
+              <Search
+                size={14}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search room, shelter, ID..."
+                className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-8 pr-3 text-[9px] outline-none focus:border-[#45b99b]"
+              />
+            </div>
 
             <FilterSelect
               value={selectedShelter}
-              options={["All shelters", ...shelters]}
+              options={["All shelters", ...shelterList]}
               onChange={setSelectedShelter}
             />
 
@@ -509,7 +541,6 @@ export default function RoomBedManagementPage() {
           </div>
 
           <div className="flex items-center flex-wrap gap-x-4 gap-y-2 px-1">
-
             {bedStatuses.map((status) => (
               <LegendItem key={status} status={status} />
             ))}
@@ -517,11 +548,16 @@ export default function RoomBedManagementPage() {
         </section>
 
         {/* ================= ROOM GRID ================= */}
-
-        {filteredRooms.length > 0 ? (
+        {loading ? (
+          <div className="bg-white border border-[#d5e3e9] rounded-xl py-20 text-center">
+            <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#1c638a]">
+              <Loader2 size={18} className="animate-spin" />
+              Loading room and bed allocations...
+            </div>
+          </div>
+        ) : rooms.length > 0 ? (
           <section className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-
-            {filteredRooms.map((room) => (
+            {rooms.map((room) => (
               <RoomCard
                 key={room.id}
                 room={room}
@@ -535,9 +571,7 @@ export default function RoomBedManagementPage() {
         ) : (
           <div className="bg-white border border-[#d5e3e9] rounded-xl py-16 text-center">
             <Building2 size={30} className="mx-auto text-slate-300" />
-            <h3 className="text-sm font-semibold mt-3">
-              No rooms found
-            </h3>
+            <h3 className="text-sm font-semibold mt-3">No rooms found</h3>
             <p className="text-xs text-slate-400 mt-1">
               Try changing your filters or add a new room.
             </p>
@@ -551,20 +585,15 @@ export default function RoomBedManagementPage() {
         )}
 
         {/* ================= OCCUPANCY SUMMARY ================= */}
-
         <section className="mt-4 bg-white border border-[#d5e3e9] rounded-xl p-4">
-
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-semibold">
-              Overall bed distribution
-            </h3>
+            <h3 className="text-xs font-semibold">Overall bed distribution</h3>
             <span className="text-[9px] text-slate-400">
               {totalBeds} total beds
             </span>
           </div>
 
           <div className="h-3 rounded-full overflow-hidden flex bg-slate-100">
-
             {totalBeds > 0 && (
               <>
                 <div
@@ -588,25 +617,21 @@ export default function RoomBedManagementPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-
             <SummaryItem
               color="bg-[#e96772]"
               label="Occupied"
               value={occupiedBeds}
             />
-
             <SummaryItem
               color="bg-[#50bda1]"
               label="Available"
               value={availableBeds}
             />
-
             <SummaryItem
               color="bg-[#f3b947]"
               label="Reserved"
               value={reservedBeds}
             />
-
             <SummaryItem
               color="bg-[#aab5bf]"
               label="Unavailable"
@@ -617,7 +642,6 @@ export default function RoomBedManagementPage() {
       </main>
 
       {/* ================= ADD ROOM MODAL ================= */}
-
       {roomModal && (
         <Modal
           title="Add new room"
@@ -625,26 +649,21 @@ export default function RoomBedManagementPage() {
           onClose={() => setRoomModal(false)}
         >
           <form onSubmit={handleAddRoom} className="space-y-4">
-
             <FormInput
               label="Room name / number"
               placeholder="Example: Room A-03"
               value={newRoom.name}
-              onChange={(v) =>
-                setNewRoom({ ...newRoom, name: v })
-              }
+              onChange={(v) => setNewRoom({ ...newRoom, name: v })}
             />
 
             <FormSelect
               label="Shelter"
               value={newRoom.shelter}
-              options={shelters.map((s) => ({
+              options={shelterList.map((s) => ({
                 value: s,
                 label: s,
               }))}
-              onChange={(v) =>
-                setNewRoom({ ...newRoom, shelter: v })
-              }
+              onChange={(v) => setNewRoom({ ...newRoom, shelter: v })}
             />
 
             <FormSelect
@@ -654,9 +673,7 @@ export default function RoomBedManagementPage() {
                 value: f,
                 label: f,
               }))}
-              onChange={(v) =>
-                setNewRoom({ ...newRoom, floor: v })
-              }
+              onChange={(v) => setNewRoom({ ...newRoom, floor: v })}
             />
 
             <FormSelect
@@ -666,30 +683,26 @@ export default function RoomBedManagementPage() {
                 value: t,
                 label: t,
               }))}
-              onChange={(v) =>
-                setNewRoom({ ...newRoom, type: v })
-              }
+              onChange={(v) => setNewRoom({ ...newRoom, type: v })}
             />
 
             <FormInput
               label="Initial bed count"
               type="number"
               value={newRoom.bedCount}
-              onChange={(v) =>
-                setNewRoom({ ...newRoom, bedCount: v })
-              }
+              onChange={(v) => setNewRoom({ ...newRoom, bedCount: v })}
             />
 
             <ModalActions
               onCancel={() => setRoomModal(false)}
               submitLabel="Add room"
+              loading={isSubmittingRoom}
             />
           </form>
         </Modal>
       )}
 
       {/* ================= ADD BEDS MODAL ================= */}
-
       {bedModal && (
         <Modal
           title="Add beds"
@@ -697,7 +710,6 @@ export default function RoomBedManagementPage() {
           onClose={() => setBedModal(false)}
         >
           <form onSubmit={handleAddBeds} className="space-y-4">
-
             <FormSelect
               label="Select room"
               value={newBed.roomId}
@@ -705,30 +717,26 @@ export default function RoomBedManagementPage() {
                 value: room.id,
                 label: `${room.name} · ${room.shelter}`,
               }))}
-              onChange={(v) =>
-                setNewBed({ ...newBed, roomId: v })
-              }
+              onChange={(v) => setNewBed({ ...newBed, roomId: v })}
             />
 
             <FormInput
               label="Number of beds to add"
               type="number"
               value={newBed.count}
-              onChange={(v) =>
-                setNewBed({ ...newBed, count: v })
-              }
+              onChange={(v) => setNewBed({ ...newBed, count: v })}
             />
 
             <ModalActions
               onCancel={() => setBedModal(false)}
               submitLabel="Add beds"
+              loading={isAddingBeds}
             />
           </form>
         </Modal>
       )}
 
       {/* ================= MANAGE ROOM MODAL ================= */}
-
       {manageModal && selectedRoom && (
         <Modal
           title={`Manage ${selectedRoom.name}`}
@@ -736,70 +744,74 @@ export default function RoomBedManagementPage() {
           onClose={() => setManageModal(false)}
         >
           <div className="space-y-3">
-
             <div className="grid grid-cols-2 gap-3">
-
               <div className="bg-[#f4f8fa] rounded-lg p-3">
-                <p className="text-[9px] text-slate-500">
-                  Total beds
-                </p>
-                <p className="text-xl font-bold">
-                  {selectedRoom.beds.length}
-                </p>
+                <p className="text-[9px] text-slate-500">Total beds</p>
+                <p className="text-xl font-bold">{selectedRoom.beds.length}</p>
               </div>
 
               <div className="bg-[#f4f8fa] rounded-lg p-3">
-                <p className="text-[9px] text-slate-500">
-                  Available beds
-                </p>
+                <p className="text-[9px] text-slate-500">Available beds</p>
                 <p className="text-xl font-bold text-[#269a77]">
-                  {selectedRoom.beds.filter(
-                    (b) => b.status === "Available"
-                  ).length}
+                  {
+                    selectedRoom.beds.filter((b) => b.status === "Available")
+                      .length
+                  }
                 </p>
               </div>
             </div>
 
-            <h3 className="text-xs font-semibold pt-2">
-              Room beds
-            </h3>
+            <h3 className="text-xs font-semibold pt-2">Room beds</h3>
 
-            {selectedRoom.beds.map((bed) => (
-              <div
-                key={bed.id}
-                className="flex items-center justify-between border border-slate-100 rounded-lg p-3"
-              >
-                <div>
-                  <p className="text-xs font-semibold">{bed.id}</p>
-                  <p className="text-[9px] text-slate-400 mt-1">
-                    {bed.resident || "No resident assigned"}
-                  </p>
-                </div>
-
-                <select
-                  value={bed.status}
-                  onChange={(e) =>
-                    updateBedStatus(
-                      selectedRoom.id,
-                      bed.id,
-                      e.target.value as BedStatus
-                    )
-                  }
-                  className="border border-slate-200 rounded-md px-2 py-1.5 text-[9px] outline-none"
+            <div className="max-h-[220px] overflow-y-auto space-y-2 pr-1">
+              {selectedRoom.beds.map((bed) => (
+                <div
+                  key={bed.id}
+                  className="flex items-center justify-between border border-slate-100 rounded-lg p-3"
                 >
-                  {bedStatuses.map((status) => (
-                    <option key={status}>{status}</option>
-                  ))}
-                </select>
-              </div>
-            ))}
+                  <div>
+                    <p className="text-xs font-semibold">{bed.id}</p>
+                    <p className="text-[9px] text-slate-400 mt-1">
+                      {bed.resident || "No resident assigned"}
+                    </p>
+                  </div>
+
+                  <select
+                    value={bed.status}
+                    onChange={(e) =>
+                      updateBedStatus(
+                        selectedRoom.id,
+                        bed.id,
+                        e.target.value as BedStatus,
+                        bed.resident
+                      )
+                    }
+                    className="border border-slate-200 rounded-md px-2 py-1.5 text-[9px] outline-none"
+                  >
+                    {bedStatuses.map((status) => (
+                      <option key={status}>{status}</option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
 
             <button
               onClick={deleteRoom}
-              className="w-full mt-3 border border-red-200 text-red-600 rounded-lg py-2.5 text-xs font-semibold flex justify-center items-center gap-2 hover:bg-red-50"
+              disabled={isDeletingRoom}
+              className="w-full mt-3 border border-red-200 text-red-600 rounded-lg py-2.5 text-xs font-semibold flex justify-center items-center gap-2 hover:bg-red-50 disabled:opacity-50"
             >
-              <Trash2 size={14} />
-              Delete room
+              {isDeletingRoom ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 size={14} />
+                  Delete room
+                </>
+              )}
             </button>
 
             <button
@@ -812,8 +824,7 @@ export default function RoomBedManagementPage() {
         </Modal>
       )}
 
-      {/* ================= BED STATUS MODAL ================= */}
-
+      {/* ================= BED STATUS QUICK MODAL ================= */}
       {selectedBed && (
         <Modal
           title={`Manage bed ${selectedBed.bedId}`}
@@ -821,16 +832,11 @@ export default function RoomBedManagementPage() {
           onClose={() => setSelectedBed(null)}
         >
           <div className="space-y-3">
-
             {bedStatuses.map((status) => (
               <button
                 key={status}
                 onClick={() =>
-                  updateBedStatus(
-                    selectedBed.roomId,
-                    selectedBed.bedId,
-                    status
-                  )
+                  updateBedStatus(selectedBed.roomId, selectedBed.bedId, status)
                 }
                 className="w-full flex items-center justify-between border border-slate-200 rounded-lg p-3 text-xs hover:bg-slate-50"
               >
@@ -846,14 +852,10 @@ export default function RoomBedManagementPage() {
       )}
 
       {/* ================= SUCCESS MESSAGE ================= */}
-
       {successMessage && (
-        <div className="fixed bottom-5 right-5 z-[70] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3">
-
-          <CheckCircle2 size={17} className="shrink-0" />
-
-          <p className="text-xs">{successMessage}</p>
-
+        <div className="fixed bottom-5 right-5 z-[70] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
+          <CheckCircle2 size={17} className="shrink-0 text-emerald-400" />
+          <p className="text-xs flex-1">{successMessage}</p>
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
           </button>
@@ -874,22 +876,16 @@ function RoomCard({
   onManage: () => void;
   onBedClick: (bedId: string) => void;
 }) {
-  const available = room.beds.filter(
-    (b) => b.status === "Available"
-  ).length;
+  const available = room.beds.filter((b) => b.status === "Available").length;
 
   return (
     <article className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
-
       {/* ROOM HEADER */}
-
       <div className="px-3.5 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
-
         <div className="min-w-0">
           <h3 className="text-[10px] font-bold">{room.name}</h3>
-
           <p className="text-[8px] text-slate-400 mt-1">
-            {room.type} · {room.floor}
+            {room.type} · {room.floor} · {room.shelter}
           </p>
         </div>
 
@@ -899,41 +895,26 @@ function RoomCard({
       </div>
 
       {/* BED GRID */}
-
       <div className="p-3.5 min-h-[98px]">
-
         <div className="flex flex-wrap gap-2">
-
           {room.beds.map((bed) => (
             <button
               key={bed.id}
               onClick={() => onBedClick(bed.id)}
-              title={`${bed.id} · ${bed.status}`}
+              title={`${bed.id} · ${bed.status}${bed.resident ? ` (${bed.resident})` : ""}`}
               className={`w-[90px] h-[70px] rounded-lg flex flex-col items-center justify-center gap-0.5 transition hover:scale-[1.03] ${bedStyle(bed.status)}`}
             >
               <BedDouble size={17} strokeWidth={1.8} />
-
-              <span className="text-[8px] font-semibold">
-                {bed.id}
-              </span>
-
-              <span className="text-[7px]">
-                {bed.status}
-              </span>
+              <span className="text-[8px] font-semibold">{bed.id}</span>
+              <span className="text-[7px]">{bed.status}</span>
             </button>
           ))}
-
         </div>
       </div>
 
       {/* ROOM FOOTER */}
-
       <div className="px-3.5 py-2.5 border-t border-slate-200 flex justify-between items-center">
-
-        <p className="text-[8px] text-slate-400">
-          {room.beds.length} total beds
-        </p>
-
+        <p className="text-[8px] text-slate-400">{room.beds.length} total beds</p>
         <button
           onClick={onManage}
           className="text-[8px] text-[#28749b] hover:underline font-medium"
@@ -968,19 +949,16 @@ function KpiCard({
 
   return (
     <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm p-3.5 flex items-center gap-3 min-h-[77px]">
-
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${styles[color]}`}>
+      <div
+        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${styles[color]}`}
+      >
         {icon}
       </div>
 
       <div className="min-w-0">
         <p className="text-[9px] text-slate-500">{title}</p>
-        <h3 className="text-[21px] font-bold leading-tight mt-0.5">
-          {value}
-        </h3>
-        <p className="text-[8px] text-slate-400 mt-0.5">
-          {description}
-        </p>
+        <h3 className="text-[21px] font-bold leading-tight mt-0.5">{value}</h3>
+        <p className="text-[8px] text-slate-400 mt-0.5">{description}</p>
       </div>
     </div>
   );
@@ -1000,16 +978,18 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full sm:min-w-[145px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </select>
 
       <ChevronDown
         size={13}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
       />
     </div>
   );
@@ -1034,9 +1014,7 @@ function StatusDot({ status }: { status: BedStatus }) {
     Unavailable: "bg-[#aab5bf]",
   };
 
-  return (
-    <span className={`w-2.5 h-2.5 rounded-sm ${styles[status]}`} />
-  );
+  return <span className={`w-2.5 h-2.5 rounded-sm ${styles[status]}`} />;
 }
 
 function LegendItem({ status }: { status: BedStatus }) {
@@ -1081,10 +1059,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
-
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
       <input
         required
         type={type}
@@ -1112,10 +1087,7 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
-
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -1144,17 +1116,12 @@ function Modal({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
       <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
-              {subtitle}
-            </p>
+            <p className="text-[10px] text-slate-400 mt-1">{subtitle}</p>
           </div>
-
           <button
             type="button"
             onClick={onClose}
@@ -1163,7 +1130,6 @@ function Modal({
             <X size={19} />
           </button>
         </div>
-
         {children}
       </div>
     </div>
@@ -1173,13 +1139,14 @@ function Modal({
 function ModalActions({
   onCancel,
   submitLabel,
+  loading = false,
 }: {
   onCancel: () => void;
   submitLabel: string;
+  loading?: boolean;
 }) {
   return (
     <div className="flex gap-3 pt-3">
-
       <button
         type="button"
         onClick={onCancel}
@@ -1190,9 +1157,17 @@ function ModalActions({
 
       <button
         type="submit"
-        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+        disabled={loading}
+        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665] flex items-center justify-center gap-2 disabled:opacity-50"
       >
-        {submitLabel}
+        {loading ? (
+          <>
+            <Loader2 size={14} className="animate-spin" />
+            Saving...
+          </>
+        ) : (
+          submitLabel
+        )}
       </button>
     </div>
   );

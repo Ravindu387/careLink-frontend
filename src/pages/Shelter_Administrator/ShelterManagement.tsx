@@ -1,10 +1,6 @@
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Search,
-  Globe,
-  Bell,
-  CircleHelp,
   ChevronRight,
   ChevronDown,
   Plus,
@@ -14,24 +10,19 @@ import {
   X,
   SlidersHorizontal,
   Building2,
-  MapPin,
-  Users,
+  AlertCircle,
+  Loader2,
+  RefreshCw,
+  CheckCircle2,
 } from "lucide-react";
+import { shelterService } from "../../services/shelterService";
+import type {
+  ShelterItem,
+  ShelterStatus,
+  ShelterSummary,
+} from "../../types/shelter";
 
-type ShelterStatus = "Near Capacity" | "Active" | "Full" | "Maintenance";
-
-type Shelter = {
-  id: string;
-  name: string;
-  district: string;
-  type: string;
-  capacity: number;
-  occupied: number;
-  manager: string;
-  status: ShelterStatus;
-};
-
-const initialShelters: Shelter[] = [
+const initialShelters: ShelterItem[] = [
   {
     id: "SH-001",
     name: "Riverton Central School",
@@ -117,9 +108,11 @@ const occupancyOptions = [
 ];
 
 export default function ShelterManagementPage() {
-  const [shelters, setShelters] = useState(initialShelters);
+  const [shelters, setShelters] = useState<ShelterItem[]>(initialShelters);
+  const [summary, setSummary] = useState<ShelterSummary | null>(null);
 
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [district, setDistrict] = useState("All districts");
   const [type, setType] = useState("All shelter types");
   const [status, setStatus] = useState("All statuses");
@@ -129,8 +122,18 @@ export default function ShelterManagementPage() {
   const [view, setView] = useState<"list" | "grid">("list");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedShelter, setSelectedShelter] = useState<Shelter | null>(null);
+  const [totalCount, setTotalCount] = useState(initialShelters.length);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5;
+
+  const [selectedShelter, setSelectedShelter] = useState<ShelterItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [newShelter, setNewShelter] = useState({
     name: "",
@@ -145,194 +148,180 @@ export default function ShelterManagementPage() {
     maxCapacity: "",
   });
 
-  const itemsPerPage = 5;
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-  // SUMMARY VALUES
-  const totalCapacity = shelters.reduce(
-    (sum, shelter) => sum + shelter.capacity,
-    0
-  );
+  // Fetch summary
+  const fetchSummary = useCallback(async () => {
+    try {
+      const data = await shelterService.getShelterSummary();
+      setSummary(data);
+    } catch {
+      // Calculate from local list if backend fails
+      const registered = shelters.length;
+      const operational = shelters.filter(
+        (s) => s.status === "Active" || s.status === "Near Capacity"
+      ).length;
+      const nearCap = shelters.filter((s) => s.status === "Near Capacity").length;
+      const maint = shelters.filter((s) => s.status === "Maintenance").length;
+      setSummary({ registered, operational, nearCapacity: nearCap, maintenance: maint });
+    }
+  }, [shelters]);
 
-  const totalOccupied = shelters.reduce(
-    (sum, shelter) => sum + shelter.occupied,
-    0
-  );
+  // Fetch shelters
+  const fetchShelters = useCallback(async () => {
+    setLoading(true);
+    setErrorMessage("");
+    try {
+      const params = {
+        search: debouncedSearch.trim() || undefined,
+        district: district !== "All districts" ? district : undefined,
+        type: type !== "All shelter types" ? type : undefined,
+        status: status !== "All statuses" ? status : undefined,
+        occupancy: occupancy !== "Any occupancy" ? occupancy : undefined,
+        minCapacity: extraFilters.minCapacity ? Number(extraFilters.minCapacity) : undefined,
+        maxCapacity: extraFilters.maxCapacity ? Number(extraFilters.maxCapacity) : undefined,
+        page: currentPage,
+        pageSize: itemsPerPage,
+      };
 
-  const registered = shelters.length;
-
-  const operational = shelters.filter(
-    (s) => s.status === "Active" || s.status === "Near Capacity"
-  ).length;
-
-  const nearCapacity = shelters.filter(
-    (s) => s.status === "Near Capacity"
-  ).length;
-
-  const maintenance = shelters.filter(
-    (s) => s.status === "Maintenance"
-  ).length;
-
-  // FILTERING
-  const filteredShelters = useMemo(() => {
-    return shelters.filter((shelter) => {
-      const matchesSearch =
-        shelter.name.toLowerCase().includes(search.toLowerCase()) ||
-        shelter.id.toLowerCase().includes(search.toLowerCase()) ||
-        shelter.manager.toLowerCase().includes(search.toLowerCase());
-
-      const matchesDistrict =
-        district === "All districts" || shelter.district === district;
-
-      const matchesType =
-        type === "All shelter types" || shelter.type === type;
-
-      const matchesStatus =
-        status === "All statuses" || shelter.status === status;
-
-      const remaining = shelter.capacity - shelter.occupied;
-
-      let matchesOccupancy = true;
-
-      if (occupancy === "Available spaces") {
-        matchesOccupancy = remaining > 0;
-      } else if (occupancy === "Near capacity") {
-        matchesOccupancy = shelter.status === "Near Capacity";
-      } else if (occupancy === "Fully occupied") {
-        matchesOccupancy = shelter.occupied === shelter.capacity;
-      } else if (occupancy === "Empty") {
-        matchesOccupancy = shelter.occupied === 0;
-      }
-
-      const matchesMin =
-        !extraFilters.minCapacity ||
-        shelter.capacity >= Number(extraFilters.minCapacity);
-
-      const matchesMax =
-        !extraFilters.maxCapacity ||
-        shelter.capacity <= Number(extraFilters.maxCapacity);
-
-      return (
-        matchesSearch &&
-        matchesDistrict &&
-        matchesType &&
-        matchesStatus &&
-        matchesOccupancy &&
-        matchesMin &&
-        matchesMax
-      );
-    });
+      const result = await shelterService.getShelters(params);
+      setShelters(result.items);
+      setTotalCount(result.totalCount);
+      setTotalPages(result.totalPages || 1);
+    } catch {
+      setErrorMessage("Could not load shelter records. Showing cached data.");
+    } finally {
+      setLoading(false);
+    }
   }, [
-    shelters,
-    search,
+    debouncedSearch,
     district,
     type,
     status,
     occupancy,
     extraFilters,
+    currentPage,
   ]);
 
-  // PAGINATION
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredShelters.length / itemsPerPage)
-  );
+  useEffect(() => {
+    fetchShelters();
+  }, [fetchShelters]);
 
-  const currentShelters = filteredShelters.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(() => {
+    fetchSummary();
+  }, [fetchSummary]);
 
-  // RESET PAGINATION WHEN FILTERING
-  const changeFilter = (callback: () => void) => {
-    callback();
-    setCurrentPage(1);
-  };
+  // Auto-clear success message
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   // REGISTER NEW SHELTER
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const capacity = Number(newShelter.capacity);
+    if (!newShelter.name.trim() || capacity <= 0) {
+      setErrorMessage("Please enter a valid shelter name and positive capacity.");
+      return;
+    }
 
-    if (!newShelter.name.trim() || capacity <= 0) return;
+    setIsSubmitting(true);
+    setErrorMessage("");
 
-    const shelter: Shelter = {
-      id: `SH-${String(Date.now()).slice(-4)}`,
-      name: newShelter.name,
-      district: newShelter.district,
-      type: newShelter.type,
-      capacity,
-      occupied: 0,
-      manager: newShelter.manager || "Not assigned",
-      status: "Active",
-    };
+    try {
+      await shelterService.createShelter({
+        name: newShelter.name.trim(),
+        district: newShelter.district,
+        type: newShelter.type,
+        capacity,
+        manager: newShelter.manager.trim() || "Not assigned",
+      });
 
-    setShelters((prev) => [...prev, shelter]);
-
-    setSearch("");
-    setDistrict("All districts");
-    setType("All shelter types");
-    setStatus("All statuses");
-    setOccupancy("Any occupancy");
-    setCurrentPage(1);
-
-    setNewShelter({
-      name: "",
-      district: "Central District",
-      type: "Public School",
-      capacity: "",
-      manager: "",
-    });
-
-    setModalOpen(false);
+      setSuccessMessage(`Shelter "${newShelter.name}" registered successfully.`);
+      setNewShelter({
+        name: "",
+        district: "Central District",
+        type: "Public School",
+        capacity: "",
+        manager: "",
+      });
+      setModalOpen(false);
+      setCurrentPage(1);
+      fetchShelters();
+      fetchSummary();
+    } catch {
+      setErrorMessage("Failed to register the shelter. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // EXPORT CSV
-  const handleExport = () => {
-    const headers = [
-      "Shelter ID",
-      "Shelter Name",
-      "District",
-      "Type",
-      "Capacity",
-      "Occupied",
-      "Available",
-      "Rate",
-      "Manager",
-      "Status",
-    ];
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const allShelters = await shelterService.getAllShelters();
+      const exportList = allShelters.length > 0 ? allShelters : shelters;
 
-    const rows = filteredShelters.map((s) => [
-      s.id,
-      s.name,
-      s.district,
-      s.type,
-      s.capacity,
-      s.occupied,
-      s.capacity - s.occupied,
-      `${Math.round((s.occupied / s.capacity) * 100)}%`,
-      s.manager,
-      s.status,
-    ]);
+      const headers = [
+        "Shelter ID",
+        "Shelter Name",
+        "District",
+        "Type",
+        "Capacity",
+        "Occupied",
+        "Available",
+        "Rate",
+        "Manager",
+        "Status",
+      ];
 
-    const csv = [headers, ...rows]
-      .map((row) =>
-        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")
-      )
-      .join("\n");
+      const rows = exportList.map((s) => [
+        s.id,
+        s.name,
+        s.district,
+        s.type,
+        s.capacity,
+        s.occupied,
+        s.capacity - s.occupied,
+        `${Math.round((s.occupied / (s.capacity || 1)) * 100)}%`,
+        s.manager,
+        s.status,
+      ]);
 
-    const blob = new Blob(["\uFEFF" + csv], {
-      type: "text/csv;charset=utf-8;",
-    });
+      const csv = [headers, ...rows]
+        .map((row) =>
+          row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")
+        )
+        .join("\n");
 
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+      const blob = new Blob(["\uFEFF" + csv], {
+        type: "text/csv;charset=utf-8;",
+      });
 
-    link.href = url;
-    link.download = "shelter-management.csv";
-    link.click();
-
-    URL.revokeObjectURL(url);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `shelter-management-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      setSuccessMessage("Shelter data exported successfully.");
+    } catch {
+      setErrorMessage("Failed to export shelters.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const resetFilters = () => {
@@ -345,13 +334,20 @@ export default function ShelterManagementPage() {
     setCurrentPage(1);
   };
 
+  const registeredVal = summary ? summary.registered : shelters.length;
+  const operationalVal = summary
+    ? summary.operational
+    : shelters.filter((s) => s.status === "Active" || s.status === "Near Capacity").length;
+  const nearCapVal = summary
+    ? summary.nearCapacity
+    : shelters.filter((s) => s.status === "Near Capacity").length;
+  const maintVal = summary
+    ? summary.maintenance
+    : shelters.filter((s) => s.status === "Maintenance").length;
+
   return (
     <div className="min-h-screen bg-[#eef5f7] text-[#123e60] font-sans">
-
-      {/* ================= MAIN ================= */}
-
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
-
         {/* BREADCRUMB */}
         <div className="flex items-center gap-2 text-[9px] mb-7">
           <span className="text-slate-400">CareLink</span>
@@ -361,27 +357,69 @@ export default function ShelterManagementPage() {
           <span className="font-semibold">Shelter Management</span>
         </div>
 
+        {/* FEEDBACK BANNERS */}
+        {errorMessage && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center justify-between text-xs animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <AlertCircle size={16} className="text-red-500 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              onClick={() => setErrorMessage("")}
+              className="text-red-500 hover:text-red-700 font-semibold"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between text-xs animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+              <span>{successMessage}</span>
+            </div>
+            <button
+              onClick={() => setSuccessMessage("")}
+              className="text-emerald-500 hover:text-emerald-700 font-semibold"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
+
         {/* PAGE HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-
           <div>
             <h1 className="text-[23px] md:text-[25px] font-normal">
               Shelter Management
             </h1>
-
             <p className="text-[11px] text-slate-500 mt-2">
               Register, monitor, and manage emergency shelter facilities.
             </p>
           </div>
 
           <div className="flex gap-2">
+            <button
+              onClick={() => {
+                fetchShelters();
+                fetchSummary();
+              }}
+              disabled={loading}
+              title="Refresh data"
+              className="h-9 px-3 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold flex items-center gap-1.5 hover:bg-slate-50 disabled:opacity-50"
+            >
+              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
 
             <button
               onClick={handleExport}
-              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-slate-50"
+              disabled={isExporting}
+              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-slate-50 disabled:opacity-50"
             >
               <Download size={14} />
-              Export
+              {isExporting ? "Exporting..." : "Export"}
             </button>
 
             <button
@@ -395,72 +433,64 @@ export default function ShelterManagementPage() {
         </div>
 
         {/* ================= SUMMARY BAR ================= */}
-
-        <section className="bg-white border border-[#d5e3e9] rounded-lg grid grid-cols-2 md:grid-cols-4 mb-3 py-3">
-
-          <SummaryItem value={registered} label="Registered" />
-
-          <SummaryItem value={operational} label="Operational" />
-
-          <SummaryItem value={nearCapacity} label="Near capacity" />
-
-          <SummaryItem value={maintenance} label="Under maintenance" />
-
+        <section className="bg-white border border-[#d5e3e9] rounded-lg grid grid-cols-2 md:grid-cols-4 mb-3 py-3 shadow-sm">
+          <SummaryItem value={registeredVal} label="Registered" />
+          <SummaryItem value={operationalVal} label="Operational" />
+          <SummaryItem value={nearCapVal} label="Near capacity" />
+          <SummaryItem value={maintVal} label="Under maintenance" />
         </section>
 
         {/* ================= SEARCH + FILTERS ================= */}
-
         <section className="flex flex-col xl:flex-row gap-2 mb-3">
-
           {/* SEARCH */}
           <div className="relative flex-1 min-w-0">
             <Search
               size={15}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
-
             <input
               value={search}
-              onChange={(e) =>
-                changeFilter(() => setSearch(e.target.value))
-              }
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by shelter name or ID..."
               className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-[10px] outline-none focus:border-[#45b99b]"
             />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 xl:flex gap-2">
-
             <FilterSelect
               value={district}
               options={districts}
-              onChange={(v) =>
-                changeFilter(() => setDistrict(v))
-              }
+              onChange={(v) => {
+                setDistrict(v);
+                setCurrentPage(1);
+              }}
             />
 
             <FilterSelect
               value={type}
               options={shelterTypes}
-              onChange={(v) =>
-                changeFilter(() => setType(v))
-              }
+              onChange={(v) => {
+                setType(v);
+                setCurrentPage(1);
+              }}
             />
 
             <FilterSelect
               value={status}
               options={statuses}
-              onChange={(v) =>
-                changeFilter(() => setStatus(v))
-              }
+              onChange={(v) => {
+                setStatus(v);
+                setCurrentPage(1);
+              }}
             />
 
             <FilterSelect
               value={occupancy}
               options={occupancyOptions}
-              onChange={(v) =>
-                changeFilter(() => setOccupancy(v))
-              }
+              onChange={(v) => {
+                setOccupancy(v);
+                setCurrentPage(1);
+              }}
             />
 
             <button
@@ -479,13 +509,11 @@ export default function ShelterManagementPage() {
 
         {/* MORE FILTERS */}
         {moreFilters && (
-          <div className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-
+          <div className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3 grid grid-cols-1 sm:grid-cols-3 gap-3 shadow-sm animate-in fade-in">
             <div>
               <label className="text-[10px] font-semibold block mb-1.5">
                 Minimum capacity
               </label>
-
               <input
                 type="number"
                 min="0"
@@ -506,7 +534,6 @@ export default function ShelterManagementPage() {
               <label className="text-[10px] font-semibold block mb-1.5">
                 Maximum capacity
               </label>
-
               <input
                 type="number"
                 min="0"
@@ -535,25 +562,18 @@ export default function ShelterManagementPage() {
         )}
 
         {/* ================= REGISTERED SHELTERS ================= */}
-
         <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
-
           {/* TABLE HEADER */}
           <div className="px-4 py-3 flex items-center justify-between border-b border-slate-200">
-
             <div>
-              <h2 className="text-xs font-semibold">
-                Registered shelters
-              </h2>
-
+              <h2 className="text-xs font-semibold">Registered shelters</h2>
               <p className="text-[9px] text-slate-400 mt-1">
-                {shelters.length} shelters · demonstration records
+                {totalCount} shelters · live administrative records
               </p>
             </div>
 
             {/* VIEW TOGGLE */}
             <div className="flex border border-slate-200 rounded-md p-0.5">
-
               <button
                 onClick={() => setView("list")}
                 className={`w-7 h-7 flex items-center justify-center rounded ${
@@ -580,14 +600,19 @@ export default function ShelterManagementPage() {
             </div>
           </div>
 
+          {/* LOADING STATE */}
+          {loading && (
+            <div className="flex items-center justify-center py-16 text-slate-400 gap-2">
+              <Loader2 size={18} className="animate-spin text-[#1c5d83]" />
+              <span className="text-xs">Loading shelter data...</span>
+            </div>
+          )}
+
           {/* LIST VIEW */}
-          {view === "list" && (
+          {!loading && view === "list" && (
             <div className="overflow-x-auto">
-
               <table className="w-full min-w-[950px] text-left">
-
                 <thead className="bg-[#f5f9fa] border-b border-slate-200">
-
                   <tr className="text-[8px] text-slate-500">
                     <th className="px-3 py-3 font-medium">Shelter ID</th>
                     <th className="px-3 py-3 font-medium">Shelter Name</th>
@@ -604,13 +629,10 @@ export default function ShelterManagementPage() {
                 </thead>
 
                 <tbody>
-                  {currentShelters.map((shelter) => {
-
-                    const available =
-                      shelter.capacity - shelter.occupied;
-
+                  {shelters.map((shelter) => {
+                    const available = shelter.capacity - shelter.occupied;
                     const rate = Math.round(
-                      (shelter.occupied / shelter.capacity) * 100
+                      (shelter.occupied / (shelter.capacity || 1)) * 100
                     );
 
                     return (
@@ -622,54 +644,25 @@ export default function ShelterManagementPage() {
                         <td className="px-3 py-3.5 font-semibold text-[#174f75]">
                           {shelter.id}
                         </td>
-
-                        <td className="px-3 py-3.5">
-                          {shelter.name}
-                        </td>
-
-                        <td className="px-3 py-3.5">
-                          {shelter.district}
-                        </td>
-
-                        <td className="px-3 py-3.5">
-                          {shelter.type}
-                        </td>
-
-                        <td className="px-3 py-3.5">
-                          {shelter.capacity}
-                        </td>
-
-                        <td className="px-3 py-3.5">
-                          {shelter.occupied}
-                        </td>
-
-                        <td className="px-3 py-3.5">
-                          {available}
-                        </td>
-
-                        <td className="px-3 py-3.5">
-                          {rate}%
-                        </td>
-
-                        <td className="px-3 py-3.5">
-                          {shelter.manager}
-                        </td>
-
+                        <td className="px-3 py-3.5">{shelter.name}</td>
+                        <td className="px-3 py-3.5">{shelter.district}</td>
+                        <td className="px-3 py-3.5">{shelter.type}</td>
+                        <td className="px-3 py-3.5">{shelter.capacity}</td>
+                        <td className="px-3 py-3.5">{shelter.occupied}</td>
+                        <td className="px-3 py-3.5">{available}</td>
+                        <td className="px-3 py-3.5">{rate}%</td>
+                        <td className="px-3 py-3.5">{shelter.manager}</td>
                         <td className="px-3 py-3.5">
                           <StatusBadge status={shelter.status} />
                         </td>
-
                         <td className="px-3 py-3.5">
-                          <ChevronRight
-                            size={13}
-                            className="text-slate-400"
-                          />
+                          <ChevronRight size={13} className="text-slate-400" />
                         </td>
                       </tr>
                     );
                   })}
 
-                  {currentShelters.length === 0 && (
+                  {shelters.length === 0 && (
                     <tr>
                       <td
                         colSpan={11}
@@ -685,12 +678,11 @@ export default function ShelterManagementPage() {
           )}
 
           {/* GRID VIEW */}
-          {view === "grid" && (
+          {!loading && view === "grid" && (
             <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-
-              {currentShelters.map((shelter) => {
+              {shelters.map((shelter) => {
                 const rate = Math.round(
-                  (shelter.occupied / shelter.capacity) * 100
+                  (shelter.occupied / (shelter.capacity || 1)) * 100
                 );
 
                 return (
@@ -707,7 +699,6 @@ export default function ShelterManagementPage() {
                     <h3 className="text-xs font-semibold mt-4">
                       {shelter.name}
                     </h3>
-
                     <p className="text-[9px] text-slate-400 mt-1">
                       {shelter.id} · {shelter.district}
                     </p>
@@ -721,7 +712,7 @@ export default function ShelterManagementPage() {
                       <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
                         <div
                           className="h-full bg-[#45b99b] rounded-full"
-                          style={{ width: `${rate}%` }}
+                          style={{ width: `${Math.min(rate, 100)}%` }}
                         />
                       </div>
                     </div>
@@ -733,22 +724,27 @@ export default function ShelterManagementPage() {
                   </button>
                 );
               })}
+
+              {shelters.length === 0 && (
+                <div className="col-span-full text-center py-12 text-xs text-slate-400">
+                  No shelters found. Try changing your filters.
+                </div>
+              )}
             </div>
           )}
 
           {/* PAGINATION */}
           <div className="px-3.5 py-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-
             <p className="text-[9px] text-slate-400">
-              Showing {filteredShelters.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}
+              Showing{" "}
+              {totalCount === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}
               {"–"}
-              {Math.min(currentPage * itemsPerPage, filteredShelters.length)}
+              {Math.min(currentPage * itemsPerPage, totalCount)}
               {" of "}
-              {filteredShelters.length}
+              {totalCount}
             </p>
 
             <div className="flex items-center gap-1">
-
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
@@ -774,7 +770,7 @@ export default function ShelterManagementPage() {
               )}
 
               <button
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || totalPages === 0}
                 onClick={() => setCurrentPage((p) => p + 1)}
                 className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
               >
@@ -786,16 +782,14 @@ export default function ShelterManagementPage() {
 
         {/* SHELTER DETAIL PANEL */}
         {selectedShelter && (
-          <div className="fixed inset-0 z-40 bg-black/30 flex justify-end">
-
-            <div className="bg-white w-full max-w-md h-full shadow-2xl p-6 overflow-y-auto">
-
+          <div className="fixed inset-0 z-40 bg-black/30 flex justify-end animate-in fade-in">
+            <div className="bg-white w-full max-w-md h-full shadow-2xl p-6 overflow-y-auto animate-in slide-in-from-right">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold">
-                  Shelter details
-                </h2>
-
-                <button onClick={() => setSelectedShelter(null)}>
+                <h2 className="text-lg font-semibold">Shelter details</h2>
+                <button
+                  onClick={() => setSelectedShelter(null)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
                   <X size={20} />
                 </button>
               </div>
@@ -808,7 +802,6 @@ export default function ShelterManagementPage() {
                 <h3 className="text-lg font-semibold mt-4">
                   {selectedShelter.name}
                 </h3>
-
                 <p className="text-xs text-slate-400 mt-1">
                   {selectedShelter.id}
                 </p>
@@ -819,23 +812,36 @@ export default function ShelterManagementPage() {
               </div>
 
               <div className="mt-6 space-y-4 text-xs">
-
                 <DetailRow label="District" value={selectedShelter.district} />
                 <DetailRow label="Shelter type" value={selectedShelter.type} />
                 <DetailRow label="Manager" value={selectedShelter.manager} />
-                <DetailRow label="Total capacity" value={String(selectedShelter.capacity)} />
-                <DetailRow label="Occupied" value={String(selectedShelter.occupied)} />
-                <DetailRow label="Available spaces" value={String(selectedShelter.capacity - selectedShelter.occupied)} />
-
+                <DetailRow
+                  label="Total capacity"
+                  value={String(selectedShelter.capacity)}
+                />
+                <DetailRow
+                  label="Occupied"
+                  value={String(selectedShelter.occupied)}
+                />
+                <DetailRow
+                  label="Available spaces"
+                  value={String(
+                    selectedShelter.capacity - selectedShelter.occupied
+                  )}
+                />
                 <DetailRow
                   label="Occupancy rate"
-                  value={`${Math.round((selectedShelter.occupied / selectedShelter.capacity) * 100)}%`}
+                  value={`${Math.round(
+                    (selectedShelter.occupied /
+                      (selectedShelter.capacity || 1)) *
+                      100
+                  )}%`}
                 />
               </div>
 
               <button
                 onClick={() => setSelectedShelter(null)}
-                className="w-full mt-8 bg-[#1c5d83] text-white py-3 rounded-lg text-xs font-semibold"
+                className="w-full mt-8 bg-[#1c5d83] hover:bg-[#144665] text-white py-3 rounded-lg text-xs font-semibold transition"
               >
                 Close details
               </button>
@@ -845,28 +851,25 @@ export default function ShelterManagementPage() {
 
         {/* REGISTER SHELTER MODAL */}
         {modalOpen && (
-          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
-            <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6">
-
+          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4 animate-in fade-in">
+            <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 animate-in zoom-in-95">
               <div className="flex justify-between items-center mb-5">
                 <div>
-                  <h2 className="text-lg font-semibold">
-                    Register shelter
-                  </h2>
-
+                  <h2 className="text-lg font-semibold">Register shelter</h2>
                   <p className="text-xs text-slate-400 mt-1">
                     Add a new emergency shelter facility.
                   </p>
                 </div>
 
-                <button onClick={() => setModalOpen(false)}>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
                   <X size={19} />
                 </button>
               </div>
 
               <form onSubmit={handleRegister} className="space-y-4">
-
                 <FormInput
                   label="Shelter name"
                   value={newShelter.name}
@@ -916,17 +919,26 @@ export default function ShelterManagementPage() {
                 <div className="flex gap-3 pt-2">
                   <button
                     type="button"
+                    disabled={isSubmitting}
                     onClick={() => setModalOpen(false)}
-                    className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold"
+                    className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50 transition"
                   >
                     Cancel
                   </button>
 
                   <button
                     type="submit"
-                    className="flex-1 bg-[#1c5d83] text-white rounded-lg py-3 text-xs font-semibold"
+                    disabled={isSubmitting}
+                    className="flex-1 bg-[#1c5d83] hover:bg-[#144665] text-white rounded-lg py-3 text-xs font-semibold flex items-center justify-center gap-2 transition disabled:opacity-60"
                   >
-                    Register shelter
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        <span>Registering...</span>
+                      </>
+                    ) : (
+                      <span>Register shelter</span>
+                    )}
                   </button>
                 </div>
               </form>
@@ -972,7 +984,7 @@ function FilterSelect({
         className="w-full xl:w-[125px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-7 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
 
@@ -993,7 +1005,11 @@ function StatusBadge({ status }: { status: ShelterStatus }) {
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+    <span
+      className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${
+        styles[status] || styles.Active
+      }`}
+    >
       {status}
     </span>
   );
@@ -1014,10 +1030,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
-
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
       <input
         required
         type={type}
@@ -1044,17 +1057,14 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
-
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
     </div>

@@ -1,11 +1,7 @@
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import {
   Search,
-  Globe,
-  Bell,
-  CircleHelp,
   ChevronRight,
   ChevronDown,
   Plus,
@@ -19,78 +15,21 @@ import {
   UserRound,
   CalendarDays,
   ClipboardList,
-  Settings,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
+import { maintenanceService } from "../../services/maintenanceService";
+import type {
+  MaintenanceRequest,
+  MaintenanceSummary,
+  Priority,
+  RequestStatus,
+  CreateMaintenanceRequestInput,
+} from "../../types/maintenance";
 
-/* ================= TYPES ================= */
+/* ================= DEFAULT FALLBACK LISTS ================= */
 
-type Priority = "Critical" | "High" | "Medium" | "Low";
-
-type RequestStatus =
-  | "In Progress"
-  | "Assigned"
-  | "Completed"
-  | "Pending"
-  | "On Hold";
-
-type MaintenanceRequest = {
-  id: string;
-  issue: string;
-  category: string;
-  shelter: string;
-  room: string;
-  reported: string;
-  priority: Priority;
-  technician: string;
-  status: RequestStatus;
-  description: string;
-};
-
-/* ================= SAMPLE DATA ================= */
-
-const initialRequests: MaintenanceRequest[] = [
-  {
-    id: "MR-341",
-    issue: "Water pump pressure failure",
-    category: "Plumbing",
-    shelter: "St. Mary Civic",
-    room: "Utility Room",
-    reported: "22 Jun · 12:02",
-    priority: "Critical",
-    technician: "N. Kumara",
-    status: "In Progress",
-    description:
-      "Water pump pressure has dropped significantly. The maintenance team needs to inspect the pump and restore normal water supply.",
-  },
-  {
-    id: "MR-337",
-    issue: "Lighting fault",
-    category: "Electrical",
-    shelter: "Riverton Central",
-    room: "Corridor B",
-    reported: "22 Jun · 08:42",
-    priority: "Medium",
-    technician: "D. Silva",
-    status: "Assigned",
-    description:
-      "Several corridor lights are not functioning. Electrical inspection and replacement are required.",
-  },
-  {
-    id: "MR-329",
-    issue: "Blocked drainage",
-    category: "Plumbing",
-    shelter: "North Community",
-    room: "Rear Yard",
-    reported: "21 Jun · 14:18",
-    priority: "High",
-    technician: "M. Perera",
-    status: "Completed",
-    description:
-      "Drainage blockage reported in the rear yard. Cleaning and inspection have been completed.",
-  },
-];
-
-const categories = [
+const defaultCategories = [
   "Plumbing",
   "Electrical",
   "Structural",
@@ -100,7 +39,7 @@ const categories = [
   "Other",
 ];
 
-const technicians = [
+const defaultTechnicians = [
   "N. Kumara",
   "D. Silva",
   "M. Perera",
@@ -109,7 +48,7 @@ const technicians = [
   "Unassigned",
 ];
 
-const shelters = [
+const defaultShelters = [
   "St. Mary Civic",
   "Riverton Central",
   "North Community",
@@ -117,14 +56,14 @@ const shelters = [
   "Hillview College",
 ];
 
-const priorities: Priority[] = [
+const defaultPriorities: Priority[] = [
   "Critical",
   "High",
   "Medium",
   "Low",
 ];
 
-const statuses: RequestStatus[] = [
+const defaultStatuses: RequestStatus[] = [
   "In Progress",
   "Assigned",
   "Completed",
@@ -135,102 +74,139 @@ const statuses: RequestStatus[] = [
 /* ================= MAIN COMPONENT ================= */
 
 export default function MaintenanceIncidentsPage() {
-  const [requests, setRequests] =
-    useState<MaintenanceRequest[]>(initialRequests);
+  const [requests, setRequests] = useState<MaintenanceRequest[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
 
+  const [summary, setSummary] = useState<MaintenanceSummary>({
+    criticalCount: 0,
+    inProgressCount: 0,
+    completedCount: 0,
+    pendingCount: 0,
+    onHoldCount: 0,
+    totalCount: 0,
+  });
+
+  const [categories, setCategories] = useState<string[]>(defaultCategories);
+  const [technicians, setTechnicians] = useState<string[]>(defaultTechnicians);
+  const [shelters, setShelters] = useState<string[]>(defaultShelters);
+  const [priorities] = useState<Priority[]>(defaultPriorities);
+  const [statuses] = useState<RequestStatus[]>(defaultStatuses);
+
+  // Filters
   const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] =
-    useState("All categories");
-  const [priorityFilter, setPriorityFilter] =
-    useState("All priorities");
-  const [statusFilter, setStatusFilter] =
-    useState("All statuses");
-  const [technicianFilter, setTechnicianFilter] =
-    useState("All technicians");
-  const [shelterFilter, setShelterFilter] =
-    useState("All shelters");
+  const [categoryFilter, setCategoryFilter] = useState("All categories");
+  const [priorityFilter, setPriorityFilter] = useState("All priorities");
+  const [statusFilter, setStatusFilter] = useState("All statuses");
+  const [technicianFilter, setTechnicianFilter] = useState("All technicians");
+  const [shelterFilter, setShelterFilter] = useState("All shelters");
+
+  // UI state
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdatingField, setIsUpdatingField] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedRequest, setSelectedRequest] =
     useState<MaintenanceRequest | null>(null);
 
-  const [successMessage, setSuccessMessage] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
-
-  const [newRequest, setNewRequest] = useState({
+  // Form state
+  const [newRequest, setNewRequest] = useState<CreateMaintenanceRequestInput>({
     issue: "",
     category: "Plumbing",
     shelter: "Riverton Central",
     room: "",
-    priority: "Medium" as Priority,
+    priority: "Medium",
     technician: "Unassigned",
     description: "",
   });
 
-  /* ================= FILTER REQUESTS ================= */
+  /* ================= FETCH DATA ================= */
 
-  const filteredRequests = useMemo(() => {
-    return requests.filter((request) => {
-      const searchMatch = [
-        request.id,
-        request.issue,
-        request.category,
-        request.shelter,
-        request.room,
-        request.technician,
-      ].some((value) =>
-        value.toLowerCase().includes(search.toLowerCase())
-      );
+  const fetchSummary = useCallback(async () => {
+    try {
+      const summaryData = await maintenanceService.getSummary();
+      setSummary(summaryData);
+    } catch (err) {
+      console.error("Failed to load maintenance summary:", err);
+    }
+  }, []);
 
-      return (
-        searchMatch &&
-        (categoryFilter === "All categories" ||
-          request.category === categoryFilter) &&
-        (priorityFilter === "All priorities" ||
-          request.priority === priorityFilter) &&
-        (statusFilter === "All statuses" ||
-          request.status === statusFilter) &&
-        (technicianFilter === "All technicians" ||
-          request.technician === technicianFilter) &&
-        (shelterFilter === "All shelters" ||
-          request.shelter === shelterFilter)
+  const fetchMeta = useCallback(async () => {
+    try {
+      const meta = await maintenanceService.getMeta();
+      if (meta.categories?.length) setCategories(meta.categories);
+      if (meta.technicians?.length) setTechnicians(meta.technicians);
+      if (meta.shelters?.length) setShelters(meta.shelters);
+    } catch (err) {
+      console.warn("Using default metadata fallback:", err);
+    }
+  }, []);
+
+  const fetchRequests = useCallback(async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const result = await maintenanceService.getRequests({
+        search: search.trim() || undefined,
+        category:
+          categoryFilter !== "All categories" ? categoryFilter : undefined,
+        priority:
+          priorityFilter !== "All priorities" ? priorityFilter : undefined,
+        status: statusFilter !== "All statuses" ? statusFilter : undefined,
+        technician:
+          technicianFilter !== "All technicians" ? technicianFilter : undefined,
+        shelter: shelterFilter !== "All shelters" ? shelterFilter : undefined,
+        page: currentPage,
+        pageSize,
+      });
+
+      setRequests(result.items);
+      setTotalCount(result.totalCount);
+      setTotalPages(Math.max(1, result.totalPages));
+    } catch (err: any) {
+      setErrorMessage(
+        err?.message || "Failed to load maintenance requests. Please try again."
       );
-    });
+    } finally {
+      setIsLoading(false);
+    }
   }, [
-    requests,
     search,
     categoryFilter,
     priorityFilter,
     statusFilter,
     technicianFilter,
     shelterFilter,
+    currentPage,
+    pageSize,
   ]);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredRequests.length / pageSize)
-  );
+  // Initial load
+  useEffect(() => {
+    fetchMeta();
+  }, [fetchMeta]);
 
-  const paginatedRequests = filteredRequests.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  // Fetch summary and requests when filter or pagination changes
+  useEffect(() => {
+    fetchRequests();
+    fetchSummary();
+  }, [fetchRequests, fetchSummary]);
 
-  /* ================= COUNTS ================= */
-
-  const criticalCount = requests.filter(
-    (r) => r.priority === "Critical" && r.status !== "Completed"
-  ).length;
-
-  const inProgressCount = requests.filter(
-    (r) => r.status === "In Progress"
-  ).length;
-
-  const completedCount = requests.filter(
-    (r) => r.status === "Completed"
-  ).length;
+  // Auto-dismiss success toast
+  useEffect(() => {
+    if (!successMessage) return;
+    const timer = setTimeout(() => {
+      setSuccessMessage("");
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [successMessage]);
 
   /* ================= RESET FILTERS ================= */
 
@@ -246,130 +222,149 @@ export default function MaintenanceIncidentsPage() {
 
   /* ================= CREATE REQUEST ================= */
 
-  const handleCreateRequest = (
-    e: FormEvent<HTMLFormElement>
-  ) => {
+  const handleCreateRequest = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!newRequest.issue.trim() || !newRequest.description.trim()) {
+      return;
+    }
 
-    const nextNumber =
-      Math.max(
-        0,
-        ...requests.map(
-          (r) => Number(r.id.replace("MR-", "")) || 0
-        )
-      ) + 1;
+    setIsSubmitting(true);
+    try {
+      const created = await maintenanceService.createRequest({
+        ...newRequest,
+        room: newRequest.room.trim() || "Main Facility",
+      });
 
-    const request: MaintenanceRequest = {
-      ...newRequest,
-      id: `MR-${nextNumber}`,
-      reported: `22 Jun · ${new Date().toLocaleTimeString(
-        "en-GB",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        }
-      )}`,
-      status: "Pending",
-    };
+      setNewRequest({
+        issue: "",
+        category: "Plumbing",
+        shelter: "Riverton Central",
+        room: "",
+        priority: "Medium",
+        technician: "Unassigned",
+        description: "",
+      });
 
-    setRequests((prev) => [request, ...prev]);
+      resetFilters();
+      setShowCreateModal(false);
+      setSuccessMessage(`${created.id} created successfully.`);
 
-    setNewRequest({
-      issue: "",
-      category: "Plumbing",
-      shelter: "Riverton Central",
-      room: "",
-      priority: "Medium",
-      technician: "Unassigned",
-      description: "",
-    });
-
-    resetFilters();
-    setShowCreateModal(false);
-    setSuccessMessage(
-      `${request.id} created successfully.`
-    );
+      await fetchRequests();
+      await fetchSummary();
+    } catch (err: any) {
+      alert(err?.message || "Failed to create maintenance request.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   /* ================= UPDATE REQUEST ================= */
 
-  const updateRequest = (
+  const handleUpdateRequestField = async (
     id: string,
     changes: Partial<MaintenanceRequest>
   ) => {
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.id === id
-          ? { ...request, ...changes }
-          : request
-      )
-    );
+    setIsUpdatingField(true);
+    try {
+      const updated = await maintenanceService.updateRequest(id, changes);
 
-    setSelectedRequest((prev) =>
-      prev && prev.id === id
-        ? { ...prev, ...changes }
-        : prev
-    );
+      setRequests((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, ...updated } : r))
+      );
 
-    setSuccessMessage("Maintenance request updated.");
+      setSelectedRequest((prev) =>
+        prev && prev.id === id ? { ...prev, ...updated } : prev
+      );
+
+      setSuccessMessage("Maintenance request updated.");
+      await fetchSummary();
+    } catch (err: any) {
+      alert(err?.message || "Failed to update maintenance request.");
+    } finally {
+      setIsUpdatingField(false);
+    }
   };
 
   /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-[#eef5f7] text-[#123e60] font-sans">
-
       {/* MAIN CONTENT */}
-
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
-
         {/* BREADCRUMB */}
-
         <div className="flex items-center gap-2 text-[9px] mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
-          <span className="text-slate-400">
-            Shelter Administration
-          </span>
+          <span className="text-slate-400">Shelter Administration</span>
           <ChevronRight size={11} className="text-slate-400" />
-          <span className="font-semibold">
-            Maintenance & Incidents
-          </span>
+          <span className="font-semibold">Maintenance & Incidents</span>
         </div>
 
+        {/* ERROR BANNER */}
+        {errorMessage && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={16} className="text-red-500 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              onClick={() => {
+                fetchRequests();
+                fetchSummary();
+              }}
+              className="text-xs font-semibold text-red-600 hover:text-red-800 underline flex items-center gap-1"
+            >
+              <RefreshCw size={12} />
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* PAGE HEADER */}
-
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-
           <div>
             <h1 className="text-[23px] md:text-[25px] font-normal">
               Maintenance & Incidents
             </h1>
-
             <p className="text-[11px] text-slate-500 mt-2">
               Track facility faults, repairs, technicians, and resolution progress.
             </p>
           </div>
 
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
-          >
-            <Plus size={14} />
-            Create request
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                fetchRequests();
+                fetchSummary();
+              }}
+              title="Refresh requests"
+              disabled={isLoading}
+              className="h-9 px-3 bg-white border border-[#aac4d2] text-[#1c638a] rounded-lg text-[10px] font-semibold flex items-center justify-center gap-1.5 hover:bg-slate-50 disabled:opacity-50"
+            >
+              <RefreshCw
+                size={13}
+                className={isLoading ? "animate-spin" : ""}
+              />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
+            >
+              <Plus size={14} />
+              Create request
+            </button>
+          </div>
         </div>
 
         {/* SEARCH AND FILTERS */}
-
         <section className="flex flex-col xl:flex-row gap-2 mb-3">
-
           <div className="relative flex-1 min-w-0">
             <Search
               size={15}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
-
             <input
               value={search}
               onChange={(e) => {
@@ -382,7 +377,6 @@ export default function MaintenanceIncidentsPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 xl:flex gap-2">
-
             <FilterSelect
               value={categoryFilter}
               options={["All categories", ...categories]}
@@ -434,25 +428,19 @@ export default function MaintenanceIncidentsPage() {
         </section>
 
         {/* ADVANCED FILTERS */}
-
         {showFilters && (
           <section className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3">
-
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xs font-semibold">
-                Advanced filters
-              </h3>
-
+              <h3 className="text-xs font-semibold">Advanced filters</h3>
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#267ca6] font-semibold"
+                className="text-[10px] text-[#267ca6] font-semibold hover:underline"
               >
                 Clear all
               </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
               <FilterSelect
                 value={shelterFilter}
                 options={["All shelters", ...shelters]}
@@ -461,7 +449,6 @@ export default function MaintenanceIncidentsPage() {
                   setCurrentPage(1);
                 }}
               />
-
               <p className="text-[9px] text-slate-400 self-center">
                 Filter requests by the shelter where the fault was reported.
               </p>
@@ -470,18 +457,11 @@ export default function MaintenanceIncidentsPage() {
         )}
 
         {/* MAINTENANCE REQUESTS TABLE */}
-
         <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
-
           {/* TABLE HEADER */}
-
           <div className="px-3.5 py-3.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-
             <div>
-              <h2 className="text-xs font-semibold">
-                Maintenance requests
-              </h2>
-
+              <h2 className="text-xs font-semibold">Maintenance requests</h2>
               <p className="text-[8px] text-slate-400 mt-1">
                 Sensitive information restricted to authorised staff
               </p>
@@ -493,100 +473,36 @@ export default function MaintenanceIncidentsPage() {
           </div>
 
           {/* TABLE */}
-
           <div className="overflow-x-auto">
-
             <table className="w-full min-w-[900px] text-left">
-
               <thead className="bg-[#f5f9fa] border-b border-slate-200">
                 <tr className="text-[8px] text-slate-500">
-
-                  <th className="px-3 py-3 font-medium">
-                    Request ID
-                  </th>
-
-                  <th className="px-3 py-3 font-medium">
-                    Issue
-                  </th>
-
-                  <th className="px-3 py-3 font-medium">
-                    Shelter
-                  </th>
-
-                  <th className="px-3 py-3 font-medium">
-                    Room / Area
-                  </th>
-
-                  <th className="px-3 py-3 font-medium">
-                    Reported
-                  </th>
-
-                  <th className="px-3 py-3 font-medium">
-                    Priority
-                  </th>
-
-                  <th className="px-3 py-3 font-medium">
-                    Technician
-                  </th>
-
-                  <th className="px-3 py-3 font-medium">
-                    Status
-                  </th>
-
+                  <th className="px-3 py-3 font-medium">Request ID</th>
+                  <th className="px-3 py-3 font-medium">Issue</th>
+                  <th className="px-3 py-3 font-medium">Shelter</th>
+                  <th className="px-3 py-3 font-medium">Room / Area</th>
+                  <th className="px-3 py-3 font-medium">Reported</th>
+                  <th className="px-3 py-3 font-medium">Priority</th>
+                  <th className="px-3 py-3 font-medium">Technician</th>
+                  <th className="px-3 py-3 font-medium">Status</th>
                   <th className="px-3 py-3"></th>
                 </tr>
               </thead>
 
               <tbody>
-                {paginatedRequests.map((request) => (
-                  <tr
-                    key={request.id}
-                    onClick={() => setSelectedRequest(request)}
-                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
-                  >
-
-                    <td className="px-3 py-3.5 font-semibold whitespace-nowrap">
-                      {request.id}
-                    </td>
-
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {request.issue}
-                    </td>
-
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {request.shelter}
-                    </td>
-
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {request.room}
-                    </td>
-
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {request.reported}
-                    </td>
-
-                    <td className="px-3 py-3.5">
-                      <PriorityBadge priority={request.priority} />
-                    </td>
-
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {request.technician}
-                    </td>
-
-                    <td className="px-3 py-3.5">
-                      <StatusBadge status={request.status} />
-                    </td>
-
-                    <td className="px-3 py-3.5">
-                      <ChevronRight
-                        size={13}
-                        className="text-slate-400"
-                      />
+                {isLoading && requests.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={9}
+                      className="text-center py-12 text-xs text-slate-400"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 size={16} className="animate-spin text-[#1c638a]" />
+                        <span>Loading maintenance requests...</span>
+                      </div>
                     </td>
                   </tr>
-                ))}
-
-                {paginatedRequests.length === 0 && (
+                ) : requests.length === 0 ? (
                   <tr>
                     <td
                       colSpan={9}
@@ -595,35 +511,63 @@ export default function MaintenanceIncidentsPage() {
                       No maintenance requests found.
                     </td>
                   </tr>
+                ) : (
+                  requests.map((request) => (
+                    <tr
+                      key={request.id}
+                      onClick={() => setSelectedRequest(request)}
+                      className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
+                    >
+                      <td className="px-3 py-3.5 font-semibold whitespace-nowrap">
+                        {request.id}
+                      </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        {request.issue}
+                      </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        {request.shelter}
+                      </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        {request.room}
+                      </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        {request.reported}
+                      </td>
+                      <td className="px-3 py-3.5">
+                        <PriorityBadge priority={request.priority} />
+                      </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        {request.technician}
+                      </td>
+                      <td className="px-3 py-3.5">
+                        <StatusBadge status={request.status} />
+                      </td>
+                      <td className="px-3 py-3.5">
+                        <ChevronRight size={13} className="text-slate-400" />
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
           </div>
 
           {/* PAGINATION */}
-
           <div className="px-3.5 py-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-
             <p className="text-[9px] text-slate-400">
-              Showing {filteredRequests.length} records
+              Showing {requests.length} of {totalCount} records (Page {currentPage} of {totalPages})
             </p>
 
             <div className="flex items-center gap-1">
-
               <button
-                disabled={currentPage === 1}
-                onClick={() =>
-                  setCurrentPage((p) => Math.max(1, p - 1))
-                }
+                disabled={currentPage === 1 || isLoading}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
               >
                 Previous
               </button>
 
-              {Array.from(
-                { length: totalPages },
-                (_, i) => i + 1
-              ).map((page) => (
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
@@ -638,12 +582,8 @@ export default function MaintenanceIncidentsPage() {
               ))}
 
               <button
-                disabled={currentPage === totalPages}
-                onClick={() =>
-                  setCurrentPage((p) =>
-                    Math.min(totalPages, p + 1)
-                  )
-                }
+                disabled={currentPage === totalPages || isLoading}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
               >
                 Next
@@ -653,52 +593,43 @@ export default function MaintenanceIncidentsPage() {
         </section>
 
         {/* REQUEST SUMMARY */}
-
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-
           <SummaryCard
             icon={<AlertTriangle size={17} />}
             title="Critical requests"
-            value={criticalCount}
+            value={summary.criticalCount}
             color="red"
           />
 
           <SummaryCard
             icon={<Clock size={17} />}
             title="In progress"
-            value={inProgressCount}
+            value={summary.inProgressCount}
             color="orange"
           />
 
           <SummaryCard
             icon={<CheckCircle2 size={17} />}
             title="Completed"
-            value={completedCount}
+            value={summary.completedCount}
             color="green"
           />
         </section>
       </main>
 
       {/* CREATE REQUEST MODAL */}
-
       {showCreateModal && (
         <Modal
           title="Create maintenance request"
           subtitle="Report a facility fault or maintenance requirement."
           onClose={() => setShowCreateModal(false)}
         >
-          <form
-            onSubmit={handleCreateRequest}
-            className="space-y-4"
-          >
-
+          <form onSubmit={handleCreateRequest} className="space-y-4">
             <FormInput
               label="Issue title"
               placeholder="Example: Water pump failure"
               value={newRequest.issue}
-              onChange={(v) =>
-                setNewRequest({ ...newRequest, issue: v })
-              }
+              onChange={(v) => setNewRequest({ ...newRequest, issue: v })}
             />
 
             <FormSelect
@@ -708,9 +639,7 @@ export default function MaintenanceIncidentsPage() {
                 value: c,
                 label: c,
               }))}
-              onChange={(v) =>
-                setNewRequest({ ...newRequest, category: v })
-              }
+              onChange={(v) => setNewRequest({ ...newRequest, category: v })}
             />
 
             <FormSelect
@@ -720,18 +649,14 @@ export default function MaintenanceIncidentsPage() {
                 value: s,
                 label: s,
               }))}
-              onChange={(v) =>
-                setNewRequest({ ...newRequest, shelter: v })
-              }
+              onChange={(v) => setNewRequest({ ...newRequest, shelter: v })}
             />
 
             <FormInput
               label="Room / Area"
               placeholder="Example: Utility Room"
               value={newRequest.room}
-              onChange={(v) =>
-                setNewRequest({ ...newRequest, room: v })
-              }
+              onChange={(v) => setNewRequest({ ...newRequest, room: v })}
             />
 
             <FormSelect
@@ -756,16 +681,13 @@ export default function MaintenanceIncidentsPage() {
                 value: t,
                 label: t,
               }))}
-              onChange={(v) =>
-                setNewRequest({ ...newRequest, technician: v })
-              }
+              onChange={(v) => setNewRequest({ ...newRequest, technician: v })}
             />
 
             <div>
               <label className="block text-xs font-medium mb-1.5">
                 Description
               </label>
-
               <textarea
                 required
                 rows={3}
@@ -783,31 +705,28 @@ export default function MaintenanceIncidentsPage() {
 
             <ModalActions
               onCancel={() => setShowCreateModal(false)}
-              submitLabel="Create request"
+              submitLabel={isSubmitting ? "Creating..." : "Create request"}
+              disabled={isSubmitting}
             />
           </form>
         </Modal>
       )}
 
       {/* REQUEST DETAILS PANEL */}
-
       {selectedRequest && (
         <div className="fixed inset-0 z-40 bg-black/30 flex justify-end">
-
           <div className="bg-white w-full max-w-md h-full shadow-2xl p-6 overflow-y-auto">
-
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">
-                Request details
-              </h2>
-
-              <button onClick={() => setSelectedRequest(null)}>
+              <h2 className="text-lg font-semibold">Request details</h2>
+              <button
+                onClick={() => setSelectedRequest(null)}
+                className="text-slate-400 hover:text-slate-700"
+              >
                 <X size={20} />
               </button>
             </div>
 
             <div className="mt-7">
-
               <div className="w-14 h-14 rounded-xl bg-[#eaf3f8] text-[#287da7] flex items-center justify-center">
                 <Wrench size={25} />
               </div>
@@ -816,9 +735,7 @@ export default function MaintenanceIncidentsPage() {
                 {selectedRequest.issue}
               </h3>
 
-              <p className="text-xs text-slate-400 mt-1">
-                {selectedRequest.id}
-              </p>
+              <p className="text-xs text-slate-400 mt-1">{selectedRequest.id}</p>
 
               <div className="flex flex-wrap gap-2 mt-3">
                 <PriorityBadge priority={selectedRequest.priority} />
@@ -827,7 +744,6 @@ export default function MaintenanceIncidentsPage() {
             </div>
 
             <div className="mt-7 space-y-4">
-
               <DetailRow
                 icon={<ClipboardList size={15} />}
                 label="Category"
@@ -860,20 +776,21 @@ export default function MaintenanceIncidentsPage() {
             </div>
 
             <div className="mt-7">
-              <h3 className="text-xs font-semibold mb-2">
-                Description
-              </h3>
-
+              <h3 className="text-xs font-semibold mb-2">Description</h3>
               <p className="bg-[#f5f9fa] rounded-lg p-3 text-xs text-slate-600 leading-relaxed">
                 {selectedRequest.description}
               </p>
             </div>
 
             <div className="mt-7 space-y-4">
-
-              <h3 className="text-xs font-semibold">
-                Update request
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-semibold">Update request</h3>
+                {isUpdatingField && (
+                  <span className="text-[10px] text-[#287da7] flex items-center gap-1">
+                    <Loader2 size={11} className="animate-spin" /> Saving...
+                  </span>
+                )}
+              </div>
 
               <FormSelect
                 label="Assigned technician"
@@ -883,7 +800,7 @@ export default function MaintenanceIncidentsPage() {
                   label: t,
                 }))}
                 onChange={(v) =>
-                  updateRequest(selectedRequest.id, {
+                  handleUpdateRequestField(selectedRequest.id, {
                     technician: v,
                   })
                 }
@@ -897,7 +814,7 @@ export default function MaintenanceIncidentsPage() {
                   label: p,
                 }))}
                 onChange={(v) =>
-                  updateRequest(selectedRequest.id, {
+                  handleUpdateRequestField(selectedRequest.id, {
                     priority: v as Priority,
                   })
                 }
@@ -911,7 +828,7 @@ export default function MaintenanceIncidentsPage() {
                   label: s,
                 }))}
                 onChange={(v) =>
-                  updateRequest(selectedRequest.id, {
+                  handleUpdateRequestField(selectedRequest.id, {
                     status: v as RequestStatus,
                   })
                 }
@@ -929,15 +846,14 @@ export default function MaintenanceIncidentsPage() {
       )}
 
       {/* SUCCESS MESSAGE */}
-
       {successMessage && (
         <div className="fixed bottom-5 right-5 z-[70] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3">
-
           <CheckCircle2 size={17} className="shrink-0" />
-
           <p className="text-xs">{successMessage}</p>
-
-          <button onClick={() => setSuccessMessage("")}>
+          <button
+            onClick={() => setSuccessMessage("")}
+            className="text-white/80 hover:text-white"
+          >
             <X size={15} />
           </button>
         </div>
@@ -971,17 +887,13 @@ function FilterSelect({
 
       <ChevronDown
         size={13}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
       />
     </div>
   );
 }
 
-function PriorityBadge({
-  priority,
-}: {
-  priority: Priority;
-}) {
+function PriorityBadge({ priority }: { priority: Priority }) {
   const styles: Record<Priority, string> = {
     Critical: "bg-[#fdebed] text-[#c82e3e]",
     High: "bg-[#fff0df] text-[#c47a1b]",
@@ -990,17 +902,17 @@ function PriorityBadge({
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[priority]}`}>
+    <span
+      className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${
+        styles[priority] || "bg-slate-100 text-slate-600"
+      }`}
+    >
       {priority}
     </span>
   );
 }
 
-function StatusBadge({
-  status,
-}: {
-  status: RequestStatus;
-}) {
+function StatusBadge({ status }: { status: RequestStatus }) {
   const styles: Record<RequestStatus, string> = {
     "In Progress": "bg-[#edf1f3] text-[#4f6979]",
     Assigned: "bg-[#edf1f3] text-[#4f6979]",
@@ -1010,7 +922,11 @@ function StatusBadge({
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+    <span
+      className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${
+        styles[status] || "bg-slate-100 text-slate-600"
+      }`}
+    >
       {status}
     </span>
   );
@@ -1035,7 +951,9 @@ function SummaryCard({
 
   return (
     <div className="bg-white border border-[#d5e3e9] rounded-xl p-3 flex items-center gap-3">
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${styles[color]}`}>
+      <div
+        className={`w-9 h-9 rounded-lg flex items-center justify-center ${styles[color]}`}
+      >
         {icon}
       </div>
       <div>
@@ -1059,10 +977,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
-
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
       <input
         required
         value={value}
@@ -1087,10 +1002,7 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
-
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -1119,17 +1031,12 @@ function Modal({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
       <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
-              {subtitle}
-            </p>
+            <p className="text-[10px] text-slate-400 mt-1">{subtitle}</p>
           </div>
-
           <button
             type="button"
             onClick={onClose}
@@ -1138,7 +1045,6 @@ function Modal({
             <X size={19} />
           </button>
         </div>
-
         {children}
       </div>
     </div>
@@ -1148,24 +1054,27 @@ function Modal({
 function ModalActions({
   onCancel,
   submitLabel,
+  disabled = false,
 }: {
   onCancel: () => void;
   submitLabel: string;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex gap-3 pt-3">
-
       <button
         type="button"
         onClick={onCancel}
-        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50"
+        disabled={disabled}
+        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50 disabled:opacity-50"
       >
         Cancel
       </button>
 
       <button
         type="submit"
-        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+        disabled={disabled}
+        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665] disabled:opacity-50"
       >
         {submitLabel}
       </button>
@@ -1184,14 +1093,10 @@ function DetailRow({
 }) {
   return (
     <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-
       <div className="text-[#2785b7]">{icon}</div>
-
       <div className="flex-1 min-w-0">
         <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">
-          {value}
-        </p>
+        <p className="text-xs font-semibold mt-1 break-words">{value}</p>
       </div>
     </div>
   );

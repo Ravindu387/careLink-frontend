@@ -1,4 +1,6 @@
 
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Search,
   Globe,
@@ -7,6 +9,7 @@ import {
   ChevronRight,
   Menu,
 } from "lucide-react";
+import { notificationService } from "../../services/notificationService";
 
 interface AdminTopbarProps {
   onMenuClick: () => void;
@@ -15,6 +18,21 @@ interface AdminTopbarProps {
 export default function AdminTopbar({
   onMenuClick,
 }: AdminTopbarProps) {
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  useEffect(() => {
+    let isMounted = true;
+    notificationService
+      .getUnreadCount("ShelterAdmin")
+      .then((count) => {
+        if (isMounted) setUnreadCount(count);
+      })
+      .catch((err) => console.warn("Failed to fetch unread count:", err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   return (
     <header className="z-30 flex h-[56px] w-full shrink-0 items-center justify-between gap-3 border-b border-[#d6e4e9] bg-white px-4 sm:px-5">
 
@@ -91,17 +109,19 @@ export default function AdminTopbar({
         </button>
 
         {/* NOTIFICATIONS */}
-        <button
-          type="button"
+        <Link
+          to="/shelter-admin/notifications"
           aria-label="Notifications"
-          className="relative flex h-[35px] w-[35px] items-center justify-center rounded-lg border border-[#d7e4e9] text-[#496d85] hover:bg-slate-50"
+          className="relative flex h-[35px] w-[35px] items-center justify-center rounded-lg border border-[#d7e4e9] text-[#496d85] hover:bg-slate-50 transition"
         >
           <Bell size={17} />
 
-          <span className="absolute -right-1 -top-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-red-500 px-1 text-[8px] font-bold text-white">
-            8
-          </span>
-        </button>
+          {unreadCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-red-500 px-1 text-[8px] font-bold text-white">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </Link>
 
         {/* USER PROFILE */}
         <div className="flex items-center gap-2 border-l border-[#d7e4e9] pl-3">

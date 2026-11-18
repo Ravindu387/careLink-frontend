@@ -1,11 +1,7 @@
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import {
   Search,
-  Globe,
-  Bell,
-  CircleHelp,
   ChevronRight,
   ChevronDown,
   Plus,
@@ -15,84 +11,29 @@ import {
   ShieldCheck,
   Accessibility,
   ClipboardCheck,
-  CalendarDays,
   UserRound,
   MapPin,
   Clock,
   CheckCircle2,
   Filter,
-  Activity,
-  HeartPulse,
   FileWarning,
+  RefreshCw,
+  Trash2,
+  AlertCircle,
 } from "lucide-react";
+import { healthSafetyService } from "../../services/healthSafetyService";
+import type {
+  HealthSafetyIncident,
+  HealthSafetySummary,
+  HealthSafetyMeta,
+  Severity,
+  IncidentStatus,
+  SafetyCheckItem,
+} from "../../types/healthSafety";
 
-/* ================= TYPES ================= */
+/* ================= DEFAULT FALLBACK OPTIONS ================= */
 
-type Severity = "Critical" | "High" | "Medium" | "Low";
-
-type IncidentStatus =
-  | "Action Required"
-  | "Under Investigation"
-  | "Resolved";
-
-type Incident = {
-  id: string;
-  type: string;
-  location: string;
-  reportedBy: string;
-  date: string;
-  time: string;
-  severity: Severity;
-  assignedStaff: string;
-  status: IncidentStatus;
-  description: string;
-};
-
-/* ================= SAMPLE DATA ================= */
-
-const initialIncidents: Incident[] = [
-  {
-    id: "HI-202",
-    type: "Medical assistance",
-    location: "Resident RES-10831",
-    reportedBy: "Nurse M. Rao",
-    date: "22 Jun",
-    time: "11:42",
-    severity: "High",
-    assignedStaff: "Dr. M. Rao",
-    status: "Action Required",
-    description:
-      "A resident requires medical assistance and immediate assessment by the medical team.",
-  },
-  {
-    id: "HI-198",
-    type: "Sanitation inspection",
-    location: "Kitchen Area B",
-    reportedBy: "S. Nirosha",
-    date: "22 Jun",
-    time: "09:15",
-    severity: "Medium",
-    assignedStaff: "Facilities Team",
-    status: "Under Investigation",
-    description:
-      "A sanitation concern was reported in the kitchen area. Inspection is required.",
-  },
-  {
-    id: "HI-191",
-    type: "Accessibility concern",
-    location: "Entrance Ramp",
-    reportedBy: "A. Perera",
-    date: "21 Jun",
-    time: "16:20",
-    severity: "Low",
-    assignedStaff: "Maintenance",
-    status: "Resolved",
-    description:
-      "An accessibility issue was identified near the entrance ramp and referred to maintenance.",
-  },
-];
-
-const incidentTypes = [
+const defaultIncidentTypes = [
   "Medical assistance",
   "Sanitation inspection",
   "Fire safety",
@@ -103,7 +44,7 @@ const incidentTypes = [
   "Other",
 ];
 
-const staffMembers = [
+const defaultStaffMembers = [
   "Dr. M. Rao",
   "Nurse M. Rao",
   "Facilities Team",
@@ -112,14 +53,14 @@ const staffMembers = [
   "Shelter Manager",
 ];
 
-const severityOptions: Severity[] = [
+const defaultSeverityOptions: Severity[] = [
   "Critical",
   "High",
   "Medium",
   "Low",
 ];
 
-const statusOptions: IncidentStatus[] = [
+const defaultStatusOptions: IncidentStatus[] = [
   "Action Required",
   "Under Investigation",
   "Resolved",
@@ -128,31 +69,30 @@ const statusOptions: IncidentStatus[] = [
 /* ================= MAIN COMPONENT ================= */
 
 export default function HealthSafetyPage() {
-  const [incidents, setIncidents] =
-    useState<Incident[]>(initialIncidents);
+  const [incidents, setIncidents] = useState<HealthSafetyIncident[]>([]);
+  const [summary, setSummary] = useState<HealthSafetySummary | null>(null);
+  const [meta, setMeta] = useState<HealthSafetyMeta | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const [search, setSearch] = useState("");
-
-  const [typeFilter, setTypeFilter] =
-    useState("All incident types");
-
-  const [severityFilter, setSeverityFilter] =
-    useState("All severities");
-
-  const [statusFilter, setStatusFilter] =
-    useState("All statuses");
-
-  const [dateFilter, setDateFilter] =
-    useState("Date range");
-
+  const [typeFilter, setTypeFilter] = useState("All incident types");
+  const [severityFilter, setSeverityFilter] = useState("All severities");
+  const [statusFilter, setStatusFilter] = useState("All statuses");
+  const [dateFilter, setDateFilter] = useState("Date range");
+  const [reporterFilter, setReporterFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
-  const [showRegisterModal, setShowRegisterModal] =
-    useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [selectedIncident, setSelectedIncident] =
-    useState<Incident | null>(null);
-
+    useState<HealthSafetyIncident | null>(null);
   const [successMessage, setSuccessMessage] = useState("");
 
   const [newIncident, setNewIncident] = useState({
@@ -164,73 +104,96 @@ export default function HealthSafetyPage() {
     description: "",
   });
 
-  /* ================= KPI CALCULATIONS ================= */
+  const incidentTypes = meta?.incidentTypes ?? defaultIncidentTypes;
+  const staffMembers = meta?.staffMembers ?? defaultStaffMembers;
+  const severityOptions = meta?.severities ?? defaultSeverityOptions;
+  const statusOptions = meta?.statuses ?? defaultStatusOptions;
 
-  const actionRequired = incidents.filter(
-    (incident) => incident.status === "Action Required"
-  ).length;
+  /* ================= FETCH DATA ================= */
 
-  const underInvestigation = incidents.filter(
-    (incident) =>
-      incident.status === "Under Investigation"
-  ).length;
+  const loadSummaryAndMeta = useCallback(async () => {
+    try {
+      setSummaryLoading(true);
+      const [summaryRes, metaRes] = await Promise.all([
+        healthSafetyService.getSummary(),
+        healthSafetyService.getMeta(),
+      ]);
+      setSummary(summaryRes);
+      setMeta(metaRes);
+    } catch (err: any) {
+      console.error("Failed to load health safety summary or meta:", err);
+    } finally {
+      setSummaryLoading(false);
+    }
+  }, []);
 
-  const resolved = incidents.filter(
-    (incident) => incident.status === "Resolved"
-  ).length;
+  const loadIncidents = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  /* ================= FILTERING ================= */
+      const params: Record<string, string> = {};
+      if (search.trim()) params.search = search.trim();
+      if (typeFilter && !typeFilter.startsWith("All")) params.type = typeFilter;
+      if (severityFilter && !severityFilter.startsWith("All"))
+        params.severity = severityFilter;
+      if (statusFilter && !statusFilter.startsWith("All"))
+        params.status = statusFilter;
+      if (dateFilter && !dateFilter.startsWith("Date"))
+        params.dateRange = dateFilter;
+
+      const data = await healthSafetyService.getIncidents(params);
+      setIncidents(data);
+      setCurrentPage(1);
+    } catch (err: any) {
+      console.error("Failed to fetch health & safety incidents:", err);
+      setError(err?.message || "Failed to load incidents. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [search, typeFilter, severityFilter, statusFilter, dateFilter]);
+
+  useEffect(() => {
+    loadSummaryAndMeta();
+  }, [loadSummaryAndMeta]);
+
+  useEffect(() => {
+    loadIncidents();
+  }, [loadIncidents]);
+
+  /* ================= CLIENT-SIDE ADVANCED FILTERING & PAGINATION ================= */
 
   const filteredIncidents = useMemo(() => {
     return incidents.filter((incident) => {
-      const matchesSearch = [
-        incident.id,
-        incident.type,
-        incident.location,
-        incident.reportedBy,
-        incident.assignedStaff,
-      ].some((value) =>
-        value.toLowerCase().includes(search.toLowerCase())
-      );
-
-      const matchesType =
-        typeFilter === "All incident types" ||
-        incident.type === typeFilter;
-
-      const matchesSeverity =
-        severityFilter === "All severities" ||
-        incident.severity === severityFilter;
-
-      const matchesStatus =
-        statusFilter === "All statuses" ||
-        incident.status === statusFilter;
-
-      let matchesDate = true;
-
-      if (dateFilter === "Today") {
-        matchesDate = incident.date === "22 Jun";
-      } else if (dateFilter === "Last 7 days") {
-        matchesDate = ["22 Jun", "21 Jun"].includes(
-          incident.date
-        );
+      if (
+        reporterFilter.trim() &&
+        !incident.reportedBy
+          .toLowerCase()
+          .includes(reporterFilter.toLowerCase().trim())
+      ) {
+        return false;
       }
-
-      return (
-        matchesSearch &&
-        matchesType &&
-        matchesSeverity &&
-        matchesStatus &&
-        matchesDate
-      );
+      if (
+        locationFilter.trim() &&
+        !incident.location
+          .toLowerCase()
+          .includes(locationFilter.toLowerCase().trim())
+      ) {
+        return false;
+      }
+      return true;
     });
-  }, [
-    incidents,
-    search,
-    typeFilter,
-    severityFilter,
-    statusFilter,
-    dateFilter,
-  ]);
+  }, [incidents, reporterFilter, locationFilter]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredIncidents.length / pageSize)
+  );
+
+  const paginatedIncidents = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredIncidents.slice(start, start + pageSize);
+  }, [filteredIncidents, currentPage, pageSize]);
 
   /* ================= RESET FILTERS ================= */
 
@@ -240,94 +203,120 @@ export default function HealthSafetyPage() {
     setSeverityFilter("All severities");
     setStatusFilter("All statuses");
     setDateFilter("Date range");
+    setReporterFilter("");
+    setLocationFilter("");
+    setCurrentPage(1);
   };
 
   /* ================= REGISTER INCIDENT ================= */
 
-  const handleRegisterIncident = (
-    e: FormEvent<HTMLFormElement>
-  ) => {
+  const handleRegisterIncident = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!newIncident.location.trim() || !newIncident.reportedBy.trim()) return;
 
-    const incident: Incident = {
-      id: `HI-${Math.max(
-        0,
-        ...incidents.map(
-          (item) => Number(item.id.replace("HI-", "")) || 0
-        )
-      ) + 1}`,
-      type: newIncident.type,
-      location: newIncident.location.trim(),
-      reportedBy: newIncident.reportedBy.trim(),
-      date: "22 Jun",
-      time: new Date().toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      severity: newIncident.severity,
-      assignedStaff: newIncident.assignedStaff,
-      status: "Action Required",
-      description: newIncident.description.trim(),
-    };
+    try {
+      setActionLoading(true);
+      const created = await healthSafetyService.createIncident({
+        type: newIncident.type,
+        location: newIncident.location.trim(),
+        reportedBy: newIncident.reportedBy.trim(),
+        severity: newIncident.severity,
+        assignedStaff: newIncident.assignedStaff,
+        description: newIncident.description.trim(),
+      });
 
-    setIncidents((prev) => [incident, ...prev]);
+      setIncidents((prev) => [created, ...prev]);
+      setNewIncident({
+        type: incidentTypes[0] || "Medical assistance",
+        location: "",
+        reportedBy: "",
+        severity: "Medium",
+        assignedStaff: staffMembers[0] || "Nurse M. Rao",
+        description: "",
+      });
 
-    setNewIncident({
-      type: "Medical assistance",
-      location: "",
-      reportedBy: "",
-      severity: "Medium",
-      assignedStaff: "Nurse M. Rao",
-      description: "",
-    });
-
-    resetFilters();
-    setShowRegisterModal(false);
-    setSuccessMessage(
-      `Incident ${incident.id} registered successfully.`
-    );
+      setShowRegisterModal(false);
+      setSuccessMessage(`Incident ${created.id} registered successfully.`);
+      loadSummaryAndMeta();
+    } catch (err: any) {
+      console.error("Failed to register incident:", err);
+      alert(err?.message || "Failed to register incident.");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   /* ================= UPDATE INCIDENT ================= */
 
-  const updateIncident = (
+  const handleUpdateIncident = async (
     id: string,
-    changes: Partial<Incident>
+    changes: {
+      assignedStaff?: string;
+      severity?: string;
+      status?: string;
+      description?: string;
+      location?: string;
+    }
   ) => {
-    setIncidents((prev) =>
-      prev.map((incident) =>
-        incident.id === id
-          ? { ...incident, ...changes }
-          : incident
-      )
-    );
+    try {
+      setActionLoading(true);
+      const updated = await healthSafetyService.updateIncident(id, changes);
 
-    setSelectedIncident((prev) =>
-      prev && prev.id === id
-        ? { ...prev, ...changes }
-        : prev
-    );
+      setIncidents((prev) =>
+        prev.map((incident) => (incident.id === id ? updated : incident))
+      );
 
-    setSuccessMessage("Incident updated successfully.");
+      if (selectedIncident && selectedIncident.id === id) {
+        setSelectedIncident(updated);
+      }
+
+      setSuccessMessage(`Incident ${id} updated successfully.`);
+      loadSummaryAndMeta();
+    } catch (err: any) {
+      console.error("Failed to update incident:", err);
+      alert(err?.message || "Failed to update incident.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  /* ================= DELETE INCIDENT ================= */
+
+  const handleDeleteIncident = async (id: string) => {
+    if (!window.confirm(`Are you sure you want to delete incident ${id}?`)) {
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      await healthSafetyService.deleteIncident(id);
+      setIncidents((prev) => prev.filter((item) => item.id !== id));
+      if (selectedIncident && selectedIncident.id === id) {
+        setSelectedIncident(null);
+      }
+      setSuccessMessage(`Incident ${id} deleted successfully.`);
+      loadSummaryAndMeta();
+    } catch (err: any) {
+      console.error("Failed to delete incident:", err);
+      alert(err?.message || "Failed to delete incident.");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-[#eef5f7] text-[#123e60] font-sans">
-
       {/* ================= MAIN CONTENT ================= */}
 
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
-
         {/* BREADCRUMB */}
 
         <div className="flex items-center gap-2 text-[9px] mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
-          <span className="text-slate-400">
-            Shelter Administration
-          </span>
+          <span className="text-slate-400">Shelter Administration</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="font-semibold">Health & Safety</span>
         </div>
@@ -335,63 +324,102 @@ export default function HealthSafetyPage() {
         {/* PAGE HEADER */}
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-
           <div>
             <h1 className="text-[23px] md:text-[25px] font-normal">
               Health & Safety
             </h1>
 
             <p className="text-[11px] text-slate-500 mt-2">
-              Monitor health incidents, safety inspections, sanitation, and evacuation readiness.
+              Monitor health incidents, safety inspections, sanitation, and
+              evacuation readiness.
             </p>
           </div>
 
-          <button
-            onClick={() => setShowRegisterModal(true)}
-            className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
-          >
-            <Plus size={14} />
-            Register incident
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                loadIncidents();
+                loadSummaryAndMeta();
+              }}
+              title="Refresh data"
+              className="h-9 px-3 bg-white border border-[#d5e3e9] text-[#1c638a] rounded-lg text-[10px] font-semibold flex items-center justify-center gap-1.5 hover:bg-slate-50 transition"
+            >
+              <RefreshCw
+                size={13}
+                className={loading || summaryLoading ? "animate-spin" : ""}
+              />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+
+            <button
+              onClick={() => setShowRegisterModal(true)}
+              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 hover:bg-[#144665] transition shadow-sm"
+            >
+              <Plus size={14} />
+              Register incident
+            </button>
+          </div>
         </div>
 
         {/* ================= SAFETY CHECK CARDS ================= */}
 
         <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-3">
-
-          <SafetyCard
-            icon={<Check size={17} />}
-            color="green"
-            title="Fire safety check"
-            description="Completed · 21 Jun"
-          />
-
-          <SafetyCard
-            icon={<AlertTriangle size={17} />}
-            color="orange"
-            title="Sanitation inspection"
-            description="Due today"
-          />
-
-          <SafetyCard
-            icon={<ShieldCheck size={17} />}
-            color="blue"
-            title="Evacuation drill"
-            description="Scheduled · 24 Jun"
-          />
-
-          <SafetyCard
-            icon={<Accessibility size={17} />}
-            color="red"
-            title="Accessibility review"
-            description="2 concerns open"
-          />
+          {summaryLoading && !summary ? (
+            Array.from({ length: 4 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="bg-white border border-[#d5e3e9] rounded-xl p-3 flex items-center gap-3 min-h-[62px] animate-pulse"
+              >
+                <div className="w-9 h-9 rounded-lg bg-slate-200 shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-2.5 bg-slate-200 rounded w-24" />
+                  <div className="h-2 bg-slate-100 rounded w-16" />
+                </div>
+              </div>
+            ))
+          ) : summary?.safetyChecks && summary.safetyChecks.length > 0 ? (
+            summary.safetyChecks.map((check) => (
+              <SafetyCard
+                key={check.id}
+                icon={renderSafetyCheckIcon(check.iconKey)}
+                color={normalizeColor(check.color)}
+                title={check.title}
+                description={check.description}
+              />
+            ))
+          ) : (
+            <>
+              <SafetyCard
+                icon={<Check size={17} />}
+                color="green"
+                title="Fire safety check"
+                description="Completed · 21 Jun"
+              />
+              <SafetyCard
+                icon={<AlertTriangle size={17} />}
+                color="orange"
+                title="Sanitation inspection"
+                description="Due today"
+              />
+              <SafetyCard
+                icon={<ShieldCheck size={17} />}
+                color="blue"
+                title="Evacuation drill"
+                description="Scheduled · 24 Jun"
+              />
+              <SafetyCard
+                icon={<Accessibility size={17} />}
+                color="red"
+                title="Accessibility review"
+                description="2 concerns open"
+              />
+            </>
+          )}
         </section>
 
         {/* ================= SEARCH + FILTERS ================= */}
 
         <section className="flex flex-col xl:flex-row gap-2 mb-3">
-
           <div className="relative flex-1 min-w-0">
             <Search
               size={15}
@@ -402,12 +430,11 @@ export default function HealthSafetyPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search health incidents..."
-              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-[10px] outline-none focus:border-[#45b99b]"
+              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-[10px] outline-none focus:border-[#45b99b] transition"
             />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 xl:flex gap-2">
-
             <FilterSelect
               value={typeFilter}
               options={["All incident types", ...incidentTypes]}
@@ -428,17 +455,13 @@ export default function HealthSafetyPage() {
 
             <FilterSelect
               value={dateFilter}
-              options={[
-                "Date range",
-                "Today",
-                "Last 7 days",
-              ]}
+              options={["Date range", "Today", "Last 7 days", "Last 30 days"]}
               onChange={setDateFilter}
             />
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`h-9 px-3 bg-white border rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 whitespace-nowrap ${
+              className={`h-9 px-3 bg-white border rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition ${
                 showFilters
                   ? "border-[#2785b7] text-[#2785b7]"
                   : "border-[#aac4d2]"
@@ -454,7 +477,6 @@ export default function HealthSafetyPage() {
 
         {showFilters && (
           <section className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3">
-
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-semibold">
                 Advanced incident filters
@@ -462,43 +484,53 @@ export default function HealthSafetyPage() {
 
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#267ca6] font-semibold"
+                className="text-[10px] text-[#267ca6] font-semibold hover:underline"
               >
                 Clear filters
               </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
               <FormInput
                 label="Reported by"
                 placeholder="Search reporter name"
-                value=""
-                onChange={(value) => {
-                  setSearch(value);
-                }}
+                value={reporterFilter}
+                onChange={setReporterFilter}
               />
 
               <FormInput
                 label="Incident location"
                 placeholder="Search incident location"
-                value=""
-                onChange={(value) => {
-                  setSearch(value);
-                }}
+                value={locationFilter}
+                onChange={setLocationFilter}
               />
             </div>
           </section>
         )}
 
+        {/* ================= ERROR STATE ================= */}
+
+        {error && (
+          <div className="bg-[#fdebed] border border-[#f8bcc2] text-[#c82e3e] px-4 py-3 rounded-xl mb-3 flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <AlertCircle size={16} className="shrink-0" />
+              <span>{error}</span>
+            </div>
+            <button
+              onClick={loadIncidents}
+              className="text-xs font-semibold underline hover:no-underline"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* ================= INCIDENT TABLE ================= */}
 
         <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
-
           {/* TABLE HEADER */}
 
           <div className="px-3.5 py-3.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-
             <div>
               <h2 className="text-xs font-semibold">
                 Health & safety incidents
@@ -517,15 +549,14 @@ export default function HealthSafetyPage() {
           {/* TABLE */}
 
           <div className="overflow-x-auto">
-
             <table className="w-full min-w-[950px] text-left">
-
               <thead className="bg-[#f5f9fa] border-b border-slate-200">
                 <tr className="text-[8px] text-slate-500">
-
                   <th className="px-3 py-3 font-medium">Incident ID</th>
                   <th className="px-3 py-3 font-medium">Incident Type</th>
-                  <th className="px-3 py-3 font-medium">Resident / Location</th>
+                  <th className="px-3 py-3 font-medium">
+                    Resident / Location
+                  </th>
                   <th className="px-3 py-3 font-medium">Reported By</th>
                   <th className="px-3 py-3 font-medium">Date & Time</th>
                   <th className="px-3 py-3 font-medium">Severity</th>
@@ -536,55 +567,59 @@ export default function HealthSafetyPage() {
               </thead>
 
               <tbody>
-                {filteredIncidents.map((incident) => (
-                  <tr
-                    key={incident.id}
-                    onClick={() => setSelectedIncident(incident)}
-                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
-                  >
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <tr key={idx} className="border-b border-slate-100">
+                      <td colSpan={9} className="px-3 py-3.5">
+                        <div className="h-4 bg-slate-100 rounded w-full animate-pulse" />
+                      </td>
+                    </tr>
+                  ))
+                ) : paginatedIncidents.length > 0 ? (
+                  paginatedIncidents.map((incident) => (
+                    <tr
+                      key={incident.id}
+                      onClick={() => setSelectedIncident(incident)}
+                      className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
+                    >
+                      <td className="px-3 py-3.5 font-semibold whitespace-nowrap text-[#1c638a]">
+                        {incident.id}
+                      </td>
 
-                    <td className="px-3 py-3.5 font-semibold whitespace-nowrap">
-                      {incident.id}
-                    </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap font-medium">
+                        {incident.type}
+                      </td>
 
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {incident.type}
-                    </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        {incident.location}
+                      </td>
 
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {incident.location}
-                    </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        {incident.reportedBy}
+                      </td>
 
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {incident.reportedBy}
-                    </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        {incident.date} · {incident.time}
+                      </td>
 
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {incident.date} · {incident.time}
-                    </td>
+                      <td className="px-3 py-3.5">
+                        <SeverityBadge severity={incident.severity} />
+                      </td>
 
-                    <td className="px-3 py-3.5">
-                      <SeverityBadge severity={incident.severity} />
-                    </td>
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        {incident.assignedStaff}
+                      </td>
 
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-                      {incident.assignedStaff}
-                    </td>
+                      <td className="px-3 py-3.5">
+                        <IncidentStatusBadge status={incident.status} />
+                      </td>
 
-                    <td className="px-3 py-3.5">
-                      <IncidentStatusBadge status={incident.status} />
-                    </td>
-
-                    <td className="px-3 py-3.5">
-                      <ChevronRight
-                        size={13}
-                        className="text-slate-400"
-                      />
-                    </td>
-                  </tr>
-                ))}
-
-                {filteredIncidents.length === 0 && (
+                      <td className="px-3 py-3.5">
+                        <ChevronRight size={13} className="text-slate-400" />
+                      </td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
                     <td
                       colSpan={9}
@@ -601,37 +636,52 @@ export default function HealthSafetyPage() {
           {/* PAGINATION */}
 
           <div className="px-3.5 py-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-
             <p className="text-[9px] text-slate-400">
-              Showing {filteredIncidents.length} records
+              Showing{" "}
+              {paginatedIncidents.length > 0
+                ? (currentPage - 1) * pageSize + 1
+                : 0}
+              -
+              {Math.min(
+                currentPage * pageSize,
+                filteredIncidents.length
+              )}{" "}
+              of {filteredIncidents.length} records
             </p>
 
             <div className="flex items-center gap-1">
-
               <button
-                disabled
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] opacity-40"
+                onClick={() =>
+                  setCurrentPage((p) => Math.max(1, p - 1))
+                }
+                disabled={currentPage <= 1}
+                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
               >
                 Previous
               </button>
 
-              {[1, 2, 3].map((page) => (
-                <button
-                  key={page}
-                  disabled={page !== 1}
-                  className={`w-7 h-8 rounded-lg border text-[9px] ${
-                    page === 1
-                      ? "bg-[#1c638a] text-white border-[#1c638a]"
-                      : "border-slate-200 opacity-40"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-7 h-8 rounded-lg border text-[9px] transition ${
+                      page === currentPage
+                        ? "bg-[#1c638a] text-white border-[#1c638a]"
+                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
 
               <button
-                disabled
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] opacity-40"
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                disabled={currentPage >= totalPages}
+                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
               >
                 Next
               </button>
@@ -642,25 +692,38 @@ export default function HealthSafetyPage() {
         {/* ================= INCIDENT SUMMARY ================= */}
 
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-
           <SummaryCard
             icon={<AlertTriangle size={16} />}
             title="Action required"
-            value={actionRequired}
+            value={
+              summary
+                ? summary.actionRequired
+                : incidents.filter((i) => i.status === "Action Required")
+                    .length
+            }
             color="red"
           />
 
           <SummaryCard
             icon={<Clock size={16} />}
             title="Under investigation"
-            value={underInvestigation}
+            value={
+              summary
+                ? summary.underInvestigation
+                : incidents.filter((i) => i.status === "Under Investigation")
+                    .length
+            }
             color="orange"
           />
 
           <SummaryCard
             icon={<CheckCircle2 size={16} />}
             title="Resolved incidents"
-            value={resolved}
+            value={
+              summary
+                ? summary.resolved
+                : incidents.filter((i) => i.status === "Resolved").length
+            }
             color="green"
           />
         </section>
@@ -674,11 +737,7 @@ export default function HealthSafetyPage() {
           subtitle="Record an incident for review and follow-up."
           onClose={() => setShowRegisterModal(false)}
         >
-          <form
-            onSubmit={handleRegisterIncident}
-            className="space-y-4"
-          >
-
+          <form onSubmit={handleRegisterIncident} className="space-y-4">
             <FormSelect
               label="Incident type"
               value={newIncident.type}
@@ -686,9 +745,7 @@ export default function HealthSafetyPage() {
                 value: type,
                 label: type,
               }))}
-              onChange={(v) =>
-                setNewIncident({ ...newIncident, type: v })
-              }
+              onChange={(v) => setNewIncident({ ...newIncident, type: v })}
             />
 
             <FormInput
@@ -761,7 +818,10 @@ export default function HealthSafetyPage() {
 
             <ModalActions
               onCancel={() => setShowRegisterModal(false)}
-              submitLabel="Register incident"
+              submitLabel={
+                actionLoading ? "Registering..." : "Register incident"
+              }
+              submitting={actionLoading}
             />
           </form>
         </Modal>
@@ -771,21 +831,19 @@ export default function HealthSafetyPage() {
 
       {selectedIncident && (
         <div className="fixed inset-0 z-40 bg-black/30 flex justify-end">
-
           <div className="bg-white w-full max-w-md h-full shadow-2xl p-6 overflow-y-auto">
-
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">
-                Incident details
-              </h2>
+              <h2 className="text-lg font-semibold">Incident details</h2>
 
-              <button onClick={() => setSelectedIncident(null)}>
+              <button
+                onClick={() => setSelectedIncident(null)}
+                className="text-slate-400 hover:text-slate-700"
+              >
                 <X size={20} />
               </button>
             </div>
 
             <div className="mt-7">
-
               <div className="w-14 h-14 rounded-xl bg-[#eaf3f8] text-[#287da7] flex items-center justify-center">
                 <FileWarning size={25} />
               </div>
@@ -805,7 +863,6 @@ export default function HealthSafetyPage() {
             </div>
 
             <div className="mt-7 space-y-4">
-
               <DetailRow
                 icon={<MapPin size={15} />}
                 label="Resident / Location"
@@ -842,10 +899,7 @@ export default function HealthSafetyPage() {
             </div>
 
             <div className="mt-7 space-y-4">
-
-              <h3 className="text-xs font-semibold">
-                Update incident
-              </h3>
+              <h3 className="text-xs font-semibold">Update incident</h3>
 
               <FormSelect
                 label="Assigned staff"
@@ -855,7 +909,7 @@ export default function HealthSafetyPage() {
                   label: s,
                 }))}
                 onChange={(v) =>
-                  updateIncident(selectedIncident.id, {
+                  handleUpdateIncident(selectedIncident.id, {
                     assignedStaff: v,
                   })
                 }
@@ -869,8 +923,8 @@ export default function HealthSafetyPage() {
                   label: s,
                 }))}
                 onChange={(v) =>
-                  updateIncident(selectedIncident.id, {
-                    severity: v as Severity,
+                  handleUpdateIncident(selectedIncident.id, {
+                    severity: v,
                   })
                 }
               />
@@ -883,18 +937,31 @@ export default function HealthSafetyPage() {
                   label: s,
                 }))}
                 onChange={(v) =>
-                  updateIncident(selectedIncident.id, {
-                    status: v as IncidentStatus,
+                  handleUpdateIncident(selectedIncident.id, {
+                    status: v,
                   })
                 }
               />
 
-              <button
-                onClick={() => setSelectedIncident(null)}
-                className="w-full bg-[#1c638a] text-white py-3 rounded-lg text-xs font-semibold hover:bg-[#144665]"
-              >
-                Done
-              </button>
+              <div className="pt-2 flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedIncident(null)}
+                  className="w-full bg-[#1c638a] text-white py-3 rounded-lg text-xs font-semibold hover:bg-[#144665] transition"
+                >
+                  Done
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDeleteIncident(selectedIncident.id)}
+                  disabled={actionLoading}
+                  className="w-full border border-red-200 text-red-600 hover:bg-red-50 py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition disabled:opacity-50"
+                >
+                  <Trash2 size={13} />
+                  Delete incident
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -904,8 +971,7 @@ export default function HealthSafetyPage() {
 
       {successMessage && (
         <div className="fixed bottom-5 right-5 z-[70] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3">
-
-          <CheckCircle2 size={17} className="shrink-0" />
+          <CheckCircle2 size={17} className="shrink-0 text-emerald-400" />
 
           <p className="text-xs">{successMessage}</p>
 
@@ -916,6 +982,31 @@ export default function HealthSafetyPage() {
       )}
     </div>
   );
+}
+
+/* ================= HELPER FUNCTIONS ================= */
+
+function renderSafetyCheckIcon(iconKey: string): ReactNode {
+  switch (iconKey) {
+    case "Check":
+      return <Check size={17} />;
+    case "AlertTriangle":
+      return <AlertTriangle size={17} />;
+    case "ShieldCheck":
+      return <ShieldCheck size={17} />;
+    case "Accessibility":
+      return <Accessibility size={17} />;
+    default:
+      return <ClipboardCheck size={17} />;
+  }
+}
+
+function normalizeColor(color?: string): "green" | "orange" | "blue" | "red" {
+  const c = color?.toLowerCase();
+  if (c === "green" || c === "orange" || c === "blue" || c === "red") {
+    return c;
+  }
+  return "blue";
 }
 
 /* ================= REUSABLE COMPONENTS ================= */
@@ -940,16 +1031,15 @@ function SafetyCard({
 
   return (
     <div className="bg-white border border-[#d5e3e9] rounded-xl p-3 flex items-center gap-3 min-h-[62px]">
-
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${styles[color]}`}>
+      <div
+        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${styles[color]}`}
+      >
         {icon}
       </div>
 
       <div className="min-w-0">
         <p className="text-[9px] font-semibold">{title}</p>
-        <p className="text-[8px] text-slate-400 mt-1">
-          {description}
-        </p>
+        <p className="text-[8px] text-slate-400 mt-1">{description}</p>
       </div>
     </div>
   );
@@ -969,27 +1059,25 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full xl:w-[120px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full xl:w-[130px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </select>
 
       <ChevronDown
         size={13}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
       />
     </div>
   );
 }
 
-function SeverityBadge({
-  severity,
-}: {
-  severity: Severity;
-}) {
-  const styles: Record<Severity, string> = {
+function SeverityBadge({ severity }: { severity: Severity | string }) {
+  const styles: Record<string, string> = {
     Critical: "bg-[#fdebed] text-[#c82e3e]",
     High: "bg-[#fff0df] text-[#c47a1b]",
     Medium: "bg-[#fff5df] text-[#a97a20]",
@@ -997,25 +1085,29 @@ function SeverityBadge({
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[severity]}`}>
+    <span
+      className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${
+        styles[severity] || styles.Low
+      }`}
+    >
       {severity}
     </span>
   );
 }
 
-function IncidentStatusBadge({
-  status,
-}: {
-  status: IncidentStatus;
-}) {
-  const styles: Record<IncidentStatus, string> = {
+function IncidentStatusBadge({ status }: { status: IncidentStatus | string }) {
+  const styles: Record<string, string> = {
     "Action Required": "bg-[#edf1f3] text-[#4f6979]",
     "Under Investigation": "bg-[#edf1f3] text-[#4f6979]",
     Resolved: "bg-[#e5f8f1] text-[#218d70]",
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+    <span
+      className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${
+        styles[status] || "bg-slate-100 text-slate-600"
+      }`}
+    >
       {status}
     </span>
   );
@@ -1040,7 +1132,9 @@ function SummaryCard({
 
   return (
     <div className="bg-white border border-[#d5e3e9] rounded-xl p-3 flex items-center gap-3">
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${styles[color]}`}>
+      <div
+        className={`w-9 h-9 rounded-lg flex items-center justify-center ${styles[color]}`}
+      >
         {icon}
       </div>
       <div>
@@ -1066,9 +1160,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
 
       <input
         required
@@ -1095,9 +1187,7 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
 
       <select
         value={value}
@@ -1127,15 +1217,11 @@ function Modal({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
       <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
-              {subtitle}
-            </p>
+            <p className="text-[10px] text-slate-400 mt-1">{subtitle}</p>
           </div>
 
           <button
@@ -1156,24 +1242,27 @@ function Modal({
 function ModalActions({
   onCancel,
   submitLabel,
+  submitting,
 }: {
   onCancel: () => void;
   submitLabel: string;
+  submitting?: boolean;
 }) {
   return (
     <div className="flex gap-3 pt-3">
-
       <button
         type="button"
         onClick={onCancel}
-        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50"
+        disabled={submitting}
+        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50 disabled:opacity-50 transition"
       >
         Cancel
       </button>
 
       <button
         type="submit"
-        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+        disabled={submitting}
+        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665] disabled:opacity-50 transition"
       >
         {submitLabel}
       </button>
@@ -1192,14 +1281,11 @@ function DetailRow({
 }) {
   return (
     <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-
       <div className="text-[#2785b7]">{icon}</div>
 
       <div className="flex-1 min-w-0">
         <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">
-          {value}
-        </p>
+        <p className="text-xs font-semibold mt-1 break-words">{value}</p>
       </div>
     </div>
   );

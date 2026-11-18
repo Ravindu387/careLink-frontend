@@ -1,10 +1,7 @@
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { FormEvent, ReactNode } from "react";
 import {
   Search,
-  Globe,
-  Bell,
-  CircleHelp,
   ChevronRight,
   Plus,
   X,
@@ -16,95 +13,40 @@ import {
   AlertTriangle,
   Settings2,
   CheckCircle2,
-  CalendarDays,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
+import { occupancyService } from "../../services/occupancyService";
+import type {
+  OccupancyShelter,
+  Admission,
+  OccupancyThreshold,
+  OccupancySummary,
+} from "../../types/occupancy";
 
-/* ================= TYPES ================= */
+/* ================= DEFAULT FALLBACKS ================= */
 
-type Shelter = {
-  id: string;
-  name: string;
-  district: string;
-  capacity: number;
-  occupied: number;
-  reserved: number;
+const defaultThresholds: OccupancyThreshold = {
+  warning: 80,
+  critical: 95,
 };
-
-type Admission = {
-  id: string;
-  resident: string;
-  shelterId: string;
-  people: number;
-  date: string;
-};
-
-/* ================= SAMPLE DATA ================= */
-
-const initialShelters: Shelter[] = [
-  {
-    id: "SH-001",
-    name: "Riverton Central School",
-    district: "Central District",
-    capacity: 660,
-    occupied: 612,
-    reserved: 0,
-  },
-  {
-    id: "SH-002",
-    name: "North Community Hall",
-    district: "North District",
-    capacity: 500,
-    occupied: 284,
-    reserved: 0,
-  },
-  {
-    id: "SH-003",
-    name: "St. Mary Civic Centre",
-    district: "Eastbank",
-    capacity: 450,
-    occupied: 450,
-    reserved: 0,
-  },
-  {
-    id: "SH-004",
-    name: "Lakeside Sports Hall",
-    district: "West District",
-    capacity: 400,
-    occupied: 196,
-    reserved: 0,
-  },
-  {
-    id: "SH-005",
-    name: "Hillview College",
-    district: "North District",
-    capacity: 320,
-    occupied: 0,
-    reserved: 46,
-  },
-];
-
-const initialAdmissions: Admission[] = [];
 
 /* ================= MAIN COMPONENT ================= */
 
 export default function OccupancyManagementPage() {
-  const [shelters, setShelters] = useState(initialShelters);
-  const [admissions, setAdmissions] = useState(initialAdmissions);
-
-  const [thresholds, setThresholds] = useState({
-    warning: 80,
-    critical: 95,
-  });
+  const [shelters, setShelters] = useState<OccupancyShelter[]>([]);
+  const [admissions, setAdmissions] = useState<Admission[]>([]);
+  const [thresholds, setThresholds] =
+    useState<OccupancyThreshold>(defaultThresholds);
+  const [summary, setSummary] = useState<OccupancySummary | null>(null);
 
   const [modal, setModal] = useState<
-  "admission" | "threshold" | "allocation" | null
->(null);
-
-  const [notifications, setNotifications] = useState(8);
+    "admission" | "threshold" | "allocation" | null
+  >(null);
 
   const [admissionForm, setAdmissionForm] = useState({
     resident: "",
-    shelterId: "SH-002",
+    shelterId: "SH-001",
     people: "1",
     date: new Date().toISOString().slice(0, 10),
   });
@@ -116,37 +58,66 @@ export default function OccupancyManagementPage() {
 
   const [search, setSearch] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /* ================= CALCULATIONS ================= */
+  /* ================= FETCH DATA ================= */
 
-  const totalCapacity = shelters.reduce(
-    (sum, shelter) => sum + shelter.capacity,
-    0
-  );
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      const [sheltersData, summaryData, admissionsData, thresholdsData] =
+        await Promise.all([
+          occupancyService.getShelters(),
+          occupancyService.getSummary(),
+          occupancyService.getAdmissions(),
+          occupancyService.getThresholds(),
+        ]);
 
-  const totalOccupied = shelters.reduce(
-    (sum, shelter) => sum + shelter.occupied,
-    0
-  );
+      setShelters(sheltersData);
+      setSummary(summaryData);
+      setAdmissions(admissionsData);
+      setThresholds(thresholdsData);
 
-  const totalReserved = shelters.reduce(
-    (sum, shelter) => sum + shelter.reserved,
-    0
-  );
+      if (sheltersData.length > 0 && !admissionForm.shelterId) {
+        setAdmissionForm((prev) => ({
+          ...prev,
+          shelterId: sheltersData[0].id,
+        }));
+      }
+    } catch (err: any) {
+      setErrorMessage(
+        err?.message || "Failed to load occupancy data. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [admissionForm.shelterId]);
 
-  const totalAvailable = shelters.reduce(
-    (sum, shelter) =>
-      sum + shelter.capacity - shelter.occupied - shelter.reserved,
-    0
-  );
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
-  const totalDepartures = 35;
-  const totalAdmissions = 62;
+  // Auto-dismiss success toast
+  useEffect(() => {
+    if (!successMessage) return;
+    const timer = setTimeout(() => {
+      setSuccessMessage("");
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [successMessage]);
 
-  const occupancyRate =
-    totalCapacity > 0
-      ? (totalOccupied / totalCapacity) * 100
-      : 0;
+  /* ================= DERIVED CALCULATIONS ================= */
+
+  const totalCapacity = summary?.totalCapacity ?? 0;
+  const totalOccupied = summary?.totalOccupied ?? 0;
+  const totalReserved = summary?.totalReserved ?? 0;
+  const totalAvailable = summary?.totalAvailable ?? 0;
+  const occupancyRate = summary?.occupancyRate ?? 0;
+  const totalDepartures = summary?.totalDeparturesToday ?? 35;
+  const totalAdmissions = summary?.totalAdmissionsToday ?? 62;
 
   const filteredShelters = useMemo(
     () =>
@@ -160,8 +131,9 @@ export default function OccupancyManagementPage() {
 
   /* ================= SHELTER STATUS ================= */
 
-  const getShelterStatus = (shelter: Shelter) => {
-    const rate = (shelter.occupied / shelter.capacity) * 100;
+  const getShelterStatus = (shelter: OccupancyShelter) => {
+    const rate =
+      shelter.capacity > 0 ? (shelter.occupied / shelter.capacity) * 100 : 0;
 
     if (rate >= thresholds.critical) {
       return {
@@ -188,91 +160,105 @@ export default function OccupancyManagementPage() {
 
   /* ================= RECORD ADMISSION ================= */
 
-  const handleAdmission = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAdmission = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const people = Number(admissionForm.people);
+    if (!admissionForm.resident.trim() || people <= 0) {
+      setSuccessMessage("Please enter a valid resident name and number of people.");
+      return;
+    }
 
     const selectedShelter = shelters.find(
-      (shelter) => shelter.id === admissionForm.shelterId
+      (s) => s.id === admissionForm.shelterId
     );
 
-    if (!selectedShelter || people <= 0) return;
+    if (!selectedShelter) return;
 
-    const available =
-      selectedShelter.capacity -
-      selectedShelter.occupied -
-      selectedShelter.reserved;
-
-    if (people > available) {
+    if (people > selectedShelter.available) {
       setSuccessMessage(
-        `Not enough available beds. Only ${available} spaces are available.`
+        `Not enough available beds. Only ${selectedShelter.available} spaces are available in ${selectedShelter.name}.`
       );
       return;
     }
 
-    const newAdmission: Admission = {
-      id: `ADM-${Date.now().toString().slice(-6)}`,
-      resident: admissionForm.resident,
-      shelterId: admissionForm.shelterId,
-      people,
-      date: admissionForm.date,
-    };
+    setIsSubmitting(true);
+    try {
+      const created = await occupancyService.recordAdmission({
+        resident: admissionForm.resident.trim(),
+        shelterId: admissionForm.shelterId,
+        people,
+        date: admissionForm.date,
+      });
 
-    setShelters((prev) =>
-      prev.map((shelter) =>
-        shelter.id === admissionForm.shelterId
-          ? { ...shelter, occupied: shelter.occupied + people }
-          : shelter
-      )
-    );
+      setAdmissions((prev) => [created, ...prev]);
 
-    setAdmissions((prev) => [...prev, newAdmission]);
+      setAdmissionForm({
+        resident: "",
+        shelterId: shelters[0]?.id || "SH-001",
+        people: "1",
+        date: new Date().toISOString().slice(0, 10),
+      });
 
-    setAdmissionForm({
-      resident: "",
-      shelterId: "SH-002",
-      people: "1",
-      date: new Date().toISOString().slice(0, 10),
-    });
+      setModal(null);
+      setSuccessMessage(`Admission ${created.id} recorded successfully.`);
 
-    setModal(null);
-    setSuccessMessage("Admission recorded successfully.");
+      // Refresh live shelters & summary from backend
+      const [freshShelters, freshSummary] = await Promise.all([
+        occupancyService.getShelters(),
+        occupancyService.getSummary(),
+      ]);
+      setShelters(freshShelters);
+      setSummary(freshSummary);
+    } catch (err: any) {
+      setSuccessMessage(err?.message || "Failed to record admission.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   /* ================= CONFIGURE THRESHOLDS ================= */
 
-  const handleThresholdSave = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleThresholdSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const warning = Number(thresholdForm.warning);
     const critical = Number(thresholdForm.critical);
 
-    if (
-      warning <= 0 ||
-      critical > 100 ||
-      critical <= warning
-    ) {
+    if (warning <= 0 || critical > 100 || critical <= warning) {
       setSuccessMessage(
-        "Critical threshold must be higher than warning and both must be within 1–100."
+        "Critical threshold must be higher than warning and both must be within 1–100%."
       );
       return;
     }
 
-    setThresholds({ warning, critical });
-    setModal(null);
-    setSuccessMessage("Occupancy thresholds updated successfully.");
+    setIsSubmitting(true);
+    try {
+      const saved = await occupancyService.saveThresholds({ warning, critical });
+      setThresholds(saved);
+      setModal(null);
+      setSuccessMessage("Occupancy thresholds updated successfully.");
+
+      // Refresh shelters with updated thresholds
+      const [freshShelters, freshSummary] = await Promise.all([
+        occupancyService.getShelters(),
+        occupancyService.getSummary(),
+      ]);
+      setShelters(freshShelters);
+      setSummary(freshSummary);
+    } catch (err: any) {
+      setSuccessMessage(err?.message || "Failed to update thresholds.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-[#eef5f7] text-[#123e60] font-sans">
-
-      {/* ================= MAIN CONTENT ================= */}
-
+      {/* MAIN CONTENT */}
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
-
         {/* BREADCRUMB */}
         <div className="flex items-center gap-2 text-[9px] mb-7">
           <span className="text-slate-400">CareLink</span>
@@ -282,20 +268,44 @@ export default function OccupancyManagementPage() {
           <span className="font-semibold">Occupancy Management</span>
         </div>
 
+        {/* ERROR BANNER */}
+        {errorMessage && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={16} className="text-red-500 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              onClick={loadData}
+              className="text-xs font-semibold text-red-600 hover:text-red-800 underline flex items-center gap-1"
+            >
+              <RefreshCw size={12} />
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* PAGE HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-
           <div>
             <h1 className="text-[23px] md:text-[25px] font-normal">
               Occupancy Management
             </h1>
-
             <p className="text-[11px] text-slate-500 mt-2">
               Monitor capacity, reservations, admissions, and departures in real time.
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <button
+              onClick={loadData}
+              title="Refresh occupancy data"
+              disabled={isLoading}
+              className="h-9 px-3 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold flex items-center gap-1.5 hover:bg-slate-50 disabled:opacity-50"
+            >
+              <RefreshCw size={13} className={isLoading ? "animate-spin" : ""} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
 
             <button
               onClick={() => {
@@ -321,28 +331,26 @@ export default function OccupancyManagementPage() {
           </div>
         </div>
 
-        {/* ================= CAPACITY WARNING ================= */}
-
-        {shelters.some(
-          (s) => getShelterStatus(s).label !== "Available"
-        ) && (
+        {/* CAPACITY WARNING */}
+        {shelters.some((s) => getShelterStatus(s).label !== "Available") && (
           <section className="bg-[#fff8e9] border border-[#f6d58b] border-l-[3px] border-l-[#f4b638] rounded-lg px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-
-            <AlertTriangle
-              size={18}
-              className="text-[#a56b0c] shrink-0"
-            />
+            <AlertTriangle size={18} className="text-[#a56b0c] shrink-0" />
 
             <div className="flex-1">
               <p className="text-[10px] font-bold text-[#96620d]">
                 Capacity warning
               </p>
-
               <p className="text-[9px] text-[#96620d] mt-1">
                 {shelters
                   .filter((s) => getShelterStatus(s).label !== "Available")
-                  .map((s) => `${s.name} is ${Math.round((s.occupied / s.capacity) * 100)}% occupied`)
-                  .join(". ")}.
+                  .map(
+                    (s) =>
+                      `${s.name} is ${Math.round(
+                        (s.occupied / s.capacity) * 100
+                      )}% occupied`
+                  )
+                  .join(". ")}
+                .
               </p>
             </div>
 
@@ -355,10 +363,8 @@ export default function OccupancyManagementPage() {
           </section>
         )}
 
-        {/* ================= KPI CARDS ================= */}
-
+        {/* KPI CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 mb-3">
-
           <KpiCard
             icon={<Users size={18} />}
             color="blue"
@@ -400,78 +406,95 @@ export default function OccupancyManagementPage() {
           />
         </div>
 
-        {/* ================= OCCUPANCY + DISTRIBUTION ================= */}
-
+        {/* OCCUPANCY + DISTRIBUTION */}
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,2.25fr)_minmax(300px,0.9fr)] gap-3">
-
           {/* SHELTER-WISE OCCUPANCY */}
           <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
-
-            <div className="px-4 py-3.5 border-b border-slate-200 flex items-center justify-between">
+            <div className="px-4 py-3.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h2 className="text-xs font-semibold">
-                  Shelter-wise occupancy
-                </h2>
-
+                <h2 className="text-xs font-semibold">Shelter-wise occupancy</h2>
                 <p className="text-[9px] text-slate-400 mt-1">
-                  Warning at {thresholds.warning}% · Critical at {thresholds.critical}%
+                  Warning at {thresholds.warning}% · Critical at{" "}
+                  {thresholds.critical}%
                 </p>
               </div>
 
-              <span className="bg-[#eaf3f8] text-[#267ba6] px-2 py-1 rounded-md text-[8px] font-semibold">
-                Live capacity
-              </span>
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <Search
+                    size={12}
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Filter shelters..."
+                    className="h-7 w-40 pl-7 pr-2 border border-slate-200 rounded-md text-[9px] outline-none focus:border-[#45b99b]"
+                  />
+                </div>
+
+                <span className="bg-[#eaf3f8] text-[#267ba6] px-2 py-1 rounded-md text-[8px] font-semibold whitespace-nowrap">
+                  Live capacity
+                </span>
+              </div>
             </div>
 
             <div className="px-4 py-1">
+              {isLoading && shelters.length === 0 ? (
+                <div className="py-12 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+                  <Loader2 size={16} className="animate-spin text-[#1c5d83]" />
+                  <span>Loading shelters...</span>
+                </div>
+              ) : (
+                filteredShelters.map((shelter) => {
+                  const rate =
+                    shelter.capacity > 0
+                      ? (shelter.occupied / shelter.capacity) * 100
+                      : 0;
 
-              {filteredShelters.map((shelter) => {
+                  const available =
+                    shelter.capacity - shelter.occupied - shelter.reserved;
 
-                const rate =
-                  (shelter.occupied / shelter.capacity) * 100;
+                  const shelterStatus = getShelterStatus(shelter);
 
-                const available =
-                  shelter.capacity - shelter.occupied - shelter.reserved;
+                  return (
+                    <div
+                      key={shelter.id}
+                      className="py-4 border-b border-[#dbe6eb] last:border-b-0"
+                    >
+                      <div className="flex justify-between items-center gap-3 mb-2">
+                        <div>
+                          <p className="text-[10px] font-semibold">
+                            {shelter.name}
+                          </p>
+                          <p className="text-[8px] text-slate-400 mt-1">
+                            {shelter.district} · {available} beds available
+                          </p>
+                        </div>
 
-                const shelterStatus = getShelterStatus(shelter);
-
-                return (
-                  <div
-                    key={shelter.id}
-                    className="py-4 border-b border-[#dbe6eb] last:border-b-0"
-                  >
-
-                    <div className="flex justify-between items-center gap-3 mb-2">
-
-                      <div>
-                        <p className="text-[10px] font-semibold">
-                          {shelter.name}
-                        </p>
-
-                        <p className="text-[8px] text-slate-400 mt-1">
-                          {shelter.district} · {available} beds available
-                        </p>
+                        <span
+                          className={`px-2 py-1 rounded-md text-[8px] font-semibold whitespace-nowrap ${shelterStatus.badge}`}
+                        >
+                          {shelterStatus.label} · {Math.round(rate)}%
+                        </span>
                       </div>
 
-                      <span className={`px-2 py-1 rounded-md text-[8px] font-semibold whitespace-nowrap ${shelterStatus.badge}`}>
-                        {shelterStatus.label} · {Math.round(rate)}%
-                      </span>
+                      <div className="h-[6px] w-full rounded-full bg-[#e9eff2] overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${Math.min(rate, 100)}%`,
+                            backgroundColor: shelterStatus.color,
+                          }}
+                        />
+                      </div>
                     </div>
+                  );
+                })
+              )}
 
-                    <div className="h-[6px] w-full rounded-full bg-[#e9eff2] overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${Math.min(rate, 100)}%`,
-                          backgroundColor: shelterStatus.color,
-                        }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-
-              {filteredShelters.length === 0 && (
+              {filteredShelters.length === 0 && !isLoading && (
                 <div className="py-12 text-center text-xs text-slate-400">
                   No shelters found.
                 </div>
@@ -481,49 +504,46 @@ export default function OccupancyManagementPage() {
 
           {/* CAPACITY DISTRIBUTION */}
           <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
-
             <div className="px-4 py-3.5 border-b border-slate-200">
-              <h2 className="text-xs font-semibold">
-                Capacity distribution
-              </h2>
-
+              <h2 className="text-xs font-semibold">Capacity distribution</h2>
               <p className="text-[9px] text-slate-400 mt-1">
                 All registered shelters
               </p>
             </div>
 
             <div className="px-5 py-5">
-
               {/* DONUT CHART */}
               <div className="flex justify-center py-1">
-
                 <div
                   className="relative w-[150px] h-[150px] rounded-full"
                   style={{
-                    background: `conic-gradient(
-                      #21638d 0% ${occupancyRate}%,
-                      #45b99b ${occupancyRate}% ${occupancyRate + (totalAvailable / totalCapacity) * 100}%,
-                      #f3b443 ${occupancyRate + (totalAvailable / totalCapacity) * 100}% 100%
-                    )`,
+                    background:
+                      totalCapacity > 0
+                        ? `conic-gradient(
+                            #21638d 0% ${occupancyRate}%,
+                            #45b99b ${occupancyRate}% ${
+                            occupancyRate +
+                            (totalAvailable / totalCapacity) * 100
+                          }%,
+                            #f3b443 ${
+                            occupancyRate +
+                            (totalAvailable / totalCapacity) * 100
+                          }% 100%
+                          )`
+                        : "#e9eff2",
                   }}
                 >
-
                   <div className="absolute inset-[23px] bg-white rounded-full flex flex-col items-center justify-center">
-
                     <p className="text-[21px] font-bold">
                       {occupancyRate.toFixed(1)}%
                     </p>
-
-                    <p className="text-[9px] text-slate-400 mt-1">
-                      Occupied
-                    </p>
+                    <p className="text-[9px] text-slate-400 mt-1">Occupied</p>
                   </div>
                 </div>
               </div>
 
               {/* LEGEND */}
               <div className="mt-5 space-y-4">
-
                 <LegendItem
                   color="#21638d"
                   label="Occupied"
@@ -541,7 +561,6 @@ export default function OccupancyManagementPage() {
                   label="Reserved"
                   value={totalReserved.toLocaleString()}
                 />
-
               </div>
             </div>
           </section>
@@ -553,7 +572,7 @@ export default function OccupancyManagementPage() {
             <div className="px-4 py-3 border-b border-slate-200">
               <h2 className="text-xs font-semibold">Recent admissions</h2>
               <p className="text-[9px] text-slate-400 mt-1">
-                Admissions recorded during this session
+                Resident admissions recorded in the system
               </p>
             </div>
 
@@ -570,11 +589,16 @@ export default function OccupancyManagementPage() {
                 </thead>
                 <tbody>
                   {admissions.map((admission) => (
-                    <tr key={admission.id} className="border-t border-slate-100 text-[10px]">
+                    <tr
+                      key={admission.id}
+                      className="border-t border-slate-100 text-[10px]"
+                    >
                       <td className="px-4 py-3 font-semibold">{admission.id}</td>
                       <td className="px-4 py-3">{admission.resident}</td>
                       <td className="px-4 py-3">
-                        {shelters.find(s => s.id === admission.shelterId)?.name}
+                        {admission.shelterName ||
+                          shelters.find((s) => s.id === admission.shelterId)?.name ||
+                          admission.shelterId}
                       </td>
                       <td className="px-4 py-3">{admission.people}</td>
                       <td className="px-4 py-3">{admission.date}</td>
@@ -585,18 +609,13 @@ export default function OccupancyManagementPage() {
             </div>
           </section>
         )}
-
       </main>
 
-      {/* ================= MODALS ================= */}
-
+      {/* MODALS */}
       {modal && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
           <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6">
-
             <div className="flex justify-between items-center mb-5">
-
               <div>
                 <h2 className="text-base font-semibold">
                   {modal === "admission" && "Record admission"}
@@ -613,7 +632,10 @@ export default function OccupancyManagementPage() {
                 </p>
               </div>
 
-              <button onClick={() => setModal(null)}>
+              <button
+                onClick={() => setModal(null)}
+                className="text-slate-400 hover:text-slate-700"
+              >
                 <X size={19} />
               </button>
             </div>
@@ -621,7 +643,6 @@ export default function OccupancyManagementPage() {
             {/* ADMISSION FORM */}
             {modal === "admission" && (
               <form onSubmit={handleAdmission} className="space-y-4">
-
                 <FormInput
                   label="Resident / Household name"
                   placeholder="Enter resident name"
@@ -693,9 +714,11 @@ export default function OccupancyManagementPage() {
 
                 <button
                   type="submit"
-                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665] flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
-                  Confirm admission
+                  {isSubmitting && <Loader2 size={13} className="animate-spin" />}
+                  <span>{isSubmitting ? "Recording..." : "Confirm admission"}</span>
                 </button>
               </form>
             )}
@@ -703,7 +726,6 @@ export default function OccupancyManagementPage() {
             {/* THRESHOLD FORM */}
             {modal === "threshold" && (
               <form onSubmit={handleThresholdSave} className="space-y-4">
-
                 <FormInput
                   label="Warning threshold (%)"
                   type="number"
@@ -728,9 +750,11 @@ export default function OccupancyManagementPage() {
 
                 <button
                   type="submit"
-                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-xs font-semibold"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665] flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
-                  Save thresholds
+                  {isSubmitting && <Loader2 size={13} className="animate-spin" />}
+                  <span>{isSubmitting ? "Saving..." : "Save thresholds"}</span>
                 </button>
               </form>
             )}
@@ -738,11 +762,8 @@ export default function OccupancyManagementPage() {
             {/* ALLOCATION PLAN */}
             {modal === "allocation" && (
               <div className="space-y-3">
-
                 {shelters
-                  .filter(
-                    (s) => getShelterStatus(s).label !== "Available"
-                  )
+                  .filter((s) => getShelterStatus(s).label !== "Available")
                   .map((shelter) => (
                     <div
                       key={shelter.id}
@@ -756,7 +777,8 @@ export default function OccupancyManagementPage() {
                       </div>
 
                       <p className="text-[10px] text-slate-400 mt-1">
-                        {shelter.capacity - shelter.occupied - shelter.reserved} spaces available
+                        {shelter.capacity - shelter.occupied - shelter.reserved}{" "}
+                        spaces available
                       </p>
                     </div>
                   ))}
@@ -773,20 +795,19 @@ export default function OccupancyManagementPage() {
             >
               Close
             </button>
-
           </div>
         </div>
       )}
 
-      {/* SUCCESS / ERROR MESSAGE */}
+      {/* SUCCESS / ERROR TOAST */}
       {successMessage && (
         <div className="fixed bottom-5 right-5 z-[60] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-start gap-3">
-
-          <CheckCircle2 size={17} className="shrink-0 mt-0.5" />
-
+          <CheckCircle2 size={17} className="text-[#37b18d] shrink-0 mt-0.5" />
           <p className="text-xs leading-5">{successMessage}</p>
-
-          <button onClick={() => setSuccessMessage("")}>
+          <button
+            onClick={() => setSuccessMessage("")}
+            className="text-white/80 hover:text-white"
+          >
             <X size={15} />
           </button>
         </div>
@@ -804,7 +825,7 @@ function KpiCard({
   value,
   description,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: "blue" | "green" | "orange";
   title: string;
   value: string;
@@ -818,8 +839,9 @@ function KpiCard({
 
   return (
     <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm p-3.5 flex items-center gap-3 min-h-[77px]">
-
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${styles[color]}`}>
+      <div
+        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${styles[color]}`}
+      >
         {icon}
       </div>
 
@@ -871,9 +893,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
-        {label}
-      </label>
+      <label className="block text-xs font-medium mb-1.5">{label}</label>
 
       <input
         required
