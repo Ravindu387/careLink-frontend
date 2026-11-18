@@ -3,7 +3,6 @@ import {
   Globe,
   HelpCircle,
   Bell,
-  Plus,
   Menu,
   ChevronDown,
 } from "lucide-react";
