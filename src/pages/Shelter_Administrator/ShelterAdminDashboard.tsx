@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { accommodationService } from "../../services/accommodationService";
 import {
   Search,
   Globe,
@@ -161,20 +162,45 @@ export default function ShelterAdminDashboard() {
     capacity: "",
   });
 
+  useEffect(() => {
+    accommodationService
+      .getRequests({ pageSize: 5 })
+      .then((res) => {
+        if (res.items && res.items.length > 0) {
+          setRequests(
+            res.items.map((r) => ({
+              id: r.id,
+              applicant: r.applicant,
+              people: r.familyMembers,
+              requestedAt: r.currentLocation,
+              priority: r.requestedShelter,
+              status: (r.status === "Approved" || r.status === "Pending" ? r.status : "Under Review") as RequestStatus,
+            }))
+          );
+        }
+      })
+      .catch((err) => console.error("Error loading dashboard requests:", err));
+  }, []);
+
   const filteredRequests = requests.filter((request) =>
     `${request.id} ${request.applicant} ${request.requestedAt}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
 
-  const approveRequest = (id: string) => {
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.id === id
-          ? { ...request, status: "Approved" }
-          : request
-      )
-    );
+  const approveRequest = async (id: string) => {
+    try {
+      await accommodationService.updateRequestStatus(id, "Approved");
+      setRequests((prev) =>
+        prev.map((request) =>
+          request.id === id
+            ? { ...request, status: "Approved" }
+            : request
+        )
+      );
+    } catch (err) {
+      console.error("Failed to approve request:", err);
+    }
 
     setSelectedRequest(null);
   };
