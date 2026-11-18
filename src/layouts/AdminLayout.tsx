@@ -1,15 +1,13 @@
-
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
-import AdminSidebar from "../components/admin/AdminSidebar";
-import AdminTopbar from "../components/admin/AdminTopbar";
+import AdminSidebar from "../pages/admin/AdminSidebar";
+import AdminTopbar from "../pages/admin/AdminTopbar";
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-[#EFF6F7]">
-
       <AdminSidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -22,7 +20,6 @@ export default function AdminLayout() {
 
         <Outlet />
       </div>
-
     </div>
   );
 }
