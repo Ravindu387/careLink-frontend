@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+
+import { useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import {
   Search,
+  Globe,
+  Bell,
+  CircleHelp,
   ChevronRight,
   ChevronDown,
   Plus,
@@ -10,26 +14,40 @@ import {
   AlertTriangle,
   Clock,
   Package,
+  Droplets,
+  HeartPulse,
   Boxes,
   CheckCircle2,
   SlidersHorizontal,
+  Truck,
   CalendarDays,
   MapPin,
-  Loader2,
-  RefreshCw,
-  AlertCircle,
+  ClipboardList,
 } from "lucide-react";
-import { resourceService } from "../../services/resourceService";
-import type {
-  Resource,
-  ResourceSummary,
-  StockStatus,
-} from "../../types/resource";
-import type { Shelter } from "../../types/accommodation";
 
-/* ================= FALLBACK DATA ================= */
+/* ================= TYPES ================= */
 
-const fallbackResources: Resource[] = [
+type StockStatus =
+  | "Healthy"
+  | "Low Stock"
+  | "Critical"
+  | "Out of Stock";
+
+type Resource = {
+  id: string;
+  name: string;
+  category: string;
+  available: number;
+  minimum: number;
+  unit: string;
+  expiry: string;
+  lastUpdated: string;
+  shelter: string;
+};
+
+/* ================= SAMPLE DATA ================= */
+
+const initialResources: Resource[] = [
   {
     id: "INV-104",
     name: "Drinking Water - 10L",
@@ -40,7 +58,6 @@ const fallbackResources: Resource[] = [
     expiry: "—",
     lastUpdated: "22 Jun",
     shelter: "Riverton Central School",
-    status: "Healthy",
   },
   {
     id: "INV-107",
@@ -52,7 +69,6 @@ const fallbackResources: Resource[] = [
     expiry: "12 Jul",
     lastUpdated: "22 Jun",
     shelter: "Riverton Central School",
-    status: "Low Stock",
   },
   {
     id: "INV-112",
@@ -64,7 +80,6 @@ const fallbackResources: Resource[] = [
     expiry: "—",
     lastUpdated: "22 Jun",
     shelter: "Riverton Central School",
-    status: "Healthy",
   },
   {
     id: "INV-118",
@@ -76,7 +91,6 @@ const fallbackResources: Resource[] = [
     expiry: "03 Aug",
     lastUpdated: "22 Jun",
     shelter: "Riverton Central School",
-    status: "Critical",
   },
   {
     id: "INV-124",
@@ -88,7 +102,50 @@ const fallbackResources: Resource[] = [
     expiry: "28 Sep",
     lastUpdated: "22 Jun",
     shelter: "Riverton Central School",
-    status: "Out of Stock",
+  },
+  {
+    id: "INV-130",
+    name: "Baby Food Packs",
+    category: "Food & Water",
+    available: 46,
+    minimum: 100,
+    unit: "Packs",
+    expiry: "15 Jul",
+    lastUpdated: "21 Jun",
+    shelter: "North Community Hall",
+  },
+  {
+    id: "INV-135",
+    name: "Medical Gloves",
+    category: "Medical",
+    available: 210,
+    minimum: 100,
+    unit: "Boxes",
+    expiry: "10 Aug",
+    lastUpdated: "21 Jun",
+    shelter: "North Community Hall",
+  },
+  {
+    id: "INV-140",
+    name: "Sleeping Mats",
+    category: "Bedding",
+    available: 75,
+    minimum: 100,
+    unit: "Units",
+    expiry: "—",
+    lastUpdated: "20 Jun",
+    shelter: "Lakeside Sports Hall",
+  },
+  {
+    id: "INV-145",
+    name: "Sanitary Products",
+    category: "Hygiene",
+    available: 18,
+    minimum: 60,
+    unit: "Packs",
+    expiry: "05 Jul",
+    lastUpdated: "20 Jun",
+    shelter: "St. Mary Civic Centre",
   },
 ];
 
@@ -101,7 +158,7 @@ const categories = [
   "Equipment",
 ];
 
-const fallbackShelters = [
+const shelters = [
   "Riverton Central School",
   "North Community Hall",
   "St. Mary Civic Centre",
@@ -111,50 +168,49 @@ const fallbackShelters = [
 /* ================= STATUS CALCULATION ================= */
 
 function getStockStatus(resource: Resource): StockStatus {
-  if (resource.status) return resource.status;
   if (resource.available === 0) return "Out of Stock";
-  if (resource.available < resource.minimum * 0.5) return "Critical";
-  if (resource.available < resource.minimum) return "Low Stock";
+
+  if (resource.available < resource.minimum * 0.5) {
+    return "Critical";
+  }
+
+  if (resource.available < resource.minimum) {
+    return "Low Stock";
+  }
+
   return "Healthy";
 }
 
 /* ================= MAIN COMPONENT ================= */
 
 export default function ResourceInventoryPage() {
-  const [resources, setResources] = useState<Resource[]>(fallbackResources);
-  const [shelterList, setShelterList] = useState<string[]>(fallbackShelters);
-  const [summary, setSummary] = useState<ResourceSummary | null>(null);
+  const [resources, setResources] =
+    useState<Resource[]>(initialResources);
 
-  // Filters & Search
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("All categories");
-  const [statusFilter, setStatusFilter] = useState("All stock statuses");
-  const [expiryFilter, setExpiryFilter] = useState("Any expiry");
-  const [shelterFilter, setShelterFilter] = useState("All shelters");
+  const [categoryFilter, setCategoryFilter] =
+    useState("All categories");
+  const [statusFilter, setStatusFilter] =
+    useState("All stock statuses");
+  const [expiryFilter, setExpiryFilter] =
+    useState("Any expiry");
+  const [shelterFilter, setShelterFilter] =
+    useState("All shelters");
 
   const [moreFilters, setMoreFilters] = useState(false);
   const [minQuantity, setMinQuantity] = useState("");
   const [maxQuantity, setMaxQuantity] = useState("");
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 5;
 
-  // Modals & Panels
   const [addModal, setAddModal] = useState(false);
-  const [distributionModal, setDistributionModal] = useState(false);
-  const [detailsResource, setDetailsResource] = useState<Resource | null>(null);
+  const [distributionModal, setDistributionModal] =
+    useState(false);
+  const [detailsResource, setDetailsResource] =
+    useState<Resource | null>(null);
 
-  // Status & Feedback
-  const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDistributing, setIsDistributing] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const [newResource, setNewResource] = useState({
     name: "",
@@ -163,112 +219,117 @@ export default function ResourceInventoryPage() {
     minimum: "",
     unit: "Units",
     expiry: "",
-    shelter: fallbackShelters[0],
+    shelter: "Riverton Central School",
   });
 
   const [distribution, setDistribution] = useState({
     resourceId: "",
     quantity: "",
-    shelter: fallbackShelters[0],
+    shelter: "Riverton Central School",
     recipient: "",
     notes: "",
   });
 
-  // Debounce search input
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 350);
-    return () => clearTimeout(handler);
-  }, [search]);
+  /* ================= KPI DATA ================= */
 
-  // Load shelters from API
-  useEffect(() => {
-    const loadShelters = async () => {
-      try {
-        const data: Shelter[] = await resourceService.getShelters();
-        if (data && data.length > 0) {
-          const names = data.map((s) => s.name);
-          setShelterList(names);
-          setNewResource((prev) => ({
-            ...prev,
-            shelter: prev.shelter || names[0],
-          }));
-          setDistribution((prev) => ({
-            ...prev,
-            shelter: prev.shelter || names[0],
-          }));
-        }
-      } catch (err) {
-        console.warn("Could not load shelters from API, using fallback shelters:", err);
-      }
-    };
-    loadShelters();
-  }, []);
+  const healthyCount = resources.filter(
+    (r) => getStockStatus(r) === "Healthy"
+  ).length;
 
-  // Fetch Summary / KPI counts
-  const fetchSummary = useCallback(async () => {
-    try {
-      const data = await resourceService.getResourceSummary();
-      setSummary(data);
-    } catch (err) {
-      console.warn("Could not load resource summary:", err);
-    }
-  }, []);
+  const criticalCount = resources.filter(
+    (r) =>
+      getStockStatus(r) === "Critical" ||
+      getStockStatus(r) === "Out of Stock"
+  ).length;
 
-  // Fetch Resources from Backend
-  const fetchResources = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage("");
-    try {
-      const result = await resourceService.getResources({
-        search: debouncedSearch || undefined,
-        category: categoryFilter !== "All categories" ? categoryFilter : undefined,
-        status: statusFilter !== "All stock statuses" ? statusFilter : undefined,
-        expiryFilter: expiryFilter !== "Any expiry" ? expiryFilter : undefined,
-        shelterId: shelterFilter !== "All shelters" ? shelterFilter : undefined,
-        minQuantity: minQuantity ? Number(minQuantity) : undefined,
-        maxQuantity: maxQuantity ? Number(maxQuantity) : undefined,
-        page: currentPage,
-        pageSize: itemsPerPage,
-      });
+  const lowStockCount = resources.filter(
+    (r) => getStockStatus(r) === "Low Stock"
+  ).length;
 
-      setResources(result.items || []);
-      setTotalCount(result.totalCount);
-      setTotalPages(Math.max(1, result.totalPages));
-    } catch (err: any) {
-      console.error("Error fetching resources:", err);
-      setErrorMessage(
-        err.message || "Failed to load inventory from backend. Check that the API is running."
+  const expiringCount = resources.filter((r) => {
+    if (r.expiry === "—") return false;
+
+    const date = new Date(`${r.expiry} 2025`);
+    const today = new Date("22 Jun 2025");
+    const days =
+      (date.getTime() - today.getTime()) / 86400000;
+
+    return days >= 0 && days <= 30;
+  }).length;
+
+  /* ================= FILTERING ================= */
+
+  const filteredResources = useMemo(() => {
+    return resources.filter((resource) => {
+      const status = getStockStatus(resource);
+
+      const matchesSearch =
+        resource.id.toLowerCase().includes(search.toLowerCase()) ||
+        resource.name.toLowerCase().includes(search.toLowerCase()) ||
+        resource.category.toLowerCase().includes(search.toLowerCase());
+
+      const matchesCategory =
+        categoryFilter === "All categories" ||
+        resource.category === categoryFilter;
+
+      const matchesStatus =
+        statusFilter === "All stock statuses" ||
+        status === statusFilter;
+
+      const matchesShelter =
+        shelterFilter === "All shelters" ||
+        resource.shelter === shelterFilter;
+
+      const matchesExpiry =
+        expiryFilter === "Any expiry" ||
+        (expiryFilter === "Has expiry date" &&
+          resource.expiry !== "—") ||
+        (expiryFilter === "No expiry date" &&
+          resource.expiry === "—");
+
+      const matchesMin =
+        !minQuantity ||
+        resource.available >= Number(minQuantity);
+
+      const matchesMax =
+        !maxQuantity ||
+        resource.available <= Number(maxQuantity);
+
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesStatus &&
+        matchesShelter &&
+        matchesExpiry &&
+        matchesMin &&
+        matchesMax
       );
-    } finally {
-      setLoading(false);
-    }
+    });
   }, [
-    debouncedSearch,
+    resources,
+    search,
     categoryFilter,
     statusFilter,
-    expiryFilter,
     shelterFilter,
+    expiryFilter,
     minQuantity,
     maxQuantity,
-    currentPage,
-    itemsPerPage,
   ]);
 
-  // Refetch resources when filters change
-  useEffect(() => {
-    fetchResources();
-  }, [fetchResources]);
+  /* ================= PAGINATION ================= */
 
-  // Refetch summary on mount
-  useEffect(() => {
-    fetchSummary();
-  }, [fetchSummary]);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredResources.length / itemsPerPage)
+  );
+
+  const currentResources = filteredResources.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const resetFilters = () => {
     setSearch("");
-    setDebouncedSearch("");
     setCategoryFilter("All categories");
     setStatusFilter("All stock statuses");
     setExpiryFilter("Any expiry");
@@ -280,232 +341,176 @@ export default function ResourceInventoryPage() {
 
   /* ================= ADD RESOURCE ================= */
 
-  const handleAddResource = async (e: FormEvent<HTMLFormElement>) => {
+  const handleAddResource = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setErrorMessage("");
 
-    try {
-      const created = await resourceService.createResource({
-        name: newResource.name.trim(),
-        category: newResource.category,
-        available: Number(newResource.available),
-        minimum: Number(newResource.minimum),
-        unit: newResource.unit,
-        expiryDate: newResource.expiry || undefined,
-        shelter: newResource.shelter,
-      });
+    const resource: Resource = {
+      id: `INV-${Date.now().toString().slice(-5)}`,
+      name: newResource.name.trim(),
+      category: newResource.category,
+      available: Number(newResource.available),
+      minimum: Number(newResource.minimum),
+      unit: newResource.unit,
+      expiry: newResource.expiry || "—",
+      lastUpdated: "Today",
+      shelter: newResource.shelter,
+    };
 
-      setSuccessMessage(`Resource "${created.name}" (${created.id}) added successfully.`);
-      setAddModal(false);
+    setResources((prev) => [resource, ...prev]);
 
-      // Reset form
-      setNewResource({
-        name: "",
-        category: "Food & Water",
-        available: "",
-        minimum: "",
-        unit: "Units",
-        expiry: "",
-        shelter: shelterList[0] || fallbackShelters[0],
-      });
+    setNewResource({
+      name: "",
+      category: "Food & Water",
+      available: "",
+      minimum: "",
+      unit: "Units",
+      expiry: "",
+      shelter: "Riverton Central School",
+    });
 
-      // Refetch
-      setCurrentPage(1);
-      await fetchResources();
-      await fetchSummary();
-    } catch (err: any) {
-      console.error("Error adding resource:", err);
-      setErrorMessage(err.message || "Failed to add resource.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    setSearch("");
+    setCategoryFilter("All categories");
+    setStatusFilter("All stock statuses");
+    setShelterFilter("All shelters");
+    setCurrentPage(1);
+
+    setAddModal(false);
+    setSuccessMessage("Resource added successfully.");
   };
 
   /* ================= RECORD DISTRIBUTION ================= */
 
-  const handleDistribution = async (e: FormEvent<HTMLFormElement>) => {
+  const handleDistribution = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const qty = Number(distribution.quantity);
 
-    if (!distribution.resourceId || qty <= 0) {
-      setErrorMessage("Please select a resource and enter a valid quantity.");
+    const quantity = Number(distribution.quantity);
+
+    const resource = resources.find(
+      (r) => r.id === distribution.resourceId
+    );
+
+    if (!resource || quantity <= 0) return;
+
+    if (quantity > resource.available) {
+      setSuccessMessage("Insufficient stock for this distribution.");
       return;
     }
 
-    setIsDistributing(true);
-    setErrorMessage("");
+    setResources((prev) =>
+      prev.map((r) =>
+        r.id === distribution.resourceId
+          ? { ...r, available: r.available - quantity, lastUpdated: "Today" }
+          : r
+      )
+    );
 
-    try {
-      const updated = await resourceService.recordDistribution({
-        resourceId: distribution.resourceId,
-        quantity: qty,
-        shelter: distribution.shelter,
-        recipient: distribution.recipient.trim(),
-        notes: distribution.notes.trim() || undefined,
-      });
+    setDistribution({
+      resourceId: "",
+      quantity: "",
+      shelter: "Riverton Central School",
+      recipient: "",
+      notes: "",
+    });
 
-      setSuccessMessage(
-        `${qty} ${updated.unit} distributed successfully from ${updated.name}.`
-      );
-      setDistributionModal(false);
-      setDetailsResource(null);
+    setDistributionModal(false);
+    setDetailsResource(null);
 
-      // Reset form
-      setDistribution({
-        resourceId: "",
-        quantity: "",
-        shelter: shelterList[0] || fallbackShelters[0],
-        recipient: "",
-        notes: "",
-      });
-
-      await fetchResources();
-      await fetchSummary();
-    } catch (err: any) {
-      console.error("Error recording distribution:", err);
-      setErrorMessage(err.message || "Failed to record distribution.");
-    } finally {
-      setIsDistributing(false);
-    }
+    setSuccessMessage(
+      `${quantity} ${resource.unit} distributed successfully.`
+    );
   };
 
   /* ================= EXPORT CSV ================= */
 
-  const handleExport = async () => {
-    setIsExporting(true);
-    try {
-      let exportData: Resource[] = [];
-      try {
-        exportData = await resourceService.getAllResources();
-      } catch {
-        exportData = resources;
-      }
+  const handleExport = () => {
+    const headers = [
+      "Resource ID",
+      "Resource Name",
+      "Category",
+      "Available",
+      "Minimum",
+      "Unit",
+      "Expiry",
+      "Last Updated",
+      "Shelter",
+      "Status",
+    ];
 
-      if (!exportData || exportData.length === 0) {
-        exportData = resources;
-      }
+    const rows = filteredResources.map((r) => [
+      r.id,
+      r.name,
+      r.category,
+      r.available,
+      r.minimum,
+      r.unit,
+      r.expiry,
+      r.lastUpdated,
+      r.shelter,
+      getStockStatus(r),
+    ]);
 
-      const headers = [
-        "Resource ID",
-        "Resource Name",
-        "Category",
-        "Available",
-        "Minimum",
-        "Unit",
-        "Expiry",
-        "Last Updated",
-        "Shelter",
-        "Status",
-      ];
+    const csv = [headers, ...rows]
+      .map((row) =>
+        row
+          .map((value) =>
+            `"${String(value).replace(/"/g, '""')}"`
+          )
+          .join(",")
+      )
+      .join("\n");
 
-      const rows = exportData.map((r) => [
-        r.id,
-        r.name,
-        r.category,
-        r.available,
-        r.minimum,
-        r.unit,
-        r.expiry,
-        r.lastUpdated,
-        r.shelter,
-        getStockStatus(r),
-      ]);
+    const blob = new Blob(["\uFEFF" + csv], {
+      type: "text/csv;charset=utf-8;",
+    });
 
-      const csv = [headers, ...rows]
-        .map((row) =>
-          row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")
-        )
-        .join("\n");
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
 
-      const blob = new Blob(["\uFEFF" + csv], {
-        type: "text/csv;charset=utf-8;",
-      });
+    link.href = url;
+    link.download = "carelink-inventory-report.csv";
+    link.click();
 
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = `carelink-inventory-${new Date().toISOString().slice(0, 10)}.csv`;
-      link.click();
-
-      URL.revokeObjectURL(url);
-      setSuccessMessage("Inventory report exported successfully.");
-    } catch (err: any) {
-      setErrorMessage("Failed to export inventory: " + (err.message || ""));
-    } finally {
-      setIsExporting(false);
-    }
+    URL.revokeObjectURL(url);
   };
 
-  // KPI Calculations
-  const immediateActionCount =
-    summary?.immediateActionCount ??
-    resources.filter(
-      (r) => getStockStatus(r) === "Critical" || getStockStatus(r) === "Out of Stock"
-    ).length;
-
-  const expiringCount =
-    summary?.expiringSoonCount ??
-    resources.filter((r) => r.expiry !== "—").length;
-
-  const incomingDonations = summary?.incomingDonationsCount ?? 4;
+  /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-[#eef5f7] text-[#123e60] font-sans">
+
       {/* ================= MAIN CONTENT ================= */}
+
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
+
         {/* BREADCRUMB */}
+
         <div className="flex items-center gap-2 text-[9px] mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
-          <span className="text-slate-400">Shelter Administration</span>
+          <span className="text-slate-400">
+            Shelter Administration
+          </span>
           <ChevronRight size={11} className="text-slate-400" />
-          <span className="font-semibold">Resource & Inventory Management</span>
+          <span className="font-semibold">
+            Resource & Inventory Management
+          </span>
         </div>
 
-        {/* ERROR BANNER */}
-        {errorMessage && (
-          <div className="mb-4 bg-red-50 border border-red-200 text-red-800 rounded-lg p-3 text-xs flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertCircle size={16} className="text-red-500 shrink-0" />
-              <span>{errorMessage}</span>
-            </div>
-            <button
-              onClick={() => {
-                fetchResources();
-                fetchSummary();
-              }}
-              className="text-xs font-semibold underline text-red-700 hover:text-red-900"
-            >
-              Retry
-            </button>
-          </div>
-        )}
-
         {/* PAGE HEADER */}
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+
           <div>
             <h1 className="text-[23px] md:text-[25px] font-normal">
               Resource & Inventory Management
             </h1>
+
             <p className="text-[11px] text-slate-500 mt-2">
               Track stock, donations, distributions, minimum levels, and expiry risks.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                fetchResources();
-                fetchSummary();
-              }}
-              title="Refresh inventory"
-              className="h-9 px-3 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold flex items-center gap-1.5 hover:bg-slate-50 text-slate-600"
-            >
-              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
-              Refresh
-            </button>
+          <div className="flex gap-2">
 
             <button
               onClick={() => setDistributionModal(true)}
@@ -525,11 +530,13 @@ export default function ResourceInventoryPage() {
         </div>
 
         {/* ================= ALERT CARDS ================= */}
+
         <section className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+
           <AlertCard
             icon={<AlertTriangle size={17} />}
             color="red"
-            title={`${immediateActionCount} items require immediate action`}
+            title={`${criticalCount} items require immediate action`}
             description="Critical and out-of-stock inventory items"
           />
 
@@ -543,18 +550,21 @@ export default function ResourceInventoryPage() {
           <AlertCard
             icon={<Package size={17} />}
             color="green"
-            title={`${incomingDonations} incoming donations`}
+            title="4 incoming donations"
             description="Expected within the next 48 hours"
           />
         </section>
 
         {/* ================= SEARCH + FILTERS ================= */}
+
         <section className="flex flex-col xl:flex-row gap-2 mb-3">
+
           <div className="relative flex-1 min-w-0">
             <Search
               size={15}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
+
             <input
               value={search}
               onChange={(e) => {
@@ -567,6 +577,7 @@ export default function ResourceInventoryPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 xl:flex gap-2">
+
             <FilterSelect
               value={categoryFilter}
               options={["All categories", ...categories]}
@@ -597,7 +608,6 @@ export default function ResourceInventoryPage() {
                 "Any expiry",
                 "Has expiry date",
                 "No expiry date",
-                "Expiring soon",
               ]}
               onChange={(v) => {
                 setExpiryFilter(v);
@@ -607,7 +617,7 @@ export default function ResourceInventoryPage() {
 
             <FilterSelect
               value={shelterFilter}
-              options={["All shelters", ...shelterList]}
+              options={["All shelters", ...shelters]}
               onChange={(v) => {
                 setShelterFilter(v);
                 setCurrentPage(1);
@@ -629,10 +639,15 @@ export default function ResourceInventoryPage() {
         </section>
 
         {/* ================= ADVANCED FILTERS ================= */}
+
         {moreFilters && (
           <section className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3">
+
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xs font-semibold">Advanced filters</h3>
+              <h3 className="text-xs font-semibold">
+                Advanced filters
+              </h3>
+
               <button
                 onClick={resetFilters}
                 className="text-[10px] text-[#267ca6] font-semibold"
@@ -642,6 +657,7 @@ export default function ResourceInventoryPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
               <FormInput
                 label="Minimum available quantity"
                 type="number"
@@ -668,44 +684,45 @@ export default function ResourceInventoryPage() {
         )}
 
         {/* ================= INVENTORY TABLE ================= */}
+
         <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
+
           {/* TABLE HEADER */}
+
           <div className="px-3.5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200">
+
             <div>
-              <h2 className="text-xs font-semibold">Current inventory</h2>
+              <h2 className="text-xs font-semibold">
+                Current inventory
+              </h2>
+
               <p className="text-[8px] text-slate-400 mt-1">
                 {shelterFilter === "All shelters"
                   ? "All registered shelters"
                   : shelterFilter}
                 {" · "}
-                {(totalCount || resources.length)} resource records
+                {filteredResources.length} resource records
               </p>
             </div>
 
             <button
               onClick={handleExport}
-              disabled={isExporting}
-              className="flex items-center gap-2 text-[10px] font-semibold text-[#1c638a] hover:text-[#144665] disabled:opacity-50"
+              className="flex items-center gap-2 text-[10px] font-semibold text-[#1c638a] hover:text-[#144665]"
             >
-              {isExporting ? <Loader2 size={13} className="animate-spin" /> : <Download size={14} />}
+              <Download size={14} />
               Inventory report
             </button>
           </div>
 
           {/* TABLE */}
-          <div className="overflow-x-auto relative min-h-[220px]">
-            {loading && (
-              <div className="absolute inset-0 bg-white/70 z-10 flex items-center justify-center">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#1c638a]">
-                  <Loader2 size={18} className="animate-spin" />
-                  Loading inventory records...
-                </div>
-              </div>
-            )}
+
+          <div className="overflow-x-auto">
 
             <table className="w-full min-w-[1000px] text-left">
+
               <thead className="bg-[#f5f9fa] border-b border-slate-200">
                 <tr className="text-[8px] text-slate-500">
+
                   <th className="px-3 py-3 font-medium">Resource ID</th>
                   <th className="px-3 py-3 font-medium">Resource Name</th>
                   <th className="px-3 py-3 font-medium">Category</th>
@@ -720,7 +737,7 @@ export default function ResourceInventoryPage() {
               </thead>
 
               <tbody>
-                {resources.map((resource) => {
+                {currentResources.map((resource) => {
                   const status = getStockStatus(resource);
 
                   return (
@@ -729,35 +746,54 @@ export default function ResourceInventoryPage() {
                       onClick={() => setDetailsResource(resource)}
                       className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
                     >
+
                       <td className="px-3 py-3.5 font-semibold text-[#174f75]">
                         {resource.id}
                       </td>
+
                       <td className="px-3 py-3.5 whitespace-nowrap">
                         {resource.name}
                       </td>
+
                       <td className="px-3 py-3.5 whitespace-nowrap">
                         {resource.category}
                       </td>
+
                       <td className="px-3 py-3.5 font-medium">
                         {resource.available.toLocaleString()}
                       </td>
+
                       <td className="px-3 py-3.5">
                         {resource.minimum.toLocaleString()}
                       </td>
-                      <td className="px-3 py-3.5">{resource.unit}</td>
-                      <td className="px-3 py-3.5">{resource.expiry}</td>
-                      <td className="px-3 py-3.5">{resource.lastUpdated}</td>
+
+                      <td className="px-3 py-3.5">
+                        {resource.unit}
+                      </td>
+
+                      <td className="px-3 py-3.5">
+                        {resource.expiry}
+                      </td>
+
+                      <td className="px-3 py-3.5">
+                        {resource.lastUpdated}
+                      </td>
+
                       <td className="px-3 py-3.5">
                         <StockBadge status={status} />
                       </td>
+
                       <td className="px-3 py-3.5">
-                        <ChevronRight size={13} className="text-slate-400" />
+                        <ChevronRight
+                          size={13}
+                          className="text-slate-400"
+                        />
                       </td>
                     </tr>
                   );
                 })}
 
-                {!loading && resources.length === 0 && (
+                {currentResources.length === 0 && (
                   <tr>
                     <td
                       colSpan={10}
@@ -772,17 +808,25 @@ export default function ResourceInventoryPage() {
           </div>
 
           {/* PAGINATION */}
+
           <div className="px-3.5 py-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+
             <p className="text-[9px] text-slate-400">
               Showing{" "}
-              {totalCount === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}
+              {filteredResources.length === 0
+                ? 0
+                : (currentPage - 1) * itemsPerPage + 1}
               {"–"}
-              {Math.min(currentPage * itemsPerPage, totalCount || resources.length)}
+              {Math.min(
+                currentPage * itemsPerPage,
+                filteredResources.length
+              )}
               {" of "}
-              {(totalCount || resources.length).toLocaleString()}
+              {filteredResources.length}
             </p>
 
             <div className="flex items-center gap-1">
+
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
@@ -791,7 +835,10 @@ export default function ResourceInventoryPage() {
                 Previous
               </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              {Array.from(
+                { length: totalPages },
+                (_, i) => i + 1
+              ).map((page) => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
@@ -818,6 +865,7 @@ export default function ResourceInventoryPage() {
       </main>
 
       {/* ================= ADD RESOURCE MODAL ================= */}
+
       {addModal && (
         <Modal
           title="Add new resource"
@@ -825,11 +873,14 @@ export default function ResourceInventoryPage() {
           onClose={() => setAddModal(false)}
         >
           <form onSubmit={handleAddResource} className="space-y-4">
+
             <FormInput
               label="Resource name"
               placeholder="Example: Drinking Water - 10L"
               value={newResource.name}
-              onChange={(v) => setNewResource({ ...newResource, name: v })}
+              onChange={(v) =>
+                setNewResource({ ...newResource, name: v })
+              }
             />
 
             <FormSelect
@@ -839,10 +890,13 @@ export default function ResourceInventoryPage() {
                 value: c,
                 label: c,
               }))}
-              onChange={(v) => setNewResource({ ...newResource, category: v })}
+              onChange={(v) =>
+                setNewResource({ ...newResource, category: v })
+              }
             />
 
             <div className="grid grid-cols-2 gap-3">
+
               <FormInput
                 label="Available quantity"
                 type="number"
@@ -856,55 +910,55 @@ export default function ResourceInventoryPage() {
                 label="Minimum stock level"
                 type="number"
                 value={newResource.minimum}
-                onChange={(v) => setNewResource({ ...newResource, minimum: v })}
+                onChange={(v) =>
+                  setNewResource({ ...newResource, minimum: v })
+                }
               />
             </div>
 
             <FormSelect
               label="Unit"
               value={newResource.unit}
-              options={[
-                "Units",
-                "Packs",
-                "Kits",
-                "Boxes",
-                "Litres",
-                "Bottles",
-              ].map((u) => ({
+              options={["Units", "Packs", "Kits", "Boxes", "Litres", "Bottles"].map((u) => ({
                 value: u,
                 label: u,
               }))}
-              onChange={(v) => setNewResource({ ...newResource, unit: v })}
+              onChange={(v) =>
+                setNewResource({ ...newResource, unit: v })
+              }
             />
 
             <FormInput
               label="Expiry date"
               type="date"
-              required={false}
               value={newResource.expiry}
-              onChange={(v) => setNewResource({ ...newResource, expiry: v })}
+              onChange={(v) =>
+                setNewResource({ ...newResource, expiry: v })
+              }
             />
 
             <FormSelect
               label="Shelter"
               value={newResource.shelter}
-              options={shelterList.map((s) => ({
+              options={shelters.map((s) => ({
                 value: s,
                 label: s,
               }))}
-              onChange={(v) => setNewResource({ ...newResource, shelter: v })}
+              onChange={(v) =>
+                setNewResource({ ...newResource, shelter: v })
+              }
             />
 
             <ModalActions
               onCancel={() => setAddModal(false)}
               submitLabel="Add resource"
-              loading={isSubmitting}
             />
           </form>
         </Modal>
       )}
 
       {/* ================= DISTRIBUTION MODAL ================= */}
+
       {distributionModal && (
         <Modal
           title="Record resource distribution"
@@ -912,6 +966,7 @@ export default function ResourceInventoryPage() {
           onClose={() => setDistributionModal(false)}
         >
           <form onSubmit={handleDistribution} className="space-y-4">
+
             <FormSelect
               label="Select resource"
               value={distribution.resourceId}
@@ -945,7 +1000,7 @@ export default function ResourceInventoryPage() {
             <FormSelect
               label="Destination shelter"
               value={distribution.shelter}
-              options={shelterList.map((s) => ({
+              options={shelters.map((s) => ({
                 value: s,
                 label: s,
               }))}
@@ -970,7 +1025,10 @@ export default function ResourceInventoryPage() {
             />
 
             <div>
-              <label className="block text-xs font-medium mb-1.5">Notes</label>
+              <label className="block text-xs font-medium mb-1.5">
+                Notes
+              </label>
+
               <textarea
                 value={distribution.notes}
                 onChange={(e) =>
@@ -988,24 +1046,30 @@ export default function ResourceInventoryPage() {
             <ModalActions
               onCancel={() => setDistributionModal(false)}
               submitLabel="Confirm distribution"
-              loading={isDistributing}
             />
           </form>
         </Modal>
       )}
 
       {/* ================= RESOURCE DETAILS PANEL ================= */}
+
       {detailsResource && (
         <div className="fixed inset-0 z-40 bg-black/30 flex justify-end">
+
           <div className="bg-white w-full max-w-md h-full shadow-2xl p-6 overflow-y-auto">
+
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Resource details</h2>
+              <h2 className="text-lg font-semibold">
+                Resource details
+              </h2>
+
               <button onClick={() => setDetailsResource(null)}>
                 <X size={20} />
               </button>
             </div>
 
             <div className="mt-7">
+
               <div className="w-14 h-14 rounded-xl bg-[#eaf3f8] text-[#287da7] flex items-center justify-center">
                 <Package size={25} />
               </div>
@@ -1013,30 +1077,41 @@ export default function ResourceInventoryPage() {
               <h3 className="text-lg font-semibold mt-4">
                 {detailsResource.name}
               </h3>
-              <p className="text-xs text-slate-400 mt-1">{detailsResource.id}</p>
+
+              <p className="text-xs text-slate-400 mt-1">
+                {detailsResource.id}
+              </p>
 
               <div className="mt-3">
-                <StockBadge status={getStockStatus(detailsResource)} />
+                <StockBadge
+                  status={getStockStatus(detailsResource)}
+                />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-7">
+
               <div className="bg-[#f4f8fa] rounded-lg p-3">
-                <p className="text-[9px] text-slate-500">Available stock</p>
+                <p className="text-[9px] text-slate-500">
+                  Available stock
+                </p>
                 <p className="text-xl font-bold mt-1">
-                  {detailsResource.available.toLocaleString()} {detailsResource.unit}
+                  {detailsResource.available}
                 </p>
               </div>
 
               <div className="bg-[#f4f8fa] rounded-lg p-3">
-                <p className="text-[9px] text-slate-500">Minimum stock</p>
+                <p className="text-[9px] text-slate-500">
+                  Minimum stock
+                </p>
                 <p className="text-xl font-bold mt-1">
-                  {detailsResource.minimum.toLocaleString()} {detailsResource.unit}
+                  {detailsResource.minimum}
                 </p>
               </div>
             </div>
 
             <div className="mt-7 space-y-4">
+
               <DetailRow
                 icon={<Boxes size={15} />}
                 label="Category"
@@ -1097,10 +1172,14 @@ export default function ResourceInventoryPage() {
       )}
 
       {/* ================= SUCCESS MESSAGE ================= */}
+
       {successMessage && (
-        <div className="fixed bottom-5 right-5 z-[70] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
-          <CheckCircle2 size={17} className="shrink-0 text-emerald-400" />
-          <p className="text-xs flex-1">{successMessage}</p>
+        <div className="fixed bottom-5 right-5 z-[70] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3">
+
+          <CheckCircle2 size={17} className="shrink-0" />
+
+          <p className="text-xs">{successMessage}</p>
+
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
           </button>
@@ -1124,40 +1203,25 @@ function AlertCard({
   description: string;
 }) {
   const styles = {
-    red: "bg-[#fff2f2] border-[#ffd6d6] text-[#b93737]",
-    orange: "bg-[#fff8ee] border-[#ffe6bf] text-[#bd6a00]",
-    green: "bg-[#f2faf6] border-[#d4edd9] text-[#1c834a]",
+    red: "bg-[#fdebed] text-[#ed5260]",
+    orange: "bg-[#fff4df] text-[#dc9a24]",
+    green: "bg-[#e5f8f1] text-[#37b18d]",
   };
 
   return (
-    <div
-      className={`border rounded-xl p-3 flex items-center gap-3 ${styles[color]}`}
-    >
-      <div className="w-8 h-8 rounded-lg bg-white/70 flex items-center justify-center shrink-0">
+    <div className="bg-white border border-[#d5e3e9] rounded-xl p-3 flex items-center gap-3 min-h-[67px]">
+
+      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${styles[color]}`}>
         {icon}
       </div>
-      <div>
-        <h3 className="text-xs font-semibold">{title}</h3>
-        <p className="text-[9px] text-slate-500 mt-0.5">{description}</p>
+
+      <div className="min-w-0">
+        <p className="text-[9px] font-semibold">{title}</p>
+        <p className="text-[8px] text-slate-400 mt-1">
+          {description}
+        </p>
       </div>
     </div>
-  );
-}
-
-function StockBadge({ status }: { status: StockStatus }) {
-  const styles: Record<StockStatus, string> = {
-    Healthy: "bg-[#e5f8f1] text-[#269a77]",
-    "Low Stock": "bg-[#fff7ea] text-[#cf8700]",
-    Critical: "bg-[#feeceb] text-[#d64545]",
-    "Out of Stock": "bg-[#f1f5f7] text-[#556977]",
-  };
-
-  return (
-    <span
-      className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}
-    >
-      {status}
-    </span>
   );
 }
 
@@ -1175,20 +1239,33 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full xl:w-[135px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-7 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full xl:w-[145px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
+          <option key={option}>{option}</option>
         ))}
       </select>
 
       <ChevronDown
         size={13}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
+        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
       />
     </div>
+  );
+}
+
+function StockBadge({ status }: { status: StockStatus }) {
+  const styles: Record<StockStatus, string> = {
+    Healthy: "bg-[#e5f8f1] text-[#218d70]",
+    "Low Stock": "bg-[#fff4dc] text-[#b47710]",
+    Critical: "bg-[#fdebed] text-[#d83d4b]",
+    "Out of Stock": "bg-[#edf1f3] text-[#5c7282]",
+  };
+
+  return (
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+      {status}
+    </span>
   );
 }
 
@@ -1198,20 +1275,21 @@ function FormInput({
   value,
   onChange,
   type = "text",
-  required = true,
 }: {
   label: string;
   placeholder?: string;
   value: string;
   onChange: (value: string) => void;
   type?: string;
-  required?: boolean;
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">{label}</label>
+      <label className="block text-xs font-medium mb-1.5">
+        {label}
+      </label>
+
       <input
-        required={required}
+        required
         type={type}
         min={type === "number" ? 0 : undefined}
         value={value}
@@ -1236,8 +1314,12 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">{label}</label>
+      <label className="block text-xs font-medium mb-1.5">
+        {label}
+      </label>
+
       <select
+        required
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
@@ -1248,6 +1330,73 @@ function FormSelect({
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+function Modal({
+  title,
+  subtitle,
+  onClose,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+
+      <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+
+        <div className="flex justify-between items-start mb-5">
+          <div>
+            <h2 className="text-lg font-semibold">{title}</h2>
+            <p className="text-[10px] text-slate-400 mt-1">
+              {subtitle}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-slate-500 hover:text-slate-800"
+          >
+            <X size={19} />
+          </button>
+        </div>
+
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function ModalActions({
+  onCancel,
+  submitLabel,
+}: {
+  onCancel: () => void;
+  submitLabel: string;
+}) {
+  return (
+    <div className="flex gap-3 pt-3">
+
+      <button
+        type="button"
+        onClick={onCancel}
+        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+      >
+        {submitLabel}
+      </button>
     </div>
   );
 }
@@ -1263,77 +1412,15 @@ function DetailRow({
 }) {
   return (
     <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+
       <div className="text-[#2785b7]">{icon}</div>
+
       <div className="flex-1 min-w-0">
         <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">{value}</p>
+        <p className="text-xs font-semibold mt-1 break-words">
+          {value}
+        </p>
       </div>
-    </div>
-  );
-}
-
-function Modal({
-  title,
-  subtitle,
-  children,
-  onClose,
-}: {
-  title: string;
-  subtitle: string;
-  children: ReactNode;
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-5">
-          <div>
-            <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">{subtitle}</p>
-          </div>
-          <button onClick={onClose}>
-            <X size={19} />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function ModalActions({
-  onCancel,
-  submitLabel,
-  loading = false,
-}: {
-  onCancel: () => void;
-  submitLabel: string;
-  loading?: boolean;
-}) {
-  return (
-    <div className="flex gap-3 pt-2">
-      <button
-        type="button"
-        onClick={onCancel}
-        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold"
-      >
-        Cancel
-      </button>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665] flex items-center justify-center gap-2 disabled:opacity-50"
-      >
-        {loading ? (
-          <>
-            <Loader2 size={14} className="animate-spin" />
-            Saving...
-          </>
-        ) : (
-          submitLabel
-        )}
-      </button>
     </div>
   );
 }
