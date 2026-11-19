@@ -1,15 +1,12 @@
-
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Heart,
   Search,
   Globe,
   Bell,
   Accessibility,
-  Home,
   Plus,
   ClipboardList,
-  Map,
   House,
   TriangleAlert,
   Users,
@@ -30,354 +27,600 @@ import {
   Phone,
   Calendar,
   CheckCircle,
+  Wifi,
+  WifiOff,
+  RefreshCw,
+  AlertCircle,
+  Smartphone,
+  Laptop,
+  KeyRound,
+  Download,
+  RotateCcw,
+  Check,
+  Sliders,
+  Volume2,
+  EyeIcon,
+  ShieldCheck,
+  Copy,
 } from "lucide-react";
-
-const navigation = [
-  { name: "Home", icon: Home },
-  { name: "Request Help", icon: Plus },
-  { name: "My Requests", icon: ClipboardList, count: 2 },
-  { name: "Nearby Support", icon: Map },
-  { name: "Shelters", icon: House },
-  { name: "Safety Updates", icon: TriangleAlert, count: 3 },
-  { name: "My Household", icon: Users },
-  { name: "My Documents", icon: FileText },
-  { name: "Messages", icon: MessageSquare, count: 2 },
-  { name: "Notifications", icon: Bell, count: 4 },
-  { name: "Feedback", icon: Heart },
-  { name: "Profile & Settings", icon: Accessibility },
-];
+import Sidebar from "./Sidebar";
+import Topbar from "./Topbar";
+import { useAuth } from "../../context/AuthContext";
+import {
+  citizenProfileService,
+  DEFAULT_CITIZEN_PROFILE,
+} from "../../services/citizenProfileService";
+import type {
+  CitizenProfileSettings,
+  UpdateFullProfilePayload,
+  ChangePasswordPayload,
+} from "../../types/citizenProfile";
 
 const settingsTabs = [
-  { name: "Personal details", icon: User },
-  { name: "Contact & location", icon: MapPin },
-  { name: "Language & accessibility", icon: Languages },
-  { name: "Notifications", icon: Bell },
-  { name: "Privacy & data", icon: Lock },
-  { name: "Security", icon: Shield },
+  { name: "Personal details", icon: User, description: "Manage basic identification details and name" },
+  { name: "Contact & location", icon: MapPin, description: "Update residential address and contact phone" },
+  { name: "Language & accessibility", icon: Languages, description: "Preferred language, contrast, and font scale" },
+  { name: "Notifications", icon: Bell, description: "Configure emergency SMS, email, and push notices" },
+  { name: "Privacy & data", icon: Lock, description: "Data sharing consents and export options" },
+  { name: "Security", icon: Shield, description: "Password updates and two-factor authentication" },
 ];
 
 export default function ProfileSettings() {
+  const { user } = useAuth();
+  const citizenName = user?.fullName || "Samira Khan";
+
   const [activeTab, setActiveTab] = useState("Personal details");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [saved, setSaved] = useState<boolean>(false);
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [copiedRef, setCopiedRef] = useState<boolean>(false);
 
-  const [form, setForm] = useState({
-    fullName: "Samira Khan",
-    dateOfBirth: "1990-12-04",
-    preferredName: "Samira",
-    citizenReference: "CIT-10482",
-    email: "samira.khan@email.com",
-    phone: "+94 77 412 8088",
-    address: "North Ward, Greater Riverton",
-    district: "North Ward",
-    language: "English",
-    accessibility: "Standard",
-    password: "",
+  // Form profile state
+  const [profile, setProfile] = useState<CitizenProfileSettings>(DEFAULT_CITIZEN_PROFILE);
+
+  // Password change state
+  const [passwordForm, setPasswordForm] = useState<ChangePasswordPayload>({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const updateField = (field: string, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+  // Load Profile from Backend
+  const loadProfile = useCallback(async () => {
+    try {
+      setLoading(true);
+      setErrorMsg(null);
+      const data = await citizenProfileService.getProfile(citizenName);
+      setProfile(data);
+      setIsOnline(true);
+      setHasChanges(false);
+    } catch (err: any) {
+      console.warn("Could not fetch profile from backend API, using local state:", err);
+      setIsOnline(false);
+      // Fallback
+      setProfile((prev) => prev || DEFAULT_CITIZEN_PROFILE);
+    } finally {
+      setLoading(false);
+    }
+  }, [citizenName]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  // Update helper
+  const updateField = <K extends keyof CitizenProfileSettings>(
+    field: K,
+    value: CitizenProfileSettings[K]
+  ) => {
+    setProfile((prev) => ({ ...prev, [field]: value }));
+    setHasChanges(true);
     setSaved(false);
   };
 
-  const handleSave = () => {
-    setSaved(true);
+  // Save changes handler
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setErrorMsg(null);
+
+      const payload: UpdateFullProfilePayload = {
+        fullName: profile.fullName,
+        preferredName: profile.preferredName,
+        dateOfBirth: profile.dateOfBirth,
+        nationalId: profile.nationalId,
+        gender: profile.gender,
+        email: profile.email,
+        phone: profile.phone,
+        address: profile.address,
+        district: profile.district,
+        city: profile.city,
+        postalCode: profile.postalCode,
+        emergencyContactName: profile.emergencyContactName,
+        emergencyContactPhone: profile.emergencyContactPhone,
+        emergencyContactRelation: profile.emergencyContactRelation,
+        language: profile.language,
+        accessibility: profile.accessibility,
+        highContrast: profile.highContrast,
+        largeText: profile.largeText,
+        screenReaderSupport: profile.screenReaderSupport,
+        audioAssistance: profile.audioAssistance,
+        emergencyAlerts: profile.emergencyAlerts,
+        requestStatusUpdates: profile.requestStatusUpdates,
+        safetyNotifications: profile.safetyNotifications,
+        messagesFromSupportTeams: profile.messagesFromSupportTeams,
+        shelterAvailabilityUpdates: profile.shelterAvailabilityUpdates,
+        smsAlerts: profile.smsAlerts,
+        emailAlerts: profile.emailAlerts,
+        shareLocationDuringDisaster: profile.shareLocationDuringDisaster,
+        shareMedicalWithRescuers: profile.shareMedicalWithRescuers,
+        allowVolunteersContact: profile.allowVolunteersContact,
+        dataRetentionConsent: profile.dataRetentionConsent,
+      };
+
+      if (isOnline) {
+        const updated = await citizenProfileService.updateFullProfile(payload, citizenName);
+        setProfile(updated);
+      }
+
+      setSaved(true);
+      setHasChanges(false);
+      setTimeout(() => setSaved(false), 4000);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to save profile changes.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Change Password Handler
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(null);
+
+    if (!passwordForm.currentPassword) {
+      setPasswordError("Current password is required.");
+      return;
+    }
+
+    if (!passwordForm.newPassword) {
+      setPasswordError("New password cannot be empty.");
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters.");
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError("New password and confirm password do not match.");
+      return;
+    }
+
+    try {
+      setPasswordSaving(true);
+      if (isOnline) {
+        await citizenProfileService.changePassword(passwordForm, citizenName);
+      }
+      setPasswordSuccess("Password changed successfully!");
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setTimeout(() => setPasswordSuccess(null), 4000);
+    } catch (err: any) {
+      setPasswordError(err.message || "Failed to change password.");
+    } finally {
+      setPasswordSaving(false);
+    }
+  };
+
+  // Toggle Two-Factor
+  const handleToggle2FA = async () => {
+    try {
+      const nextState = !profile.twoFactorEnabled;
+      updateField("twoFactorEnabled", nextState);
+      if (isOnline) {
+        await citizenProfileService.toggleTwoFactor(nextState, citizenName);
+      }
+    } catch (err: any) {
+      console.error("Failed to toggle 2FA:", err);
+    }
+  };
+
+  // Reset to Demo Defaults
+  const handleResetProfile = async () => {
+    if (confirm("Reset profile settings to default demo values?")) {
+      try {
+        setLoading(true);
+        if (isOnline) {
+          const reset = await citizenProfileService.resetProfile(citizenName);
+          setProfile(reset);
+        } else {
+          setProfile(DEFAULT_CITIZEN_PROFILE);
+        }
+        setHasChanges(false);
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } catch (err: any) {
+        setErrorMsg("Failed to reset profile.");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  // Export Data JSON
+  const handleExportData = () => {
+    const dataStr =
+      "data:text/json;charset=utf-8," +
+      encodeURIComponent(JSON.stringify(profile, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute(
+      "download",
+      `carelink_profile_${profile.citizenReference || "export"}.json`
+    );
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  // Copy citizen reference
+  const handleCopyRef = () => {
+    navigator.clipboard.writeText(profile.citizenReference);
+    setCopiedRef(true);
+    setTimeout(() => setCopiedRef(false), 2000);
+  };
+
+  // Toggle All Notifications
+  const handleToggleAllNotifications = (enable: boolean) => {
+    setProfile((prev) => ({
+      ...prev,
+      emergencyAlerts: enable,
+      requestStatusUpdates: enable,
+      safetyNotifications: enable,
+      messagesFromSupportTeams: enable,
+      shelterAvailabilityUpdates: enable,
+      smsAlerts: enable,
+      emailAlerts: enable,
+    }));
+    setHasChanges(true);
   };
 
   const inputClass =
-    "w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-xs text-[#173d5b] outline-none focus:border-[#287da6] focus:ring-2 focus:ring-sky-100";
+    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none transition focus:border-[#287da6] focus:ring-2 focus:ring-sky-100 disabled:bg-slate-50 disabled:text-slate-500";
 
   const labelClass =
-    "mb-2 block text-[10px] font-semibold text-[#173d5b]";
+    "mb-1.5 block text-[11px] font-semibold text-[#173d5b]";
+
+  // Calculate profile completeness
+  const completenessItems = [
+    Boolean(profile.fullName),
+    Boolean(profile.email),
+    Boolean(profile.phone),
+    Boolean(profile.address),
+    Boolean(profile.emergencyContactName),
+    Boolean(profile.emergencyContactPhone),
+    Boolean(profile.nationalId),
+  ];
+  const completedCount = completenessItems.filter(Boolean).length;
+  const completenessPercent = Math.round((completedCount / completenessItems.length) * 100);
 
   return (
     <div className="min-h-screen bg-[#eef4f6] text-[#173d5b]">
-
       {/* SIDEBAR */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[295px] flex-col bg-[#153e5e] text-white transition-transform lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
+      <Sidebar
+        activePage="Profile & Settings"
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-        {/* LOGO */}
-        <div className="flex h-[74px] items-center justify-between border-b border-white/10 px-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#65b9aa] text-[#153e5e]">
-              <Heart size={23} />
-            </div>
-
-            <div>
-              <h1 className="text-xl font-bold">ReliefOS</h1>
-              <p className="text-[10px] text-sky-200">
-                Citizen Support
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* ACTIVE RESPONSE */}
-        <div className="mx-3 mt-4 rounded-xl border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
-            ● Active Local Response
-          </p>
-
-          <p className="mt-2 text-xs font-bold">
-            Greater Riverton Floods
-          </p>
-
-          <p className="mt-1 text-[10px] text-sky-200">
-            Help centres and shelters are open
-          </p>
-        </div>
-
-        {/* NAVIGATION */}
-        <div className="px-5 pb-2 pt-5">
-          <p className="text-[9px] font-bold uppercase tracking-widest text-sky-300">
-            Your Support
-          </p>
-        </div>
-
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            const active = item.name === "Profile & Settings";
-
-            return (
-              <button
-                key={item.name}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex w-full items-center gap-3 rounded-lg border-l-[3px] px-3 py-3 text-left text-xs transition ${
-                  active
-                    ? "border-[#65b9aa] bg-[#287da6] font-semibold text-white"
-                    : "border-transparent text-sky-100 hover:bg-white/10"
-                }`}
-              >
-                <Icon size={17} />
-
-                <span className="flex-1">{item.name}</span>
-
-                {item.count && (
-                  <span className="rounded-full bg-red-500 px-2 py-0.5 text-[9px]">
-                    {item.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* EMERGENCY */}
-        <div className="mx-3 mb-3 rounded-xl bg-white p-3 text-[#173d5b]">
-          <div className="flex items-center gap-3">
-            <Phone size={20} />
-
-            <div>
-              <p className="text-[10px] font-semibold">
-                Emergency help line
-              </p>
-              <a
-                href="tel:112"
-                className="text-sm font-bold text-red-600"
-              >
-                Call 112
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* USER PROFILE */}
-        <div className="flex items-center gap-3 border-t border-white/10 px-5 py-4">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#287da6] text-xs font-bold">
-            SK
-          </div>
-
-          <div className="flex-1">
-            <p className="text-xs font-bold">Samira Khan</p>
-            <p className="text-[10px] text-sky-200">
-              Citizen account
-            </p>
-          </div>
-
-          <ChevronRight size={17} />
-        </div>
-      </aside>
-
-      {/* MOBILE OVERLAY */}
-      {sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-          aria-label="Close sidebar"
-        />
-      )}
-
-      {/* MAIN CONTENT */}
-      <main className="min-h-screen lg:ml-[295px]">
-
-        {/* HEADER */}
-        <header className="sticky top-0 z-30 flex h-[74px] items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 sm:px-6">
-
-          <div className="flex flex-1 items-center gap-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden"
-            >
-              <Menu size={22} />
-            </button>
-
-            <div className="flex max-w-[520px] flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3">
-              <Search size={17} className="text-slate-400" />
-
-              <input
-                placeholder="Search help, shelters, services..."
-                className="w-full bg-transparent text-xs outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button className="hidden items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs sm:flex">
-              <Globe size={15} />
-              English
-            </button>
-
-            <button className="hidden rounded-lg border border-slate-200 p-2 sm:block">
-              <Accessibility size={18} />
-            </button>
-
-            <button className="relative rounded-lg border border-slate-200 p-2">
-              <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
-                4
-              </span>
-            </button>
-
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#287da6] text-xs font-bold text-white">
-              SK
-            </div>
-
-            <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Samira</p>
-              <p className="text-[9px] text-slate-400">
-                North Ward
-              </p>
-            </div>
-
-            <ChevronRight size={17} />
-          </div>
-        </header>
+      {/* MAIN LAYOUT */}
+      <main className="min-h-screen transition-all duration-300 lg:ml-[295px]">
+        {/* TOPBAR */}
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
         {/* PAGE CONTENT */}
-        <div className="mx-auto max-w-[1400px] p-4 sm:p-6">
-
-          {/* TITLE */}
+        <div className="mx-auto max-w-[1400px] p-4 sm:p-6 lg:p-8">
+          {/* TOP BAR / HEADER */}
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold">
-                Profile & Settings
-              </h2>
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
+                  Profile & Settings
+                </h1>
+
+                {/* API Status Badge */}
+                <div
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium shadow-sm ${
+                    isOnline
+                      ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                      : "border border-amber-200 bg-amber-50 text-amber-700"
+                  }`}
+                  title={
+                    isOnline
+                      ? "Connected to CareLink Backend API"
+                      : "Offline Fallback Mode (Local edits preserved)"
+                  }
+                >
+                  {isOnline ? (
+                    <Wifi size={13} className="text-emerald-600 animate-pulse" />
+                  ) : (
+                    <WifiOff size={13} className="text-amber-600" />
+                  )}
+                  <span>{isOnline ? "Backend API Online" : "Local Fallback Mode"}</span>
+                </div>
+
+                <button
+                  onClick={loadProfile}
+                  disabled={loading}
+                  className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 hover:bg-slate-50 hover:text-[#287da6] disabled:opacity-50"
+                  title="Reload profile from server"
+                >
+                  <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+                </button>
+              </div>
 
               <p className="mt-1 text-xs text-slate-500">
-                Manage your contact details, privacy, language, accessibility, and account security.
+                Manage your identification, verified contact information, accessibility preferences, and data privacy.
               </p>
             </div>
 
-            <button
-              onClick={handleSave}
-              className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-3 text-xs font-semibold text-white hover:bg-[#1c6388]"
-            >
-              {saved ? <CheckCircle size={15} /> : <Save size={15} />}
-              {saved ? "Saved" : "Save changes"}
-            </button>
+            {/* Action buttons */}
+            <div className="flex items-center gap-2">
+              {hasChanges && (
+                <span className="hidden text-xs font-medium text-amber-700 sm:inline-block">
+                  ● Unsaved changes
+                </span>
+              )}
+
+              <button
+                onClick={handleSave}
+                disabled={saving || loading}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition ${
+                  saved
+                    ? "bg-emerald-600 hover:bg-emerald-700"
+                    : "bg-[#287da6] hover:bg-[#1f6486]"
+                } disabled:opacity-60`}
+              >
+                {saving ? (
+                  <RefreshCw size={15} className="animate-spin" />
+                ) : saved ? (
+                  <CheckCircle size={15} />
+                ) : (
+                  <Save size={15} />
+                )}
+                <span>
+                  {saving ? "Saving..." : saved ? "Changes Saved!" : "Save changes"}
+                </span>
+              </button>
+            </div>
           </div>
 
-          {/* SETTINGS LAYOUT */}
-          <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+          {/* ERROR ALERT */}
+          {errorMsg && (
+            <div className="mb-5 flex items-center justify-between rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+              <div className="flex items-center gap-2">
+                <AlertCircle size={16} className="text-red-600 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+              <button
+                onClick={() => setErrorMsg(null)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          )}
 
-            {/* SETTINGS MENU */}
-            <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-sm">
+          {/* PROFILE SUMMARY HERO CARD */}
+          <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              {/* Left: Avatar & Basic Info */}
+              <div className="flex items-center gap-4">
+                <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#287da6] to-[#153e5e] text-xl font-bold text-white shadow-md">
+                  {profile.fullName
+                    .split(" ")
+                    .map((n) => n[0])
+                    .slice(0, 2)
+                    .join("") || "SK"}
+                  <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-white">
+                    <Check size={11} className="text-white" />
+                  </div>
+                </div>
 
-              {settingsTabs.map((tab) => {
-                const Icon = tab.icon;
-                const active = activeTab === tab.name;
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-base font-bold text-[#173d5b] sm:text-lg">
+                      {profile.fullName || "Citizen User"}
+                    </h2>
+                    <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-[10px] font-semibold text-[#287da6]">
+                      Citizen Portal
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                      <ShieldCheck size={12} /> Verified Identity
+                    </span>
+                  </div>
 
-                return (
+                  <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <Mail size={13} className="text-slate-400" />
+                      {profile.email}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Phone size={13} className="text-slate-400" />
+                      {profile.phone}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <MapPin size={13} className="text-slate-400" />
+                      {profile.district || profile.address}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Reference pill & Completeness */}
+              <div className="flex flex-col items-start gap-2 border-t border-slate-100 pt-4 sm:items-end sm:border-t-0 sm:pt-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-slate-400">Citizen Ref:</span>
                   <button
-                    key={tab.name}
-                    onClick={() => {
-                      setActiveTab(tab.name);
-                      setSaved(false);
-                    }}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-4 text-left text-xs transition ${
-                      active
-                        ? "bg-[#e8f2f7] font-semibold text-[#287da6]"
-                        : "text-slate-500 hover:bg-slate-50"
-                    }`}
+                    onClick={handleCopyRef}
+                    className="group inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-mono font-semibold text-[#173d5b] transition hover:bg-slate-100"
+                    title="Click to copy citizen reference"
                   >
-                    <Icon size={18} />
-
-                    <span className="flex-1">{tab.name}</span>
-
-                    <ChevronRight size={16} />
+                    <span>{profile.citizenReference}</span>
+                    {copiedRef ? (
+                      <Check size={12} className="text-emerald-600" />
+                    ) : (
+                      <Copy size={12} className="text-slate-400 group-hover:text-slate-600" />
+                    )}
                   </button>
-                );
-              })}
+                </div>
+
+                {/* Completeness Bar */}
+                <div className="w-full sm:w-48">
+                  <div className="flex justify-between text-[10px] text-slate-500">
+                    <span>Profile Completeness</span>
+                    <span className="font-semibold text-[#287da6]">{completenessPercent}%</span>
+                  </div>
+                  <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[#65b9aa] to-[#287da6] transition-all duration-500"
+                      style={{ width: `${completenessPercent}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* MAIN SETTINGS GRID */}
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+            {/* SETTINGS SIDE MENU */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+              <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Settings Sections
+              </div>
+              <div className="space-y-1">
+                {settingsTabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const active = activeTab === tab.name;
+
+                  return (
+                    <button
+                      key={tab.name}
+                      onClick={() => {
+                        setActiveTab(tab.name);
+                        setSaved(false);
+                      }}
+                      className={`group flex w-full items-center gap-3 rounded-xl px-3 py-3.5 text-left text-xs transition ${
+                        active
+                          ? "bg-[#e8f2f7] font-semibold text-[#287da6] shadow-sm"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-[#173d5b]"
+                      }`}
+                    >
+                      <div
+                        className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
+                          active
+                            ? "bg-[#287da6] text-white"
+                            : "bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700"
+                        }`}
+                      >
+                        <Icon size={16} />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="truncate text-xs font-semibold">{tab.name}</p>
+                        <p className="truncate text-[10px] text-slate-400 font-normal">
+                          {tab.description}
+                        </p>
+                      </div>
+
+                      <ChevronRight
+                        size={15}
+                        className={`transition ${
+                          active ? "text-[#287da6]" : "text-slate-300 group-hover:text-slate-400"
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Reset to defaults helper */}
+              <div className="mt-4 border-t border-slate-100 p-2">
+                <button
+                  onClick={handleResetProfile}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-[11px] font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                >
+                  <RotateCcw size={12} />
+                  Reset to Demo Values
+                </button>
+              </div>
             </div>
 
-            {/* SETTINGS CONTENT */}
-            <section className="min-h-[300px] rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-
-              {/* PERSONAL DETAILS */}
+            {/* TAB CONTENT PANEL */}
+            <section className="min-h-[460px] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+              {/* 1. PERSONAL DETAILS TAB */}
               {activeTab === "Personal details" && (
-                <>
-                  <h3 className="text-sm font-semibold">
-                    Personal details
-                  </h3>
-
-                  <p className="mt-1 text-[10px] text-slate-500">
-                    Update your personal details.
-                  </p>
-
-                  <div className="my-5 border-t border-slate-200" />
-
-                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div>
-                      <label className={labelClass}>
-                        Full name
-                      </label>
+                      <h3 className="text-base font-bold text-[#173d5b]">Personal details</h3>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Update your official identification names and birth information.
+                      </p>
+                    </div>
+                    <span className="rounded-lg bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-[#287da6]">
+                      Identity
+                    </span>
+                  </div>
 
+                  <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div>
+                      <label className={labelClass}>Full name (as in NIC / Passport)</label>
                       <input
+                        type="text"
                         className={inputClass}
-                        value={form.fullName}
-                        onChange={(e) =>
-                          updateField("fullName", e.target.value)
-                        }
+                        value={profile.fullName}
+                        onChange={(e) => updateField("fullName", e.target.value)}
+                        placeholder="e.g. Samira Khan"
                       />
                     </div>
 
                     <div>
-                      <label className={labelClass}>
-                        Date of birth
-                      </label>
+                      <label className={labelClass}>Preferred / Known name</label>
+                      <input
+                        type="text"
+                        className={inputClass}
+                        value={profile.preferredName}
+                        onChange={(e) => updateField("preferredName", e.target.value)}
+                        placeholder="e.g. Samira"
+                      />
+                    </div>
 
+                    <div>
+                      <label className={labelClass}>Date of birth</label>
                       <div className="relative">
                         <input
                           type="date"
                           className={inputClass}
-                          value={form.dateOfBirth}
-                          onChange={(e) =>
-                            updateField("dateOfBirth", e.target.value)
-                          }
+                          value={profile.dateOfBirth}
+                          onChange={(e) => updateField("dateOfBirth", e.target.value)}
                         />
                         <Calendar
                           size={15}
@@ -387,302 +630,805 @@ export default function ProfileSettings() {
                     </div>
 
                     <div>
-                      <label className={labelClass}>
-                        Preferred name
-                      </label>
-
-                      <input
-                        className={inputClass}
-                        value={form.preferredName}
-                        onChange={(e) =>
-                          updateField("preferredName", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <label className={labelClass}>
-                        Citizen reference
-                      </label>
-
-                      <input
-                        className={`${inputClass} bg-slate-50`}
-                        value={form.citizenReference}
-                        readOnly
-                      />
-                    </div>
-
-                  </div>
-                </>
-              )}
-
-              {/* CONTACT & LOCATION */}
-              {activeTab === "Contact & location" && (
-                <>
-                  <h3 className="text-sm font-semibold">
-                    Contact & location
-                  </h3>
-
-                  <p className="mt-1 text-[10px] text-slate-500">
-                    Manage your contact information and saved address.
-                  </p>
-
-                  <div className="my-5 border-t border-slate-200" />
-
-                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-
-                    <div>
-                      <label className={labelClass}>
-                        Email address
-                      </label>
-                      <input
-                        type="email"
-                        className={inputClass}
-                        value={form.email}
-                        onChange={(e) =>
-                          updateField("email", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <label className={labelClass}>
-                        Contact number
-                      </label>
-                      <input
-                        className={inputClass}
-                        value={form.phone}
-                        onChange={(e) =>
-                          updateField("phone", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <label className={labelClass}>
-                        Saved address
-                      </label>
-                      <input
-                        className={inputClass}
-                        value={form.address}
-                        onChange={(e) =>
-                          updateField("address", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <label className={labelClass}>
-                        District
-                      </label>
-                      <input
-                        className={inputClass}
-                        value={form.district}
-                        onChange={(e) =>
-                          updateField("district", e.target.value)
-                        }
-                      />
-                    </div>
-
-                  </div>
-                </>
-              )}
-
-              {/* LANGUAGE & ACCESSIBILITY */}
-              {activeTab === "Language & accessibility" && (
-                <>
-                  <h3 className="text-sm font-semibold">
-                    Language & accessibility
-                  </h3>
-
-                  <p className="mt-1 text-[10px] text-slate-500">
-                    Choose your preferred language and accessibility options.
-                  </p>
-
-                  <div className="my-5 border-t border-slate-200" />
-
-                  <div className="space-y-5">
-
-                    <div>
-                      <label className={labelClass}>
-                        Preferred language
-                      </label>
-
-                      <select
-                        className={inputClass}
-                        value={form.language}
-                        onChange={(e) =>
-                          updateField("language", e.target.value)
-                        }
-                      >
-                        <option>English</option>
-                        <option>Sinhala</option>
-                        <option>Tamil</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className={labelClass}>
-                        Accessibility preference
-                      </label>
-
-                      <select
-                        className={inputClass}
-                        value={form.accessibility}
-                        onChange={(e) =>
-                          updateField("accessibility", e.target.value)
-                        }
-                      >
-                        <option>Standard</option>
-                        <option>Large text</option>
-                        <option>High contrast</option>
-                        <option>Screen reader support</option>
-                      </select>
-                    </div>
-
-                  </div>
-                </>
-              )}
-
-              {/* NOTIFICATIONS */}
-              {activeTab === "Notifications" && (
-                <>
-                  <h3 className="text-sm font-semibold">
-                    Notifications
-                  </h3>
-
-                  <p className="mt-1 text-[10px] text-slate-500">
-                    Manage how you receive important updates.
-                  </p>
-
-                  <div className="my-5 border-t border-slate-200" />
-
-                  {[
-                    "Emergency alerts",
-                    "Request status updates",
-                    "Safety notifications",
-                    "Messages from support teams",
-                    "Shelter availability updates",
-                  ].map((item) => (
-                    <label
-                      key={item}
-                      className="flex items-center justify-between border-b border-slate-100 py-4"
-                    >
-                      <span className="text-xs">{item}</span>
-
-                      <input
-                        type="checkbox"
-                        defaultChecked
-                        className="h-4 w-4 accent-[#287da6]"
-                      />
-                    </label>
-                  ))}
-                </>
-              )}
-
-              {/* PRIVACY */}
-              {activeTab === "Privacy & data" && (
-                <>
-                  <h3 className="text-sm font-semibold">
-                    Privacy & data
-                  </h3>
-
-                  <p className="mt-1 text-[10px] text-slate-500">
-                    Manage your personal information and data privacy.
-                  </p>
-
-                  <div className="my-5 border-t border-slate-200" />
-
-                  <div className="space-y-4">
-
-                    <div className="rounded-lg border border-slate-200 p-4">
-                      <h4 className="text-xs font-semibold">
-                        Personal information
-                      </h4>
-                      <p className="mt-2 text-[10px] text-slate-500">
-                        Your personal information is protected and only shared with authorised support teams when necessary.
-                      </p>
-                    </div>
-
-                    <div className="rounded-lg border border-slate-200 p-4">
-                      <h4 className="text-xs font-semibold">
-                        Data sharing preferences
-                      </h4>
-                      <p className="mt-2 text-[10px] text-slate-500">
-                        Control how your information is used when requesting assistance.
-                      </p>
-                    </div>
-
-                  </div>
-                </>
-              )}
-
-              {/* SECURITY */}
-              {activeTab === "Security" && (
-                <>
-                  <h3 className="text-sm font-semibold">
-                    Security
-                  </h3>
-
-                  <p className="mt-1 text-[10px] text-slate-500">
-                    Manage your account security and password.
-                  </p>
-
-                  <div className="my-5 border-t border-slate-200" />
-
-                  <div className="max-w-lg space-y-5">
-
-                    <div>
-                      <label className={labelClass}>
-                        Current password
-                      </label>
-
+                      <label className={labelClass}>Citizen Reference ID</label>
                       <div className="relative">
                         <input
-                          type={showPassword ? "text" : "password"}
-                          className={inputClass}
-                          placeholder="Enter current password"
-                          value={form.password}
-                          onChange={(e) =>
-                            updateField("password", e.target.value)
-                          }
+                          type="text"
+                          className={`${inputClass} bg-slate-50 text-slate-600 font-mono`}
+                          value={profile.citizenReference}
+                          readOnly
                         />
-
                         <button
                           type="button"
-                          onClick={() =>
-                            setShowPassword(!showPassword)
-                          }
-                          className="absolute right-3 top-3 text-slate-400"
+                          onClick={handleCopyRef}
+                          className="absolute right-2.5 top-2.5 rounded p-1 text-slate-400 hover:text-slate-600"
+                          title="Copy reference ID"
                         >
-                          {showPassword ? (
-                            <EyeOff size={16} />
-                          ) : (
-                            <Eye size={16} />
-                          )}
+                          {copiedRef ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                         </button>
                       </div>
+                      <p className="mt-1 text-[10px] text-slate-400">
+                        Assigned by CareLink Registry for relief dispatch and verification.
+                      </p>
                     </div>
 
-                    <button
-                      type="button"
-                      className="rounded-lg border border-slate-300 px-4 py-3 text-xs font-semibold text-[#287da6] hover:bg-sky-50"
-                    >
-                      Change password
-                    </button>
+                    <div>
+                      <label className={labelClass}>National Identity Card (NIC) / ID Number</label>
+                      <input
+                        type="text"
+                        className={inputClass}
+                        value={profile.nationalId || ""}
+                        onChange={(e) => updateField("nationalId", e.target.value)}
+                        placeholder="e.g. 199084501234"
+                      />
+                    </div>
 
+                    <div>
+                      <label className={labelClass}>Gender</label>
+                      <select
+                        className={inputClass}
+                        value={profile.gender || "Female"}
+                        onChange={(e) => updateField("gender", e.target.value)}
+                      >
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Non-binary">Non-binary</option>
+                        <option value="Prefer not to say">Prefer not to say</option>
+                      </select>
+                    </div>
                   </div>
-                </>
-              )}
-
-              {/* SAVE STATUS */}
-              {saved && (
-                <div className="mt-6 flex items-center gap-2 rounded-lg bg-emerald-50 p-3 text-xs text-emerald-700">
-                  <CheckCircle size={16} />
-                  Changes saved successfully!
                 </div>
               )}
 
+              {/* 2. CONTACT & LOCATION TAB */}
+              {activeTab === "Contact & location" && (
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                      <h3 className="text-base font-bold text-[#173d5b]">Contact & location</h3>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Primary communication channels and residential dispatch address.
+                      </p>
+                    </div>
+                    <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+                      Location
+                    </span>
+                  </div>
+
+                  <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div>
+                      <label className={labelClass}>Email address</label>
+                      <div className="relative">
+                        <input
+                          type="email"
+                          className={inputClass}
+                          value={profile.email}
+                          onChange={(e) => updateField("email", e.target.value)}
+                          placeholder="name@email.com"
+                        />
+                        <Mail
+                          size={15}
+                          className="pointer-events-none absolute right-3 top-3 text-slate-400"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className={labelClass}>Primary contact number</label>
+                      <div className="relative">
+                        <input
+                          type="tel"
+                          className={inputClass}
+                          value={profile.phone}
+                          onChange={(e) => updateField("phone", e.target.value)}
+                          placeholder="+94 77 412 8088"
+                        />
+                        <Phone
+                          size={15}
+                          className="pointer-events-none absolute right-3 top-3 text-slate-400"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className={labelClass}>Saved residential address</label>
+                      <input
+                        type="text"
+                        className={inputClass}
+                        value={profile.address}
+                        onChange={(e) => updateField("address", e.target.value)}
+                        placeholder="Street, Building No, Area"
+                      />
+                    </div>
+
+                    <div>
+                      <label className={labelClass}>Grama Niladhari / District / Ward</label>
+                      <input
+                        type="text"
+                        className={inputClass}
+                        value={profile.district}
+                        onChange={(e) => updateField("district", e.target.value)}
+                        placeholder="e.g. North Ward"
+                      />
+                    </div>
+
+                    <div>
+                      <label className={labelClass}>City / Region</label>
+                      <input
+                        type="text"
+                        className={inputClass}
+                        value={profile.city || "Greater Riverton"}
+                        onChange={(e) => updateField("city", e.target.value)}
+                        placeholder="e.g. Greater Riverton"
+                      />
+                    </div>
+                  </div>
+
+                  {/* EMERGENCY CONTACT SUB-CARD */}
+                  <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-100 text-red-600">
+                        <Heart size={14} />
+                      </div>
+                      <h4 className="text-xs font-bold text-[#173d5b]">
+                        Designated Emergency Contact
+                      </h4>
+                    </div>
+                    <p className="mb-4 text-[11px] text-slate-500">
+                      Authorized person reached during search and rescue or sudden medical evacuations.
+                    </p>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      <div>
+                        <label className={labelClass}>Contact Person Name</label>
+                        <input
+                          type="text"
+                          className={inputClass}
+                          value={profile.emergencyContactName || ""}
+                          onChange={(e) => updateField("emergencyContactName", e.target.value)}
+                          placeholder="e.g. Rashid Khan"
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Emergency Phone</label>
+                        <input
+                          type="tel"
+                          className={inputClass}
+                          value={profile.emergencyContactPhone || ""}
+                          onChange={(e) => updateField("emergencyContactPhone", e.target.value)}
+                          placeholder="+94 77 455 0182"
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Relationship</label>
+                        <input
+                          type="text"
+                          className={inputClass}
+                          value={profile.emergencyContactRelation || ""}
+                          onChange={(e) => updateField("emergencyContactRelation", e.target.value)}
+                          placeholder="e.g. Brother, Spouse"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 3. LANGUAGE & ACCESSIBILITY TAB */}
+              {activeTab === "Language & accessibility" && (
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                      <h3 className="text-base font-bold text-[#173d5b]">Language & accessibility</h3>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Customise typography, high contrast, and spoken text readability options.
+                      </p>
+                    </div>
+                    <span className="rounded-lg bg-purple-50 px-2.5 py-1 text-[11px] font-medium text-purple-700">
+                      Accessibility
+                    </span>
+                  </div>
+
+                  <div className="mt-6 space-y-6">
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                      <div>
+                        <label className={labelClass}>Preferred language</label>
+                        <select
+                          className={inputClass}
+                          value={profile.language}
+                          onChange={(e) => updateField("language", e.target.value)}
+                        >
+                          <option value="English">English (United Kingdom)</option>
+                          <option value="Sinhala">සිංහල (Sinhala)</option>
+                          <option value="Tamil">தமிழ் (Tamil)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className={labelClass}>Accessibility preset</label>
+                        <select
+                          className={inputClass}
+                          value={profile.accessibility}
+                          onChange={(e) => updateField("accessibility", e.target.value)}
+                        >
+                          <option value="Standard">Standard default</option>
+                          <option value="Large text">Large text preset</option>
+                          <option value="High contrast">High contrast preset</option>
+                          <option value="Screen reader support">Screen reader assistance</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* INTERACTIVE TOGGLE TILES */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div className="flex items-start justify-between rounded-xl border border-slate-200 p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-100 text-[#287da6]">
+                            <Sliders size={16} />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold">High contrast palette</p>
+                            <p className="text-[10px] text-slate-500">
+                              Increases text distinction for outdoor visibility.
+                            </p>
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={profile.highContrast}
+                          onChange={(e) => updateField("highContrast", e.target.checked)}
+                          className="h-4 w-4 rounded accent-[#287da6] cursor-pointer"
+                        />
+                      </div>
+
+                      <div className="flex items-start justify-between rounded-xl border border-slate-200 p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+                            <EyeIcon size={16} />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold">Large text scaling</p>
+                            <p className="text-[10px] text-slate-500">
+                              Enhances button labels and emergency alerts size.
+                            </p>
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={profile.largeText}
+                          onChange={(e) => updateField("largeText", e.target.checked)}
+                          className="h-4 w-4 rounded accent-[#287da6] cursor-pointer"
+                        />
+                      </div>
+
+                      <div className="flex items-start justify-between rounded-xl border border-slate-200 p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                            <Accessibility size={16} />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold">Screen reader optimization</p>
+                            <p className="text-[10px] text-slate-500">
+                              Provides ARIA landmarks and descriptive image alt-tags.
+                            </p>
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={profile.screenReaderSupport}
+                          onChange={(e) => updateField("screenReaderSupport", e.target.checked)}
+                          className="h-4 w-4 rounded accent-[#287da6] cursor-pointer"
+                        />
+                      </div>
+
+                      <div className="flex items-start justify-between rounded-xl border border-slate-200 p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+                            <Volume2 size={16} />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold">Audio evacuation cues</p>
+                            <p className="text-[10px] text-slate-500">
+                              Audible sirens during severe flood and cyclone bulletins.
+                            </p>
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={profile.audioAssistance}
+                          onChange={(e) => updateField("audioAssistance", e.target.checked)}
+                          className="h-4 w-4 rounded accent-[#287da6] cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. NOTIFICATIONS TAB */}
+              {activeTab === "Notifications" && (
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                      <h3 className="text-base font-bold text-[#173d5b]">Notification preferences</h3>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Choose which channels notify you during emergencies and dispatch tracking.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleToggleAllNotifications(true)}
+                        className="rounded-lg border border-slate-200 px-2 py-1 text-[10px] font-semibold text-slate-600 hover:bg-slate-50"
+                      >
+                        Enable All
+                      </button>
+                      <button
+                        onClick={() => handleToggleAllNotifications(false)}
+                        className="rounded-lg border border-slate-200 px-2 py-1 text-[10px] font-semibold text-slate-600 hover:bg-slate-50"
+                      >
+                        Disable All
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 divide-y divide-slate-100">
+                    {[
+                      {
+                        key: "emergencyAlerts",
+                        label: "Critical evacuation & life-safety bulletins",
+                        desc: "High-priority flood warnings and immediate zone evacuation alarms",
+                        badge: "Critical",
+                        badgeColor: "bg-red-50 text-red-700 border-red-200",
+                        val: profile.emergencyAlerts,
+                      },
+                      {
+                        key: "requestStatusUpdates",
+                        label: "Assistance request progress & dispatch updates",
+                        desc: "Notifications when food, medical kits, or drivers are assigned",
+                        badge: "Dispatches",
+                        badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
+                        val: profile.requestStatusUpdates,
+                      },
+                      {
+                        key: "safetyNotifications",
+                        label: "Regional flood level and road closure notices",
+                        desc: "Hourly municipal road conditions and safe passage routes",
+                        badge: "Advisories",
+                        badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+                        val: profile.safetyNotifications,
+                      },
+                      {
+                        key: "messagesFromSupportTeams",
+                        label: "Direct messages from relief officers & case workers",
+                        desc: "Replies from municipal support coordinators",
+                        badge: "Chat",
+                        badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
+                        val: profile.messagesFromSupportTeams,
+                      },
+                      {
+                        key: "shelterAvailabilityUpdates",
+                        label: "Shelter occupancy and space availability alerts",
+                        desc: "Capacity alerts for Riverton High School and Community Centers",
+                        badge: "Shelters",
+                        badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                        val: profile.shelterAvailabilityUpdates,
+                      },
+                      {
+                        key: "smsAlerts",
+                        label: "SMS text message notifications",
+                        desc: "Receive fallback alerts on phone when mobile data/internet fails",
+                        badge: "SMS",
+                        badgeColor: "bg-slate-100 text-slate-700 border-slate-200",
+                        val: profile.smsAlerts,
+                      },
+                      {
+                        key: "emailAlerts",
+                        label: "Email summary bulletins",
+                        desc: "Daily operational recaps and verified service updates",
+                        badge: "Email",
+                        badgeColor: "bg-slate-100 text-slate-700 border-slate-200",
+                        val: profile.emailAlerts,
+                      },
+                    ].map((item) => (
+                      <label
+                        key={item.key}
+                        className="flex items-center justify-between py-4 cursor-pointer hover:bg-slate-50/50 px-2 rounded-lg transition"
+                      >
+                        <div className="pr-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-[#173d5b]">
+                              {item.label}
+                            </span>
+                            <span
+                              className={`rounded border px-1.5 py-0.5 text-[9px] font-medium ${item.badgeColor}`}
+                            >
+                              {item.badge}
+                            </span>
+                          </div>
+                          <p className="mt-0.5 text-[10px] text-slate-500">
+                            {item.desc}
+                          </p>
+                        </div>
+
+                        <input
+                          type="checkbox"
+                          checked={item.val}
+                          onChange={(e) =>
+                            updateField(
+                              item.key as keyof CitizenProfileSettings,
+                              e.target.checked
+                            )
+                          }
+                          className="h-4 w-4 rounded accent-[#287da6] cursor-pointer shrink-0"
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 5. PRIVACY & DATA TAB */}
+              {activeTab === "Privacy & data" && (
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                      <h3 className="text-base font-bold text-[#173d5b]">Privacy & data protection</h3>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Governance of personal info, responder location sharing, and export archives.
+                      </p>
+                    </div>
+                    <span className="rounded-lg bg-teal-50 px-2.5 py-1 text-[11px] font-medium text-teal-700">
+                      Encrypted
+                    </span>
+                  </div>
+
+                  <div className="mt-6 space-y-5">
+                    {/* Information cards */}
+                    <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck size={16} className="text-[#287da6]" />
+                        <h4 className="text-xs font-bold text-[#173d5b]">
+                          Government Disaster Response Protection Policy
+                        </h4>
+                      </div>
+                      <p className="mt-1 text-[11px] text-slate-600 leading-relaxed">
+                        {profile.personalInformationPolicy ||
+                          "Your personal information is strictly protected under municipal emergency protocols and shared exclusively with verified emergency responders during active crisis operations."}
+                      </p>
+                    </div>
+
+                    {/* Interactive Privacy Consents */}
+                    <div className="space-y-3">
+                      <label className="flex items-start justify-between rounded-xl border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition">
+                        <div className="pr-4">
+                          <p className="text-xs font-semibold text-[#173d5b]">
+                            Share live GPS coordinates with emergency rescue teams
+                          </p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">
+                            Allows first responder boats and ambulances to pinpoint your household location directly during high floods.
+                          </p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={profile.shareLocationDuringDisaster}
+                          onChange={(e) =>
+                            updateField("shareLocationDuringDisaster", e.target.checked)
+                          }
+                          className="h-4 w-4 rounded accent-[#287da6] cursor-pointer shrink-0 mt-0.5"
+                        />
+                      </label>
+
+                      <label className="flex items-start justify-between rounded-xl border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition">
+                        <div className="pr-4">
+                          <p className="text-xs font-semibold text-[#173d5b]">
+                            Share household medical notes with verified paramedic crews
+                          </p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">
+                            Permits on-scene medical personnel to view elder medications or mobility limitations before arrival.
+                          </p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={profile.shareMedicalWithRescuers}
+                          onChange={(e) =>
+                            updateField("shareMedicalWithRescuers", e.target.checked)
+                          }
+                          className="h-4 w-4 rounded accent-[#287da6] cursor-pointer shrink-0 mt-0.5"
+                        />
+                      </label>
+
+                      <label className="flex items-start justify-between rounded-xl border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition">
+                        <div className="pr-4">
+                          <p className="text-xs font-semibold text-[#173d5b]">
+                            Allow verified volunteer groups to contact regarding relief supplies
+                          </p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">
+                            Authorized grassroots NGOs and Red Cross community teams may coordinate grocery and clean water drop-offs.
+                          </p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={profile.allowVolunteersContact}
+                          onChange={(e) =>
+                            updateField("allowVolunteersContact", e.target.checked)
+                          }
+                          className="h-4 w-4 rounded accent-[#287da6] cursor-pointer shrink-0 mt-0.5"
+                        />
+                      </label>
+
+                      <label className="flex items-start justify-between rounded-xl border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition">
+                        <div className="pr-4">
+                          <p className="text-xs font-semibold text-[#173d5b]">
+                            Anonymized data analytics for regional disaster mitigation
+                          </p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">
+                            Permits aggregate statistics (e.g. ward supply demand) to improve future district flood defences.
+                          </p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={profile.dataRetentionConsent}
+                          onChange={(e) =>
+                            updateField("dataRetentionConsent", e.target.checked)
+                          }
+                          className="h-4 w-4 rounded accent-[#287da6] cursor-pointer shrink-0 mt-0.5"
+                        />
+                      </label>
+                    </div>
+
+                    {/* Export / Download archive */}
+                    <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <div>
+                        <h4 className="text-xs font-bold text-[#173d5b]">
+                          Download personal data record
+                        </h4>
+                        <p className="text-[10px] text-slate-500 mt-0.5">
+                          Download a copy of your verified CareLink citizen identity, contact, and settings in JSON format.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleExportData}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-[#173d5b] hover:bg-slate-100 shadow-sm"
+                      >
+                        <Download size={14} className="text-[#287da6]" />
+                        Export Data (JSON)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 6. SECURITY TAB */}
+              {activeTab === "Security" && (
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                      <h3 className="text-base font-bold text-[#173d5b]">Security & authentication</h3>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Manage login credentials, multi-factor verification, and active login sessions.
+                      </p>
+                    </div>
+                    <span className="rounded-lg bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700">
+                      2FA Active
+                    </span>
+                  </div>
+
+                  {/* 2FA Card */}
+                  <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#287da6] text-white">
+                          <Smartphone size={20} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-[#173d5b]">
+                            Two-Factor Authentication (2FA)
+                          </p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">
+                            Require SMS OTP code verification when signing in from an unrecognised device.
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleToggle2FA}
+                        className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                          profile.twoFactorEnabled
+                            ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
+                            : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                        }`}
+                      >
+                        {profile.twoFactorEnabled ? "Enabled" : "Disabled"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* CHANGE PASSWORD FORM */}
+                  <div className="mt-6 max-w-xl">
+                    <h4 className="text-xs font-bold text-[#173d5b] flex items-center gap-2">
+                      <KeyRound size={15} className="text-[#287da6]" />
+                      Change Account Password
+                    </h4>
+                    <p className="text-[10px] text-slate-500 mt-1 mb-4">
+                      Use at least 6 characters including numbers and letters.
+                    </p>
+
+                    {passwordSuccess && (
+                      <div className="mb-4 flex items-center gap-2 rounded-lg bg-emerald-50 p-3 text-xs text-emerald-700 border border-emerald-200">
+                        <CheckCircle size={15} />
+                        {passwordSuccess}
+                      </div>
+                    )}
+
+                    {passwordError && (
+                      <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-700 border border-red-200">
+                        <AlertCircle size={15} />
+                        {passwordError}
+                      </div>
+                    )}
+
+                    <form onSubmit={handleChangePassword} className="space-y-4">
+                      <div>
+                        <label className={labelClass}>Current password</label>
+                        <div className="relative">
+                          <input
+                            type={showCurrentPassword ? "text" : "password"}
+                            className={inputClass}
+                            placeholder="Enter current password (demo: Pass@1234)"
+                            value={passwordForm.currentPassword}
+                            onChange={(e) =>
+                              setPasswordForm((prev) => ({
+                                ...prev,
+                                currentPassword: e.target.value,
+                              }))
+                            }
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                          >
+                            {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className={labelClass}>New password</label>
+                          <div className="relative">
+                            <input
+                              type={showNewPassword ? "text" : "password"}
+                              className={inputClass}
+                              placeholder="New password"
+                              value={passwordForm.newPassword}
+                              onChange={(e) =>
+                                setPasswordForm((prev) => ({
+                                  ...prev,
+                                  newPassword: e.target.value,
+                                }))
+                              }
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                            >
+                              {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className={labelClass}>Confirm new password</label>
+                          <div className="relative">
+                            <input
+                              type={showConfirmPassword ? "text" : "password"}
+                              className={inputClass}
+                              placeholder="Confirm password"
+                              value={passwordForm.confirmPassword}
+                              onChange={(e) =>
+                                setPasswordForm((prev) => ({
+                                  ...prev,
+                                  confirmPassword: e.target.value,
+                                }))
+                              }
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                            >
+                              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={passwordSaving}
+                        className="rounded-lg bg-[#287da6] px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-[#1f6486] disabled:opacity-60 transition"
+                      >
+                        {passwordSaving ? "Updating Password..." : "Update Password"}
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* ACTIVE SESSIONS LIST */}
+                  <div className="mt-8 border-t border-slate-100 pt-6">
+                    <h4 className="text-xs font-bold text-[#173d5b] mb-3">
+                      Active Login Sessions
+                    </h4>
+                    <div className="space-y-3">
+                      {profile.activeSessions && profile.activeSessions.length > 0 ? (
+                        profile.activeSessions.map((session, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between rounded-xl border border-slate-200 p-3.5"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                                {session.device.toLowerCase().includes("mobile") ||
+                                session.device.toLowerCase().includes("ios") ? (
+                                  <Smartphone size={17} />
+                                ) : (
+                                  <Laptop size={17} />
+                                )}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-xs font-semibold text-[#173d5b]">
+                                    {session.device}
+                                  </p>
+                                  {session.isCurrent && (
+                                    <span className="rounded bg-emerald-100 px-1.5 py-0.2 text-[9px] font-semibold text-emerald-800">
+                                      This Device
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[10px] text-slate-400">
+                                  {session.location} • Last active: {session.lastActive}
+                                </p>
+                              </div>
+                            </div>
+
+                            {!session.isCurrent && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setProfile((prev) => ({
+                                    ...prev,
+                                    activeSessions: prev.activeSessions.filter(
+                                      (_, i) => i !== idx
+                                    ),
+                                  }));
+                                  setHasChanges(true);
+                                }}
+                                className="text-[11px] font-medium text-red-500 hover:text-red-700"
+                              >
+                                Revoke
+                              </button>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-xs text-slate-400">No other active sessions.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SAVE STATUS BANNER */}
+              {saved && (
+                <div className="mt-6 flex items-center gap-2 rounded-xl bg-emerald-50 p-3.5 text-xs text-emerald-700 border border-emerald-200">
+                  <CheckCircle size={16} />
+                  <span>Your profile and settings have been saved successfully!</span>
+                </div>
+              )}
             </section>
           </div>
         </div>
