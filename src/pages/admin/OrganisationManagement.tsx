@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import {
   Building2,
   Check,
@@ -17,12 +17,20 @@ import {
   ShieldCheck,
   Eye,
   Ban,
+  RefreshCw,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
+import { organizationService } from "../../services/organizationService";
+import type {
+  Organization,
+  OrganizationStats,
+} from "../../types/organization";
 
 type OrganisationStatus = "Active" | "Pending" | "Suspended";
 type VerificationStatus = "Verified" | "Pending Review";
 
-type Organisation = {
+interface LegacyOrgItem {
   id: string;
   name: string;
   type: string;
@@ -30,53 +38,78 @@ type Organisation = {
   members: number;
   verification: VerificationStatus;
   status: OrganisationStatus;
-};
+}
 
-const initialOrganisations: Organisation[] = [
+const initialOrganisations: (Organization & { members?: number; verification?: VerificationStatus })[] = [
   {
     id: "ORG-001",
+    code: "NDA",
     name: "National Disaster Authority",
     type: "Government Agency",
     scope: "National",
+    membersCount: 482,
     members: 482,
+    verificationStatus: "Verified",
     verification: "Verified",
     status: "Active",
+    isActive: true,
+    createdAt: "2024-01-10T00:00:00Z",
   },
   {
     id: "ORG-014",
+    code: "CSN",
     name: "CareLink Shelter Network",
     type: "Local NGO",
     scope: "Greater Riverton",
+    membersCount: 164,
     members: 164,
+    verificationStatus: "Verified",
     verification: "Verified",
     status: "Active",
+    isActive: true,
+    createdAt: "2024-02-15T00:00:00Z",
   },
   {
     id: "ORG-027",
+    code: "GRN",
     name: "Global Relief Network",
     type: "International NGO",
     scope: "4 districts",
+    membersCount: 286,
     members: 286,
+    verificationStatus: "Pending Review",
     verification: "Pending Review",
     status: "Pending",
+    isActive: false,
+    createdAt: "2024-03-01T00:00:00Z",
   },
   {
     id: "ORG-042",
+    code: "ELU",
     name: "Emergency Logistics Unit",
     type: "Government Agency",
     scope: "Central Region",
+    membersCount: 98,
     members: 98,
+    verificationStatus: "Verified",
     verification: "Verified",
     status: "Active",
+    isActive: true,
+    createdAt: "2024-03-20T00:00:00Z",
   },
   {
     id: "ORG-058",
+    code: "CRA",
     name: "Community Response Alliance",
     type: "Community Organisation",
     scope: "North Ward",
+    membersCount: 72,
     members: 72,
+    verificationStatus: "Verified",
     verification: "Verified",
     status: "Active",
+    isActive: true,
+    createdAt: "2024-04-05T00:00:00Z",
   },
 ];
 
@@ -147,8 +180,12 @@ function StatCard({
 }
 
 export default function OrganisationManagement() {
-  const [organisations, setOrganisations] =
-    useState<Organisation[]>(initialOrganisations);
+  const [organisations, setOrganisations] = useState<Organization[]>([]);
+  const [stats, setStats] = useState<OrganizationStats | null>(null);
+  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All organisation types");
@@ -158,25 +195,53 @@ export default function OrganisationManagement() {
 
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [showDetails, setShowDetails] = useState<Organisation | null>(null);
+  const [showDetails, setShowDetails] = useState<Organization | null>(null);
   const [menuId, setMenuId] = useState<string | null>(null);
 
   // Administrative action modal fields
-  const [actionTitle, setActionTitle] = useState("Register Organisation");
+  const [newOrgName, setNewOrgName] = useState("");
+  const [newOrgType, setNewOrgType] = useState("Local NGO");
+  const [newOrgScope, setNewOrgScope] = useState("Greater Riverton");
+  const [newOrgEmail, setNewOrgEmail] = useState("");
+  const [newOrgPhone, setNewOrgPhone] = useState("");
   const [environment, setEnvironment] = useState("Production");
-  const [actionScope, setActionScope] = useState("Selected record");
   const [approvalType, setApprovalType] = useState(
     "Standard administrator approval"
   );
   const [administrativeRationale, setAdministrativeRationale] = useState("");
+  const [actionTitle, setActionTitle] = useState("Register Organisation");
+  const [actionScope, setActionScope] = useState("Selected record");
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
+  const fetchOrganisations = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [res, statData, typeList] = await Promise.all([
+        organizationService.getOrganizations(),
+        organizationService.getStats(),
+        organizationService.getTypes(),
+      ]);
+      setOrganisations(res?.items || []);
+      setStats(statData);
+      setAvailableTypes(typeList);
+    } catch (err: any) {
+      setError(err.message || "Failed to load organizations from backend.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchOrganisations();
+  }, [fetchOrganisations]);
+
   const filteredOrganisations = useMemo(() => {
     return organisations.filter((org) => {
       const searchMatch =
-        `${org.id} ${org.name} ${org.type} ${org.scope}`
+        `${org.id} ${org.code || ""} ${org.name} ${org.type} ${org.scope}`
           .toLowerCase()
           .includes(search.toLowerCase());
 
@@ -190,7 +255,7 @@ export default function OrganisationManagement() {
 
       const verificationMatch =
         verificationFilter === "All verification states" ||
-        org.verification === verificationFilter;
+        org.verificationStatus === verificationFilter;
 
       return searchMatch && typeMatch && regionMatch && verificationMatch;
     });
@@ -212,65 +277,85 @@ export default function OrganisationManagement() {
     currentPage * pageSize
   );
 
-  const pendingCount = organisations.filter(
-    (org) => org.verification === "Pending Review"
+  const pendingCount = stats?.pendingOrganizations ?? organisations.filter(
+    (org) => org.verificationStatus === "Pending Review"
   ).length;
 
-  const suspendedCount = organisations.filter(
+  const suspendedCount = stats?.suspendedOrganizations ?? organisations.filter(
     (org) => org.status === "Suspended"
   ).length;
 
-  const handleAdministrativeAction = (
+  const handleAdministrativeAction = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    if (!newOrgName.trim()) {
+      alert("Organization name is required.");
+      return;
+    }
 
-    const actionData = {
-      actionTitle,
-      environment,
-      scope: actionScope,
-      approvalType,
-      administrativeRationale,
-      recordedAt: new Date().toISOString(),
-    };
+    setIsSubmitting(true);
+    try {
+      const created = await organizationService.createOrganization({
+        name: newOrgName.trim(),
+        type: newOrgType,
+        scope: newOrgScope,
+        contactEmail: newOrgEmail.trim() || undefined,
+        contactPhone: newOrgPhone.trim() || undefined,
+        description: administrativeRationale.trim() || undefined,
+      });
 
-    // Demo only: connect this action to your ASP.NET Core API for persistence.
-    console.log("Administrative action:", actionData);
-    alert("Administrative action recorded successfully (demo).");
-
-    setShowRegisterModal(false);
-    setAdministrativeRationale("");
+      setOrganisations((prev) => [created, ...prev]);
+      setShowRegisterModal(false);
+      setNewOrgName("");
+      setNewOrgEmail("");
+      setNewOrgPhone("");
+      setAdministrativeRationale("");
+      organizationService.getStats().then(setStats).catch(() => {});
+    } catch (err: any) {
+      alert(err.message || "Failed to register organization.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const updateStatus = (
+  const updateStatus = async (
     id: string,
-    status: OrganisationStatus
+    status: "Active" | "Pending" | "Suspended"
   ) => {
-    setOrganisations((previous) =>
-      previous.map((org) =>
-        org.id === id
+    try {
+      await organizationService.updateStatus(id, status);
+      setOrganisations((previous) =>
+        previous.map((org) =>
+          org.id === id
+            ? {
+                ...org,
+                status,
+                verificationStatus:
+                  status === "Active" ? "Verified" : org.verificationStatus,
+                isActive: status === "Active",
+              }
+            : org
+        )
+      );
+
+      setShowDetails((previous) =>
+        previous?.id === id
           ? {
-              ...org,
+              ...previous,
               status,
-              verification:
-                status === "Active" ? "Verified" : org.verification,
+              verificationStatus:
+                status === "Active" ? "Verified" : previous.verificationStatus,
+              isActive: status === "Active",
             }
-          : org
-      )
-    );
+          : previous
+      );
 
-    setShowDetails((previous) =>
-      previous?.id === id
-        ? {
-            ...previous,
-            status,
-            verification:
-              status === "Active" ? "Verified" : previous.verification,
-          }
-        : previous
-    );
-
-    setMenuId(null);
+      setMenuId(null);
+      organizationService.getStats().then(setStats).catch(() => {});
+    } catch (err: any) {
+      alert(err.message || "Failed to update organization status.");
+    }
   };
 
   const exportCSV = () => {
@@ -289,8 +374,8 @@ export default function OrganisationManagement() {
       org.name,
       org.type,
       org.scope,
-      org.members,
-      org.verification,
+      org.membersCount ?? (org as any).members ?? 0,
+      org.verificationStatus ?? (org as any).verification ?? "Verified",
       org.status,
     ]);
 
@@ -586,11 +671,11 @@ export default function OrganisationManagement() {
                     </td>
 
                     <td className="px-4 py-4">
-                      {org.members}
+                      {org.membersCount ?? (org as any).members ?? 0}
                     </td>
 
                     <td className="px-4 py-4">
-                      <VerificationBadge verification={org.verification} />
+                      <VerificationBadge verification={org.verificationStatus ?? (org as any).verification ?? "Verified"} />
                     </td>
 
                     <td className="px-4 py-4">
@@ -973,7 +1058,7 @@ export default function OrganisationManagement() {
                   </p>
                   <p className="mt-1 flex items-center gap-2 text-xs font-semibold text-[#123B5C]">
                     <Users size={13} />
-                    {showDetails.members}
+                    {showDetails.membersCount ?? (showDetails as any).members ?? 0}
                   </p>
                 </div>
 
@@ -982,7 +1067,7 @@ export default function OrganisationManagement() {
                     VERIFICATION
                   </p>
                   <div className="mt-2">
-                    <VerificationBadge verification={showDetails.verification} />
+                    <VerificationBadge verification={showDetails.verificationStatus ?? (showDetails as any).verification ?? "Verified"} />
                   </div>
                 </div>
 
