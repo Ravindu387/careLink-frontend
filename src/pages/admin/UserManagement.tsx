@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { userService } from "../../services/userService";
 import type { UserDetails, UserStats } from "../../types/user";
+import PermissionGuard from "../../components/common/PermissionGuard";
 
 type UserStatus = "Active" | "Pending" | "Disabled";
 type Verification = "Verified" | "Pending Approval" | "Email Verified";
