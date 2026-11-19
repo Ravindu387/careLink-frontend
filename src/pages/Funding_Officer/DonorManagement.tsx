@@ -1,6 +1,10 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+
+import { useMemo, useState } from "react";
 import {
   Search,
+  Globe,
+  CircleHelp,
+  Bell,
   ChevronRight,
   ChevronDown,
   Download,
@@ -9,59 +13,85 @@ import {
   MoreHorizontal,
   X,
   Users,
-  Loader2,
-  RefreshCw,
-  AlertCircle,
-  Eye,
-  CheckCircle2,
-  ShieldAlert,
-  Trash2,
 } from "lucide-react";
-import { donorService } from "../../services/donorService";
-import type {
-  Donor,
-  DonorSummary,
-  DonorVerification,
-  DonorStatusType,
-} from "../../types/donor";
+
+type Donor = {
+  id: string;
+  name: string;
+  type: string;
+  contact: string;
+  scope: string;
+  verification: "Verified" | "Under Review" | "Pending";
+  contributions: number;
+  status: "Active" | "Restricted" | "Inactive";
+};
+
+const initialDonors: Donor[] = [
+  {
+    id: "DNR-2048",
+    name: "Global Relief Foundation",
+    type: "Foundation",
+    contact: "contact@grf.org",
+    scope: "International",
+    verification: "Verified",
+    contributions: 842000,
+    status: "Active",
+  },
+  {
+    id: "DNR-2039",
+    name: "Riverton Foods Ltd",
+    type: "Corporate",
+    contact: "impact@rivertonfoods.com",
+    scope: "National",
+    verification: "Verified",
+    contributions: 185400,
+    status: "Active",
+  },
+  {
+    id: "DNR-2028",
+    name: "HealthAccess International",
+    type: "International NGO",
+    contact: "giving@healthaccess.org",
+    scope: "International",
+    verification: "Verified",
+    contributions: 420000,
+    status: "Active",
+  },
+  {
+    id: "DNR-2014",
+    name: "Community Giving Circle",
+    type: "Community Group",
+    contact: "hello@cgc.org",
+    scope: "Greater Riverton",
+    verification: "Under Review",
+    contributions: 48720,
+    status: "Restricted",
+  },
+];
 
 export default function DonorManagement() {
-  const [donors, setDonors] = useState<Donor[]>([]);
-  const [summary, setSummary] = useState<DonorSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  const [donors, setDonors] = useState(initialDonors);
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
   const [typeFilter, setTypeFilter] = useState("All types");
-  const [verificationFilter, setVerificationFilter] = useState("All verification states");
+  const [verificationFilter, setVerificationFilter] =
+    useState("All verification states");
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [dateFilter, setDateFilter] = useState("Date range");
-  const [scopeFilter, setScopeFilter] = useState("All scopes");
-  const [minContributionFilter, setMinContributionFilter] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [selectedDonors, setSelectedDonors] = useState<string[]>([]);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState<Donor | null>(null);
   const [showBulkMenu, setShowBulkMenu] = useState(false);
   const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const [toast, setToast] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
 
   const [newDonor, setNewDonor] = useState({
     name: "",
     type: "Foundation",
     contact: "",
     scope: "National",
-    address: "",
-    notes: "",
   });
 
   const pageSize = 4;
@@ -71,94 +101,66 @@ export default function DonorManagement() {
     window.setTimeout(() => setToast(""), 3000);
   };
 
-  // Debounce search
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search);
-      setCurrentPage(1);
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [search]);
+  // FILTER DONORS
 
-  // Load KPI Summary
-  const loadSummary = useCallback(async () => {
-    try {
-      const data = await donorService.getDonorSummary();
-      setSummary(data);
-    } catch {
-      // Graceful fallback
-    }
-  }, []);
+  const filteredDonors = useMemo(() => {
+    return donors.filter((donor) => {
+      const matchesSearch = [
+        donor.id,
+        donor.name,
+        donor.contact,
+        donor.type,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search.toLowerCase());
 
-  // Load Donors
-  const loadDonors = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const minContrib = minContributionFilter ? parseFloat(minContributionFilter) : undefined;
-      const result = await donorService.getDonors({
-        page: currentPage,
-        pageSize,
-        search: debouncedSearch || undefined,
-        type: typeFilter !== "All types" ? typeFilter : undefined,
-        verification:
-          verificationFilter !== "All verification states"
-            ? verificationFilter
-            : undefined,
-        status: statusFilter !== "All statuses" ? statusFilter : undefined,
-        scope: scopeFilter !== "All scopes" ? scopeFilter : undefined,
-        dateRange: dateFilter !== "Date range" ? dateFilter : undefined,
-        minContribution: !isNaN(minContrib!) ? minContrib : undefined,
-      });
+      const matchesType =
+        typeFilter === "All types" ||
+        donor.type === typeFilter;
 
-      setDonors(result.items || []);
-      setTotalCount(result.totalCount || 0);
-      setTotalPages(result.totalPages || 1);
-    } catch (err: any) {
-      setError(err?.message || "Failed to load donor profiles. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+      const matchesVerification =
+        verificationFilter === "All verification states" ||
+        donor.verification === verificationFilter;
+
+      const matchesStatus =
+        statusFilter === "All statuses" ||
+        donor.status === statusFilter;
+
+      return (
+        matchesSearch &&
+        matchesType &&
+        matchesVerification &&
+        matchesStatus
+      );
+    });
   }, [
-    currentPage,
-    pageSize,
-    debouncedSearch,
+    donors,
+    search,
     typeFilter,
     verificationFilter,
     statusFilter,
-    scopeFilter,
-    dateFilter,
-    minContributionFilter,
   ]);
 
-  useEffect(() => {
-    loadDonors();
-  }, [loadDonors]);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredDonors.length / pageSize)
+  );
 
-  useEffect(() => {
-    loadSummary();
-  }, [loadSummary]);
+  const paginatedDonors = filteredDonors.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
-  // Multi-select
   const toggleSelect = (id: string) => {
-    setSelectedDonors((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    setSelectedDonors((previous) =>
+      previous.includes(id)
+        ? previous.filter((item) => item !== id)
+        : [...previous, id]
     );
   };
 
-  const toggleSelectAll = () => {
-    const visibleIds = donors.map((d) => d.id);
-    const allSelected = visibleIds.every((id) => selectedDonors.includes(id));
-
-    setSelectedDonors((prev) =>
-      allSelected
-        ? prev.filter((id) => !visibleIds.includes(id))
-        : [...new Set([...prev, ...visibleIds])]
-    );
-  };
-
-  // Add Donor
-  const handleAddDonor = async (e: React.FormEvent) => {
+  const handleAddDonor = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!newDonor.name.trim() || !newDonor.contact.trim()) {
@@ -166,200 +168,155 @@ export default function DonorManagement() {
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      await donorService.createDonor({
-        name: newDonor.name.trim(),
-        type: newDonor.type,
-        contact: newDonor.contact.trim(),
-        scope: newDonor.scope,
-        address: newDonor.address.trim() || undefined,
-        notes: newDonor.notes.trim() || undefined,
-      });
+    const donor: Donor = {
+      id: `DNR-${Math.floor(2000 + Math.random() * 7999)}`,
+      name: newDonor.name,
+      type: newDonor.type,
+      contact: newDonor.contact,
+      scope: newDonor.scope,
+      verification: "Pending",
+      contributions: 0,
+      status: "Active",
+    };
 
-      notify("Donor registered successfully.");
-      setShowAddModal(false);
-      setNewDonor({
-        name: "",
-        type: "Foundation",
-        contact: "",
-        scope: "National",
-        address: "",
-        notes: "",
-      });
-
-      setCurrentPage(1);
-      loadDonors();
-      loadSummary();
-    } catch (err: any) {
-      notify(err?.message || "Failed to register donor.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    setDonors((previous) => [donor, ...previous]);
+    setNewDonor({
+      name: "",
+      type: "Foundation",
+      contact: "",
+      scope: "National",
+    });
+    setCurrentPage(1);
+    setShowAddModal(false);
+    notify("Donor registered successfully.");
   };
 
-  // Update Status
-  const handleToggleStatus = async (donor: Donor) => {
-    const nextStatus: DonorStatusType =
-      donor.status === "Restricted" ? "Active" : "Restricted";
+  // EXPORT CSV
 
-    try {
-      await donorService.updateStatus(donor.id, nextStatus);
-      notify(`Donor marked as ${nextStatus.toLowerCase()}.`);
-      setActiveMenu(null);
-      loadDonors();
-      loadSummary();
-    } catch (err: any) {
-      notify(err?.message || "Failed to update donor status.");
-    }
+  const handleExport = () => {
+    const headers = [
+      "Donor ID",
+      "Donor",
+      "Type",
+      "Contact",
+      "Scope",
+      "Verification",
+      "Lifetime Contributions",
+      "Status",
+    ];
+
+    const rows = filteredDonors.map((donor) => [
+      donor.id,
+      donor.name,
+      donor.type,
+      donor.contact,
+      donor.scope,
+      donor.verification,
+      donor.contributions,
+      donor.status,
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) =>
+        row
+          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+          .join(",")
+      )
+      .join("\n");
+
+    const blob = new Blob([csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "donor-management.csv";
+    link.click();
+
+    URL.revokeObjectURL(url);
+    notify("Donor report exported successfully.");
   };
 
-  // Bulk Actions
-  const handleBulkAction = async (action: "Activate" | "Restrict" | "Deactivate") => {
+  const handleBulkAction = (action: string) => {
     if (selectedDonors.length === 0) {
       notify("Please select at least one donor.");
       return;
     }
 
-    try {
-      const res = await donorService.bulkAction({
-        ids: selectedDonors,
-        action,
-      });
-      notify(res.message || `${action} action completed.`);
-      setSelectedDonors([]);
-      setShowBulkMenu(false);
-      loadDonors();
-      loadSummary();
-    } catch (err: any) {
-      notify(err?.message || `Failed to execute ${action} action.`);
-    }
-  };
-
-  // Delete Donor
-  const handleDeleteDonor = async (id: string) => {
-    if (!window.confirm(`Are you sure you want to delete donor ${id}?`)) {
-      return;
-    }
-
-    try {
-      await donorService.deleteDonor(id);
-      notify(`Donor ${id} deleted.`);
-      setActiveMenu(null);
-      loadDonors();
-      loadSummary();
-    } catch (err: any) {
-      notify(err?.message || "Failed to delete donor.");
-    }
-  };
-
-  // Export CSV
-  const handleExport = async () => {
-    setIsExporting(true);
-    try {
-      const allData = await donorService.getAllDonors();
-      const recordsToExport = allData && allData.length > 0 ? allData : donors;
-
-      const headers = [
-        "Donor ID",
-        "Donor",
-        "Type",
-        "Contact",
-        "Scope",
-        "Verification",
-        "Lifetime Contributions",
-        "Status",
-        "Address",
-        "Notes",
-      ];
-
-      const rows = recordsToExport.map((donor) => [
-        donor.id,
-        donor.name,
-        donor.type,
-        donor.contact,
-        donor.scope,
-        donor.verification,
-        donor.contributions,
-        donor.status,
-        donor.address || "",
-        donor.notes || "",
-      ]);
-
-      const csv = [headers, ...rows]
-        .map((row) =>
-          row
-            .map((value) => `"${String(value).replace(/"/g, '""')}"`)
-            .join(",")
+    if (action === "Restrict") {
+      setDonors((previous) =>
+        previous.map((donor) =>
+          selectedDonors.includes(donor.id)
+            ? { ...donor, status: "Restricted" }
+            : donor
         )
-        .join("\n");
-
-      const blob = new Blob([csv], {
-        type: "text/csv;charset=utf-8;",
-      });
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = `donor-management-${new Date().toISOString().split("T")[0]}.csv`;
-      link.click();
-
-      URL.revokeObjectURL(url);
-      notify("Donor report exported successfully.");
-    } catch (err: any) {
-      notify(err?.message || "Failed to export donor records.");
-    } finally {
-      setIsExporting(false);
+      );
     }
+
+    if (action === "Activate") {
+      setDonors((previous) =>
+        previous.map((donor) =>
+          selectedDonors.includes(donor.id)
+            ? { ...donor, status: "Active" }
+            : donor
+        )
+      );
+    }
+
+    setSelectedDonors([]);
+    setShowBulkMenu(false);
+    notify(`${action} action completed.`);
   };
 
   return (
     <div className="min-h-screen w-full bg-[#eef5f7] text-[#123e60] overflow-x-hidden">
+
       {/* MAIN CONTENT */}
+
       <main className="max-w-[1600px] mx-auto px-5 md:px-8 py-4">
+
         {/* BREADCRUMB */}
+
         <div className="flex items-center gap-2 text-[8px] mb-7">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={10} />
-          <span className="text-slate-500">Funding & Donations</span>
+          <span className="text-slate-500">
+            Funding & Donations
+          </span>
           <ChevronRight size={10} />
           <span className="font-semibold">Donor Management</span>
         </div>
 
         {/* TITLE */}
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+
           <div>
-            <h1 className="text-[21px] font-medium">Donor Management</h1>
+            <h1 className="text-[21px] font-medium">
+              Donor Management
+            </h1>
+
             <p className="text-[9px] text-slate-500 mt-1">
-              Manage donor profiles, verification, communication preferences, and contribution history.
+              Manage donor profiles, verification,
+              communication preferences, and contribution history.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                loadDonors();
-                loadSummary();
-              }}
-              title="Refresh donors"
-              className="h-[32px] w-[32px] bg-white border border-[#b5cbd8] rounded-lg text-[#23749e] flex items-center justify-center hover:bg-slate-50 transition"
-            >
-              <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
-            </button>
+          <div className="flex gap-2">
 
             <button
               onClick={handleExport}
-              disabled={isExporting}
-              className="h-[32px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[9px] text-[#23749e] flex items-center gap-2 hover:bg-slate-50 transition disabled:opacity-50"
+              className="h-[32px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[9px] text-[#23749e] flex items-center gap-2 hover:bg-slate-50"
             >
-              {isExporting ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
+              <Download size={13} />
               Export
             </button>
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="h-[32px] px-3 bg-[#23749e] text-white rounded-lg text-[9px] font-semibold flex items-center gap-2 hover:bg-[#175c80] transition shadow-sm"
+              className="h-[32px] px-3 bg-[#23749e] text-white rounded-lg text-[9px] font-semibold flex items-center gap-2 hover:bg-[#175c80]"
             >
               <Plus size={13} />
               Add donor
@@ -367,38 +324,29 @@ export default function DonorManagement() {
           </div>
         </div>
 
-        {/* ERROR STATE */}
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between text-red-700 text-xs">
-            <div className="flex items-center gap-2">
-              <AlertCircle size={16} />
-              <span>{error}</span>
-            </div>
-            <button
-              onClick={() => loadDonors()}
-              className="text-xs font-semibold underline hover:no-underline ml-4"
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-
         {/* SEARCH AND FILTERS */}
+
         <section className="flex flex-col lg:flex-row gap-2 mb-2.5">
+
           <div className="relative flex-1">
             <Search
               size={13}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
+
             <input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search donor name, ID, contact, or type..."
-              className="w-full h-[35px] bg-white border border-[#d5e3e9] rounded-lg pl-8 pr-3 text-[9px] outline-none focus:border-[#39ae90] transition"
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search donor name, ID, or contact..."
+              className="w-full h-[35px] bg-white border border-[#d5e3e9] rounded-lg pl-8 pr-3 text-[9px] outline-none focus:border-[#39ae90]"
             />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex gap-2">
+
             <FilterSelect
               value={typeFilter}
               onChange={(value) => {
@@ -411,7 +359,6 @@ export default function DonorManagement() {
                 "Corporate",
                 "International NGO",
                 "Community Group",
-                "Individual",
               ]}
             />
 
@@ -435,15 +382,17 @@ export default function DonorManagement() {
                 setStatusFilter(value);
                 setCurrentPage(1);
               }}
-              options={["All statuses", "Active", "Restricted", "Inactive"]}
+              options={[
+                "All statuses",
+                "Active",
+                "Restricted",
+                "Inactive",
+              ]}
             />
 
             <FilterSelect
               value={dateFilter}
-              onChange={(value) => {
-                setDateFilter(value);
-                setCurrentPage(1);
-              }}
+              onChange={setDateFilter}
               options={[
                 "Date range",
                 "Last 7 days",
@@ -455,106 +404,90 @@ export default function DonorManagement() {
 
             <button
               onClick={() => setShowMoreFilters(!showMoreFilters)}
-              className={`h-[35px] px-3 bg-white border rounded-lg text-[9px] flex items-center justify-center gap-2 hover:bg-slate-50 transition whitespace-nowrap ${
-                showMoreFilters || scopeFilter !== "All scopes" || minContributionFilter
-                  ? "border-[#23749e] text-[#23749e] font-semibold"
-                  : "border-[#b5cbd8]"
-              }`}
+              className="h-[35px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[9px] flex items-center justify-center gap-2 hover:bg-slate-50"
             >
               <Filter size={12} />
               More filters
-              {(scopeFilter !== "All scopes" || minContributionFilter) && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#23749e]" />
-              )}
             </button>
           </div>
         </section>
 
-        {/* MORE FILTERS TRAY */}
         {showMoreFilters && (
-          <div className="bg-white rounded-lg border border-[#d5e3e9] p-3 mb-3 flex flex-wrap items-center gap-3 shadow-sm">
+          <div className="bg-white rounded-lg border border-[#d5e3e9] p-3 mb-3 flex flex-wrap items-center gap-3">
             <div>
-              <p className="text-[8px] text-slate-500 mb-1">Minimum contribution ($)</p>
+              <p className="text-[8px] text-slate-500 mb-1">
+                Minimum contribution
+              </p>
               <input
                 type="number"
-                value={minContributionFilter}
-                onChange={(e) => {
-                  setMinContributionFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="e.g. 50000"
-                className="border border-[#d5e3e9] rounded-md px-2 py-1.5 text-[9px] outline-none focus:border-[#39ae90] w-36"
+                placeholder="Minimum USD"
+                className="border rounded-md px-2 py-2 text-[9px] outline-none"
               />
             </div>
 
             <div>
-              <p className="text-[8px] text-slate-500 mb-1">Donor scope</p>
-              <select
-                value={scopeFilter}
-                onChange={(e) => {
-                  setScopeFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="border border-[#d5e3e9] rounded-md px-2 py-1.5 text-[9px] outline-none focus:border-[#39ae90] bg-white cursor-pointer"
-              >
-                <option value="All scopes">All scopes</option>
-                <option value="International">International</option>
-                <option value="National">National</option>
-                <option value="Greater Riverton">Greater Riverton</option>
+              <p className="text-[8px] text-slate-500 mb-1">
+                Donor scope
+              </p>
+              <select className="border rounded-md px-2 py-2 text-[9px]">
+                <option>All scopes</option>
+                <option>International</option>
+                <option>National</option>
+                <option>Greater Riverton</option>
               </select>
             </div>
 
             <button
               onClick={() => {
-                setScopeFilter("All scopes");
-                setMinContributionFilter("");
-                setCurrentPage(1);
-                notify("Additional filters reset.");
+                setShowMoreFilters(false);
+                notify("Filters applied.");
               }}
-              className="text-[9px] text-[#23749e] hover:underline mt-4"
+              className="bg-[#23749e] text-white rounded-md px-3 py-2 text-[9px] mt-3"
             >
-              Reset filters
+              Apply
             </button>
           </div>
         )}
 
         {/* DONOR TABLE */}
+
         <section className="bg-white rounded-lg border border-[#d5e3e9] shadow-sm overflow-hidden">
+
           {/* TABLE HEADER */}
+
           <div className="min-h-[52px] px-3 flex items-center justify-between border-b border-[#d7e4e9]">
+
             <div>
-              <h2 className="text-[10px] font-medium">Donor Management</h2>
-              <p className="text-[8px] text-slate-400 mt-0.5">
-                {totalCount} total donor{totalCount === 1 ? "" : "s"} found
+              <h2 className="text-[10px] font-medium">
+                Donor Management
+              </h2>
+
+              <p className="text-[8px] text-slate-400 mt-1">
+                {filteredDonors.length} demonstration records
               </p>
             </div>
 
             <div className="relative">
               <button
                 onClick={() => setShowBulkMenu(!showBulkMenu)}
-                className="h-[31px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[8px] hover:bg-slate-50 transition flex items-center gap-1.5"
+                className="h-[31px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[8px] hover:bg-slate-50"
               >
                 Bulk actions
-                <ChevronDown size={11} />
               </button>
 
               {showBulkMenu && (
-                <div className="absolute right-0 top-9 z-20 w-44 bg-white border border-slate-200 rounded-lg shadow-lg p-1">
-                  <div className="px-2 py-1 text-[8px] font-semibold text-slate-400 uppercase tracking-wider">
-                    With selected ({selectedDonors.length})
-                  </div>
+                <div className="absolute right-0 top-9 z-20 w-40 bg-white border border-slate-200 rounded-lg shadow-lg p-1">
                   <button
                     onClick={() => handleBulkAction("Activate")}
-                    className="w-full text-left px-3 py-1.5 text-[9px] hover:bg-slate-50 rounded flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50 rounded"
                   >
-                    <CheckCircle2 size={12} className="text-[#159b79]" />
                     Activate selected
                   </button>
+
                   <button
                     onClick={() => handleBulkAction("Restrict")}
-                    className="w-full text-left px-3 py-1.5 text-[9px] hover:bg-slate-50 rounded flex items-center gap-2 text-amber-600"
+                    className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50 rounded"
                   >
-                    <ShieldAlert size={12} className="text-amber-500" />
                     Restrict selected
                   </button>
                 </div>
@@ -563,260 +496,224 @@ export default function DonorManagement() {
           </div>
 
           {/* RESPONSIVE TABLE */}
+
           <div className="w-full overflow-x-auto">
+
             <table className="w-full min-w-[900px] text-left">
+
               <thead>
-                <tr className="h-[28px] bg-[#f5f8f9] border-b border-[#d5e3e9] text-[7px] text-slate-500">
-                  <th className="px-2.5 font-medium w-8">
-                    <input
-                      type="checkbox"
-                      checked={
-                        donors.length > 0 &&
-                        donors.every((d) => selectedDonors.includes(d.id))
-                      }
-                      onChange={toggleSelectAll}
-                      className="accent-[#23749e] w-3 h-3 cursor-pointer"
-                    />
+                <tr className="h-[27px] bg-[#f5f8f9] border-b border-[#d5e3e9] text-[7px] text-slate-500">
+
+                  <th className="px-2.5 font-medium">
+                    Donor ID
                   </th>
-                  <th className="px-2 font-medium">Donor ID</th>
+
                   <th className="px-2 font-medium">Donor</th>
+
                   <th className="px-2 font-medium">Type</th>
+
                   <th className="px-2 font-medium">Contact</th>
+
                   <th className="px-2 font-medium">Scope</th>
+
                   <th className="px-2 font-medium">Verification</th>
-                  <th className="px-2 font-medium">Lifetime Contributions</th>
+
+                  <th className="px-2 font-medium">
+                    Lifetime Contributions
+                  </th>
+
                   <th className="px-2 font-medium">Status</th>
-                  <th className="px-2 font-medium w-10"></th>
+
+                  <th className="px-2 font-medium"></th>
+
                 </tr>
               </thead>
 
               <tbody>
-                {loading ? (
-                  Array.from({ length: 4 }).map((_, i) => (
-                    <tr key={i} className="h-[38px] border-b border-[#e1eaf0] animate-pulse">
-                      <td className="px-2.5">
-                        <div className="w-3 h-3 bg-slate-200 rounded" />
-                      </td>
-                      <td className="px-2">
-                        <div className="h-3 w-16 bg-slate-200 rounded" />
-                      </td>
-                      <td className="px-2">
-                        <div className="h-3 w-28 bg-slate-200 rounded" />
-                      </td>
-                      <td className="px-2">
-                        <div className="h-3 w-20 bg-slate-200 rounded" />
-                      </td>
-                      <td className="px-2">
-                        <div className="h-3 w-24 bg-slate-200 rounded" />
-                      </td>
-                      <td className="px-2">
-                        <div className="h-3 w-16 bg-slate-200 rounded" />
-                      </td>
-                      <td className="px-2">
-                        <div className="h-4 w-14 bg-slate-200 rounded" />
-                      </td>
-                      <td className="px-2">
-                        <div className="h-4 w-20 bg-slate-200 rounded" />
-                      </td>
-                      <td className="px-2">
-                        <div className="h-4 w-12 bg-slate-200 rounded" />
-                      </td>
-                      <td className="px-2"></td>
-                    </tr>
-                  ))
-                ) : donors.length === 0 ? (
-                  <tr>
-                    <td colSpan={10} className="py-12 text-center">
-                      <Users size={24} className="mx-auto text-slate-300 mb-2" />
-                      <p className="text-[10px] text-slate-500 font-medium">
-                        No donors found.
-                      </p>
+                {paginatedDonors.map((donor, index) => (
+                  <tr
+                    key={donor.id}
+                    className={`h-[36px] border-b border-[#e1eaf0] hover:bg-[#f0f8fa] transition ${
+                      index % 2 === 1 ? "bg-[#f7fafb]" : "bg-white"
+                    }`}
+                  >
+
+                    <td className="px-2.5 text-[7px] font-semibold whitespace-nowrap">
+                      {donor.id}
+                    </td>
+
+                    <td className="px-2 text-[7px] whitespace-nowrap">
+                      {donor.name}
+                    </td>
+
+                    <td className="px-2 text-[7px] whitespace-nowrap">
+                      {donor.type}
+                    </td>
+
+                    <td className="px-2 text-[7px] whitespace-nowrap">
+                      {donor.contact}
+                    </td>
+
+                    <td className="px-2 text-[7px] whitespace-nowrap">
+                      {donor.scope}
+                    </td>
+
+                    <td className="px-2 text-[7px] whitespace-nowrap">
+                      <VerificationBadge
+                        status={donor.verification}
+                      />
+                    </td>
+
+                    <td className="px-2 text-[7px] whitespace-nowrap">
+                      <span className="bg-[#e7f2f8] text-[#23749e] rounded px-2 py-1 font-semibold">
+                        ${donor.contributions.toLocaleString("en-US")}
+                      </span>
+                    </td>
+
+                    <td className="px-2 text-[7px] whitespace-nowrap">
+                      <DonorStatus status={donor.status} />
+                    </td>
+
+                    <td className="px-2 relative">
                       <button
-                        onClick={() => {
-                          setSearch("");
-                          setTypeFilter("All types");
-                          setVerificationFilter("All verification states");
-                          setStatusFilter("All statuses");
-                          setScopeFilter("All scopes");
-                          setDateFilter("Date range");
-                          setMinContributionFilter("");
-                          setCurrentPage(1);
-                        }}
-                        className="text-[9px] text-[#23749e] hover:underline mt-2 inline-block"
+                        onClick={() =>
+                          setActiveMenu(
+                            activeMenu === donor.id
+                              ? null
+                              : donor.id
+                          )
+                        }
+                        className="text-slate-500 hover:text-[#23749e]"
                       >
-                        Clear filters
+                        <MoreHorizontal size={15} />
                       </button>
+
+                      {activeMenu === donor.id && (
+                        <div className="absolute right-4 top-6 z-30 bg-white border border-slate-200 shadow-lg rounded-lg w-36 p-1">
+
+                          <button
+                            onClick={() => {
+                              notify(`Viewing ${donor.name}`);
+                              setActiveMenu(null);
+                            }}
+                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                          >
+                            View profile
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setSelectedDonors([donor.id]);
+                              notify("Donor selected.");
+                              setActiveMenu(null);
+                            }}
+                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                          >
+                            Select donor
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setDonors((previous) =>
+                                previous.map((item) =>
+                                  item.id === donor.id
+                                    ? {
+                                        ...item,
+                                        status:
+                                          item.status === "Restricted"
+                                            ? "Active"
+                                            : "Restricted",
+                                      }
+                                    : item
+                                )
+                              );
+
+                              setActiveMenu(null);
+                              notify("Donor status updated.");
+                            }}
+                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                          >
+                            {donor.status === "Restricted"
+                              ? "Activate"
+                              : "Restrict"}
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
-                ) : (
-                  donors.map((donor, index) => (
-                    <tr
-                      key={donor.id}
-                      className={`h-[36px] border-b border-[#e1eaf0] hover:bg-[#f0f8fa] transition ${
-                        index % 2 === 1 ? "bg-[#f7fafb]" : "bg-white"
-                      }`}
-                    >
-                      <td className="px-2.5">
-                        <input
-                          type="checkbox"
-                          checked={selectedDonors.includes(donor.id)}
-                          onChange={() => toggleSelect(donor.id)}
-                          className="accent-[#23749e] w-3 h-3 cursor-pointer"
-                        />
-                      </td>
-
-                      <td className="px-2 text-[7px] font-semibold whitespace-nowrap">
-                        <button
-                          onClick={() => setShowDetailsModal(donor)}
-                          className="hover:underline text-[#23749e]"
-                        >
-                          {donor.id}
-                        </button>
-                      </td>
-
-                      <td className="px-2 text-[7px] font-medium whitespace-nowrap">
-                        {donor.name}
-                      </td>
-
-                      <td className="px-2 text-[7px] whitespace-nowrap text-slate-600">
-                        {donor.type}
-                      </td>
-
-                      <td className="px-2 text-[7px] whitespace-nowrap text-slate-500">
-                        {donor.contact}
-                      </td>
-
-                      <td className="px-2 text-[7px] whitespace-nowrap text-slate-600">
-                        {donor.scope}
-                      </td>
-
-                      <td className="px-2 whitespace-nowrap">
-                        <VerificationBadge status={donor.verification} />
-                      </td>
-
-                      <td className="px-2 text-[7px] whitespace-nowrap">
-                        <span className="bg-[#e7f2f8] text-[#23749e] rounded px-2 py-0.5 font-semibold">
-                          ${donor.contributions.toLocaleString("en-US")}
-                        </span>
-                      </td>
-
-                      <td className="px-2 text-[7px] whitespace-nowrap">
-                        <DonorStatus status={donor.status} />
-                      </td>
-
-                      <td className="px-2 relative">
-                        <button
-                          onClick={() =>
-                            setActiveMenu(
-                              activeMenu === donor.id ? null : donor.id
-                            )
-                          }
-                          className="text-slate-500 hover:text-[#23749e] p-1 rounded hover:bg-slate-100 transition"
-                        >
-                          <MoreHorizontal size={15} />
-                        </button>
-
-                        {activeMenu === donor.id && (
-                          <div className="absolute right-4 top-6 z-30 bg-white border border-slate-200 shadow-lg rounded-lg w-40 p-1">
-                            <button
-                              onClick={() => {
-                                setShowDetailsModal(donor);
-                                setActiveMenu(null);
-                              }}
-                              className="w-full text-left px-3 py-1.5 text-[9px] hover:bg-slate-50 rounded flex items-center gap-2"
-                            >
-                              <Eye size={12} className="text-slate-400" />
-                              View profile
-                            </button>
-
-                            <button
-                              onClick={() => {
-                                setSelectedDonors([donor.id]);
-                                notify(`Donor ${donor.id} selected.`);
-                                setActiveMenu(null);
-                              }}
-                              className="w-full text-left px-3 py-1.5 text-[9px] hover:bg-slate-50 rounded"
-                            >
-                              Select donor
-                            </button>
-
-                            <button
-                              onClick={() => handleToggleStatus(donor)}
-                              className="w-full text-left px-3 py-1.5 text-[9px] hover:bg-slate-50 rounded"
-                            >
-                              {donor.status === "Restricted"
-                                ? "Activate donor"
-                                : "Restrict donor"}
-                            </button>
-
-                            <div className="my-1 border-t border-slate-100" />
-
-                            <button
-                              onClick={() => handleDeleteDonor(donor.id)}
-                              className="w-full text-left px-3 py-1.5 text-[9px] hover:bg-red-50 text-red-600 rounded flex items-center gap-2"
-                            >
-                              <Trash2 size={12} />
-                              Delete profile
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
+                ))}
               </tbody>
             </table>
+
+            {paginatedDonors.length === 0 && (
+              <div className="py-10 text-center">
+                <Users
+                  size={24}
+                  className="mx-auto text-slate-300 mb-2"
+                />
+                <p className="text-[10px] text-slate-400">
+                  No donors found.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* PAGINATION */}
-          <div className="min-h-[43px] px-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#d7e4e9]">
+
+          <div className="min-h-[43px] px-3 flex flex-wrap items-center justify-between gap-2">
+
             <p className="text-[8px] text-slate-400">
               Showing{" "}
-              {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
-              {Math.min(currentPage * pageSize, totalCount)} of{" "}
-              {totalCount.toLocaleString()}
+              {filteredDonors.length === 0
+                ? 0
+                : (currentPage - 1) * pageSize + 1}
+              {"–"}
+              {Math.min(currentPage * pageSize, filteredDonors.length)}
+              {" "}of {filteredDonors.length}
+              {search === "" &&
+                typeFilter === "All types" &&
+                statusFilter === "All statuses" &&
+                verificationFilter === "All verification states" &&
+                " · 2,184"}
             </p>
 
             <div className="flex items-center gap-1.5">
+
               <button
-                disabled={currentPage === 1 || loading}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="h-[25px] px-3 border border-[#d5e3e9] rounded-md text-[8px] disabled:opacity-40 hover:bg-slate-50 transition"
+                disabled={currentPage === 1}
+                onClick={() =>
+                  setCurrentPage((page) => Math.max(1, page - 1))
+                }
+                className="h-[25px] px-3 border border-[#d5e3e9] rounded-md text-[8px] disabled:opacity-40 hover:bg-slate-50"
               >
                 Previous
               </button>
 
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, index) => {
-                let pageNumber: number;
-                if (totalPages <= 5) {
-                  pageNumber = index + 1;
-                } else if (currentPage <= 3) {
-                  pageNumber = index + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNumber = totalPages - 4 + index;
-                } else {
-                  pageNumber = currentPage - 2 + index;
-                }
-
-                return (
-                  <button
-                    key={pageNumber}
-                    onClick={() => setCurrentPage(pageNumber)}
-                    className={`w-[24px] h-[25px] rounded-md border text-[8px] transition ${
-                      currentPage === pageNumber
-                        ? "bg-[#23749e] border-[#23749e] text-white font-semibold"
-                        : "bg-white border-[#d5e3e9] hover:bg-slate-50"
-                    }`}
-                  >
-                    {pageNumber}
-                  </button>
-                );
-              })}
+              {Array.from(
+                { length: Math.min(totalPages, 3) },
+                (_, index) => index + 1
+              ).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-[24px] h-[25px] rounded-md border text-[8px] ${
+                    currentPage === page
+                      ? "bg-[#23749e] border-[#23749e] text-white"
+                      : "bg-white border-[#d5e3e9] hover:bg-slate-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
 
               <button
-                disabled={currentPage >= totalPages || loading}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="h-[25px] px-3 border border-[#b5cbd8] rounded-md text-[8px] disabled:opacity-40 hover:bg-slate-50 transition"
+                disabled={currentPage >= totalPages}
+                onClick={() =>
+                  setCurrentPage((page) =>
+                    Math.min(totalPages, page + 1)
+                  )
+                }
+                className="h-[25px] px-3 border border-[#b5cbd8] rounded-md text-[8px] disabled:opacity-40 hover:bg-slate-50"
               >
                 Next
               </button>
@@ -826,30 +723,37 @@ export default function DonorManagement() {
       </main>
 
       {/* ADD DONOR MODAL */}
+
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-[#102d42]/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-[#102d42]/40 flex items-center justify-center p-4">
+
           <form
             onSubmit={handleAddDonor}
-            className="bg-white rounded-xl shadow-xl w-full max-w-[430px] p-5 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white rounded-xl shadow-xl w-full max-w-[430px] p-5"
           >
+
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-[16px] font-semibold">Register new donor</h2>
+                <h2 className="text-[16px] font-semibold">
+                  Register new donor
+                </h2>
+
                 <p className="text-[9px] text-slate-400 mt-1">
-                  Enter the donor profile and contact information below.
+                  Enter the donor information below.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="text-slate-400 hover:text-red-500 transition"
+                className="text-slate-400 hover:text-red-500"
               >
                 <X size={19} />
               </button>
             </div>
 
             <div className="space-y-3">
+
               <FormField label="Donor name">
                 <input
                   required
@@ -860,8 +764,8 @@ export default function DonorManagement() {
                       name: e.target.value,
                     })
                   }
-                  placeholder="Enter donor or organization name"
-                  className="w-full border border-[#d5e3e9] rounded-lg px-3 py-2 text-[10px] outline-none focus:border-[#23749e]"
+                  placeholder="Enter donor name"
+                  className="form-input"
                 />
               </FormField>
 
@@ -874,13 +778,13 @@ export default function DonorManagement() {
                       type: e.target.value,
                     })
                   }
-                  className="w-full border border-[#d5e3e9] rounded-lg px-3 py-2 text-[10px] outline-none focus:border-[#23749e] bg-white cursor-pointer"
+                  className="form-input"
                 >
-                  <option value="Foundation">Foundation</option>
-                  <option value="Corporate">Corporate</option>
-                  <option value="International NGO">International NGO</option>
-                  <option value="Community Group">Community Group</option>
-                  <option value="Individual">Individual</option>
+                  <option>Foundation</option>
+                  <option>Corporate</option>
+                  <option>International NGO</option>
+                  <option>Community Group</option>
+                  <option>Individual</option>
                 </select>
               </FormField>
 
@@ -895,8 +799,8 @@ export default function DonorManagement() {
                       contact: e.target.value,
                     })
                   }
-                  placeholder="e.g. contact@domain.org"
-                  className="w-full border border-[#d5e3e9] rounded-lg px-3 py-2 text-[10px] outline-none focus:border-[#23749e]"
+                  placeholder="example@email.com"
+                  className="form-input"
                 />
               </FormField>
 
@@ -909,58 +813,29 @@ export default function DonorManagement() {
                       scope: e.target.value,
                     })
                   }
-                  className="w-full border border-[#d5e3e9] rounded-lg px-3 py-2 text-[10px] outline-none focus:border-[#23749e] bg-white cursor-pointer"
+                  className="form-input"
                 >
-                  <option value="National">National</option>
-                  <option value="International">International</option>
-                  <option value="Greater Riverton">Greater Riverton</option>
+                  <option>National</option>
+                  <option>International</option>
+                  <option>Greater Riverton</option>
                 </select>
-              </FormField>
-
-              <FormField label="Address / Location (optional)">
-                <input
-                  value={newDonor.address}
-                  onChange={(e) =>
-                    setNewDonor({
-                      ...newDonor,
-                      address: e.target.value,
-                    })
-                  }
-                  placeholder="e.g. Colombo 03, Sri Lanka"
-                  className="w-full border border-[#d5e3e9] rounded-lg px-3 py-2 text-[10px] outline-none focus:border-[#23749e]"
-                />
-              </FormField>
-
-              <FormField label="Notes (optional)">
-                <input
-                  value={newDonor.notes}
-                  onChange={(e) =>
-                    setNewDonor({
-                      ...newDonor,
-                      notes: e.target.value,
-                    })
-                  }
-                  placeholder="e.g. Focus areas, recurring grant program details"
-                  className="w-full border border-[#d5e3e9] rounded-lg px-3 py-2 text-[10px] outline-none focus:border-[#23749e]"
-                />
               </FormField>
             </div>
 
             <div className="flex justify-end gap-2 mt-6">
+
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px] hover:bg-slate-50 transition"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px]"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold hover:bg-[#175c80] transition flex items-center gap-1.5 disabled:opacity-50"
+                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold"
               >
-                {isSubmitting && <Loader2 size={12} className="animate-spin" />}
                 Register donor
               </button>
             </div>
@@ -968,92 +843,12 @@ export default function DonorManagement() {
         </div>
       )}
 
-      {/* VIEW DETAILS MODAL */}
-      {showDetailsModal && (
-        <div className="fixed inset-0 z-50 bg-[#102d42]/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-[480px] p-6 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-4 border-b border-[#e1eaf0]">
-              <div>
-                <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">
-                  Donor Profile
-                </span>
-                <h2 className="text-[18px] font-bold text-[#123e60]">
-                  {showDetailsModal.name}
-                </h2>
-                <span className="text-[10px] text-slate-500 font-mono">
-                  {showDetailsModal.id}
-                </span>
-              </div>
-              <button
-                onClick={() => setShowDetailsModal(null)}
-                className="text-slate-400 hover:text-slate-600 transition"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="py-4 space-y-3 text-[11px]">
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400">Donor Type</span>
-                <span className="font-semibold text-[#123e60]">
-                  {showDetailsModal.type}
-                </span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400">Contact Email</span>
-                <span className="font-medium">{showDetailsModal.contact}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400">Operational Scope</span>
-                <span className="font-medium">{showDetailsModal.scope}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400">Lifetime Contributions</span>
-                <span className="font-bold text-[#23749e]">
-                  ${showDetailsModal.contributions.toLocaleString("en-US")}
-                </span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400">Verification</span>
-                <VerificationBadge status={showDetailsModal.verification} />
-              </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400">Status</span>
-                <DonorStatus status={showDetailsModal.status} />
-              </div>
-              {showDetailsModal.address && (
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-400">Address</span>
-                  <span className="text-slate-700">{showDetailsModal.address}</span>
-                </div>
-              )}
-              {showDetailsModal.notes && (
-                <div className="pt-1">
-                  <span className="block text-slate-400 mb-1">Notes / Description</span>
-                  <p className="bg-[#f5f8f9] p-2.5 rounded-lg text-slate-600 text-[10px]">
-                    {showDetailsModal.notes}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-end gap-2 pt-3 border-t border-[#e1eaf0]">
-              <button
-                onClick={() => setShowDetailsModal(null)}
-                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold hover:bg-[#175c80] transition"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* TOAST */}
+
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-[10px] flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-150">
-          <span>{toast}</span>
-          <button onClick={() => setToast("")} className="hover:text-slate-300">
+        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-[10px] flex items-center gap-3">
+          {toast}
+          <button onClick={() => setToast("")}>
             <X size={13} />
           </button>
         </div>
@@ -1080,18 +875,16 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none w-full lg:w-[125px] h-[35px] bg-white border border-[#d5e3e9] rounded-lg pl-2 pr-6 text-[8px] outline-none focus:border-[#39ae90] cursor-pointer transition"
+        className="appearance-none w-full lg:w-[110px] h-[35px] bg-white border border-[#d5e3e9] rounded-lg pl-2 pr-6 text-[8px] outline-none focus:border-[#39ae90] cursor-pointer"
       >
         {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
+          <option key={option}>{option}</option>
         ))}
       </select>
 
       <ChevronDown
         size={12}
-        className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
+        className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
       />
     </div>
   );
@@ -1113,11 +906,7 @@ function VerificationBadge({
   };
 
   return (
-    <span
-      className={`px-2 py-0.5 rounded text-[7px] whitespace-nowrap font-medium inline-block ${
-        styles[status] || styles.Pending
-      }`}
-    >
+    <span className={`px-2 py-1 rounded text-[7px] whitespace-nowrap ${styles[status]}`}>
       {status}
     </span>
   );
@@ -1139,11 +928,7 @@ function DonorStatus({
   };
 
   return (
-    <span
-      className={`px-2 py-0.5 rounded text-[7px] font-semibold whitespace-nowrap inline-block ${
-        styles[status] || styles.Inactive
-      }`}
-    >
+    <span className={`px-2 py-1 rounded text-[7px] font-semibold whitespace-nowrap ${styles[status]}`}>
       {status}
     </span>
   );
@@ -1162,7 +947,7 @@ function FormField({
 }) {
   return (
     <label className="block">
-      <span className="block text-[9px] font-medium mb-1.5 text-slate-700">
+      <span className="block text-[9px] font-medium mb-1.5">
         {label}
       </span>
       {children}
