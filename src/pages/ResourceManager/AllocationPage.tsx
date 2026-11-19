@@ -1,19 +1,20 @@
+import { useMemo, useState, useEffect, useCallback, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Package, Warehouse, ClipboardList, GitBranch, Truck,
+  ArrowLeftRight, ShoppingCart, BriefcaseBusiness,
+  AlertTriangle, ChartNoAxesCombined, Clock3, Settings,
+  Search, Bell, ShieldCheck, ChevronRight, Check,
+  X, Menu, Timer, RefreshCw, Plus, Download,
+  Wifi, WifiOff, Trash2, Eye, SlidersHorizontal, CheckCircle2
+} from "lucide-react";
 
-import { useMemo, useState } from "react";
-import type { FormEvent } from "react";
-
-type Allocation = {
-  id: string;
-  request: string;
-  resource: string;
-  quantity: string;
-  source: string;
-  destination: string;
-  approvedBy: string;
-  approvedAt: string;
-  status: "Partially Allocated" | "Allocated" | "Released" | "Completed" | "Pending";
-  warehouse: string;
-};
+import { allocationService } from "../../services/allocationService";
+import type {
+  Allocation,
+  AllocationStatus,
+  CreateAllocationPayload,
+} from "../../types/allocation";
 
 const initialAllocations: Allocation[] = [
   {
@@ -103,18 +104,18 @@ const initialAllocations: Allocation[] = [
 ];
 
 const navigation = [
-  { icon: "⬡", label: "Inventory" },
-  { icon: "⌂", label: "Warehouses" },
-  { icon: "▤", label: "Resource Requests", count: "18" },
-  { icon: "♧", label: "Allocations", count: "7" },
-  { icon: "▣", label: "Dispatch & Tracking", count: "12" },
-  { icon: "⇄", label: "Stock Transfers" },
-  { icon: "🛒", label: "Procurement" },
-  { icon: "♙", label: "Suppliers" },
-  { icon: "⚠", label: "Alerts", count: "9" },
-  { icon: "⌁", label: "Reports & Analytics" },
-  { icon: "◷", label: "Audit Log" },
-  { icon: "⚙", label: "Settings" },
+  { label: "Inventory", path: "/resource-manager/inventory", icon: Package },
+  { label: "Warehouses", path: "/resource-manager/warehouses", icon: Warehouse },
+  { label: "Resource Requests", path: "/resource-manager/requests", icon: ClipboardList, count: 18 },
+  { label: "Allocations", path: "/resource-manager/allocations", icon: GitBranch, count: 7 },
+  { label: "Dispatch & Tracking", path: "/resource-manager/dispatch", icon: Truck, count: 12 },
+  { label: "Stock Transfers", path: "/resource-manager/transfers", icon: ArrowLeftRight },
+  { label: "Procurement", path: "/resource-manager/procurement", icon: ShoppingCart },
+  { label: "Suppliers", path: "/resource-manager/suppliers", icon: BriefcaseBusiness },
+  { label: "Alerts", path: "/resource-manager/alerts", icon: AlertTriangle, count: 9 },
+  { label: "Reports & Analytics", path: "/resource-manager/reports", icon: ChartNoAxesCombined },
+  { label: "Audit Log", path: "/resource-manager/audit-log", icon: Clock3 },
+  { label: "Settings", path: "/resource-manager/settings", icon: Settings },
 ];
 
 const tabs = [
@@ -126,16 +127,17 @@ const tabs = [
 ];
 
 const statusStyles: Record<string, string> = {
-  "Partially Allocated": "bg-sky-50 text-sky-700",
-  Allocated: "bg-blue-50 text-blue-700",
-  Released: "bg-slate-100 text-slate-700",
-  Completed: "bg-emerald-50 text-emerald-700",
-  Pending: "bg-amber-50 text-amber-700",
+  "Partially Allocated": "bg-sky-50 text-sky-700 border border-sky-200",
+  Allocated: "bg-blue-50 text-blue-700 border border-blue-200",
+  Released: "bg-slate-100 text-slate-700 border border-slate-200",
+  Completed: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  Pending: "bg-amber-50 text-amber-700 border border-amber-200",
 };
 
 export default function AllocationPage() {
-  const [allocations, setAllocations] = useState(initialAllocations);
+  const navigate = useNavigate();
 
+  const [allocations, setAllocations] = useState<Allocation[]>(initialAllocations);
   const [activeTab, setActiveTab] = useState("All");
   const [search, setSearch] = useState("");
   const [warehouse, setWarehouse] = useState("All warehouses");
@@ -144,10 +146,14 @@ export default function AllocationPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedAllocation, setSelectedAllocation] =
-    useState<Allocation | null>(null);
+  const [selectedAllocation, setSelectedAllocation] = useState<Allocation | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [newAllocation, setNewAllocation] = useState({
+  const [isBackendConnected, setIsBackendConnected] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+
+  const [newAllocation, setNewAllocation] = useState<CreateAllocationPayload>({
     request: "",
     resource: "",
     quantity: "",
@@ -156,6 +162,27 @@ export default function AllocationPage() {
   });
 
   const pageSize = 4;
+
+  // FETCH ALLOCATIONS FROM BACKEND
+  const loadAllocations = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await allocationService.getAllocations();
+      if (data && Array.isArray(data) && data.length > 0) {
+        setAllocations(data);
+      }
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("CareLink API not reachable, using local allocations:", err);
+      setIsBackendConnected(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAllocations();
+  }, [loadAllocations]);
 
   // Search and filters
   const filteredAllocations = useMemo(() => {
@@ -167,7 +194,8 @@ export default function AllocationPage() {
 
       const warehouseMatch =
         warehouse === "All warehouses" ||
-        item.warehouse === warehouse;
+        item.warehouse === warehouse ||
+        item.source === warehouse;
 
       const destinationMatch =
         destination === "All destinations" ||
@@ -244,7 +272,7 @@ export default function AllocationPage() {
   };
 
   // Create allocation
-  const handleCreateAllocation = (
+  const handleCreateAllocation = async (
     event: FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
@@ -258,20 +286,29 @@ export default function AllocationPage() {
       return;
     }
 
-    const allocation: Allocation = {
-      id: `AL-${String(Date.now()).slice(-4)}`,
-      request: newAllocation.request,
-      resource: newAllocation.resource,
-      quantity: newAllocation.quantity,
-      source: newAllocation.source,
-      destination: newAllocation.destination,
-      approvedBy: "Pending Approval",
-      approvedAt: "Just now",
-      status: "Pending",
-      warehouse: newAllocation.source,
-    };
-
-    setAllocations((previous) => [allocation, ...previous]);
+    try {
+      const created = await allocationService.createAllocation({
+        ...newAllocation,
+        approvedBy: "Daniel Perera"
+      });
+      setAllocations((previous) => [created, ...previous]);
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("Backend error, adding locally:", err);
+      const fallbackItem: Allocation = {
+        id: `AL-${String(Date.now()).slice(-4)}`,
+        request: newAllocation.request.trim(),
+        resource: newAllocation.resource.trim(),
+        quantity: newAllocation.quantity.trim(),
+        source: newAllocation.source,
+        destination: newAllocation.destination.trim(),
+        approvedBy: "Pending Approval",
+        approvedAt: "Just now",
+        status: "Pending",
+        warehouse: newAllocation.source,
+      };
+      setAllocations((previous) => [fallbackItem, ...previous]);
+    }
 
     setNewAllocation({
       request: "",
@@ -283,6 +320,68 @@ export default function AllocationPage() {
 
     setShowCreateModal(false);
     resetFilters();
+  };
+
+  // Update status (Approve/Allocate, Release, Complete, etc.)
+  const handleStatusChange = async (id: string, newStatus: AllocationStatus) => {
+    setActionInProgress(id);
+    try {
+      await allocationService.updateAllocationStatus(id, {
+        status: newStatus,
+        approvedBy: "Daniel Perera"
+      });
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("Backend error, updating locally:", err);
+    } finally {
+      setActionInProgress(null);
+    }
+
+    setAllocations(prev =>
+      prev.map(item =>
+        item.id === id
+          ? {
+              ...item,
+              status: newStatus,
+              approvedBy: "Daniel Perera",
+              approvedAt: "Just now"
+            }
+          : item
+      )
+    );
+
+    if (selectedAllocation && selectedAllocation.id === id) {
+      setSelectedAllocation(prev =>
+        prev
+          ? {
+              ...prev,
+              status: newStatus,
+              approvedBy: "Daniel Perera",
+              approvedAt: "Just now"
+            }
+          : null
+      );
+    }
+  };
+
+  // Delete allocation
+  const handleDeleteAllocation = async (id: string) => {
+    if (!window.confirm(`Are you sure you want to cancel allocation ${id}?`)) {
+      return;
+    }
+
+    setActionInProgress(id);
+    try {
+      await allocationService.deleteAllocation(id);
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("Backend error, deleting locally:", err);
+    } finally {
+      setActionInProgress(null);
+    }
+
+    setAllocations(prev => prev.filter(item => item.id !== id));
+    setSelectedAllocation(null);
   };
 
   // Export CSV
@@ -337,16 +436,20 @@ export default function AllocationPage() {
     <div className="min-h-screen bg-[#eef4f7] text-slate-800">
 
       {/* SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[280px] flex-col bg-[#123e60] text-white lg:flex">
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col bg-[#123e60] text-white transition-transform lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
 
         {/* Logo */}
-        <div className="flex h-[70px] items-center gap-3 border-b border-white/10 px-6">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#58b8a5] text-2xl text-[#123e60]">
-            ◈
+        <div className="flex h-[74px] items-center gap-3 border-b border-white/10 px-6">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#58b8a5] text-[#123e60]">
+            <GitBranch size={22} />
           </div>
 
           <div>
-            <h1 className="text-lg font-bold">ReliefOS</h1>
+            <h1 className="text-xl font-bold">ReliefOS</h1>
             <p className="text-[10px] text-sky-200">
               Resource Management
             </p>
@@ -376,16 +479,16 @@ export default function AllocationPage() {
           </p>
 
           {navigation.map((item) => {
+            const Icon = item.icon;
             const selected = item.label === "Allocations";
 
             return (
               <button
                 key={item.label}
                 onClick={() => {
-                  if (!selected) {
-                    window.alert(
-                      `${item.label} page is not connected yet.`
-                    );
+                  if (selected) return;
+                  if (item.path) {
+                    navigate(item.path);
                   }
                 }}
                 className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
@@ -394,13 +497,11 @@ export default function AllocationPage() {
                     : "text-sky-100 hover:bg-white/10"
                 }`}
               >
-                <span className="w-4 text-center text-lg">
-                  {item.icon}
-                </span>
+                <Icon size={17} />
 
                 <span className="flex-1">{item.label}</span>
 
-                {item.count && (
+                {"count" in item && item.count && (
                   <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold">
                     {item.count}
                   </span>
@@ -423,53 +524,112 @@ export default function AllocationPage() {
             </p>
           </div>
 
-          <span>›</span>
+          <ChevronRight size={18} />
         </div>
       </aside>
+
+      {sidebarOpen && (
+        <button
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-label="Close navigation"
+        />
+      )}
 
       {/* MAIN CONTENT */}
       <main className="min-h-screen lg:ml-[280px]">
 
         {/* HEADER */}
-        <header className="sticky top-0 z-20 flex h-[70px] items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-7">
+        <header className="sticky top-0 z-20 flex h-[74px] items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 sm:px-7">
+
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden text-slate-700"
+            aria-label="Open navigation"
+          >
+            <Menu size={22} />
+          </button>
 
           <div className="flex w-full max-w-[470px] items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
-            <span className="text-xl text-slate-400">⌕</span>
+            <Search size={16} className="text-slate-400" />
 
             <input
-              placeholder="Search resources, requests, dispatches..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search allocations, requests, resources..."
               className="w-full bg-transparent text-xs outline-none"
             />
 
-            <span className="rounded border bg-white px-2 py-1 text-[9px] text-slate-400">
-              ⌘ K
-            </span>
+            {search ? (
+              <button onClick={() => setSearch("")}>
+                <X size={15} className="text-slate-400" />
+              </button>
+            ) : (
+              <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+                ⌘ K
+              </span>
+            )}
           </div>
 
-          <div className="ml-4 flex shrink-0 items-center gap-3 sm:gap-5">
+          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
 
-            <div className="hidden text-right md:block">
+            {/* BACKEND API STATUS BADGE */}
+            <div className="hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 text-[10px]">
+              {isBackendConnected ? (
+                <>
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-emerald-700 font-medium flex items-center gap-1">
+                    <Wifi size={12} /> Backend API Online
+                  </span>
+                </>
+              ) : isBackendConnected === false ? (
+                <>
+                  <span className="h-2 w-2 rounded-full bg-amber-500" />
+                  <span className="text-amber-700 font-medium flex items-center gap-1">
+                    <WifiOff size={12} /> Local Fallback Mode
+                  </span>
+                </>
+              ) : (
+                <span className="text-slate-400">Connecting...</span>
+              )}
+            </div>
+
+            <div className="hidden border-r border-slate-200 pr-4 text-right md:block">
               <p className="text-[9px] uppercase text-slate-400">
                 Primary Hub
               </p>
-              <p className="text-[10px] font-bold">
+              <p className="text-[10px] font-bold text-slate-800">
                 Central Logistics Hub
               </p>
             </div>
 
-            <button className="hidden rounded-lg border p-2.5 text-slate-600 sm:block">
-              ♢
+            <button
+              onClick={loadAllocations}
+              title="Refresh allocations from backend"
+              className="rounded-lg border p-2.5 text-slate-600 hover:bg-slate-50 transition"
+            >
+              <RefreshCw size={17} className={isLoading ? "animate-spin text-sky-700" : ""} />
             </button>
 
-            <button className="relative rounded-lg border p-2.5 text-slate-600">
-              ♧
+            <button className="hidden rounded-lg border p-2.5 text-slate-600 sm:block">
+              <ShieldCheck size={18} />
+            </button>
+
+            <button
+              onClick={() => navigate("/resource-manager/alerts")}
+              className="relative rounded-lg border p-2.5 text-slate-600"
+            >
+              <Bell size={18} />
               <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
                 9
               </span>
             </button>
 
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-700 text-xs font-bold text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#287ba5] text-xs font-bold text-white">
                 DP
               </div>
 
@@ -480,10 +640,6 @@ export default function AllocationPage() {
                 </p>
               </div>
             </div>
-
-            <span className="hidden text-xl text-slate-500 sm:block">
-              ›
-            </span>
           </div>
         </header>
 
@@ -493,9 +649,9 @@ export default function AllocationPage() {
           <section className="flex flex-wrap items-end justify-between gap-4">
 
             <div>
-              <p className="mb-6 text-[10px] text-slate-400">
+              <p className="mb-2 flex items-center gap-1 text-[10px] text-slate-400">
                 Resource Operations
-                <span className="mx-2">›</span>
+                <ChevronRight size={12} />
                 <span className="font-bold text-slate-700">
                   Allocations
                 </span>
@@ -505,24 +661,26 @@ export default function AllocationPage() {
                 Allocations
               </h2>
 
-              <p className="mt-2 text-xs text-slate-500">
-                Reserve and release verified stock against approved operational requests.
+              <p className="mt-1 text-xs text-slate-500">
+                Reserve, track, and release verified stock against approved operational requests in real time.
               </p>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={handleExport}
-                className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
               >
-                ↓ Export
+                <Download size={14} />
+                Export
               </button>
 
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="rounded-lg bg-[#267da5] px-4 py-3 text-xs font-semibold text-white hover:bg-[#17658b]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#267da5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#17658b] transition shadow-sm"
               >
-                + Create Allocation
+                <Plus size={15} />
+                Create Allocation
               </button>
             </div>
           </section>
@@ -535,56 +693,59 @@ export default function AllocationPage() {
                 title: "Active records",
                 value: activeCount,
                 note: "Across current operation",
-                icon: "⬡",
+                icon: GitBranch,
                 style: "bg-sky-50 text-sky-700",
               },
               {
                 title: "Awaiting action",
                 value: awaitingCount,
                 note: "Assigned to your team",
-                icon: "◷",
+                icon: Clock3,
                 style: "bg-amber-50 text-amber-600",
               },
               {
-                title: "Completed today",
+                title: "Completed",
                 value: completedCount,
                 note: "All audit recorded",
-                icon: "✓",
+                icon: CheckCircle2,
                 style: "bg-emerald-50 text-emerald-600",
               },
               {
                 title: "Exceptions",
                 value: exceptionCount,
-                note: "Require review",
-                icon: "⚠",
+                note: "Partially allocated",
+                icon: AlertTriangle,
                 style: "bg-red-50 text-red-600",
               },
-            ].map((card) => (
-              <div
-                key={card.title}
-                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-              >
+            ].map((card) => {
+              const Icon = card.icon;
+              return (
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl text-xl ${card.style}`}
+                  key={card.title}
+                  className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
                 >
-                  {card.icon}
+                  <div
+                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${card.style}`}
+                  >
+                    <Icon size={20} />
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] text-slate-400">
+                      {card.title}
+                    </p>
+
+                    <h3 className="text-2xl font-bold text-slate-800">
+                      {card.value}
+                    </h3>
+
+                    <p className="text-[9px] text-slate-400">
+                      {card.note}
+                    </p>
+                  </div>
                 </div>
-
-                <div>
-                  <p className="text-[9px] text-slate-400">
-                    {card.title}
-                  </p>
-
-                  <h3 className="text-2xl font-bold text-slate-800">
-                    {card.value}
-                  </h3>
-
-                  <p className="text-[9px] text-slate-400">
-                    {card.note}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </section>
 
           {/* TABS */}
@@ -598,7 +759,7 @@ export default function AllocationPage() {
                     setActiveTab(tab);
                     setCurrentPage(1);
                   }}
-                  className={`relative flex items-center gap-1.5 pb-4 text-[10px] ${
+                  className={`relative flex items-center gap-1.5 pb-4 text-[11px] transition ${
                     activeTab === tab
                       ? "font-bold text-sky-700"
                       : "text-slate-500 hover:text-sky-700"
@@ -607,14 +768,14 @@ export default function AllocationPage() {
                   {tab}
 
                   {tab === "All" && (
-                    <span className="rounded-full bg-sky-100 px-1.5 py-0.5 text-[8px] text-sky-700">
-                      48
+                    <span className="rounded-full bg-sky-100 px-1.5 py-0.5 text-[8px] font-bold text-sky-700">
+                      {allocations.length}
                     </span>
                   )}
 
                   {tab === "Needs action" && (
-                    <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[8px]">
-                      7
+                    <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[8px] font-bold text-amber-700">
+                      {awaitingCount}
                     </span>
                   )}
 
@@ -627,10 +788,10 @@ export default function AllocationPage() {
           </section>
 
           {/* SEARCH AND FILTERS */}
-          <section className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(180px,1fr)_repeat(3,minmax(130px,auto))_auto]">
+          <section className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(200px,1fr)_repeat(3,minmax(140px,auto))_auto]">
 
             <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5">
-              <span className="text-xl text-slate-400">⌕</span>
+              <Search size={16} className="text-slate-400" />
 
               <input
                 value={search}
@@ -649,7 +810,7 @@ export default function AllocationPage() {
                 setWarehouse(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[10px] outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none"
             >
               <option>All warehouses</option>
               {["Central Hub", "West Depot", "Eastbank", "North Hub"].map((v) => (
@@ -663,7 +824,7 @@ export default function AllocationPage() {
                 setDestination(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[10px] outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none"
             >
               <option>All destinations</option>
               {[...new Set(allocations.map((a) => a.destination))].map((v) => (
@@ -677,7 +838,7 @@ export default function AllocationPage() {
                 setStatus(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[10px] outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none"
             >
               <option>All allocation states</option>
               {[
@@ -693,9 +854,10 @@ export default function AllocationPage() {
 
             <button
               onClick={resetFilters}
-              className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
             >
-              ⚑ More filters
+              <SlidersHorizontal size={14} />
+              Reset filters
             </button>
           </section>
 
@@ -705,7 +867,7 @@ export default function AllocationPage() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1050px] text-left">
 
-                <thead className="bg-slate-50 text-[9px] text-slate-500">
+                <thead className="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-wider">
                   <tr>
                     {[
                       "Allocation",
@@ -717,11 +879,11 @@ export default function AllocationPage() {
                       "Approved By",
                       "Approved At",
                       "Status",
-                      "",
+                      "Actions",
                     ].map((heading, index) => (
                       <th
                         key={index}
-                        className="px-3 py-4 font-semibold"
+                        className="px-4 py-3.5 font-semibold"
                       >
                         {heading}
                       </th>
@@ -729,60 +891,63 @@ export default function AllocationPage() {
                   </tr>
                 </thead>
 
-                <tbody>
+                <tbody className="divide-y divide-slate-100">
                   {displayedAllocations.map((item) => (
                     <tr
                       key={item.id}
-                      className="border-t border-slate-100 text-[10px] transition hover:bg-slate-50"
+                      className="text-xs transition hover:bg-slate-50/70"
                     >
-                      <td className="px-3 py-4 font-bold text-slate-800">
+                      <td className="px-4 py-3.5 font-bold text-slate-800">
                         {item.id}
                       </td>
 
-                      <td className="px-3 py-4 text-slate-600">
+                      <td className="px-4 py-3.5 font-medium text-slate-600">
                         {item.request}
                       </td>
 
-                      <td className="px-3 py-4 text-slate-600">
+                      <td className="px-4 py-3.5 text-slate-700 font-medium">
                         {item.resource}
                       </td>
 
-                      <td className="px-3 py-4 text-slate-600">
+                      <td className="px-4 py-3.5 text-slate-600">
                         {item.quantity}
                       </td>
 
-                      <td className="px-3 py-4 text-slate-600">
+                      <td className="px-4 py-3.5 text-slate-600">
                         {item.source}
                       </td>
 
-                      <td className="px-3 py-4 text-slate-600">
+                      <td className="px-4 py-3.5 text-slate-600">
                         {item.destination}
                       </td>
 
-                      <td className="px-3 py-4 text-slate-600">
+                      <td className="px-4 py-3.5 text-slate-600">
                         {item.approvedBy}
                       </td>
 
-                      <td className="px-3 py-4 whitespace-nowrap text-slate-600">
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 text-[11px]">
                         {item.approvedAt}
                       </td>
 
-                      <td className="px-3 py-4">
+                      <td className="px-4 py-3.5">
                         <span
-                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[9px] font-semibold ${statusStyles[item.status]}`}
+                          className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[10px] font-semibold ${statusStyles[item.status]}`}
                         >
                           {item.status}
                         </span>
                       </td>
 
-                      <td className="px-3 py-4">
-                        <button
-                          title="View allocation details"
-                          onClick={() => setSelectedAllocation(item)}
-                          className="text-xl text-slate-500 hover:text-sky-700"
-                        >
-                          ›
-                        </button>
+                      <td className="px-4 py-3.5">
+                        <div className="flex items-center gap-2">
+                          <button
+                            title="View allocation details"
+                            onClick={() => setSelectedAllocation(item)}
+                            className="flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-[11px] font-medium text-sky-700 hover:bg-sky-50 transition"
+                          >
+                            <Eye size={13} />
+                            Details
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -791,15 +956,17 @@ export default function AllocationPage() {
             </div>
 
             {displayedAllocations.length === 0 && (
-              <div className="p-10 text-center text-xs text-slate-400">
-                No allocations found. Try changing your filters.
+              <div className="p-12 text-center text-xs text-slate-400">
+                <GitBranch size={36} className="mx-auto text-slate-300 mb-2" />
+                <p className="font-semibold text-slate-600 text-sm">No allocations found</p>
+                <p className="mt-1">Try clearing or adjusting your search filters.</p>
               </div>
             )}
 
             {/* PAGINATION */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">
 
-              <p className="text-[10px] text-slate-400">
+              <p className="text-[11px] text-slate-500">
                 Showing{" "}
                 {filteredAllocations.length === 0
                   ? 0
@@ -819,7 +986,7 @@ export default function AllocationPage() {
                   onClick={() =>
                     setCurrentPage((p) => Math.max(1, p - 1))
                   }
-                  className="rounded-lg border px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+                  className="rounded-lg border px-3 py-1.5 text-xs text-slate-600 disabled:opacity-40 hover:bg-slate-50"
                 >
                   Previous
                 </button>
@@ -831,10 +998,10 @@ export default function AllocationPage() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`h-8 min-w-8 rounded-lg border px-2 text-[10px] ${
+                    className={`h-7 min-w-7 rounded-lg border px-2 text-xs ${
                       safePage === page
                         ? "border-sky-700 bg-sky-700 font-bold text-white"
-                        : "border-slate-200 bg-white text-slate-600"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                     }`}
                   >
                     {page}
@@ -846,7 +1013,7 @@ export default function AllocationPage() {
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
                   }
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-[10px] text-slate-600 disabled:opacity-40"
+                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-600 disabled:opacity-40 hover:bg-slate-50"
                 >
                   Next
                 </button>
@@ -855,7 +1022,7 @@ export default function AllocationPage() {
           </section>
 
           <footer className="py-2 text-center text-[10px] text-slate-400">
-            ReliefOS · Humanitarian Resource Management Platform
+            ReliefOS · Humanitarian Resource Management Platform · Connected to CareLink API
           </footer>
 
         </div>
@@ -869,27 +1036,27 @@ export default function AllocationPage() {
             onSubmit={handleCreateAllocation}
             className="w-full max-w-md space-y-4 rounded-2xl bg-white p-6 shadow-xl"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <h3 className="text-lg font-bold">
+                <h3 className="text-lg font-bold text-slate-800">
                   Create Allocation
                 </h3>
-                <p className="mt-1 text-xs text-slate-500">
-                  Enter allocation information below.
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Allocate inventory against an approved resource request.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="text-2xl text-slate-400"
+                className="text-slate-400 hover:text-slate-600"
               >
-                ×
+                <X size={20} />
               </button>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium">
+              <label className="mb-1 block text-xs font-semibold text-slate-700">
                 Request ID
               </label>
               <input
@@ -902,13 +1069,13 @@ export default function AllocationPage() {
                   })
                 }
                 placeholder="Example: RR-2841"
-                className="w-full rounded-lg border p-3 text-sm outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium">
-                Resource
+              <label className="mb-1 block text-xs font-semibold text-slate-700">
+                Resource Name
               </label>
               <input
                 required
@@ -919,13 +1086,13 @@ export default function AllocationPage() {
                     resource: e.target.value,
                   })
                 }
-                placeholder="Enter resource name"
-                className="w-full rounded-lg border p-3 text-sm outline-none focus:border-sky-500"
+                placeholder="e.g. Trauma Medical Kit, Drinking Water"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium">
+              <label className="mb-1 block text-xs font-semibold text-slate-700">
                 Quantity
               </label>
               <input
@@ -937,62 +1104,64 @@ export default function AllocationPage() {
                     quantity: e.target.value,
                   })
                 }
-                placeholder="Example: 100 units"
-                className="w-full rounded-lg border p-3 text-sm outline-none focus:border-sky-500"
+                placeholder="Example: 500 units / 1,200 L"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
               />
             </div>
 
-            <div>
-              <label className="mb-1 block text-xs font-medium">
-                Source Warehouse
-              </label>
-              <select
-                value={newAllocation.source}
-                onChange={(e) =>
-                  setNewAllocation({
-                    ...newAllocation,
-                    source: e.target.value,
-                  })
-                }
-                className="w-full rounded-lg border p-3 text-sm"
-              >
-                <option>Central Hub</option>
-                <option>West Depot</option>
-                <option>Eastbank</option>
-                <option>North Hub</option>
-              </select>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  Source Warehouse
+                </label>
+                <select
+                  value={newAllocation.source}
+                  onChange={(e) =>
+                    setNewAllocation({
+                      ...newAllocation,
+                      source: e.target.value,
+                    })
+                  }
+                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs bg-white"
+                >
+                  <option>Central Hub</option>
+                  <option>West Depot</option>
+                  <option>Eastbank</option>
+                  <option>North Hub</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  Destination Unit
+                </label>
+                <input
+                  required
+                  value={newAllocation.destination}
+                  onChange={(e) =>
+                    setNewAllocation({
+                      ...newAllocation,
+                      destination: e.target.value,
+                    })
+                  }
+                  placeholder="e.g. Medical Team 3"
+                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="mb-1 block text-xs font-medium">
-                Destination
-              </label>
-              <input
-                required
-                value={newAllocation.destination}
-                onChange={(e) =>
-                  setNewAllocation({
-                    ...newAllocation,
-                    destination: e.target.value,
-                  })
-                }
-                placeholder="Enter destination"
-                className="w-full rounded-lg border p-3 text-sm outline-none focus:border-sky-500"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex justify-end gap-2 pt-2 border-t">
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border px-4 py-2.5 text-xs font-semibold"
+                className="rounded-lg border px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="rounded-lg bg-sky-700 px-4 py-2.5 text-xs font-semibold text-white hover:bg-sky-800"
+                className="rounded-lg bg-sky-700 px-4 py-2 text-xs font-semibold text-white hover:bg-sky-800 transition"
               >
                 Create Allocation
               </button>
@@ -1005,51 +1174,119 @@ export default function AllocationPage() {
       {selectedAllocation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
 
-          <div className="w-full max-w-md space-y-4 rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg space-y-4 rounded-2xl bg-white p-6 shadow-xl">
 
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold">
-                Allocation Details
-              </h3>
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-slate-800">
+                    {selectedAllocation.id}
+                  </h3>
+                  <span
+                    className={`rounded-md px-2 py-0.5 text-[10px] font-semibold ${statusStyles[selectedAllocation.status]}`}
+                  >
+                    {selectedAllocation.status}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400">
+                  Request Ref: {selectedAllocation.request}
+                </p>
+              </div>
 
               <button
                 onClick={() => setSelectedAllocation(null)}
-                className="text-2xl text-slate-400"
+                className="text-slate-400 hover:text-slate-600"
               >
-                ×
+                <X size={20} />
               </button>
             </div>
 
-            {[
-              ["Allocation ID", selectedAllocation.id],
-              ["Request ID", selectedAllocation.request],
-              ["Resource", selectedAllocation.resource],
-              ["Quantity", selectedAllocation.quantity],
-              ["Source", selectedAllocation.source],
-              ["Destination", selectedAllocation.destination],
-              ["Approved By", selectedAllocation.approvedBy],
-              ["Approved At", selectedAllocation.approvedAt],
-              ["Status", selectedAllocation.status],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                className="rounded-lg bg-slate-50 p-3"
-              >
-                <p className="text-[10px] text-slate-400">
-                  {label}
-                </p>
-                <p className="mt-1 text-sm font-semibold">
-                  {value}
-                </p>
-              </div>
-            ))}
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                ["Resource", selectedAllocation.resource],
+                ["Quantity", selectedAllocation.quantity],
+                ["Source Warehouse", selectedAllocation.source],
+                ["Destination", selectedAllocation.destination],
+                ["Approved By", selectedAllocation.approvedBy],
+                ["Approved At", selectedAllocation.approvedAt],
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="rounded-lg bg-slate-50 p-3"
+                >
+                  <p className="text-[10px] text-slate-400 uppercase tracking-wide">
+                    {label}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold text-slate-700">
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
 
-            <button
-              onClick={() => setSelectedAllocation(null)}
-              className="w-full rounded-lg bg-sky-700 py-3 text-xs font-semibold text-white hover:bg-sky-800"
-            >
-              Close
-            </button>
+            {/* STATUS TRANSITION BUTTONS */}
+            <div className="border-t pt-3">
+              <p className="text-[11px] font-semibold text-slate-700 mb-2">Update Allocation Status</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedAllocation.status !== "Allocated" && (
+                  <button
+                    disabled={actionInProgress === selectedAllocation.id}
+                    onClick={() => handleStatusChange(selectedAllocation.id, "Allocated")}
+                    className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition"
+                  >
+                    Set Allocated
+                  </button>
+                )}
+
+                {selectedAllocation.status !== "Released" && (
+                  <button
+                    disabled={actionInProgress === selectedAllocation.id}
+                    onClick={() => handleStatusChange(selectedAllocation.id, "Released")}
+                    className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+                  >
+                    Release Stock
+                  </button>
+                )}
+
+                {selectedAllocation.status !== "Completed" && (
+                  <button
+                    disabled={actionInProgress === selectedAllocation.id}
+                    onClick={() => handleStatusChange(selectedAllocation.id, "Completed")}
+                    className="rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition"
+                  >
+                    Mark Completed
+                  </button>
+                )}
+
+                {selectedAllocation.status !== "Partially Allocated" && (
+                  <button
+                    disabled={actionInProgress === selectedAllocation.id}
+                    onClick={() => handleStatusChange(selectedAllocation.id, "Partially Allocated")}
+                    className="rounded-lg border border-sky-300 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 hover:bg-sky-100 transition"
+                  >
+                    Partial Allocation
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border-t pt-3">
+              <button
+                disabled={actionInProgress === selectedAllocation.id}
+                onClick={() => handleDeleteAllocation(selectedAllocation.id)}
+                className="flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition"
+              >
+                <Trash2 size={13} />
+                Cancel Allocation
+              </button>
+
+              <button
+                onClick={() => setSelectedAllocation(null)}
+                className="rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-900 transition"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
