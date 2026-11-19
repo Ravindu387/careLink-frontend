@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Heart,
   Check,
@@ -13,10 +12,7 @@ import {
   HandHeart,
   Eye,
   EyeOff,
-  AlertCircle,
-  Loader2,
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
 
 // Background image slider
 const backgroundImages = [
@@ -34,11 +30,6 @@ type AccountType =
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [currentImage, setCurrentImage] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const { register } = useAuth();
-  const navigate = useNavigate();
 
   // Automatically change background image every 4 seconds
   useEffect(() => {
@@ -112,37 +103,35 @@ export default function RegisterPage() {
     }));
   };
 
-  const handleContinue = async () => {
-    setError(null);
-
+  const handleContinue = () => {
     if (step === 2) {
       if (
-        !formData.firstName.trim() ||
-        !formData.lastName.trim() ||
-        !formData.email.trim() ||
-        !formData.phone.trim() ||
+        !formData.firstName ||
+        !formData.lastName ||
+        !formData.email ||
+        !formData.phone ||
         !formData.password ||
         !formData.confirmPassword
       ) {
-        setError("Please complete all required fields.");
+        alert("Please complete all required fields.");
         return;
       }
 
       if (formData.password !== formData.confirmPassword) {
-        setError("Passwords do not match.");
+        alert("Passwords do not match.");
         return;
       }
 
-      if (formData.password.length < 6) {
-        setError("Password must contain at least 6 characters.");
+      if (formData.password.length < 8) {
+        alert("Password must contain at least 8 characters.");
         return;
       }
 
       if (
         accountType === "organisation" &&
-        !formData.organisationName.trim()
+        !formData.organisationName
       ) {
-        setError("Please enter your organisation name.");
+        alert("Please enter your organisation name.");
         return;
       }
     }
@@ -150,44 +139,10 @@ export default function RegisterPage() {
     if (step < 3) {
       setStep((previous) => previous + 1);
     } else {
-      // Step 3 submission: Call backend API
-      setIsLoading(true);
-      setError(null);
-
-      const roleMap: Record<AccountType, string> = {
-        citizen: "Citizen",
-        volunteer: "VolunteerCoordinator",
-        organisation: "PartnerOfficer",
-        donor: "Donor",
-      };
-
-      try {
-        const authData = await register({
-          fullName: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
-          email: formData.email.trim(),
-          password: formData.password,
-          phoneNumber: formData.phone.trim(),
-          address: formData.address.trim() || undefined,
-          role: roleMap[accountType] || "Citizen",
-        });
-
-        const userRoles = authData.user.roles || [];
-        if (
-          userRoles.includes("SystemAdmin") ||
-          userRoles.includes("EmergencyCoordinator") ||
-          userRoles.includes("IncidentManager") ||
-          userRoles.includes("VolunteerCoordinator") ||
-          userRoles.includes("PartnerOfficer")
-        ) {
-          navigate("/admin/dashboard", { replace: true });
-        } else {
-          navigate("/", { replace: true });
-        }
-      } catch (err: any) {
-        setError(err.message || "Registration failed. Please check your information.");
-      } finally {
-        setIsLoading(false);
-      }
+      alert(
+        "Registration completed successfully! Redirecting to sign in."
+      );
+      window.location.href = "/login";
     }
   };
 
@@ -343,14 +298,6 @@ export default function RegisterPage() {
               ))}
             </div>
           </div>
-
-          {/* Error Banner */}
-          {error && (
-            <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-              <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-600" />
-              <span>{error}</span>
-            </div>
-          )}
 
           {/* STEP 1 */}
           {step === 1 && (
@@ -708,20 +655,11 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={handleContinue}
-              disabled={isLoading}
-              className="flex items-center gap-2 rounded-lg bg-[#123B5C] px-5 py-2.5 text-xs font-semibold text-white shadow-md transition hover:bg-[#1D5F8A] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 rounded-lg bg-[#123B5C] px-5 py-2.5 text-xs font-semibold text-white shadow-md transition hover:bg-[#1D5F8A] active:scale-[0.98]"
             >
-              {isLoading && step === 3 ? (
-                <>
-                  <Loader2 size={14} className="animate-spin" />
-                  <span>Creating Account...</span>
-                </>
-              ) : (
-                <>
-                  <span>{step === 3 ? "Create Account" : "Continue"}</span>
-                  <ArrowRight size={14} />
-                </>
-              )}
+              {step === 3 ? "Create Account" : "Continue"}
+
+              <ArrowRight size={14} />
             </button>
           </div>
 

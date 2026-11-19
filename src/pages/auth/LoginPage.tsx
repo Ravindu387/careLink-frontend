@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Heart,
   ArrowLeft,
@@ -7,10 +7,7 @@ import {
   ShieldCheck,
   Eye,
   EyeOff,
-  AlertCircle,
-  Loader2,
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
 
 // Background image slider
 const backgroundImages = [
@@ -24,14 +21,8 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [currentImage, setCurrentImage] = useState(0);
-
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   // Automatically change background image every 4 seconds
   useEffect(() => {
@@ -44,40 +35,11 @@ export default function LoginPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      const authData = await login({ email, password });
-      const userRoles = authData.user.roles || [];
-
-      // Redirect based on role or original intended location
-      const from = (location.state as any)?.from?.pathname;
-      if (from) {
-        navigate(from, { replace: true });
-        return;
-      }
-
-      if (
-        userRoles.includes("SystemAdmin") ||
-        userRoles.includes("EmergencyCoordinator") ||
-        userRoles.includes("IncidentManager") ||
-        userRoles.includes("LogisticsManager") ||
-        userRoles.includes("ShelterAdmin")
-      ) {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (userRoles.includes("VolunteerCoordinator")) {
-        navigate("/admin/dashboard", { replace: true });
-      } else {
-        navigate("/", { replace: true });
-      }
-    } catch (err: any) {
-      setError(err.message || "Invalid email or password.");
-    } finally {
-      setIsLoading(false);
-    }
+    navigate("/admin/dashboard");
   };
 
   return (
@@ -213,14 +175,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Error Banner */}
-          {error && (
-            <div className="mb-5 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-              <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-600" />
-              <span>{error}</span>
-            </div>
-          )}
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -306,17 +260,9 @@ export default function LoginPage() {
             {/* Sign In Button */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#123B5C] text-sm font-semibold text-white shadow-md transition hover:bg-[#1D5F8A] active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="mt-3 flex h-12 w-full items-center justify-center rounded-lg bg-[#123B5C] text-sm font-semibold text-white shadow-md transition hover:bg-[#1D5F8A] active:scale-[0.99]"
             >
-              {isLoading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Signing in...</span>
-                </>
-              ) : (
-                <span>Sign in</span>
-              )}
+              Sign in
             </button>
           </form>
 
