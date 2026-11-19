@@ -1,7 +1,10 @@
-import { useEffect, useState, useCallback } from "react";
+
+import { useMemo, useState } from "react";
 import {
   Search,
+  Globe,
   Bell,
+  CircleHelp,
   ChevronRight,
   AlertTriangle,
   Clock,
@@ -12,32 +15,154 @@ import {
   X,
   Settings,
   CheckCircle2,
-  Loader2,
-  AlertCircle,
-  RefreshCw,
+  SlidersHorizontal,
 } from "lucide-react";
-import { notificationService } from "../../services/notificationService";
-import type {
-  NotificationItem,
-  NotificationSummary,
-  NotificationPreference,
-  NotificationQueryParams,
-} from "../../types/notification";
+
+type NotificationCategory =
+  | "Flags"
+  | "Verification"
+  | "Campaigns"
+  | "Allocation"
+  | "Expenditure"
+  | "Reports";
+
+type NotificationItem = {
+  id: number;
+  title: string;
+  description: string;
+  time: string;
+  category: NotificationCategory;
+  icon: "alert" | "clock" | "check" | "file" | "campaign" | "shield";
+  unread: boolean;
+  reference: string;
+  details: string;
+};
+
+const initialNotifications: NotificationItem[] = [
+  {
+    id: 1,
+    title: "High-risk contribution flagged",
+    description: "DON-88398 · $18,420 requires investigation.",
+    time: "3 min ago",
+    category: "Flags",
+    icon: "alert",
+    unread: true,
+    reference: "DON-88398",
+    details:
+      "A contribution of $18,420 has been flagged due to an unusual source pattern. An authorised investigator should review the donor information and supporting documents.",
+  },
+  {
+    id: 2,
+    title: "16 donations awaiting verification",
+    description: "Combined value $82,400.",
+    time: "18 min ago",
+    category: "Verification",
+    icon: "clock",
+    unread: true,
+    reference: "VER-0016",
+    details:
+      "There are 16 donations awaiting verification with a combined value of $82,400. Review the submitted donor information and supporting documents.",
+  },
+  {
+    id: 3,
+    title: "Allocation approved",
+    description: "ALL-4408 · $180,000 shelter support.",
+    time: "34 min ago",
+    category: "Allocation",
+    icon: "check",
+    unread: true,
+    reference: "ALL-4408",
+    details:
+      "The allocation of $180,000 for emergency shelter support has been approved. The allocation is associated with the Flood Response 2025 campaign.",
+  },
+  {
+    id: 4,
+    title: "Expenditure receipt uploaded",
+    description: "EXP-9008 · Health Response Unit.",
+    time: "1 hr ago",
+    category: "Expenditure",
+    icon: "file",
+    unread: false,
+    reference: "EXP-9008",
+    details:
+      "A new expenditure receipt has been uploaded by the Health Response Unit. The receipt requires verification against the approved expenditure.",
+  },
+  {
+    id: 5,
+    title: "Campaign reached 75%",
+    description: "Clean Water Appeal · $318K raised.",
+    time: "2 hr ago",
+    category: "Campaigns",
+    icon: "campaign",
+    unread: false,
+    reference: "CAM-112",
+    details:
+      "The Clean Water Appeal campaign has reached 75% of its fundraising target, with $318K raised so far.",
+  },
+  {
+    id: 6,
+    title: "Transparency report approved",
+    description: "Weekly Funding Summary is ready to publish.",
+    time: "3 hr ago",
+    category: "Reports",
+    icon: "shield",
+    unread: false,
+    reference: "REP-204",
+    details:
+      "The Weekly Funding Summary has passed its review process and is ready for publication after authorised approval.",
+  },
+  {
+    id: 7,
+    title: "New donor registration",
+    description: "HealthAccess International · Verification submitted.",
+    time: "4 hr ago",
+    category: "Verification",
+    icon: "check",
+    unread: true,
+    reference: "DNR-2028",
+    details:
+      "HealthAccess International submitted a new donor registration. Review the organisation profile and verification documents.",
+  },
+  {
+    id: 8,
+    title: "Campaign deadline approaching",
+    description: "Emergency Shelter Fund · 3 days remaining.",
+    time: "5 hr ago",
+    category: "Campaigns",
+    icon: "campaign",
+    unread: true,
+    reference: "CAM-108",
+    details:
+      "The Emergency Shelter Fund campaign is approaching its closing date. Review the fundraising progress and prepare the final report.",
+  },
+];
 
 type TabName = "All" | "Unread" | "Flags" | "Verification" | "Campaigns";
 
-const ROLE = "FundingOfficer";
-const ROWS_PER_PAGE = 6;
+const tabs: {
+  label: TabName;
+  count?: number;
+}[] = [
+  { label: "All", count: 28 },
+  { label: "Unread", count: 9 },
+  { label: "Flags", count: 5 },
+  { label: "Verification" },
+  { label: "Campaigns" },
+];
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notifications, setNotifications] = useState(
+    initialNotifications
+  );
+
   const [activeTab, setActiveTab] = useState<TabName>("All");
+
   const [selectedNotification, setSelectedNotification] =
     useState<NotificationItem | null>(null);
+
   const [showPreferences, setShowPreferences] = useState(false);
 
-  const [preferences, setPreferences] = useState<NotificationPreference>({
-    role: ROLE,
+  const [preferences, setPreferences] = useState({
     inApp: true,
     email: true,
     sms: false,
@@ -47,255 +172,168 @@ export default function NotificationsPage() {
     reports: true,
   });
 
-  const [summary, setSummary] = useState<NotificationSummary>({
-    unreadCount: 0,
-    criticalCount: 0,
-    requestCount: 0,
-    inventoryCount: 0,
-    systemCount: 0,
-    flagsCount: 0,
-    verificationCount: 0,
-    campaignsCount: 0,
-    allocationCount: 0,
-    expenditureCount: 0,
-    reportsCount: 0,
-    totalCount: 0,
-  });
-
   const [page, setPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
+
   const [search, setSearch] = useState("");
+
   const [toast, setToast] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [savingPrefs, setSavingPrefs] = useState(false);
+
+  const rowsPerPage = 6;
 
   const notify = (message: string) => {
     setToast(message);
-    window.setTimeout(() => setToast(""), 3500);
+    window.setTimeout(() => setToast(""), 3000);
   };
 
-  // Fetch summary counts for tabs
-  const fetchSummary = useCallback(async () => {
-    try {
-      const data = await notificationService.getSummary(ROLE);
-      setSummary(data);
-    } catch (err) {
-      console.error("Failed to load notifications summary:", err);
-    }
-  }, []);
+  const unreadCount = notifications.filter(
+    (n) => n.unread
+  ).length;
 
-  // Fetch notification preferences
-  const fetchPreferences = useCallback(async () => {
-    try {
-      const prefs = await notificationService.getPreferences(ROLE);
-      setPreferences(prefs);
-    } catch (err) {
-      console.error("Failed to load preferences:", err);
-    }
-  }, []);
+  const filteredNotifications = useMemo(() => {
+    return notifications.filter((notification) => {
+      const matchesTab =
+        activeTab === "All" ||
+        (activeTab === "Unread" && notification.unread) ||
+        (activeTab === "Flags" &&
+          notification.category === "Flags") ||
+        (activeTab === "Verification" &&
+          notification.category === "Verification") ||
+        (activeTab === "Campaigns" &&
+          notification.category === "Campaigns");
 
-  // Fetch paginated notification list
-  const fetchNotifications = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params: NotificationQueryParams = {
-        role: ROLE,
-        page,
-        pageSize: ROWS_PER_PAGE,
-      };
+      const matchesSearch =
+        notification.title
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        notification.description
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        notification.reference
+          .toLowerCase()
+          .includes(search.toLowerCase());
 
-      if (activeTab === "Unread") {
-        params.unread = true;
-      } else if (activeTab !== "All") {
-        params.type = activeTab;
-      }
+      return matchesTab && matchesSearch;
+    });
+  }, [notifications, activeTab, search]);
 
-      if (search.trim()) {
-        params.search = search.trim();
-      }
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredNotifications.length / rowsPerPage)
+  );
 
-      const res = await notificationService.getNotifications(params);
-      setNotifications(res.items);
-      setTotalCount(res.totalCount);
-    } catch (err: unknown) {
-      console.error("Failed to load notifications:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to load notifications."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [activeTab, page, search]);
+  const displayedNotifications = filteredNotifications.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
 
-  useEffect(() => {
-    fetchSummary();
-    fetchPreferences();
-  }, [fetchSummary, fetchPreferences]);
+  const markAllAsRead = () => {
+    setNotifications((previous) =>
+      previous.map((notification) => ({
+        ...notification,
+        unread: false,
+      }))
+    );
 
-  useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / ROWS_PER_PAGE));
-
-  const markAllAsRead = async () => {
-    try {
-      await notificationService.markAllAsRead(ROLE);
-      setNotifications((prev) =>
-        prev.map((item) => ({ ...item, unread: false }))
-      );
-      notify("All notifications marked as read.");
-      fetchSummary();
-    } catch (err) {
-      console.error("Failed to mark all as read:", err);
-      notify("Failed to mark all as read.");
-    }
+    notify("All notifications marked as read.");
   };
 
-  const openNotification = async (notification: NotificationItem) => {
+  const openNotification = (notification: NotificationItem) => {
     setSelectedNotification(notification);
 
-    if (notification.unread) {
-      try {
-        await notificationService.markAsRead(notification.id);
-        setNotifications((prev) =>
-          prev.map((item) =>
-            item.id === notification.id ? { ...item, unread: false } : item
-          )
-        );
-        fetchSummary();
-      } catch (err) {
-        console.error("Failed to mark notification as read:", err);
-      }
-    }
+    setNotifications((previous) =>
+      previous.map((item) =>
+        item.id === notification.id
+          ? { ...item, unread: false }
+          : item
+      )
+    );
   };
 
-  const handleSavePreferences = async () => {
-    setSavingPrefs(true);
-    try {
-      const saved = await notificationService.savePreferences(preferences, ROLE);
-      setPreferences(saved);
-      setShowPreferences(false);
-      notify("Notification preferences saved successfully.");
-    } catch (err) {
-      console.error("Failed to save preferences:", err);
-      notify("Failed to save preferences. Please try again.");
-    } finally {
-      setSavingPrefs(false);
-    }
-  };
-
-  const tabs: { label: TabName; count?: number }[] = [
-    { label: "All", count: summary.totalCount },
-    { label: "Unread", count: summary.unreadCount },
-    { label: "Flags", count: summary.flagsCount },
-    { label: "Verification", count: summary.verificationCount },
-    { label: "Campaigns", count: summary.campaignsCount },
-  ];
-
-  const getIconConfig = (iconKey?: string) => {
-    switch (iconKey?.toLowerCase()) {
-      case "alert":
-      case "warning":
-        return { icon: AlertTriangle, style: "bg-[#fdebed] text-[#dc2626]" };
-      case "clock":
-      case "time":
-        return { icon: Clock, style: "bg-[#fff3dd] text-[#d28b18]" };
-      case "check":
-      case "success":
-        return { icon: Check, style: "bg-[#e5f6f0] text-[#159b79]" };
-      case "file":
-      case "document":
-        return { icon: FileText, style: "bg-[#e8f1f6] text-[#23749e]" };
-      case "campaign":
-      case "megaphone":
-        return { icon: Megaphone, style: "bg-[#e5f6f0] text-[#159b79]" };
-      case "shield":
-      case "security":
-        return { icon: ShieldCheck, style: "bg-[#e8f1f6] text-[#23749e]" };
-      default:
-        return { icon: Bell, style: "bg-[#e8f1f6] text-[#23749e]" };
-    }
+  const iconConfig = {
+    alert: {
+      icon: AlertTriangle,
+      style: "bg-[#fdebed] text-[#dc2626]",
+    },
+    clock: {
+      icon: Clock,
+      style: "bg-[#fff3dd] text-[#d28b18]",
+    },
+    check: {
+      icon: Check,
+      style: "bg-[#e5f6f0] text-[#159b79]",
+    },
+    file: {
+      icon: FileText,
+      style: "bg-[#e8f1f6] text-[#23749e]",
+    },
+    campaign: {
+      icon: Megaphone,
+      style: "bg-[#e5f6f0] text-[#159b79]",
+    },
+    shield: {
+      icon: ShieldCheck,
+      style: "bg-[#e8f1f6] text-[#23749e]",
+    },
   };
 
   return (
     <div className="min-h-screen bg-[#eef5f7] text-[#123e60]">
+
       {/* MAIN CONTENT */}
+
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 py-5">
+
         {/* BREADCRUMB */}
-        <div className="flex items-center gap-2 text-[11px] mb-6">
+
+        <div className="flex items-center gap-2 text-[9px] mb-8">
           <span className="text-slate-500">Operations</span>
-          <ChevronRight size={13} />
-          <span className="text-slate-500">Funding & Donations</span>
-          <ChevronRight size={13} />
-          <span className="font-semibold text-[#123e60]">Notifications</span>
+          <ChevronRight size={11} />
+          <span className="text-slate-500">
+            Funding & Donations
+          </span>
+          <ChevronRight size={11} />
+          <span className="font-semibold">
+            Notifications
+          </span>
         </div>
 
-        {/* PAGE TITLE & ACTIONS */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
+        {/* PAGE TITLE */}
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
+
           <div>
-            <h1 className="text-[28px] font-medium tracking-tight">Notifications</h1>
-            <p className="text-[13px] text-slate-500 mt-1">
+            <h1 className="text-[24px] font-medium">
+              Notifications
+            </h1>
+
+            <p className="text-[11px] text-slate-500 mt-1">
               Review funding alerts, verification updates, approvals, and reporting deadlines.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative">
-              <Search
-                size={15}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                type="text"
-                placeholder="Search notifications..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-                className="h-[40px] pl-9 pr-4 text-[12px] bg-white border border-[#b9cfda] rounded-xl outline-none focus:border-[#287ba5] w-[200px] sm:w-[240px] shadow-2xs"
-              />
-            </div>
+          <div className="flex gap-2">
 
             <button
               onClick={markAllAsRead}
-              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-xl text-[12px] font-medium hover:bg-[#f5fafc] transition-colors shadow-2xs cursor-pointer"
+              className="h-[37px] px-3 bg-white border border-[#b9cfda] rounded-lg text-[9px] hover:bg-[#f5fafc]"
             >
               Mark all as read
             </button>
 
             <button
               onClick={() => setShowPreferences(true)}
-              className="h-[40px] px-4 bg-[#287ba5] hover:bg-[#1e6388] text-white rounded-xl text-[12px] font-semibold transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5"
+              className="h-[37px] px-4 bg-[#287ba5] text-white rounded-lg text-[9px] font-semibold hover:bg-[#1e6388]"
             >
-              <Settings size={15} />
               Preferences
             </button>
+
           </div>
         </div>
 
-        {/* ERROR BANNER */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between text-red-800 text-[13px]">
-            <div className="flex items-center gap-3">
-              <AlertCircle size={20} className="text-red-600 shrink-0" />
-              <span>{error}</span>
-            </div>
-            <button
-              onClick={fetchNotifications}
-              className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg text-[12px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <RefreshCw size={14} />
-              Retry
-            </button>
-          </div>
-        )}
-
         {/* TABS */}
-        <div className="flex items-center gap-6 border-b border-[#d5e3e9] mb-4 overflow-x-auto">
+
+        <div className="flex items-center gap-6 border-b border-[#d5e3e9] mb-3 overflow-x-auto">
+
           {tabs.map((tab) => (
             <button
               key={tab.label}
@@ -303,318 +341,363 @@ export default function NotificationsPage() {
                 setActiveTab(tab.label);
                 setPage(1);
               }}
-              className={`h-[42px] flex items-center gap-2 text-[12px] whitespace-nowrap border-b-2 transition-colors cursor-pointer ${
+              className={`h-[39px] flex items-center gap-1.5 text-[9px] whitespace-nowrap border-b-2 transition-colors ${
                 activeTab === tab.label
                   ? "border-[#23749e] text-[#23749e] font-semibold"
                   : "border-transparent text-slate-500 hover:text-[#23749e]"
               }`}
             >
-              <span>{tab.label}</span>
+              {tab.label}
+
               {tab.count !== undefined && (
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                    activeTab === tab.label
-                      ? "bg-[#23749e] text-white"
-                      : "bg-[#e8f1f6] text-[#23749e]"
-                  }`}
-                >
-                  {tab.count}
+                <span className="bg-[#e8f1f6] text-[#23749e] rounded-full px-1.5 py-0.5 text-[8px]">
+                  {tab.label === "Unread"
+                    ? unreadCount
+                    : tab.count}
                 </span>
               )}
             </button>
           ))}
+
         </div>
 
         {/* NOTIFICATION LIST */}
-        <section className="bg-white border border-[#d5e3e9] rounded-2xl shadow-sm overflow-hidden">
-          {loading ? (
-            <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-3">
-              <Loader2 size={32} className="animate-spin text-[#287ba5]" />
-              <p className="text-[13px]">Loading notifications...</p>
+
+        <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
+
+          {displayedNotifications.map((notification) => {
+
+            const Icon = iconConfig[notification.icon].icon;
+
+            const iconStyle = iconConfig[notification.icon].style;
+
+            return (
+              <button
+                key={notification.id}
+                onClick={() => openNotification(notification)}
+                className={`w-full min-h-[70px] px-3.5 py-3 border-b border-[#d5e3e9] flex items-center gap-3 text-left hover:bg-[#f1f8f7] transition-colors ${
+                  notification.unread
+                    ? "bg-[#f4faf8]"
+                    : "bg-white"
+                }`}
+              >
+
+                {/* ICON */}
+
+                <div className={`w-[33px] h-[33px] rounded-lg flex items-center justify-center shrink-0 ${iconStyle}`}>
+                  <Icon size={17} />
+                </div>
+
+                {/* CONTENT */}
+
+                <div className="flex-1 min-w-0">
+
+                  <p className="text-[9px] font-semibold text-[#123e60]">
+                    {notification.title}
+                  </p>
+
+                  <p className="text-[8px] text-slate-500 mt-1">
+                    {notification.description}
+                  </p>
+
+                  <p className="text-[8px] text-slate-400 mt-1">
+                    {notification.time}
+                  </p>
+
+                </div>
+
+                {/* UNREAD DOT */}
+
+                {notification.unread && (
+                  <span className="w-[7px] h-[7px] rounded-full bg-[#237ba7] shrink-0" />
+                )}
+
+                <ChevronRight
+                  size={16}
+                  className="text-[#123e60] shrink-0"
+                />
+
+              </button>
+            );
+          })}
+
+          {/* EMPTY STATE */}
+
+          {displayedNotifications.length === 0 && (
+            <div className="py-16 text-center">
+
+              <Bell
+                size={30}
+                className="mx-auto text-slate-300 mb-3"
+              />
+
+              <p className="text-[12px] font-semibold">
+                No notifications found
+              </p>
+
+              <p className="text-[9px] text-slate-400 mt-1">
+                There are no notifications matching your selection.
+              </p>
+
             </div>
-          ) : (
-            <>
-              {notifications.map((notification) => {
-                const config = getIconConfig(notification.icon);
-                const IconComponent = config.icon;
-                const iconStyle = config.style;
-
-                return (
-                  <button
-                    key={notification.id}
-                    onClick={() => openNotification(notification)}
-                    className={`w-full min-h-[76px] px-5 py-4 border-b border-[#d5e3e9] flex items-center gap-4 text-left hover:bg-[#f1f8f7] transition-colors cursor-pointer ${
-                      notification.unread ? "bg-[#f4faf8]" : "bg-white"
-                    }`}
-                  >
-                    {/* ICON */}
-                    <div
-                      className={`w-[40px] h-[40px] rounded-xl flex items-center justify-center shrink-0 ${iconStyle}`}
-                    >
-                      <IconComponent size={20} />
-                    </div>
-
-                    {/* CONTENT */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2.5">
-                        <p className="text-[13px] font-semibold text-[#123e60]">
-                          {notification.title}
-                        </p>
-                        {notification.reference && (
-                          <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
-                            {notification.reference}
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="text-[12px] text-slate-500 mt-1 truncate">
-                        {notification.description}
-                      </p>
-
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        {notification.time}
-                      </p>
-                    </div>
-
-                    {/* UNREAD DOT */}
-                    {notification.unread && (
-                      <span className="w-[8px] h-[8px] rounded-full bg-[#237ba7] shrink-0" />
-                    )}
-
-                    <ChevronRight size={18} className="text-slate-400 shrink-0" />
-                  </button>
-                );
-              })}
-
-              {/* EMPTY STATE */}
-              {notifications.length === 0 && (
-                <div className="py-20 text-center">
-                  <Bell size={36} className="mx-auto text-slate-300 mb-3" />
-                  <p className="text-[14px] font-semibold text-slate-700">
-                    No notifications found
-                  </p>
-                  <p className="text-[12px] text-slate-400 mt-1">
-                    There are no notifications matching your selection.
-                  </p>
-                </div>
-              )}
-
-              {/* PAGINATION */}
-              <div className="px-5 py-3.5 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-[#d5e3e9]">
-                <p className="text-[12px] text-slate-500">
-                  Showing{" "}
-                  {totalCount === 0 ? 0 : (page - 1) * ROWS_PER_PAGE + 1}–
-                  {Math.min(page * ROWS_PER_PAGE, totalCount)} of {totalCount}
-                </p>
-
-                <div className="flex items-center gap-1.5">
-                  <button
-                    disabled={page === 1}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="h-[32px] px-3 border border-[#d5e3e9] bg-white rounded-lg text-[11px] font-medium disabled:opacity-40 hover:bg-slate-50 cursor-pointer transition-colors"
-                  >
-                    Previous
-                  </button>
-
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (number) => (
-                      <button
-                        key={number}
-                        onClick={() => setPage(number)}
-                        className={`w-[32px] h-[32px] rounded-lg text-[11px] font-semibold border cursor-pointer transition-colors ${
-                          page === number
-                            ? "bg-[#287ba5] text-white border-[#287ba5]"
-                            : "bg-white border-[#d5e3e9] text-slate-600 hover:bg-slate-50"
-                        }`}
-                      >
-                        {number}
-                      </button>
-                    )
-                  )}
-
-                  <button
-                    disabled={page === totalPages}
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="h-[32px] px-3 border border-[#d5e3e9] bg-white rounded-lg text-[11px] font-medium disabled:opacity-40 hover:bg-slate-50 cursor-pointer transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </>
           )}
+
+          {/* PAGINATION */}
+
+          <div className="px-3.5 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+
+            <p className="text-[9px] text-slate-400">
+              Showing{" "}
+              {filteredNotifications.length === 0
+                ? 0
+                : (page - 1) * rowsPerPage + 1}
+              –
+              {Math.min(
+                page * rowsPerPage,
+                filteredNotifications.length
+              )}
+              {" "}of {activeTab === "All" && !search ? 28 : filteredNotifications.length}
+            </p>
+
+            <div className="flex items-center gap-1.5">
+
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="h-[29px] px-3 border border-[#d5e3e9] rounded-lg text-[9px] disabled:opacity-40"
+              >
+                Previous
+              </button>
+
+              {Array.from(
+                { length: totalPages },
+                (_, i) => i + 1
+              ).map((number) => (
+                <button
+                  key={number}
+                  onClick={() => setPage(number)}
+                  className={`w-[28px] h-[29px] rounded-lg text-[9px] border ${
+                    page === number
+                      ? "bg-[#287ba5] text-white border-[#287ba5]"
+                      : "bg-white border-[#d5e3e9]"
+                  }`}
+                >
+                  {number}
+                </button>
+              ))}
+
+              <button
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="h-[29px] px-3 border border-[#d5e3e9] rounded-lg text-[9px] disabled:opacity-40"
+              >
+                Next
+              </button>
+
+            </div>
+          </div>
+
         </section>
+
       </main>
 
       {/* NOTIFICATION DETAILS MODAL */}
+
       {selectedNotification && (
         <Modal onClose={() => setSelectedNotification(null)}>
-          <div className="w-11 h-11 rounded-xl bg-[#e8f1f6] flex items-center justify-center mb-4 text-[#23749e]">
-            <Bell size={22} />
+
+          <div className="w-10 h-10 rounded-lg bg-[#e8f1f6] flex items-center justify-center mb-4">
+            <Bell size={19} className="text-[#23749e]" />
           </div>
 
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-[11px] font-semibold text-[#23749e] uppercase tracking-wider">
-              {selectedNotification.category || selectedNotification.type}
-            </span>
-            {selectedNotification.reference && (
-              <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
-                {selectedNotification.reference}
-              </span>
-            )}
-          </div>
+          <p className="text-[8px] font-semibold text-[#23749e]">
+            {selectedNotification.category}
+          </p>
 
-          <h2 className="text-[18px] font-semibold leading-snug">
+          <h2 className="text-[16px] font-semibold mt-1">
             {selectedNotification.title}
           </h2>
 
-          <p className="text-[11px] text-slate-400 mt-2">
+          <p className="text-[9px] text-slate-400 mt-2">
             {selectedNotification.time}
           </p>
 
-          <div className="bg-[#f5f9fa] rounded-xl p-4 mt-5 border border-[#e4edf1]">
-            <p className="text-[11px] font-semibold mb-2 text-slate-700">
+          <div className="bg-[#f5f9fa] rounded-lg p-4 mt-5">
+
+            <p className="text-[9px] font-semibold mb-2">
               Notification details
             </p>
-            <p className="text-[12px] text-slate-600 leading-relaxed">
-              {selectedNotification.details || selectedNotification.description}
+
+            <p className="text-[9px] text-slate-500 leading-relaxed">
+              {selectedNotification.details}
             </p>
+
           </div>
 
-          <div className="mt-4 flex justify-between items-center text-[11px]">
-            <span className="text-slate-400">
-              Reference: {selectedNotification.reference || "N/A"}
+          <div className="mt-4 flex justify-between items-center">
+
+            <span className="text-[9px] text-slate-400">
+              Reference: {selectedNotification.reference}
             </span>
 
-            <span className="text-[#078c70] flex items-center gap-1 font-medium">
-              <CheckCircle2 size={14} />
-              Marked as read
+            <span className="text-[8px] text-[#078c70] flex items-center gap-1">
+              <CheckCircle2 size={12} />
+              Read
             </span>
+
           </div>
 
           <button
             onClick={() => setSelectedNotification(null)}
-            className="w-full mt-6 h-11 bg-[#287ba5] hover:bg-[#1e6489] text-white rounded-xl text-[12px] font-semibold transition-colors cursor-pointer"
+            className="w-full mt-6 h-10 bg-[#287ba5] text-white rounded-lg text-[10px] font-semibold"
           >
             Close
           </button>
+
         </Modal>
       )}
 
       {/* PREFERENCES MODAL */}
+
       {showPreferences && (
         <Modal onClose={() => setShowPreferences(false)}>
-          <div className="w-11 h-11 rounded-xl bg-[#e8f1f6] flex items-center justify-center mb-4 text-[#23749e]">
-            <Settings size={22} />
+
+          <div className="w-10 h-10 rounded-lg bg-[#e8f1f6] flex items-center justify-center mb-4">
+            <Settings size={20} className="text-[#23749e]" />
           </div>
 
-          <h2 className="text-[18px] font-semibold">Notification preferences</h2>
+          <h2 className="text-[16px] font-semibold">
+            Notification preferences
+          </h2>
 
-          <p className="text-[11px] text-slate-400 mt-1 mb-5">
+          <p className="text-[9px] text-slate-400 mt-1 mb-5">
             Manage how you receive funding and donation updates.
           </p>
 
           <div className="space-y-5">
+
             <PreferenceSection title="Delivery channels">
+
               <PreferenceToggle
                 label="In-app notifications"
-                description="Receive alerts inside CareLink workspace."
+                description="Receive alerts inside CareLink."
                 checked={preferences.inApp}
                 onChange={(value) =>
-                  setPreferences((p) => ({ ...p, inApp: value }))
+                  setPreferences((p) => ({
+                    ...p,
+                    inApp: value,
+                  }))
                 }
               />
 
               <PreferenceToggle
                 label="Email notifications"
-                description="Receive updates through registered email."
+                description="Receive updates through email."
                 checked={preferences.email}
                 onChange={(value) =>
-                  setPreferences((p) => ({ ...p, email: value }))
+                  setPreferences((p) => ({
+                    ...p,
+                    email: value,
+                  }))
                 }
               />
 
               <PreferenceToggle
                 label="SMS notifications"
-                description="Receive important updates through text message."
+                description="Receive important updates through SMS."
                 checked={preferences.sms}
                 onChange={(value) =>
-                  setPreferences((p) => ({ ...p, sms: value }))
+                  setPreferences((p) => ({
+                    ...p,
+                    sms: value,
+                  }))
                 }
               />
+
             </PreferenceSection>
 
             <div className="border-t border-[#e5edf1]" />
 
             <PreferenceSection title="Notification categories">
+
               <PreferenceToggle
                 label="Critical flags"
                 description="Suspicious donations and transactions."
                 checked={preferences.critical}
                 onChange={(value) =>
-                  setPreferences((p) => ({ ...p, critical: value }))
+                  setPreferences((p) => ({
+                    ...p,
+                    critical: value,
+                  }))
                 }
               />
 
               <PreferenceToggle
                 label="Verification updates"
                 description="Donor and contribution verification."
-                checked={preferences.verification ?? true}
+                checked={preferences.verification}
                 onChange={(value) =>
-                  setPreferences((p) => ({ ...p, verification: value }))
+                  setPreferences((p) => ({
+                    ...p,
+                    verification: value,
+                  }))
                 }
               />
 
               <PreferenceToggle
                 label="Campaign updates"
                 description="Campaign progress and deadlines."
-                checked={preferences.campaigns ?? true}
+                checked={preferences.campaigns}
                 onChange={(value) =>
-                  setPreferences((p) => ({ ...p, campaigns: value }))
+                  setPreferences((p) => ({
+                    ...p,
+                    campaigns: value,
+                  }))
                 }
               />
 
               <PreferenceToggle
                 label="Reports and approvals"
-                description="Transparency reports and allocations."
-                checked={preferences.reports ?? true}
+                description="Transparency reports and approvals."
+                checked={preferences.reports}
                 onChange={(value) =>
-                  setPreferences((p) => ({ ...p, reports: value }))
+                  setPreferences((p) => ({
+                    ...p,
+                    reports: value,
+                  }))
                 }
               />
+
             </PreferenceSection>
+
           </div>
 
           <button
-            onClick={handleSavePreferences}
-            disabled={savingPrefs}
-            className="w-full mt-6 h-11 bg-[#287ba5] hover:bg-[#1e6489] disabled:opacity-50 text-white rounded-xl text-[12px] font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            onClick={() => {
+              setShowPreferences(false);
+              notify("Notification preferences saved.");
+            }}
+            className="w-full mt-6 h-10 bg-[#287ba5] text-white rounded-lg text-[10px] font-semibold"
           >
-            {savingPrefs ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Saving...
-              </>
-            ) : (
-              "Save preferences"
-            )}
+            Save preferences
           </button>
+
         </Modal>
       )}
 
-      {/* FLOATING TOAST */}
+      {/* TOAST */}
+
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[100] bg-[#143d5c] text-white rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 text-[12px] animate-in fade-in slide-in-from-bottom-5">
-          <CheckCircle2 size={18} className="text-[#57d6ad]" />
-          <span>{toast}</span>
-          <button
-            onClick={() => setToast("")}
-            className="text-slate-400 hover:text-white ml-2 cursor-pointer"
-          >
-            <X size={14} />
+        <div className="fixed bottom-5 right-5 z-[100] bg-[#143d5c] text-white rounded-lg px-4 py-3 shadow-xl flex items-center gap-3 text-[10px]">
+          <CheckCircle2 size={15} />
+          {toast}
+
+          <button onClick={() => setToast("")}>
+            <X size={13} />
           </button>
         </div>
       )}
+
     </div>
   );
 }
@@ -632,20 +715,22 @@ function Modal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-[80] bg-[#102d42]/45 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+      className="fixed inset-0 z-[80] bg-[#102d42]/45 flex items-center justify-center p-4"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-white w-full max-w-[480px] max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-6 relative animate-in zoom-in-95 duration-150">
+      <div className="bg-white w-full max-w-[460px] max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl p-5 relative">
+
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-slate-400 hover:text-red-500 transition-colors cursor-pointer w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100"
+          className="absolute right-4 top-4 text-slate-400 hover:text-red-500"
         >
           <X size={18} />
         </button>
 
         {children}
+
       </div>
     </div>
   );
@@ -664,8 +749,13 @@ function PreferenceSection({
 }) {
   return (
     <div>
-      <h3 className="text-[12px] font-semibold mb-3 text-slate-700">{title}</h3>
-      <div className="space-y-3">{children}</div>
+      <h3 className="text-[10px] font-semibold mb-3">
+        {title}
+      </h3>
+
+      <div className="space-y-3">
+        {children}
+      </div>
     </div>
   );
 }
@@ -687,9 +777,15 @@ function PreferenceToggle({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
+
       <div>
-        <p className="text-[12px] font-medium text-slate-800">{label}</p>
-        <p className="text-[10px] text-slate-400 mt-0.5">{description}</p>
+        <p className="text-[9px] font-medium">
+          {label}
+        </p>
+
+        <p className="text-[8px] text-slate-400 mt-0.5">
+          {description}
+        </p>
       </div>
 
       <button
@@ -697,16 +793,17 @@ function PreferenceToggle({
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`w-9 h-5 rounded-full p-0.5 transition-colors shrink-0 cursor-pointer ${
+        className={`w-9 h-5 rounded-full p-0.5 transition-colors shrink-0 ${
           checked ? "bg-[#287ba5]" : "bg-slate-300"
         }`}
       >
         <span
-          className={`block w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${
+          className={`block w-4 h-4 bg-white rounded-full shadow transition-transform ${
             checked ? "translate-x-4" : "translate-x-0"
           }`}
         />
       </button>
+
     </div>
   );
 }
