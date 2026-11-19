@@ -1,35 +1,22 @@
-
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { useState, useEffect, useCallback, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Package, Warehouse, ClipboardList, GitBranch, Truck,
   ArrowLeftRight, ShoppingCart, BriefcaseBusiness,
   AlertTriangle, ChartNoAxesCombined, Clock3, Settings,
   Search, Bell, ShieldCheck, ChevronRight, Check,
-  X, Menu, CircleAlert, Timer, CheckCircle2,
-  CircleCheck, SlidersHorizontal
+  X, Menu, Timer, CircleCheck, SlidersHorizontal,
+  RefreshCw, Plus, Wifi, WifiOff
 } from "lucide-react";
 
-type AlertSeverity =
-  | "Critical"
-  | "Delayed"
-  | "Low Stock"
-  | "Near Capacity"
-  | "Expiring Soon"
-  | "Warning";
-
-type AlertStatus = "Open" | "Acknowledged" | "Resolved";
-
-type AlertItem = {
-  id: number;
-  title: string;
-  description: string;
-  location: string;
-  time: string;
-  severity: AlertSeverity;
-  status: AlertStatus;
-  icon: "alert" | "truck" | "warehouse" | "clock";
-};
+import { alertService } from "../../services/alertService";
+import type {
+  AlertItem,
+  AlertSeverity,
+  AlertStatus,
+  AlertRules,
+  CreateAlertPayload,
+} from "../../types/alert";
 
 const initialAlerts: AlertItem[] = [
   {
@@ -125,18 +112,18 @@ const initialAlerts: AlertItem[] = [
 ];
 
 const navigation = [
-  { label: "Inventory", icon: Package },
-  { label: "Warehouses", icon: Warehouse },
-  { label: "Resource Requests", icon: ClipboardList, count: 18 },
-  { label: "Allocations", icon: GitBranch, count: 7 },
-  { label: "Dispatch & Tracking", icon: Truck, count: 12 },
-  { label: "Stock Transfers", icon: ArrowLeftRight },
-  { label: "Procurement", icon: ShoppingCart },
-  { label: "Suppliers", icon: BriefcaseBusiness },
-  { label: "Alerts", icon: AlertTriangle, count: 9 },
-  { label: "Reports & Analytics", icon: ChartNoAxesCombined },
-  { label: "Audit Log", icon: Clock3 },
-  { label: "Settings", icon: Settings }
+  { label: "Inventory", path: "/resource-manager/inventory", icon: Package },
+  { label: "Warehouses", path: "/resource-manager/warehouses", icon: Warehouse },
+  { label: "Resource Requests", path: "/resource-manager/requests", icon: ClipboardList, count: 18 },
+  { label: "Allocations", path: "/resource-manager/allocations", icon: GitBranch, count: 7 },
+  { label: "Dispatch & Tracking", path: "/resource-manager/dispatch", icon: Truck, count: 12 },
+  { label: "Stock Transfers", path: "/resource-manager/transfers", icon: ArrowLeftRight },
+  { label: "Procurement", path: "/resource-manager/procurement", icon: ShoppingCart },
+  { label: "Suppliers", path: "/resource-manager/suppliers", icon: BriefcaseBusiness },
+  { label: "Alerts", path: "/resource-manager/alerts", icon: AlertTriangle, count: 9 },
+  { label: "Reports & Analytics", path: "/resource-manager/reports", icon: ChartNoAxesCombined },
+  { label: "Audit Log", path: "/resource-manager/audit-log", icon: Clock3 },
+  { label: "Settings", path: "/resource-manager/settings", icon: Settings }
 ];
 
 const tabs = [
@@ -191,22 +178,69 @@ function severityColor(severity: AlertSeverity) {
 }
 
 export default function AlertsPage() {
-  const [alerts, setAlerts] = useState(initialAlerts);
+  const navigate = useNavigate();
 
+  const [alerts, setAlerts] = useState<AlertItem[]>(initialAlerts);
   const [activeTab, setActiveTab] = useState("Open");
   const [selectedAlert, setSelectedAlert] = useState<AlertItem | null>(null);
 
   const [showRules, setShowRules] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const [rules, setRules] = useState({
+  const [isBackendConnected, setIsBackendConnected] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [actionInProgress, setActionInProgress] = useState<number | null>(null);
+
+  const [rules, setRules] = useState<AlertRules>({
     critical: true,
     lowStock: true,
     capacity: true,
     dispatch: true,
     expiry: true
   });
+
+  const [newAlertForm, setNewAlertForm] = useState<CreateAlertPayload>({
+    title: "",
+    description: "",
+    location: "Central Logistics Hub",
+    severity: "Warning",
+    icon: "alert"
+  });
+
+  // FETCH ALERTS & RULES FROM BACKEND
+  const loadAlerts = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await alertService.getAlerts();
+      if (data && Array.isArray(data) && data.length > 0) {
+        setAlerts(data);
+      }
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("CareLink API not reachable, using local alerts:", err);
+      setIsBackendConnected(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const loadRules = useCallback(async () => {
+    try {
+      const data = await alertService.getAlertRules();
+      if (data) {
+        setRules(data);
+      }
+    } catch {
+      // Backend not running, use defaults
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAlerts();
+    loadRules();
+  }, [loadAlerts, loadRules]);
 
   // ALERT COUNTS
   const criticalCount = alerts.filter(
@@ -255,11 +289,21 @@ export default function AlertsPage() {
   };
 
   // ACKNOWLEDGE ALERT
-  const handleAcknowledge = (id: number) => {
+  const handleAcknowledge = async (id: number) => {
+    setActionInProgress(id);
+    try {
+      await alertService.acknowledgeAlert(id);
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("Backend error, falling back to local update:", err);
+    } finally {
+      setActionInProgress(null);
+    }
+
     setAlerts(prev =>
       prev.map(alert =>
         alert.id === id
-          ? { ...alert, status: "Acknowledged" }
+          ? { ...alert, status: "Acknowledged" as AlertStatus }
           : alert
       )
     );
@@ -268,11 +312,21 @@ export default function AlertsPage() {
   };
 
   // RESOLVE ALERT
-  const handleResolve = (id: number) => {
+  const handleResolve = async (id: number) => {
+    setActionInProgress(id);
+    try {
+      await alertService.resolveAlert(id);
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("Backend error, falling back to local update:", err);
+    } finally {
+      setActionInProgress(null);
+    }
+
     setAlerts(prev =>
       prev.map(alert =>
         alert.id === id
-          ? { ...alert, status: "Resolved" }
+          ? { ...alert, status: "Resolved" as AlertStatus }
           : alert
       )
     );
@@ -281,20 +335,67 @@ export default function AlertsPage() {
   };
 
   // MARK ALL REVIEWED
-  const handleMarkAllReviewed = () => {
+  const handleMarkAllReviewed = async () => {
+    try {
+      await alertService.markAllReviewed();
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("Backend error, falling back to local update:", err);
+    }
+
     setAlerts(prev =>
       prev.map(alert =>
         alert.status === "Open"
-          ? { ...alert, status: "Acknowledged" }
+          ? { ...alert, status: "Acknowledged" as AlertStatus }
           : alert
       )
     );
   };
 
   // SAVE ALERT RULES
-  const handleSaveRules = (e: FormEvent<HTMLFormElement>) => {
+  const handleSaveRules = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    try {
+      await alertService.updateAlertRules(rules);
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("Backend error, saved locally:", err);
+    }
     setShowRules(false);
+  };
+
+  // CREATE NEW ALERT
+  const handleCreateAlert = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!newAlertForm.title.trim()) return;
+
+    try {
+      const created = await alertService.createAlert(newAlertForm);
+      setAlerts(prev => [created, ...prev]);
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn("Backend error, adding locally:", err);
+      const localAlert: AlertItem = {
+        id: Math.max(...alerts.map(a => a.id), 0) + 1,
+        title: newAlertForm.title,
+        description: newAlertForm.description,
+        location: newAlertForm.location,
+        time: "Just now",
+        severity: newAlertForm.severity,
+        status: "Open",
+        icon: (newAlertForm.icon as AlertItem["icon"]) || "alert"
+      };
+      setAlerts(prev => [localAlert, ...prev]);
+    }
+
+    setNewAlertForm({
+      title: "",
+      description: "",
+      location: "Central Logistics Hub",
+      severity: "Warning",
+      icon: "alert"
+    });
+    setShowCreateModal(false);
   };
 
   return (
@@ -350,8 +451,9 @@ export default function AlertsPage() {
               <button
                 key={item.label}
                 onClick={() => {
-                  if (!active) {
-                    alert(`${item.label} page is not connected yet.`);
+                  if (active) return;
+                  if (item.path) {
+                    navigate(item.path);
                   }
                 }}
                 className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
@@ -417,16 +519,41 @@ export default function AlertsPage() {
             <Search size={16} className="text-slate-400" />
 
             <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               placeholder="Search resources, requests, dispatches..."
               className="w-full bg-transparent text-xs outline-none"
             />
 
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
-              ⌘ K
-            </span>
+            {search && (
+              <button onClick={() => setSearch("")}>
+                <X size={15} className="text-slate-400" />
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
+            {/* BACKEND API STATUS BADGE */}
+            <div className="hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 text-[10px]">
+              {isBackendConnected ? (
+                <>
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-emerald-700 font-medium flex items-center gap-1">
+                    <Wifi size={12} /> Backend API Online
+                  </span>
+                </>
+              ) : isBackendConnected === false ? (
+                <>
+                  <span className="h-2 w-2 rounded-full bg-amber-500" />
+                  <span className="text-amber-700 font-medium flex items-center gap-1">
+                    <WifiOff size={12} /> Local Fallback Mode
+                  </span>
+                </>
+              ) : (
+                <span className="text-slate-400">Connecting...</span>
+              )}
+            </div>
+
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
               <p className="text-[9px] uppercase text-slate-400">
                 Primary Hub
@@ -435,6 +562,14 @@ export default function AlertsPage() {
                 Central Logistics Hub
               </p>
             </div>
+
+            <button
+              onClick={loadAlerts}
+              title="Refresh alerts from backend"
+              className="rounded-lg border p-2.5 text-slate-600 hover:bg-slate-50"
+            >
+              <RefreshCw size={17} className={isLoading ? "animate-spin text-sky-700" : ""} />
+            </button>
 
             <button className="hidden rounded-lg border p-2.5 sm:block">
               <ShieldCheck size={18} />
@@ -457,8 +592,6 @@ export default function AlertsPage() {
                 Resource Manager
               </p>
             </div>
-
-            <ChevronRight size={17} className="hidden sm:block" />
           </div>
         </header>
 
@@ -474,7 +607,7 @@ export default function AlertsPage() {
             </span>
           </div>
 
-          {/* TITLE */}
+          {/* TITLE & ACTIONS */}
           <section className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">
@@ -482,21 +615,29 @@ export default function AlertsPage() {
               </h2>
 
               <p className="mt-2 text-xs text-slate-500">
-                Resolve stock, capacity, dispatch, expiry, and procurement exceptions.
+                Resolve stock, capacity, dispatch, expiry, and procurement exceptions in real-time.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
               <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-xs font-semibold text-white hover:bg-emerald-700 transition"
+              >
+                <Plus size={15} />
+                New alert
+              </button>
+
+              <button
                 onClick={handleMarkAllReviewed}
-                className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-semibold text-sky-700 hover:bg-slate-50"
+                className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-semibold text-sky-700 hover:bg-slate-50 transition"
               >
                 Mark all reviewed
               </button>
 
               <button
                 onClick={() => setShowRules(true)}
-                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-3 text-xs font-semibold text-white hover:bg-[#1c668d]"
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-3 text-xs font-semibold text-white hover:bg-[#1c668d] transition"
               >
                 <SlidersHorizontal size={15} />
                 Alert rules
@@ -524,15 +665,15 @@ export default function AlertsPage() {
               },
               {
                 title: "Acknowledged",
-                value: acknowledgedCount + 12,
+                value: acknowledgedCount,
                 note: "Assigned to owners",
                 icon: Check,
                 color: "bg-sky-50 text-sky-700"
               },
               {
-                title: "Resolved today",
-                value: resolvedCount + 20,
-                note: "Average 38 minutes",
+                title: "Resolved",
+                value: resolvedCount,
+                note: "Closed & verified",
                 icon: Timer,
                 color: "bg-emerald-50 text-emerald-600"
               }
@@ -581,7 +722,7 @@ export default function AlertsPage() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`relative flex items-center gap-1.5 pb-4 text-[11px] ${
+                    className={`relative flex items-center gap-1.5 pb-4 text-[11px] transition ${
                       activeTab === tab
                         ? "font-bold text-sky-700"
                         : "text-slate-500 hover:text-sky-700"
@@ -611,7 +752,7 @@ export default function AlertsPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search alerts..."
+              placeholder="Search alerts by title, description, location, or severity..."
               className="w-full py-3 text-xs outline-none"
             />
 
@@ -628,7 +769,7 @@ export default function AlertsPage() {
             {filteredAlerts.map(alert => (
               <div
                 key={alert.id}
-                className="flex items-center gap-3 border-b border-slate-200 p-4 sm:gap-4 sm:p-5"
+                className="flex items-center gap-3 border-b border-slate-200 p-4 sm:gap-4 sm:p-5 transition hover:bg-slate-50/50"
               >
 
                 {/* ALERT ICON */}
@@ -641,52 +782,82 @@ export default function AlertsPage() {
                 {/* ALERT INFORMATION */}
                 <div className="min-w-0 flex-1">
 
-                  <div className="mb-1">
+                  <div className="mb-1 flex items-center gap-2">
                     <span className={`rounded-md px-2 py-1 text-[9px] font-bold ${
                       severityStyles[alert.severity]
                     }`}>
                       {alert.severity}
                     </span>
+
+                    <span className="text-[10px] text-slate-400">
+                      ALT-{alert.id.toString().padStart(4, "0")}
+                    </span>
                   </div>
 
-                  <h3 className="text-[11px] font-bold text-slate-800">
+                  <h3 className="text-[12px] font-bold text-slate-800">
                     {alert.title}
                   </h3>
 
-                  <p className="mt-1 text-[10px] text-slate-500">
+                  <p className="mt-1 text-[11px] text-slate-500">
                     {alert.description}
                   </p>
 
-                  <p className="mt-1 text-[9px] text-slate-400">
-                    {alert.time}
-                  </p>
-
-                  {alert.status !== "Open" && (
-                    <p className={`mt-1 text-[9px] font-semibold ${
-                      alert.status === "Resolved"
-                        ? "text-emerald-600"
-                        : "text-sky-700"
-                    }`}>
-                      {alert.status}
-                    </p>
-                  )}
+                  <div className="mt-1 flex items-center gap-3 text-[10px] text-slate-400">
+                    <span>{alert.location}</span>
+                    <span>•</span>
+                    <span>{alert.time}</span>
+                    {alert.status !== "Open" && (
+                      <>
+                        <span>•</span>
+                        <span className={`font-semibold ${
+                          alert.status === "Resolved"
+                            ? "text-emerald-600"
+                            : "text-sky-700"
+                        }`}>
+                          {alert.status}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                {/* REVIEW BUTTON */}
-                <button
-                  onClick={() => handleReview(alert)}
-                  className="shrink-0 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-[10px] font-semibold text-sky-700 hover:bg-sky-50"
-                >
-                  Review
-                </button>
+                {/* QUICK ACTIONS */}
+                <div className="flex items-center gap-2">
+                  {alert.status === "Open" && (
+                    <button
+                      onClick={() => handleAcknowledge(alert.id)}
+                      disabled={actionInProgress === alert.id}
+                      className="hidden sm:inline-flex rounded-lg border border-sky-300 bg-sky-50 px-3 py-2 text-[10px] font-semibold text-sky-700 hover:bg-sky-100 transition"
+                    >
+                      Acknowledge
+                    </button>
+                  )}
 
-                <button
-                  onClick={() => handleReview(alert)}
-                  aria-label="View alert details"
-                  className="shrink-0 text-slate-600 hover:text-sky-700"
-                >
-                  <ChevronRight size={19} />
-                </button>
+                  {alert.status !== "Resolved" && (
+                    <button
+                      onClick={() => handleResolve(alert.id)}
+                      disabled={actionInProgress === alert.id}
+                      className="hidden sm:inline-flex rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 transition"
+                    >
+                      Resolve
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => handleReview(alert)}
+                    className="shrink-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-[10px] font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  >
+                    Details
+                  </button>
+
+                  <button
+                    onClick={() => handleReview(alert)}
+                    aria-label="View alert details"
+                    className="shrink-0 text-slate-400 hover:text-sky-700 transition"
+                  >
+                    <ChevronRight size={19} />
+                  </button>
+                </div>
               </div>
             ))}
 
@@ -711,7 +882,7 @@ export default function AlertsPage() {
           {/* BOTTOM INFO */}
           <div className="flex items-center gap-2 text-[10px] text-slate-400">
             <CircleCheck size={14} />
-            Alerts are updated based on operational activity.
+            Alerts synchronize with CareLink Logistics API backend.
           </div>
 
         </div>
@@ -801,6 +972,7 @@ export default function AlertsPage() {
                   {selectedAlert.status === "Open" && (
                     <button
                       onClick={() => handleAcknowledge(selectedAlert.id)}
+                      disabled={actionInProgress === selectedAlert.id}
                       className="rounded-lg bg-sky-700 px-4 py-2.5 text-xs font-semibold text-white hover:bg-sky-800"
                     >
                       Acknowledge
@@ -809,6 +981,7 @@ export default function AlertsPage() {
 
                   <button
                     onClick={() => handleResolve(selectedAlert.id)}
+                    disabled={actionInProgress === selectedAlert.id}
                     className="rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700"
                   >
                     Mark Resolved
@@ -817,6 +990,107 @@ export default function AlertsPage() {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* CREATE ALERT MODAL */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+          <form
+            onSubmit={handleCreateAlert}
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4"
+          >
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h3 className="text-lg font-bold text-slate-800">New Resource Alert</h3>
+                <p className="text-xs text-slate-400">Broadcast a logistics or resource alert</p>
+              </div>
+              <button type="button" onClick={() => setShowCreateModal(false)}>
+                <X size={20} className="text-slate-400" />
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700">Alert Title</label>
+              <input
+                required
+                value={newAlertForm.title}
+                onChange={e => setNewAlertForm({ ...newAlertForm, title: e.target.value })}
+                placeholder="e.g. Critical stock shortage · Trauma Medical Kits"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700">Description</label>
+              <textarea
+                required
+                rows={3}
+                value={newAlertForm.description}
+                onChange={e => setNewAlertForm({ ...newAlertForm, description: e.target.value })}
+                placeholder="Provide details on quantity, thresholds, or affected units..."
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700">Severity</label>
+                <select
+                  value={newAlertForm.severity}
+                  onChange={e => setNewAlertForm({ ...newAlertForm, severity: e.target.value as AlertSeverity })}
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500 bg-white"
+                >
+                  <option value="Critical">Critical</option>
+                  <option value="Delayed">Delayed</option>
+                  <option value="Low Stock">Low Stock</option>
+                  <option value="Near Capacity">Near Capacity</option>
+                  <option value="Expiring Soon">Expiring Soon</option>
+                  <option value="Warning">Warning</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700">Category Icon</label>
+                <select
+                  value={newAlertForm.icon}
+                  onChange={e => setNewAlertForm({ ...newAlertForm, icon: e.target.value })}
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500 bg-white"
+                >
+                  <option value="alert">Alert / Supplies</option>
+                  <option value="truck">Dispatch / Vehicle</option>
+                  <option value="warehouse">Warehouse</option>
+                  <option value="clock">Time / Expiry</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700">Location / Hub</label>
+              <input
+                value={newAlertForm.location}
+                onChange={e => setNewAlertForm({ ...newAlertForm, location: e.target.value })}
+                placeholder="e.g. Central Logistics Hub"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t">
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="rounded-lg border px-4 py-2 text-xs font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+              >
+                Create Alert
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
@@ -836,7 +1110,7 @@ export default function AlertsPage() {
                 </h3>
 
                 <p className="mt-1 text-xs text-slate-400">
-                  Configure operational notifications.
+                  Configure operational notifications saved on the backend.
                 </p>
               </div>
 
@@ -863,7 +1137,7 @@ export default function AlertsPage() {
 
                 <input
                   type="checkbox"
-                  checked={rules[key as keyof typeof rules]}
+                  checked={rules[key as keyof AlertRules]}
                   onChange={e =>
                     setRules(prev => ({
                       ...prev,
@@ -886,7 +1160,7 @@ export default function AlertsPage() {
 
               <button
                 type="submit"
-                className="rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white"
+                className="rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d]"
               >
                 Save Rules
               </button>
