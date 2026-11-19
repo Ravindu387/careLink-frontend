@@ -16,6 +16,7 @@ import {
   Check,
   ChartNoAxesCombined,
   LogOut,
+  Sparkles,
 } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
@@ -29,6 +30,8 @@ const groups = [
         name: "System Overview",
         path: "/admin/dashboard",
         icon: LayoutDashboard,
+    
+    
       },
       {
         name: "User Management",
@@ -50,6 +53,12 @@ const groups = [
         path: "/admin/verification",
         icon: Check,
         badge: 14,
+      },
+      {
+        name: "AI Recommendation Review",
+        path: "/admin/ai-review",
+        icon: Sparkles,
+        badge: 8,
       },
       {
         name: "Integration Health",
@@ -76,6 +85,11 @@ const groups = [
         name: "Reports",
         path: "/admin/reports",
         icon: ChartNoAxesCombined,
+      },
+      {
+        name: "Notifications",
+        path: "/admin/notifications",
+        icon: Bell,
       },
     ],
   },

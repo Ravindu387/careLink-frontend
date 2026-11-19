@@ -202,7 +202,8 @@ export default function PendingVerification() {
           throw new Error("Unable to load verification applications.");
         }
 
-        const data: Application[] = await response.json();
+        const text = await response.text();
+        const data: Application[] = text ? JSON.parse(text) : [];
 
         setApplications(data);
         setApiError("");

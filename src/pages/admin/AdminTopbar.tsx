@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Menu,
@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { notificationService } from "../../services/notificationService";
 
 type Props = {
   onMenu: () => void;
@@ -15,8 +16,30 @@ type Props = {
 
 export default function AdminTopbar({ onMenu }: Props) {
   const [search, setSearch] = useState("");
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  useEffect(() => {
+    let isCancelled = false;
+    const fetchUnread = async () => {
+      try {
+        const stats = await notificationService.getStats();
+        if (!isCancelled) {
+          setUnreadCount(stats.unreadCount);
+        }
+      } catch {
+        // Fallback silently if offline
+      }
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000); // Polling every 30s
+    return () => {
+      isCancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
 
   const getInitials = (name?: string) => {
     if (!name) return "U";
@@ -66,11 +89,17 @@ export default function AdminTopbar({ onMenu }: Props) {
           EN
         </button>
 
-        <button className="relative flex h-8 w-8 items-center justify-center rounded-md border border-slate-200">
+        <button
+          onClick={() => navigate("/admin/notifications")}
+          title="Notifications"
+          className="relative flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 transition hover:bg-slate-50"
+        >
           <Bell size={15} />
-          <span className="absolute -right-1 -top-1 rounded-full bg-red-500 px-1 text-[8px] text-white">
-            12
-          </span>
+          {unreadCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[8px] font-bold text-white shadow-sm">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
         </button>
 
         <button
