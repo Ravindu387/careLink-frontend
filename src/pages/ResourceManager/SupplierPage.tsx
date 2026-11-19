@@ -1,27 +1,42 @@
-
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import type { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Package, Warehouse, ClipboardList, GitBranch, Truck,
-  ArrowLeftRight, ShoppingCart, BriefcaseBusiness,
-  AlertTriangle, ChartNoAxesCombined, Clock3, Settings,
-  Search, Bell, ShieldCheck, ChevronRight, Plus,
-  Download, Check, Filter, X, Menu, Building2
+  Package,
+  Warehouse,
+  ClipboardList,
+  GitBranch,
+  Truck,
+  ArrowLeftRight,
+  ShoppingCart,
+  BriefcaseBusiness,
+  AlertTriangle,
+  ChartNoAxesCombined,
+  Clock3,
+  Settings,
+  Search,
+  Bell,
+  ShieldCheck,
+  ChevronRight,
+  Plus,
+  Download,
+  Check,
+  Filter,
+  X,
+  Menu,
+  Building2,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Trash2
 } from "lucide-react";
-
-type SupplierStatus = "Active" | "Inactive" | "Suspended";
-type Verification = "Verified" | "Pending" | "Rejected";
-
-type Supplier = {
-  id: string;
-  name: string;
-  category: string;
-  coverage: string;
-  onTimeRate: string;
-  leadTime: string;
-  verification: Verification;
-  status: SupplierStatus;
-};
+import { supplierService } from "../../services/supplierService";
+import type {
+  Supplier,
+  SupplierStatus,
+  Verification,
+  SupplierSummary
+} from "../../types/supplier";
 
 const initialSuppliers: Supplier[] = [
   {
@@ -107,18 +122,19 @@ const initialSuppliers: Supplier[] = [
 ];
 
 const navigation = [
-  { label: "Inventory", icon: Package },
-  { label: "Warehouses", icon: Warehouse },
-  { label: "Resource Requests", icon: ClipboardList, count: 18 },
-  { label: "Allocations", icon: GitBranch, count: 7 },
-  { label: "Dispatch & Tracking", icon: Truck, count: 12 },
-  { label: "Stock Transfers", icon: ArrowLeftRight },
-  { label: "Procurement", icon: ShoppingCart },
-  { label: "Suppliers", icon: BriefcaseBusiness },
-  { label: "Alerts", icon: AlertTriangle, count: 9 },
-  { label: "Reports & Analytics", icon: ChartNoAxesCombined },
-  { label: "Audit Log", icon: Clock3 },
-  { label: "Settings", icon: Settings }
+  { label: "Resource Dashboard", path: "/resource-manager/dashboard", icon: ChartNoAxesCombined },
+  { label: "Inventory", path: "/resource-manager/inventory", icon: Package },
+  { label: "Warehouses", path: "/resource-manager/warehouses", icon: Warehouse },
+  { label: "Resource Requests", path: "/resource-manager/requests", icon: ClipboardList, count: 18 },
+  { label: "Allocations", path: "/resource-manager/allocations", icon: GitBranch, count: 7 },
+  { label: "Dispatch & Tracking", path: "/resource-manager/dispatch", icon: Truck, count: 12 },
+  { label: "Stock Transfers", path: "/resource-manager/transfers", icon: ArrowLeftRight },
+  { label: "Procurement", path: "/resource-manager/procurement", icon: ShoppingCart },
+  { label: "Suppliers", path: "/resource-manager/suppliers", icon: BriefcaseBusiness },
+  { label: "Alerts", path: "/resource-manager/alerts", icon: AlertTriangle, count: 9 },
+  { label: "Reports & Analytics", path: "/resource-manager/reports", icon: ChartNoAxesCombined },
+  { label: "Audit Log", path: "/resource-manager/audit-log", icon: Clock3 },
+  { label: "Settings", path: "/resource-manager/settings", icon: Settings }
 ];
 
 const tabs = [
@@ -136,16 +152,19 @@ const statusStyles: Record<SupplierStatus, string> = {
 };
 
 const verificationStyles: Record<Verification, string> = {
-  Verified: "text-emerald-700",
-  Pending: "text-amber-600",
-  Rejected: "text-red-600"
+  Verified: "text-emerald-700 font-medium",
+  Pending: "text-amber-600 font-medium",
+  Rejected: "text-red-600 font-medium"
 };
 
 const inputClass =
   "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-sky-500";
 
 export default function SupplierPage() {
-  const [suppliers, setSuppliers] = useState(initialSuppliers);
+  const navigate = useNavigate();
+
+  const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
+  const [summary, setSummary] = useState<SupplierSummary | null>(null);
 
   const [activeTab, setActiveTab] = useState("All");
   const [search, setSearch] = useState("");
@@ -160,6 +179,14 @@ export default function SupplierPage() {
     useState<Supplier | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBackendConnected, setIsBackendConnected] = useState<boolean | null>(null);
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error" | "info";
+    text: string;
+  } | null>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     category: "Medical",
@@ -170,6 +197,33 @@ export default function SupplierPage() {
   });
 
   const pageSize = 4;
+
+  const loadData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const [suppliersData, summaryData] = await Promise.all([
+        supplierService.getSuppliers(),
+        supplierService.getSummary().catch(() => null)
+      ]);
+
+      if (suppliersData && suppliersData.length > 0) {
+        setSuppliers(suppliersData);
+      }
+      if (summaryData) {
+        setSummary(summaryData);
+      }
+      setIsBackendConnected(true);
+    } catch (error) {
+      console.warn("Backend unavailable, using local default suppliers:", error);
+      setIsBackendConnected(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // FILTER SUPPLIERS
   const filteredSuppliers = useMemo(() => {
@@ -235,21 +289,10 @@ export default function SupplierPage() {
   );
 
   // STATISTICS
-  const activeCount = suppliers.filter(
-    s => s.status === "Active"
-  ).length;
-
-  const pendingCount = suppliers.filter(
-    s => s.verification === "Pending"
-  ).length;
-
-  const verifiedCount = suppliers.filter(
-    s => s.verification === "Verified"
-  ).length;
-
-  const exceptionCount = suppliers.filter(
-    s => s.verification === "Rejected"
-  ).length;
+  const activeCount = summary?.activeCount ?? suppliers.filter(s => s.status === "Active").length;
+  const pendingCount = summary?.pendingCount ?? suppliers.filter(s => s.verification === "Pending").length;
+  const verifiedCount = summary?.verifiedCount ?? suppliers.filter(s => s.verification === "Verified").length;
+  const exceptionCount = summary?.exceptionCount ?? suppliers.filter(s => s.verification === "Rejected").length;
 
   const stats = [
     {
@@ -293,7 +336,7 @@ export default function SupplierPage() {
   };
 
   // ADD SUPPLIER
-  const handleAddSupplier = (e: FormEvent<HTMLFormElement>) => {
+  const handleAddSupplier = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (
@@ -303,38 +346,130 @@ export default function SupplierPage() {
       !formData.leadTime.trim()
     ) return;
 
-    const nextNumber =
-      Math.max(
-        ...suppliers.map(s => Number(s.id.split("-")[1])),
-        14
-      ) + 1;
+    setIsSubmitting(true);
 
-    const newSupplier: Supplier = {
-      id: `SUP-${String(nextNumber).padStart(4, "0")}`,
-      name: formData.name,
-      category: formData.category,
-      coverage: formData.coverage,
-      onTimeRate: formData.onTimeRate.endsWith("%")
-        ? formData.onTimeRate
-        : `${formData.onTimeRate}%`,
-      leadTime: formData.leadTime,
-      verification: formData.verification,
-      status: "Active"
-    };
+    try {
+      const created = await supplierService.createSupplier({
+        name: formData.name.trim(),
+        category: formData.category,
+        coverage: formData.coverage.trim(),
+        onTimeRate: formData.onTimeRate,
+        leadTime: formData.leadTime.trim(),
+        verification: formData.verification,
+        status: "Active"
+      });
 
-    setSuppliers(prev => [newSupplier, ...prev]);
+      setSuppliers(prev => [created, ...prev]);
+      setIsBackendConnected(true);
+      setStatusMessage({
+        type: "success",
+        text: `Supplier ${created.name} (${created.id}) added successfully!`
+      });
+    } catch (error) {
+      console.warn("Backend error on create, adding locally:", error);
+      const nextNumber =
+        Math.max(
+          ...suppliers.map(s => Number(s.id.split("-")[1])),
+          14
+        ) + 1;
 
-    setFormData({
-      name: "",
-      category: "Medical",
-      coverage: "",
-      onTimeRate: "",
-      leadTime: "",
-      verification: "Pending"
-    });
+      const newSupplier: Supplier = {
+        id: `SUP-${String(nextNumber).padStart(4, "0")}`,
+        name: formData.name,
+        category: formData.category,
+        coverage: formData.coverage,
+        onTimeRate: formData.onTimeRate.endsWith("%")
+          ? formData.onTimeRate
+          : `${formData.onTimeRate}%`,
+        leadTime: formData.leadTime,
+        verification: formData.verification,
+        status: "Active"
+      };
 
-    setShowCreateModal(false);
-    resetFilters();
+      setSuppliers(prev => [newSupplier, ...prev]);
+      setStatusMessage({
+        type: "info",
+        text: `Supplier ${newSupplier.name} added locally (backend offline).`
+      });
+    } finally {
+      setIsSubmitting(false);
+      setShowCreateModal(false);
+      setFormData({
+        name: "",
+        category: "Medical",
+        coverage: "",
+        onTimeRate: "",
+        leadTime: "",
+        verification: "Pending"
+      });
+      resetFilters();
+      setTimeout(() => setStatusMessage(null), 4000);
+    }
+  };
+
+  // UPDATE STATUS / VERIFICATION
+  const handleUpdateSupplier = async (
+    id: string,
+    updates: { status?: SupplierStatus; verification?: Verification }
+  ) => {
+    try {
+      setIsSubmitting(true);
+      const updated = await supplierService.updateStatus(id, updates);
+      setSuppliers(prev => prev.map(s => (s.id === id ? updated : s)));
+      if (selectedSupplier && selectedSupplier.id === id) {
+        setSelectedSupplier(updated);
+      }
+      setIsBackendConnected(true);
+      setStatusMessage({
+        type: "success",
+        text: `Supplier ${id} updated successfully.`
+      });
+    } catch (error) {
+      console.warn("Backend update failed, updating locally:", error);
+      setSuppliers(prev =>
+        prev.map(s => (s.id === id ? { ...s, ...updates } : s))
+      );
+      if (selectedSupplier && selectedSupplier.id === id) {
+        setSelectedSupplier(prev => prev ? { ...prev, ...updates } : null);
+      }
+      setStatusMessage({
+        type: "info",
+        text: `Supplier ${id} updated locally.`
+      });
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setStatusMessage(null), 4000);
+    }
+  };
+
+  // DELETE SUPPLIER
+  const handleDeleteSupplier = async (id: string) => {
+    if (!window.confirm(`Are you sure you want to remove supplier ${id}?`)) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await supplierService.deleteSupplier(id);
+      setSuppliers(prev => prev.filter(s => s.id !== id));
+      setSelectedSupplier(null);
+      setIsBackendConnected(true);
+      setStatusMessage({
+        type: "success",
+        text: `Supplier ${id} removed successfully.`
+      });
+    } catch (error) {
+      console.warn("Backend delete failed, removing locally:", error);
+      setSuppliers(prev => prev.filter(s => s.id !== id));
+      setSelectedSupplier(null);
+      setStatusMessage({
+        type: "info",
+        text: `Supplier ${id} removed locally.`
+      });
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setStatusMessage(null), 4000);
+    }
   };
 
   // EXPORT CSV
@@ -385,12 +520,12 @@ export default function SupplierPage() {
 
   return (
     <div className="min-h-screen bg-[#eef4f7] text-[#163d5c]">
-
       {/* SIDEBAR */}
-      <aside className={`fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col bg-[#143d5e] text-white transition-transform lg:translate-x-0 ${
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      }`}>
-
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col bg-[#143d5e] text-white transition-transform lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         {/* LOGO */}
         <div className="flex h-[74px] items-center gap-3 border-b border-white/10 px-5">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#62b7a8] text-[#143d5e]">
@@ -399,9 +534,7 @@ export default function SupplierPage() {
 
           <div>
             <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">
-              Resource Management
-            </p>
+            <p className="text-[10px] text-sky-200">Resource Management</p>
           </div>
         </div>
 
@@ -411,9 +544,7 @@ export default function SupplierPage() {
             ● Active Operation
           </p>
 
-          <p className="mt-2 text-xs font-bold">
-            Monsoon Floods 2025
-          </p>
+          <p className="mt-2 text-xs font-bold">Monsoon Floods 2025</p>
 
           <p className="mt-1 text-[10px] text-sky-200">
             Greater Riverton · Level 4
@@ -434,8 +565,9 @@ export default function SupplierPage() {
               <button
                 key={item.label}
                 onClick={() => {
-                  if (!active) {
-                    alert(`${item.label} page is not connected yet.`);
+                  if (active) return;
+                  if (item.path) {
+                    navigate(item.path);
                   }
                 }}
                 className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
@@ -458,7 +590,7 @@ export default function SupplierPage() {
           })}
         </nav>
 
-        {/* PROFILE */}
+        {/* USER PROFILE */}
         <div className="flex items-center gap-3 border-t border-white/10 px-5 py-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#287ba5] text-xs font-bold">
             DP
@@ -466,9 +598,7 @@ export default function SupplierPage() {
 
           <div className="flex-1">
             <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">
-              Resource Manager
-            </p>
+            <p className="text-[10px] text-sky-200">Resource Manager</p>
           </div>
 
           <ChevronRight size={18} />
@@ -485,10 +615,8 @@ export default function SupplierPage() {
 
       {/* MAIN CONTENT */}
       <main className="min-h-screen lg:ml-[280px]">
-
         {/* TOP HEADER */}
         <header className="sticky top-0 z-20 flex h-[74px] items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 lg:px-7">
-
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden"
@@ -501,6 +629,11 @@ export default function SupplierPage() {
             <Search size={16} className="text-slate-400" />
 
             <input
+              value={search}
+              onChange={e => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
               placeholder="Search resources, requests, dispatches..."
               className="w-full bg-transparent text-xs outline-none"
             />
@@ -512,19 +645,15 @@ export default function SupplierPage() {
 
           <div className="flex items-center gap-3">
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">
-                Primary Hub
-              </p>
-              <p className="text-[10px] font-bold">
-                Central Logistics Hub
-              </p>
+              <p className="text-[9px] uppercase text-slate-400">Primary Hub</p>
+              <p className="text-[10px] font-bold">Central Logistics Hub</p>
             </div>
 
-            <button className="hidden rounded-lg border p-2.5 sm:block">
+            <button className="hidden rounded-lg border p-2.5 sm:block" title="Security Status">
               <ShieldCheck size={18} />
             </button>
 
-            <button className="relative rounded-lg border p-2.5">
+            <button className="relative rounded-lg border p-2.5" title="Alerts">
               <Bell size={18} />
               <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
                 9
@@ -537,41 +666,71 @@ export default function SupplierPage() {
 
             <div className="hidden sm:block">
               <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">
-                Resource Manager
-              </p>
+              <p className="text-[9px] text-slate-400">Resource Manager</p>
             </div>
 
-            <ChevronRight size={17} className="hidden sm:block" />
+            <ChevronRight size={17} className="hidden sm:block text-slate-400" />
           </div>
         </header>
 
-        {/* PAGE CONTENT */}
+        {/* PAGE BODY */}
         <div className="space-y-6 p-4 sm:p-6 lg:p-7">
+          {/* BREADCRUMB & API STATUS BADGE */}
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400">
+            <div>
+              Resource Operations
+              <ChevronRight size={12} className="mx-1 inline" />
+              <span className="font-semibold text-[#163d5c]">Suppliers</span>
+            </div>
 
-          {/* BREADCRUMB */}
-          <div className="text-[10px] text-slate-400">
-            Resource Operations
-            <ChevronRight size={12} className="mx-1 inline" />
-            <span className="font-semibold text-[#163d5c]">
-              Suppliers
-            </span>
+            <div className="flex items-center gap-2">
+              {isBackendConnected === true && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-medium text-emerald-700 border border-emerald-200">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  API Connected
+                </span>
+              )}
+              {isBackendConnected === false && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-medium text-amber-700 border border-amber-200">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                  Offline Mode
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* STATUS NOTIFICATION BANNER */}
+          {statusMessage && (
+            <div
+              className={`flex items-center gap-3 rounded-lg border p-3.5 text-xs transition-all ${
+                statusMessage.type === "success"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                  : statusMessage.type === "error"
+                  ? "border-rose-200 bg-rose-50 text-rose-800"
+                  : "border-sky-200 bg-sky-50 text-sky-800"
+              }`}
+            >
+              {statusMessage.type === "success" ? (
+                <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+              ) : (
+                <AlertCircle size={16} className="text-sky-600 shrink-0" />
+              )}
+              <span className="flex-1 font-medium">{statusMessage.text}</span>
+            </div>
+          )}
 
           {/* TITLE */}
           <section className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight">
-                Suppliers
-              </h2>
-
+              <h2 className="text-2xl font-semibold tracking-tight">Suppliers</h2>
               <p className="mt-2 text-xs text-slate-500">
-                Maintain verified supplier capability, performance, coverage, and agreements.
+                Manage vendor profiles, contracts, performance ratings, and compliance.
               </p>
             </div>
 
             <div className="flex gap-2">
               <button
+                type="button"
                 onClick={handleExport}
                 className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-semibold text-sky-700 hover:bg-slate-50"
               >
@@ -580,6 +739,7 @@ export default function SupplierPage() {
               </button>
 
               <button
+                type="button"
                 onClick={() => setShowCreateModal(true)}
                 className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-3 text-xs font-semibold text-white hover:bg-[#1c668d]"
               >
@@ -599,22 +759,16 @@ export default function SupplierPage() {
                   key={card.title}
                   className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
                 >
-                  <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${card.color}`}>
+                  <div
+                    className={`flex h-11 w-11 items-center justify-center rounded-lg ${card.color}`}
+                  >
                     <Icon size={20} />
                   </div>
 
                   <div>
-                    <p className="text-[10px] text-slate-400">
-                      {card.title}
-                    </p>
-
-                    <h3 className="text-2xl font-bold">
-                      {card.value}
-                    </h3>
-
-                    <p className="text-[9px] text-slate-400">
-                      {card.note}
-                    </p>
+                    <p className="text-[10px] text-slate-400">{card.title}</p>
+                    <h3 className="text-2xl font-bold">{card.value}</h3>
+                    <p className="text-[9px] text-slate-400">{card.note}</p>
                   </div>
                 </div>
               );
@@ -624,44 +778,57 @@ export default function SupplierPage() {
           {/* TABS */}
           <section>
             <div className="flex flex-wrap gap-6 border-b border-slate-200">
-              {tabs.map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => {
-                    setActiveTab(tab);
-                    setCurrentPage(1);
-                  }}
-                  className={`relative flex items-center gap-1.5 pb-4 text-[11px] ${
-                    activeTab === tab
-                      ? "font-bold text-sky-700"
-                      : "text-slate-500 hover:text-sky-700"
-                  }`}
-                >
-                  {tab}
+              {tabs.map(tab => {
+                const count =
+                  tab === "All"
+                    ? suppliers.length
+                    : tab === "Needs action"
+                    ? suppliers.filter(s => s.verification === "Pending").length
+                    : tab === "Active"
+                    ? suppliers.filter(s => s.status === "Active").length
+                    : tab === "Completed"
+                    ? suppliers.filter(s => s.verification === "Verified").length
+                    : tab === "Exceptions"
+                    ? suppliers.filter(s => s.verification === "Rejected").length
+                    : 0;
 
-                  {tab === "All" && (
-                    <span className="rounded-full bg-sky-100 px-1.5 py-0.5 text-[9px] text-sky-700">
-                      48
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => {
+                      setActiveTab(tab);
+                      setCurrentPage(1);
+                    }}
+                    className={`relative flex items-center gap-1.5 pb-4 text-[11px] ${
+                      activeTab === tab
+                        ? "font-bold text-sky-700"
+                        : "text-slate-500 hover:text-sky-700"
+                    }`}
+                  >
+                    {tab}
+
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[9px] ${
+                        activeTab === tab
+                          ? "bg-sky-100 text-sky-700"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {count}
                     </span>
-                  )}
 
-                  {tab === "Needs action" && (
-                    <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px]">
-                      7
-                    </span>
-                  )}
-
-                  {activeTab === tab && (
-                    <span className="absolute bottom-0 left-0 h-0.5 w-full bg-sky-700" />
-                  )}
-                </button>
-              ))}
+                    {activeTab === tab && (
+                      <span className="absolute bottom-0 left-0 h-0.5 w-full bg-sky-700" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </section>
 
           {/* SEARCH AND FILTERS */}
           <section className="flex flex-wrap gap-2">
-
             <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3">
               <Search size={17} className="text-slate-400" />
 
@@ -687,7 +854,9 @@ export default function SupplierPage() {
             >
               <option>All categories</option>
               {[...new Set(suppliers.map(s => s.category))].map(category => (
-                <option key={category}>{category}</option>
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
             </select>
 
@@ -701,8 +870,10 @@ export default function SupplierPage() {
               style={{ width: "auto" }}
             >
               <option>All regions</option>
-              {[...new Set(suppliers.map(s => s.coverage))].map(region => (
-                <option key={region}>{region}</option>
+              {[...new Set(suppliers.map(s => s.coverage))].map(coverage => (
+                <option key={coverage} value={coverage}>
+                  {coverage}
+                </option>
               ))}
             </select>
 
@@ -716,125 +887,137 @@ export default function SupplierPage() {
               style={{ width: "auto" }}
             >
               <option>All verification states</option>
-              <option>Verified</option>
-              <option>Pending</option>
-              <option>Rejected</option>
+              {(["Verified", "Pending", "Rejected"] as Verification[]).map(verification => (
+                <option key={verification} value={verification}>
+                  {verification}
+                </option>
+              ))}
             </select>
 
             <button
+              type="button"
               onClick={resetFilters}
               className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-xs font-semibold text-sky-700 hover:bg-slate-50"
             >
               <Filter size={15} />
-              More filters
+              Reset Filters
             </button>
           </section>
 
-          {/* SUPPLIER TABLE */}
+          {/* SUPPLIERS TABLE */}
           <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[950px] text-left">
-
-                <thead className="bg-slate-50 text-[10px] text-slate-500">
-                  <tr>
-                    {[
-                      "Supplier ID",
-                      "Supplier",
-                      "Category",
-                      "Coverage",
-                      "On-time Rate",
-                      "Avg Lead Time",
-                      "Verification",
-                      "Status",
-                      ""
-                    ].map((heading, i) => (
-                      <th key={i} className="px-3 py-4 font-semibold">
-                        {heading}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {displayedSuppliers.map(supplier => (
-                    <tr
-                      key={supplier.id}
-                      className="border-t border-slate-100 text-[11px] hover:bg-slate-50"
-                    >
-                      <td className="px-3 py-4 font-bold text-slate-800">
-                        {supplier.id}
-                      </td>
-
-                      <td className="px-3 py-4 text-slate-600">
-                        {supplier.name}
-                      </td>
-
-                      <td className="px-3 py-4 text-slate-600">
-                        {supplier.category}
-                      </td>
-
-                      <td className="px-3 py-4 text-slate-600">
-                        {supplier.coverage}
-                      </td>
-
-                      <td className="px-3 py-4 text-slate-600">
-                        {supplier.onTimeRate}
-                      </td>
-
-                      <td className="px-3 py-4 text-slate-600">
-                        {supplier.leadTime}
-                      </td>
-
-                      <td className={`px-3 py-4 font-medium ${verificationStyles[supplier.verification]}`}>
-                        {supplier.verification}
-                      </td>
-
-                      <td className="px-3 py-4">
-                        <span className={`rounded-md px-2 py-1 text-[10px] font-semibold ${statusStyles[supplier.status]}`}>
-                          {supplier.status}
-                        </span>
-                      </td>
-
-                      <td className="px-3 py-4">
-                        <button
-                          onClick={() => setSelectedSupplier(supplier)}
-                          aria-label={`View ${supplier.id}`}
-                        >
-                          <ChevronRight
-                            size={18}
-                            className="text-slate-500 hover:text-sky-700"
-                          />
-                        </button>
-                      </td>
+            {isLoading ? (
+              <div className="flex h-64 flex-col items-center justify-center gap-3 p-8">
+                <Loader2 size={28} className="animate-spin text-[#287ba5]" />
+                <p className="text-xs text-slate-500">Loading suppliers...</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[1000px] text-left">
+                  <thead className="bg-slate-50 text-[10px] text-slate-500">
+                    <tr>
+                      {[
+                        "Supplier",
+                        "Category",
+                        "Coverage",
+                        "On-time Rate",
+                        "Avg Lead Time",
+                        "Verification",
+                        "Status",
+                        ""
+                      ].map((heading, i) => (
+                        <th key={i} className="px-3 py-4 font-semibold">
+                          {heading}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
 
-              {displayedSuppliers.length === 0 && (
-                <div className="p-10 text-center text-sm text-slate-400">
-                  No suppliers found.
-                </div>
-              )}
-            </div>
+                  <tbody>
+                    {displayedSuppliers.map(item => (
+                      <tr
+                        key={item.id}
+                        className="border-t border-slate-100 text-[11px] hover:bg-slate-50"
+                      >
+                        <td className="px-3 py-4">
+                          <div>
+                            <p className="font-bold text-slate-800">{item.name}</p>
+                            <p className="text-[10px] text-slate-400">{item.id}</p>
+                          </div>
+                        </td>
+
+                        <td className="px-3 py-4 text-slate-600">
+                          {item.category}
+                        </td>
+
+                        <td className="px-3 py-4 text-slate-600">
+                          {item.coverage}
+                        </td>
+
+                        <td className="px-3 py-4 font-semibold text-slate-800">
+                          {item.onTimeRate}
+                        </td>
+
+                        <td className="px-3 py-4 text-slate-600">
+                          {item.leadTime}
+                        </td>
+
+                        <td className="px-3 py-4">
+                          <span className={verificationStyles[item.verification]}>
+                            ● {item.verification}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-4">
+                          <span
+                            className={`whitespace-nowrap rounded-md px-2 py-1 text-[10px] font-semibold ${
+                              statusStyles[item.status]
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-4">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedSupplier(item)}
+                            aria-label={`View ${item.name}`}
+                            className="p-1 hover:text-sky-700"
+                          >
+                            <ChevronRight
+                              size={18}
+                              className="text-slate-500 hover:text-sky-700"
+                            />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {displayedSuppliers.length === 0 && (
+                  <div className="p-10 text-center text-sm text-slate-400">
+                    No suppliers found.
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* PAGINATION */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">
-
               <p className="text-[10px] text-slate-400">
                 Showing{" "}
                 {filteredSuppliers.length === 0
                   ? 0
                   : (safePage - 1) * pageSize + 1}
-                –
-                {Math.min(safePage * pageSize, filteredSuppliers.length)}
-                {" "}of {filteredSuppliers.length}
+                –{Math.min(safePage * pageSize, filteredSuppliers.length)}{" "}
+                of {filteredSuppliers.length}
               </p>
 
               <div className="flex items-center gap-2">
-
                 <button
+                  type="button"
                   disabled={safePage === 1}
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   className="rounded-lg border px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
@@ -842,12 +1025,10 @@ export default function SupplierPage() {
                   Previous
                 </button>
 
-                {Array.from(
-                  { length: totalPages },
-                  (_, i) => i + 1
-                ).map(n => (
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                   <button
                     key={n}
+                    type="button"
                     onClick={() => setCurrentPage(n)}
                     className={`h-8 min-w-8 rounded-lg border px-2 text-[10px] ${
                       safePage === n
@@ -860,6 +1041,7 @@ export default function SupplierPage() {
                 ))}
 
                 <button
+                  type="button"
                   disabled={safePage === totalPages}
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   className="rounded-lg border px-3 py-2 text-[10px] text-slate-600 disabled:opacity-40"
@@ -872,30 +1054,29 @@ export default function SupplierPage() {
         </div>
       </main>
 
-      {/* ADD SUPPLIER MODAL */}
+      {/* CREATE SUPPLIER MODAL */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-
           <form
             onSubmit={handleAddSupplier}
             className="max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
           >
-
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-800">
                   Add Supplier
                 </h3>
                 <p className="mt-1 text-xs text-slate-500">
-                  Enter supplier information.
+                  Enter supplier details to register in the procurement system.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600"
               >
-                <X size={20} className="text-slate-400" />
+                <X size={20} />
               </button>
             </div>
 
@@ -904,11 +1085,13 @@ export default function SupplierPage() {
               <input
                 required
                 value={formData.name}
-                onChange={e => setFormData({
-                  ...formData,
-                  name: e.target.value
-                })}
-                placeholder="Enter supplier name"
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    name: e.target.value
+                  })
+                }
+                placeholder="Enter supplier or company name"
                 className={`mt-2 ${inputClass}`}
               />
             </label>
@@ -917,18 +1100,20 @@ export default function SupplierPage() {
               Category
               <select
                 value={formData.category}
-                onChange={e => setFormData({
-                  ...formData,
-                  category: e.target.value
-                })}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    category: e.target.value
+                  })
+                }
                 className={`mt-2 ${inputClass}`}
               >
                 <option>Medical</option>
-                <option>Food & Water</option>
+                <option>Food &amp; Water</option>
                 <option>Shelter</option>
                 <option>WASH</option>
                 <option>Transport</option>
-                <option>Non-food Items</option>
+                <option>Equipment</option>
               </select>
             </label>
 
@@ -937,27 +1122,31 @@ export default function SupplierPage() {
               <input
                 required
                 value={formData.coverage}
-                onChange={e => setFormData({
-                  ...formData,
-                  coverage: e.target.value
-                })}
-                placeholder="Example: Central Region"
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    coverage: e.target.value
+                  })
+                }
+                placeholder="e.g. National, Central Region, All districts"
                 className={`mt-2 ${inputClass}`}
               />
             </label>
 
             <label className="block text-xs font-semibold">
-              On-time Delivery Rate
+              On-time Delivery Rate (%)
               <input
                 required
                 type="number"
                 min="0"
                 max="100"
                 value={formData.onTimeRate}
-                onChange={e => setFormData({
-                  ...formData,
-                  onTimeRate: e.target.value
-                })}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    onTimeRate: e.target.value
+                  })
+                }
                 placeholder="Example: 95"
                 className={`mt-2 ${inputClass}`}
               />
@@ -968,10 +1157,12 @@ export default function SupplierPage() {
               <input
                 required
                 value={formData.leadTime}
-                onChange={e => setFormData({
-                  ...formData,
-                  leadTime: e.target.value
-                })}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    leadTime: e.target.value
+                  })
+                }
                 placeholder="Example: 2.1 days"
                 className={`mt-2 ${inputClass}`}
               />
@@ -981,15 +1172,17 @@ export default function SupplierPage() {
               Verification Status
               <select
                 value={formData.verification}
-                onChange={e => setFormData({
-                  ...formData,
-                  verification: e.target.value as Verification
-                })}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    verification: e.target.value as Verification
+                  })
+                }
                 className={`mt-2 ${inputClass}`}
               >
-                <option>Pending</option>
-                <option>Verified</option>
-                <option>Rejected</option>
+                <option value="Pending">Pending</option>
+                <option value="Verified">Verified</option>
+                <option value="Rejected">Rejected</option>
               </select>
             </label>
 
@@ -997,16 +1190,18 @@ export default function SupplierPage() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border px-4 py-2.5 text-xs font-semibold"
+                className="rounded-lg border px-4 py-2.5 text-xs font-semibold hover:bg-slate-50"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d]"
+                disabled={isSubmitting}
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50"
               >
-                Add Supplier
+                {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+                <span>Add Supplier</span>
               </button>
             </div>
           </form>
@@ -1016,38 +1211,51 @@ export default function SupplierPage() {
       {/* SUPPLIER DETAILS MODAL */}
       {selectedSupplier && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-
           <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
-
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-800">
                   Supplier Details
                 </h3>
-
                 <p className="mt-1 text-xs text-slate-400">
                   {selectedSupplier.id}
                 </p>
               </div>
 
-              <button onClick={() => setSelectedSupplier(null)}>
-                <X size={20} className="text-slate-400" />
+              <button
+                type="button"
+                onClick={() => setSelectedSupplier(null)}
+                className="p-1 text-slate-400 hover:text-slate-600"
+              >
+                <X size={20} />
               </button>
             </div>
 
-            <div className="mb-4 flex items-center gap-3 rounded-xl bg-sky-50 p-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-sky-700">
-                <Building2 size={22} />
+            <div className="mb-4 flex items-center justify-between rounded-xl bg-sky-50 p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-sky-700 shadow-sm">
+                  <Building2 size={22} />
+                </div>
+
+                <div>
+                  <p className="text-sm font-bold text-slate-800">
+                    {selectedSupplier.name}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {selectedSupplier.category} · {selectedSupplier.coverage}
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <p className="text-sm font-bold text-slate-800">
-                  {selectedSupplier.name}
-                </p>
-                <p className="text-xs text-slate-500">
-                  {selectedSupplier.category}
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={() => handleDeleteSupplier(selectedSupplier.id)}
+                disabled={isSubmitting}
+                className="flex items-center gap-1 text-xs text-rose-600 hover:text-rose-800 p-1.5 rounded hover:bg-rose-50"
+                title="Remove supplier"
+              >
+                <Trash2 size={15} />
+              </button>
             </div>
 
             {[
@@ -1060,26 +1268,124 @@ export default function SupplierPage() {
               ["Verification", selectedSupplier.verification],
               ["Status", selectedSupplier.status]
             ].map(([label, value]) => (
-              <div
-                key={label}
-                className="mb-2 rounded-lg bg-slate-50 p-3"
-              >
-                <p className="text-[10px] text-slate-400">
-                  {label}
-                </p>
-
+              <div key={label} className="mb-2 rounded-lg bg-slate-50 p-3">
+                <p className="text-[10px] text-slate-400">{label}</p>
                 <p className="mt-1 text-sm font-semibold text-slate-800">
                   {value}
                 </p>
               </div>
             ))}
 
-            <button
-              onClick={() => setSelectedSupplier(null)}
-              className="mt-4 w-full rounded-lg bg-[#287ba5] py-3 text-xs font-semibold text-white hover:bg-[#1c668d]"
-            >
-              Close
-            </button>
+            {/* SUPPLIER ACTIONS */}
+            <div className="mt-4 pt-3 border-t border-slate-100 space-y-3">
+              <div>
+                <p className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider mb-2">
+                  Verification Actions
+                </p>
+                <div className="flex gap-2">
+                  {selectedSupplier.verification !== "Verified" && (
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() =>
+                        handleUpdateSupplier(selectedSupplier.id, {
+                          verification: "Verified"
+                        })
+                      }
+                      className="flex-1 rounded-lg bg-emerald-600 py-2 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                    >
+                      Verify Supplier
+                    </button>
+                  )}
+                  {selectedSupplier.verification !== "Pending" && (
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() =>
+                        handleUpdateSupplier(selectedSupplier.id, {
+                          verification: "Pending"
+                        })
+                      }
+                      className="flex-1 rounded-lg bg-amber-600 py-2 text-xs font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+                    >
+                      Set Pending
+                    </button>
+                  )}
+                  {selectedSupplier.verification !== "Rejected" && (
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() =>
+                        handleUpdateSupplier(selectedSupplier.id, {
+                          verification: "Rejected"
+                        })
+                      }
+                      className="flex-1 rounded-lg bg-rose-600 py-2 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+                    >
+                      Reject
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider mb-2">
+                  Operational Status
+                </p>
+                <div className="flex gap-2">
+                  {selectedSupplier.status !== "Active" && (
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() =>
+                        handleUpdateSupplier(selectedSupplier.id, {
+                          status: "Active"
+                        })
+                      }
+                      className="flex-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-50"
+                    >
+                      Set Active
+                    </button>
+                  )}
+                  {selectedSupplier.status !== "Inactive" && (
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() =>
+                        handleUpdateSupplier(selectedSupplier.id, {
+                          status: "Inactive"
+                        })
+                      }
+                      className="flex-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 py-1.5 text-xs font-semibold hover:bg-slate-200 disabled:opacity-50"
+                    >
+                      Set Inactive
+                    </button>
+                  )}
+                  {selectedSupplier.status !== "Suspended" && (
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() =>
+                        handleUpdateSupplier(selectedSupplier.id, {
+                          status: "Suspended"
+                        })
+                      }
+                      className="flex-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 py-1.5 text-xs font-semibold hover:bg-rose-100 disabled:opacity-50"
+                    >
+                      Suspend
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedSupplier(null)}
+                className="mt-2 w-full rounded-lg border border-slate-200 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
