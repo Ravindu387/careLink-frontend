@@ -718,11 +718,10 @@ export default function ShelterAdminDashboard() {
                 >
 
                   <div
-                    className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
-                      alert.type === "danger"
-                        ? "bg-[#fff0f0] text-[#ef525b]"
-                        : "bg-[#fff6e5] text-[#e5a12d]"
-                    }`}
+                    className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${alert.type === "danger"
+                      ? "bg-[#fff0f0] text-[#ef525b]"
+                      : "bg-[#fff6e5] text-[#e5a12d]"
+                      }`}
                   >
                     <AlertTriangle size={14} />
                   </div>
