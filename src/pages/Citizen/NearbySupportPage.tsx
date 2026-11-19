@@ -1,359 +1,386 @@
-
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
-  Heart, Search, Globe, Accessibility, Bell, Home, Plus,
-  ClipboardList, Map, House, TriangleAlert, Users, FileText,
-  MessageSquare, Phone, ChevronRight, Utensils, Cross,
-  Truck, Package, Menu, X, MapPin, Navigation, Filter,
-  List, MapPinned, Clock, CheckCircle2, LocateFixed
+  Heart,
+  Search,
+  Globe,
+  Accessibility,
+  Bell,
+  Home,
+  Plus,
+  ClipboardList,
+  Map,
+  House,
+  TriangleAlert,
+  Users,
+  FileText,
+  MessageSquare,
+  Phone,
+  ChevronRight,
+  Utensils,
+  Cross,
+  Truck,
+  Package,
+  Menu,
+  X,
+  MapPin,
+  Navigation,
+  Filter,
+  List,
+  MapPinned,
+  Clock,
+  CheckCircle2,
+  LocateFixed,
+  Wifi,
+  WifiOff,
+  RefreshCw,
+  AlertCircle,
+  Info,
+  Building2,
+  Activity,
 } from "lucide-react";
-
-const navigation = [
-  { name: "Home", icon: Home },
-  { name: "Request Help", icon: Plus },
-  { name: "My Requests", icon: ClipboardList, count: 2 },
-  { name: "Nearby Support", icon: Map },
-  { name: "Shelters", icon: House },
-  { name: "Safety Updates", icon: TriangleAlert, count: 3 },
-  { name: "My Household", icon: Users },
-  { name: "My Documents", icon: FileText },
-  { name: "Messages", icon: MessageSquare, count: 2 },
-  { name: "Notifications", icon: Bell, count: 4 },
-  { name: "Feedback", icon: Heart },
-  { name: "Profile & Settings", icon: Accessibility },
-];
-
-const supportLocations = [
-  {
-    id: 1,
-    name: "North Community Support Centre",
-    category: "Support centre",
-    distance: "0.8 km",
-    status: "Open",
-    address: "North Ward",
-    services: ["Food", "Water", "Charging"],
-    hours: "Open until 20:00",
-    icon: House,
-    color: "green",
-    x: 25,
-    y: 23,
-    description:
-      "A local support centre providing essential supplies, food, water and charging facilities.",
-    phone: "+94 21 222 1001",
-  },
-  {
-    id: 2,
-    name: "Riverton High School",
-    category: "Emergency shelter",
-    distance: "1.4 km",
-    status: "Space available",
-    address: "Riverton",
-    services: ["Accessible", "Medical"],
-    hours: "Open 24 hours",
-    icon: House,
-    color: "green",
-    x: 66,
-    y: 26,
-    description:
-      "Emergency accommodation for families and displaced residents.",
-    phone: "+94 21 222 1002",
-  },
-  {
-    id: 3,
-    name: "Eastbank Mobile Clinic",
-    category: "Medical support",
-    distance: "2.1 km",
-    status: "Open",
-    address: "Eastbank",
-    services: ["First aid", "Medicines"],
-    hours: "Open until 18:00",
-    icon: Cross,
-    color: "green",
-    x: 31,
-    y: 72,
-    description:
-      "Mobile medical assistance, first aid and essential medicines.",
-    phone: "+94 21 222 1003",
-  },
-  {
-    id: 4,
-    name: "St. Mary Civic Centre",
-    category: "Emergency shelter",
-    distance: "3.2 km",
-    status: "Full",
-    address: "Central Ward",
-    services: ["Food", "Medical", "Childcare"],
-    hours: "Currently full",
-    icon: House,
-    color: "red",
-    x: 86,
-    y: 64,
-    description:
-      "Community emergency shelter. Currently at full capacity.",
-    phone: "+94 21 222 1004",
-  },
-];
+import Sidebar from "./Sidebar";
+import Topbar from "./Topbar";
+import {
+  nearbySupportService,
+  MOCK_SUPPORT_LOCATIONS,
+} from "../../services/nearbySupportService";
+import type {
+  SupportLocation,
+  NearbySupportSummary,
+} from "../../types/nearbySupport";
 
 export default function NearbySupportPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [view, setView] = useState<"map" | "list">("map");
+
+  // Filter state
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All support");
   const [availability, setAvailability] = useState("Open now");
   const [distance, setDistance] = useState("Within 5 km");
-  const [selected, setSelected] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredLocations = supportLocations.filter((place) => {
-    const matchesSearch =
-      place.name.toLowerCase().includes(search.toLowerCase()) ||
-      place.address.toLowerCase().includes(search.toLowerCase()) ||
-      place.services.join(" ").toLowerCase().includes(search.toLowerCase());
-
-    const matchesCategory =
-      category === "All support" ||
-      (category === "Shelters" && place.category === "Emergency shelter") ||
-      (category === "Medical" && place.category === "Medical support") ||
-      (category === "Support centres" && place.category === "Support centre");
-
-    const matchesAvailability =
-      availability === "All availability" ||
-      (availability === "Open now" && place.status !== "Full") ||
-      (availability === "Space available" &&
-        place.status === "Space available");
-
-    const matchesDistance =
-      distance === "Any distance" ||
-      (distance === "Within 2 km" && parseFloat(place.distance) <= 2) ||
-      (distance === "Within 5 km" && parseFloat(place.distance) <= 5);
-
-    return (
-      matchesSearch &&
-      matchesCategory &&
-      matchesAvailability &&
-      matchesDistance
-    );
+  // Data state
+  const [locations, setLocations] = useState<SupportLocation[]>(MOCK_SUPPORT_LOCATIONS);
+  const [selected, setSelected] = useState<string | number | null>(null);
+  const [summary, setSummary] = useState<NearbySupportSummary>({
+    totalLocations: MOCK_SUPPORT_LOCATIONS.length,
+    openCount: MOCK_SUPPORT_LOCATIONS.filter((l) => l.status !== "Full").length,
+    sheltersCount: MOCK_SUPPORT_LOCATIONS.filter((l) => l.category.includes("shelter")).length,
+    medicalCount: MOCK_SUPPORT_LOCATIONS.filter((l) => l.category.includes("Medical")).length,
+    supportCentresCount: MOCK_SUPPORT_LOCATIONS.filter((l) => l.category.includes("Support centre")).length,
   });
 
-  const selectedPlace = supportLocations.find(
-    (place) => place.id === selected
-  );
+  // UI & Loading state
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isBackendConnected, setIsBackendConnected] = useState<boolean | null>(null);
+  const [feedbackToast, setFeedbackToast] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (feedbackToast) {
+      const timer = setTimeout(() => setFeedbackToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedbackToast]);
+
+  // Fetch Locations
+  const fetchLocations = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const data = await nearbySupportService.getLocations({
+        search: search.trim() || undefined,
+        category: category !== "All support" ? category : undefined,
+        availability: availability !== "All availability" ? availability : undefined,
+        distance: distance !== "Any distance" ? distance : undefined,
+      });
+
+      setLocations(data);
+      setIsBackendConnected(true);
+
+      // Fetch summary
+      try {
+        const sum = await nearbySupportService.getSummary();
+        setSummary(sum);
+      } catch {
+        setSummary({
+          totalLocations: data.length,
+          openCount: data.filter((l) => l.status !== "Full").length,
+          sheltersCount: data.filter((l) => l.category.toLowerCase().includes("shelter")).length,
+          medicalCount: data.filter((l) => l.category.toLowerCase().includes("medical")).length,
+          supportCentresCount: data.filter((l) => l.category.toLowerCase().includes("support")).length,
+        });
+      }
+    } catch (err) {
+      console.warn("Backend API offline, using local mock support locations:", err);
+      setIsBackendConnected(false);
+
+      // Client-side fallback filter
+      let fallbackList = [...MOCK_SUPPORT_LOCATIONS];
+
+      if (search.trim()) {
+        const q = search.toLowerCase().trim();
+        fallbackList = fallbackList.filter(
+          (place) =>
+            place.name.toLowerCase().includes(q) ||
+            place.address.toLowerCase().includes(q) ||
+            place.services.some((s) => s.toLowerCase().includes(q))
+        );
+      }
+
+      if (category !== "All support") {
+        fallbackList = fallbackList.filter((place) => {
+          if (category === "Shelters") return place.category === "Emergency shelter";
+          if (category === "Medical") return place.category === "Medical support";
+          if (category === "Support centres") return place.category === "Support centre";
+          return place.category.toLowerCase() === category.toLowerCase();
+        });
+      }
+
+      if (availability !== "All availability") {
+        fallbackList = fallbackList.filter((place) => {
+          if (availability === "Open now") return place.status !== "Full";
+          if (availability === "Space available") return place.status === "Space available";
+          return true;
+        });
+      }
+
+      if (distance !== "Any distance") {
+        fallbackList = fallbackList.filter((place) => {
+          const distNum = parseFloat(place.distance);
+          if (distance === "Within 2 km") return distNum <= 2;
+          if (distance === "Within 5 km") return distNum <= 5;
+          return true;
+        });
+      }
+
+      setLocations(fallbackList);
+      setSummary({
+        totalLocations: MOCK_SUPPORT_LOCATIONS.length,
+        openCount: MOCK_SUPPORT_LOCATIONS.filter((l) => l.status !== "Full").length,
+        sheltersCount: MOCK_SUPPORT_LOCATIONS.filter((l) => l.category.includes("shelter")).length,
+        medicalCount: MOCK_SUPPORT_LOCATIONS.filter((l) => l.category.includes("Medical")).length,
+        supportCentresCount: MOCK_SUPPORT_LOCATIONS.filter((l) => l.category.includes("Support centre")).length,
+      });
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, [search, category, availability, distance]);
+
+  useEffect(() => {
+    fetchLocations();
+  }, [fetchLocations]);
+
+  // Selected Place Object
+  const selectedPlace = locations.find((place) => place.id === selected) || null;
+
+  // Icon Helper
+  const getLocationIcon = (place: SupportLocation) => {
+    const cat = place.category.toLowerCase();
+    if (cat.includes("medical")) return <Cross size={18} />;
+    if (cat.includes("shelter")) return <House size={18} />;
+    return <Building2 size={18} />;
+  };
 
   return (
     <div className="min-h-screen bg-[#eef4f7] text-[#173d5b]">
-
       {/* SIDEBAR */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[295px] flex-col bg-[#153e5e] text-white transition-transform lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        {/* LOGO */}
-        <div className="flex h-[74px] items-center justify-between border-b border-white/10 px-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#65b9aa] text-[#153e5e]">
-              <Heart size={23} />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">ReliefOS</h1>
-              <p className="text-[10px] text-sky-200">Citizen Support</p>
-            </div>
-          </div>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden">
-            <X size={20} />
-          </button>
-        </div>
+      <Sidebar
+        activePage="Nearby Support"
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-        {/* ACTIVE RESPONSE */}
-        <div className="mx-3 mt-4 rounded-xl border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
-            ● Active Local Response
-          </p>
-          <p className="mt-2 text-xs font-bold">Greater Riverton Floods</p>
-          <p className="mt-1 text-[10px] text-sky-200">
-            Help centres and shelters are open
-          </p>
-        </div>
-
-        <div className="mt-5 px-5">
-          <p className="mb-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
-            Your Support
-          </p>
-        </div>
-
-        {/* NAVIGATION */}
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            const active = item.name === "Nearby Support";
-
-            return (
-              <button
-                key={item.name}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex w-full items-center gap-3 rounded-lg border-l-[3px] px-3 py-3 text-left text-xs transition ${
-                  active
-                    ? "border-[#65b9aa] bg-[#287da6] font-semibold text-white"
-                    : "border-transparent text-sky-100 hover:bg-white/10"
-                }`}
-              >
-                <Icon size={17} />
-                <span className="flex-1">{item.name}</span>
-                {item.count && (
-                  <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[9px]">
-                    {item.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* EMERGENCY */}
-        <div className="mx-3 mb-3 rounded-xl bg-white p-3 text-[#173d5b]">
-          <div className="flex items-center gap-3">
-            <Phone size={20} />
-            <div>
-              <p className="text-[10px] font-semibold">Emergency help line</p>
-              <a href="tel:112" className="text-sm font-bold text-red-600">
-                Call 112
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* USER */}
-        <div className="flex items-center gap-3 border-t border-white/10 px-5 py-4">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#287da6] text-xs font-bold">
-            SK
-          </div>
-          <div className="flex-1">
-            <p className="text-xs font-bold">Samira Khan</p>
-            <p className="text-[10px] text-sky-200">Citizen account</p>
-          </div>
-          <ChevronRight size={17} />
-        </div>
-      </aside>
-
-      {/* MOBILE OVERLAY */}
-      {sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-          aria-label="Close sidebar"
-        />
-      )}
-
-      {/* MAIN CONTENT */}
+      {/* MAIN CONTENT AREA */}
       <main className="min-h-screen lg:ml-[295px]">
+        {/* TOPBAR */}
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
-        {/* HEADER */}
-        <header className="sticky top-0 z-30 flex h-[74px] items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 sm:px-6">
-
-          <div className="flex flex-1 items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
-              <Menu size={22} />
-            </button>
-
-            <div className="flex max-w-[520px] flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3">
-              <Search size={17} className="text-slate-400" />
-              <input
-                placeholder="Search help, shelters, services..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-transparent text-xs outline-none"
-              />
+        {/* PAGE CONTENT CONTAINER */}
+        <div className="mx-auto max-w-[1500px] space-y-5 p-4 sm:p-6">
+          {/* TOAST FEEDBACK NOTIFICATION */}
+          {feedbackToast && (
+            <div
+              className={`flex items-center justify-between gap-3 rounded-xl border p-4 text-xs font-semibold shadow-md transition-all ${
+                feedbackToast.type === "success"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                  : feedbackToast.type === "error"
+                  ? "border-red-200 bg-red-50 text-red-800"
+                  : "border-sky-200 bg-sky-50 text-sky-800"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {feedbackToast.type === "success" ? (
+                  <CheckCircle2 size={16} className="text-emerald-600" />
+                ) : feedbackToast.type === "error" ? (
+                  <AlertCircle size={16} className="text-red-600" />
+                ) : (
+                  <Info size={16} className="text-sky-600" />
+                )}
+                <span>{feedbackToast.message}</span>
+              </div>
+              <button
+                onClick={() => setFeedbackToast(null)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X size={15} />
+              </button>
             </div>
-          </div>
+          )}
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button className="hidden items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs sm:flex">
-              <Globe size={15} />
-              English
-            </button>
-
-            <button className="hidden rounded-lg border border-slate-200 p-2 sm:block">
-              <Accessibility size={18} />
-            </button>
-
-            <button className="relative rounded-lg border border-slate-200 p-2">
-              <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
-                4
-              </span>
-            </button>
-
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#287da6] text-xs font-bold text-white">
-              SK
-            </div>
-
-            <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Samira</p>
-              <p className="text-[9px] text-slate-400">North Ward</p>
-            </div>
-            <ChevronRight size={17} />
-          </div>
-        </header>
-
-        {/* PAGE */}
-        <div className="mx-auto max-w-[1500px] space-y-4 p-4 sm:p-6">
-
-          {/* TITLE */}
-          <section className="flex flex-wrap items-center justify-between gap-3">
+          {/* PAGE HEADER & CONTROLS */}
+          <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-xl font-semibold">Nearby support</h2>
-              <p className="mt-2 text-xs text-slate-500">
-                Find verified help, food, water, medical help, and charging points near you.
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold tracking-tight">
+                  Nearby Support
+                </h2>
+
+                {/* BACKEND STATUS BADGE */}
+                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] shadow-xs">
+                  {isBackendConnected === true ? (
+                    <>
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="font-semibold text-emerald-700 flex items-center gap-1">
+                        <Wifi size={11} /> Backend API Online
+                      </span>
+                    </>
+                  ) : isBackendConnected === false ? (
+                    <>
+                      <span className="h-2 w-2 rounded-full bg-amber-500" />
+                      <span className="font-semibold text-amber-700 flex items-center gap-1">
+                        <WifiOff size={11} /> Local Fallback Mode
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-slate-400">Connecting...</span>
+                  )}
+                </div>
+              </div>
+
+              <p className="mt-1 text-xs text-slate-500">
+                Find verified emergency shelters, supply hubs, medical clinics, and relief centres in your vicinity.
               </p>
             </div>
 
-            {/* VIEW TOGGLE */}
-            <div className="flex rounded-lg bg-slate-200 p-1">
+            {/* ACTION CONTROLS & VIEW TOGGLE */}
+            <div className="flex items-center gap-2.5">
               <button
-                onClick={() => setView("map")}
-                className={`flex items-center gap-2 rounded-md px-3 py-2 text-[10px] font-semibold ${
-                  view === "map"
-                    ? "bg-white text-[#287da6] shadow-sm"
-                    : "text-slate-500"
-                }`}
+                onClick={() => fetchLocations()}
+                disabled={isRefreshing}
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
+                title="Refresh facility list"
               >
-                <MapPinned size={14} />
-                Map
+                <RefreshCw
+                  size={14}
+                  className={isRefreshing ? "animate-spin text-[#287da6]" : "text-slate-500"}
+                />
+                <span className="hidden sm:inline">Refresh</span>
               </button>
 
-              <button
-                onClick={() => setView("list")}
-                className={`flex items-center gap-2 rounded-md px-3 py-2 text-[10px] font-semibold ${
-                  view === "list"
-                    ? "bg-white text-[#287da6] shadow-sm"
-                    : "text-slate-500"
-                }`}
-              >
-                <List size={14} />
-                List
-              </button>
+              <div className="flex rounded-lg bg-slate-200 p-1 shadow-xs">
+                <button
+                  onClick={() => setView("map")}
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                    view === "map"
+                      ? "bg-white text-[#287da6] shadow-xs"
+                      : "text-slate-600 hover:text-[#287da6]"
+                  }`}
+                >
+                  <MapPinned size={14} />
+                  Map
+                </button>
+
+                <button
+                  onClick={() => setView("list")}
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                    view === "list"
+                      ? "bg-white text-[#287da6] shadow-xs"
+                      : "text-slate-600 hover:text-[#287da6]"
+                  }`}
+                >
+                  <List size={14} />
+                  List
+                </button>
+              </div>
             </div>
           </section>
 
-          {/* FILTERS */}
-          <section className="flex flex-wrap gap-2">
-            <div className="relative min-w-[180px] flex-1">
+          {/* KPI COUNTERS */}
+          <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Total Facilities
+              </span>
+              <p className="mt-1.5 text-xl font-bold text-[#173d5b]">
+                {summary.totalLocations}
+              </p>
+              <p className="text-[9px] text-slate-400">Active regional points</p>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+                Open Now
+              </span>
+              <p className="mt-1.5 text-xl font-bold text-emerald-600">
+                {summary.openCount}
+              </p>
+              <p className="text-[9px] text-slate-400">Immediate access</p>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#287da6]">
+                Shelters
+              </span>
+              <p className="mt-1.5 text-xl font-bold text-[#287da6]">
+                {summary.sheltersCount}
+              </p>
+              <p className="text-[9px] text-slate-400">Displacement centers</p>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
+                Medical Clinics
+              </span>
+              <p className="mt-1.5 text-xl font-bold text-rose-600">
+                {summary.medicalCount}
+              </p>
+              <p className="text-[9px] text-slate-400">First aid & prescriptions</p>
+            </div>
+          </section>
+
+          {/* SEARCH & FILTERS BAR */}
+          <section className="flex flex-wrap items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+            <div className="relative min-w-[200px] flex-1">
               <Search
-                size={15}
-                className="absolute left-3 top-3 text-slate-400"
+                size={14}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search service or location..."
-                className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-[10px] outline-none focus:border-[#287da6]"
+                placeholder="Search facility name, address, or service (e.g. Food, Medical)..."
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-8 text-xs outline-none focus:border-[#287da6] focus:bg-white"
               />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
 
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[10px] outline-none"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none focus:border-[#287da6]"
             >
               <option>All support</option>
               <option>Shelters</option>
@@ -364,7 +391,7 @@ export default function NearbySupportPage() {
             <select
               value={availability}
               onChange={(e) => setAvailability(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[10px] outline-none"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none focus:border-[#287da6]"
             >
               <option>Open now</option>
               <option>All availability</option>
@@ -374,7 +401,7 @@ export default function NearbySupportPage() {
             <select
               value={distance}
               onChange={(e) => setDistance(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[10px] outline-none"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none focus:border-[#287da6]"
             >
               <option>Within 5 km</option>
               <option>Within 2 km</option>
@@ -383,48 +410,56 @@ export default function NearbySupportPage() {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-[10px] ${
+              className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition ${
                 showFilters
                   ? "border-[#287da6] bg-sky-50 text-[#287da6]"
-                  : "border-slate-200 bg-white"
+                  : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
               }`}
             >
-              <Filter size={14} />
-              Filters
+              <Filter size={13} />
+              Filter Info
             </button>
           </section>
 
-          {/* EXTRA FILTER */}
+          {/* EXPANDABLE FILTER INFO BANNER */}
           {showFilters && (
-            <div className="rounded-lg border border-slate-200 bg-white p-4">
-              <p className="text-xs font-semibold">Support filters</p>
-              <p className="mt-2 text-[10px] text-slate-500">
-                Select the support category, availability and distance using the filters above.
-              </p>
+            <div className="flex flex-col gap-2 rounded-xl border border-sky-200 bg-sky-50/70 p-4 sm:flex-row sm:items-center sm:justify-between shadow-xs">
+              <div>
+                <p className="text-xs font-bold text-[#173d5b]">Active Filter Criteria</p>
+                <p className="mt-0.5 text-[11px] text-slate-600">
+                  Showing <strong>{category}</strong> • Availability: <strong>{availability}</strong> • Radius: <strong>{distance}</strong>
+                </p>
+              </div>
+
               <button
                 onClick={() => {
                   setCategory("All support");
-                  setAvailability("All availability");
-                  setDistance("Any distance");
+                  setAvailability("Open now");
+                  setDistance("Within 5 km");
                   setSearch("");
                 }}
-                className="mt-3 text-[10px] font-semibold text-[#287da6]"
+                className="rounded-lg border border-sky-300 bg-white px-3 py-1.5 text-xs font-semibold text-[#287da6] hover:bg-sky-50 transition"
               >
-                Clear all filters
+                Reset All Filters
               </button>
             </div>
           )}
 
-          {/* MAP AND LIST */}
-          {view === "map" ? (
-            <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_280px]">
-
-              {/* MAP */}
-              <div className="relative h-[450px] overflow-hidden rounded-xl border border-slate-200 bg-[#e8f0ed] shadow-sm sm:h-[560px]">
-
-                {/* MAP GRID */}
+          {/* VIEW: MAP VS LIST */}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white py-16 text-center">
+              <RefreshCw size={28} className="animate-spin text-[#287da6]" />
+              <p className="mt-3 text-xs font-semibold text-slate-600">
+                Finding nearby support facilities...
+              </p>
+            </div>
+          ) : view === "map" ? (
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+              {/* INTERACTIVE VECTOR MAP */}
+              <div className="relative h-[480px] sm:h-[580px] overflow-hidden rounded-xl border border-slate-200 bg-[#e8f0ed] shadow-xs">
+                {/* MAP GRID TEXTURE */}
                 <div
-                  className="absolute inset-0"
+                  className="absolute inset-0 opacity-60"
                   style={{
                     backgroundImage: `
                       linear-gradient(30deg, transparent 46%, white 47%, white 49%, transparent 50%),
@@ -434,26 +469,31 @@ export default function NearbySupportPage() {
                   }}
                 />
 
-                {/* ROAD LINES */}
-                <div className="absolute left-[-10%] top-[47%] h-7 w-[125%] -rotate-[19deg] bg-[#b9dce5]" />
+                {/* RIVER CORRIDOR */}
+                <div className="absolute left-[-10%] top-[47%] h-8 w-[125%] -rotate-[19deg] bg-[#b9dce5] shadow-xs flex items-center justify-center">
+                  <span className="text-[9px] font-bold tracking-widest text-sky-800/60 uppercase">
+                    Riverton Waterway
+                  </span>
+                </div>
 
-                <div className="absolute left-[15%] top-0 h-[110%] w-3 -rotate-[45deg] bg-white/80" />
-                <div className="absolute left-[47%] top-0 h-[110%] w-3 rotate-[45deg] bg-white/80" />
-                <div className="absolute left-[75%] top-0 h-[110%] w-3 -rotate-[45deg] bg-white/80" />
+                {/* ROAD VECTORS */}
+                <div className="absolute left-[15%] top-0 h-[110%] w-3.5 -rotate-[45deg] bg-white/90 shadow-xs" />
+                <div className="absolute left-[47%] top-0 h-[110%] w-3.5 rotate-[45deg] bg-white/90 shadow-xs" />
+                <div className="absolute left-[75%] top-0 h-[110%] w-3.5 -rotate-[45deg] bg-white/90 shadow-xs" />
 
                 {/* AREA LABELS */}
-                <span className="absolute left-[10%] top-[10%] text-[8px] font-semibold tracking-wider text-slate-400">
-                  NORTH WARD
-                </span>
+                <div className="absolute left-[8%] top-[8%] rounded bg-white/80 px-2 py-0.5 text-[8px] font-bold tracking-wider text-slate-500 shadow-xs">
+                  NORTH WARD SECTOR
+                </div>
 
-                <span className="absolute bottom-[12%] right-[10%] text-[8px] font-semibold tracking-wider text-slate-400">
-                  CENTRAL WARD
-                </span>
+                <div className="absolute bottom-[10%] right-[8%] rounded bg-white/80 px-2 py-0.5 text-[8px] font-bold tracking-wider text-slate-500 shadow-xs">
+                  CENTRAL WARD RELIEF ZONE
+                </div>
 
                 {/* LOCATION MARKERS */}
-                {filteredLocations.map((place) => {
-                  const Icon = place.icon;
+                {locations.map((place) => {
                   const active = selected === place.id;
+                  const isFull = place.status.toLowerCase() === "full";
 
                   return (
                     <button
@@ -463,27 +503,31 @@ export default function NearbySupportPage() {
                         left: `${place.x}%`,
                         top: `${place.y}%`,
                       }}
-                      className={`absolute z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px] border-white shadow-lg transition hover:scale-110 ${
+                      className={`absolute z-10 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px] border-white shadow-lg transition-transform hover:scale-110 ${
                         active
-                          ? "scale-125 bg-[#153e5e] text-white"
-                          : place.color === "red"
+                          ? "scale-125 bg-[#153e5e] text-white ring-4 ring-sky-300"
+                          : isFull
                           ? "bg-red-600 text-white"
                           : "bg-[#25866e] text-white"
                       }`}
-                      title={place.name}
+                      title={`${place.name} (${place.status})`}
                     >
-                      <Icon size={17} />
+                      {getLocationIcon(place)}
                     </button>
                   );
                 })}
 
-                {/* CURRENT LOCATION */}
-                <div className="absolute left-[50%] top-[53%] z-10 -translate-x-1/2 -translate-y-1/2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#153e5e] text-white shadow-lg">
-                    <Navigation size={14} />
+                {/* CITIZEN LOCATION MARKER */}
+                <div className="absolute left-[50%] top-[53%] z-10 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
+                  <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#153e5e] text-white shadow-lg animate-bounce">
+                    <Navigation size={15} />
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                    </span>
                   </div>
-                  <span className="mt-1 block whitespace-nowrap rounded bg-[#153e5e] px-2 py-1 text-[8px] text-white">
-                    Your location
+                  <span className="mt-1 whitespace-nowrap rounded-md bg-[#153e5e] px-2 py-0.5 text-[9px] font-bold text-white shadow-xs">
+                    Your Location (Riverside Lane)
                   </span>
                 </div>
 
@@ -491,216 +535,330 @@ export default function NearbySupportPage() {
                 <div className="absolute bottom-4 right-4 flex flex-col gap-2">
                   <button
                     onClick={() => setSelected(null)}
-                    className="rounded-lg border border-slate-200 bg-white p-2 text-[#287da6] shadow-sm"
-                    title="Clear selected location"
+                    className="rounded-lg border border-slate-200 bg-white p-2.5 text-[#287da6] shadow-md hover:bg-slate-50 transition"
+                    title="Center on my location"
                   >
-                    <LocateFixed size={17} />
+                    <LocateFixed size={18} />
                   </button>
                 </div>
 
-                {/* LEGEND */}
-                <div className="absolute bottom-4 left-4 flex items-center gap-3 rounded-lg border border-slate-200 bg-white/95 px-3 py-2">
-                  <span className="flex items-center gap-1 text-[8px]">
-                    <span className="h-2 w-2 rounded-full bg-[#25866e]" />
-                    Open
+                {/* MAP LEGEND */}
+                <div className="absolute bottom-4 left-4 flex items-center gap-3 rounded-lg border border-slate-200 bg-white/95 px-3 py-2 shadow-xs">
+                  <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-700">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#25866e]" />
+                    Open / Space Available
                   </span>
-                  <span className="flex items-center gap-1 text-[8px]">
-                    <span className="h-2 w-2 rounded-full bg-red-600" />
-                    Full or unavailable
+                  <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-700">
+                    <span className="h-2.5 w-2.5 rounded-full bg-red-600" />
+                    Full / Closed
                   </span>
                 </div>
 
-                {/* SELECTED LOCATION POPUP */}
+                {/* SELECTED LOCATION POPUP ON MAP */}
                 {selectedPlace && (
-                  <div className="absolute left-1/2 top-4 z-20 w-[85%] max-w-[270px] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-xl">
-                    <button
-                      onClick={() => setSelected(null)}
-                      className="absolute right-2 top-2 text-slate-400"
-                    >
-                      <X size={15} />
-                    </button>
-                    <p className="pr-5 text-[10px] font-bold">
-                      {selectedPlace.name}
+                  <div className="absolute left-1/2 top-4 z-20 w-[90%] max-w-[320px] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-4 shadow-xl animate-in fade-in zoom-in-95">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0 pr-2">
+                        <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-700">
+                          {selectedPlace.status}
+                        </span>
+                        <h4 className="mt-1.5 text-xs font-bold text-[#173d5b] truncate">
+                          {selectedPlace.name}
+                        </h4>
+                        <p className="mt-0.5 text-[10px] text-slate-500">
+                          {selectedPlace.distance} • {selectedPlace.address}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => setSelected(null)}
+                        className="text-slate-400 hover:text-slate-600"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+
+                    <p className="mt-2 text-[10px] text-slate-600 line-clamp-2">
+                      {selectedPlace.description}
                     </p>
-                    <p className="mt-1 text-[9px] text-slate-500">
-                      {selectedPlace.distance} · {selectedPlace.address}
-                    </p>
-                    <button
-                      onClick={() => alert(selectedPlace.description)}
-                      className="mt-2 text-[9px] font-semibold text-[#287da6]"
-                    >
-                      View information
-                    </button>
+
+                    <div className="mt-3 flex items-center gap-2 border-t border-slate-100 pt-2.5">
+                      <a
+                        href={`tel:${selectedPlace.phone}`}
+                        className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-[#287da6] py-1.5 text-xs font-semibold text-white hover:bg-[#1e668e]"
+                      >
+                        <Phone size={11} /> Call
+                      </a>
+                      <button
+                        onClick={() => {
+                          const element = document.getElementById("selected-facility-details");
+                          element?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                      >
+                        Details
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* SUPPORT CENTRE LIST */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div className="flex items-center justify-between border-b border-slate-200 px-3 py-3">
-                  <p className="text-xs font-semibold">
-                    Nearby support
-                  </p>
-                  <span className="text-[9px] text-slate-400">
-                    {filteredLocations.length} places
+              {/* SIDEBAR LIST IN MAP VIEW */}
+              <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
+                <div className="flex items-center justify-between border-b border-slate-100 p-3.5">
+                  <h3 className="text-xs font-bold text-[#173d5b]">
+                    Facilities in Range
+                  </h3>
+                  <span className="text-[10px] font-semibold text-[#287da6]">
+                    {locations.length} found
                   </span>
                 </div>
 
-                <div className="max-h-[515px] divide-y divide-slate-200 overflow-y-auto">
-                  {filteredLocations.map((place) => {
-                    const Icon = place.icon;
+                <div className="max-h-[500px] divide-y divide-slate-100 overflow-y-auto">
+                  {locations.map((place) => {
+                    const active = selected === place.id;
+                    const isFull = place.status.toLowerCase() === "full";
 
                     return (
                       <button
                         key={place.id}
                         onClick={() => setSelected(place.id)}
-                        className={`w-full p-3 text-left transition hover:bg-slate-50 ${
-                          selected === place.id ? "bg-sky-50" : ""
+                        className={`w-full p-3.5 text-left transition hover:bg-slate-50/80 ${
+                          active ? "bg-sky-50/80 border-l-4 border-l-[#287da6]" : ""
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <span
-                            className={`rounded px-2 py-1 text-[8px] font-semibold ${
-                              place.status === "Full"
-                                ? "bg-red-50 text-red-600"
-                                : "bg-emerald-50 text-emerald-700"
+                            className={`rounded-md px-2 py-0.5 text-[9px] font-bold ${
+                              isFull
+                                ? "bg-red-50 text-red-600 border border-red-200"
+                                : "bg-emerald-50 text-emerald-700 border border-emerald-200"
                             }`}
                           >
                             {place.status}
                           </span>
-                          <ChevronRight size={15} className="text-slate-400" />
+                          <span className="text-[10px] font-semibold text-slate-400">
+                            {place.distance}
+                          </span>
                         </div>
 
-                        <p className="mt-2 text-[10px] font-bold">
+                        <p className="mt-1.5 text-xs font-bold text-[#173d5b]">
                           {place.name}
                         </p>
 
-                        <p className="mt-1 text-[9px] text-slate-500">
-                          {place.category} · {place.distance}
+                        <p className="mt-0.5 text-[10px] text-slate-500">
+                          {place.category} · {place.address}
                         </p>
 
-                        <p className="mt-2 text-[9px] text-slate-500">
-                          {place.services.join(" · ")}
-                        </p>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {place.services.map((svc) => (
+                            <span
+                              key={svc}
+                              className="rounded bg-slate-100 px-1.5 py-0.5 text-[8px] font-medium text-slate-600"
+                            >
+                              {svc}
+                            </span>
+                          ))}
+                        </div>
                       </button>
                     );
                   })}
 
-                  {filteredLocations.length === 0 && (
-                    <p className="p-6 text-center text-xs text-slate-400">
-                      No support centres found.
-                    </p>
+                  {locations.length === 0 && (
+                    <div className="p-8 text-center text-xs text-slate-400">
+                      No matching support locations found in this search radius.
+                    </div>
                   )}
                 </div>
               </div>
             </div>
           ) : (
             /* LIST VIEW */
-            <div className="space-y-3">
-              {filteredLocations.map((place) => {
-                const Icon = place.icon;
+            <div className="space-y-3.5">
+              {locations.map((place) => {
+                const isFull = place.status.toLowerCase() === "full";
+                const isSelected = selected === place.id;
 
                 return (
                   <div
                     key={place.id}
-                    className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                    className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border bg-white p-4.5 shadow-xs transition hover:border-[#287da6]/40 hover:shadow-md ${
+                      isSelected ? "border-[#287da6] ring-2 ring-sky-100" : "border-slate-200"
+                    }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#e8f4f1] text-[#25866e]">
-                        <Icon size={21} />
+                    <div className="flex items-start gap-3.5">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8f4f1] text-[#25866e] shadow-xs">
+                        {getLocationIcon(place)}
                       </div>
+
                       <div>
-                        <p className="text-xs font-bold">{place.name}</p>
-                        <p className="mt-1 text-[10px] text-slate-500">
-                          {place.category} · {place.distance}
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-bold text-[#173d5b]">
+                            {place.name}
+                          </h3>
+                          <span className="text-[10px] text-slate-400 font-semibold">
+                            • {place.distance}
+                          </span>
+                        </div>
+
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          {place.category} · {place.address} · {place.hours}
                         </p>
-                        <p className="mt-1 text-[10px] text-slate-500">
-                          {place.services.join(" · ")}
-                        </p>
+
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {place.services.map((svc) => (
+                            <span
+                              key={svc}
+                              className="rounded-md bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-600"
+                            >
+                              {svc}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <span className={`rounded-md px-2 py-1 text-[9px] font-semibold ${
-                        place.status === "Full"
-                          ? "bg-red-50 text-red-600"
-                          : "bg-emerald-50 text-emerald-700"
-                      }`}>
+                    <div className="flex items-center gap-2.5 sm:self-center">
+                      <span
+                        className={`rounded-md px-2.5 py-1 text-[10px] font-bold ${
+                          isFull
+                            ? "bg-red-50 text-red-600 border border-red-200"
+                            : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        }`}
+                      >
                         {place.status}
                       </span>
 
                       <button
                         onClick={() => setSelected(place.id)}
-                        className="rounded-lg bg-[#287da6] px-3 py-2 text-[9px] font-semibold text-white"
+                        className="rounded-lg bg-[#287da6] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#1e668e] transition"
                       >
-                        View details
+                        View Details
                       </button>
                     </div>
                   </div>
                 );
               })}
+
+              {locations.length === 0 && (
+                <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-slate-500">
+                  <MapPin size={32} className="mx-auto text-slate-300" />
+                  <p className="mt-3 text-sm font-bold">No support centers matched your filters</p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Try loosening distance or availability filters to locate further facilities.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
-          {/* DETAILS PANEL */}
+          {/* SELECTED LOCATION EXPANDED DETAILS PANEL */}
           {selectedPlace && (
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#287da6]">
-                    Selected support location
-                  </p>
-                  <h3 className="mt-2 text-base font-bold">
-                    {selectedPlace.name}
-                  </h3>
+            <div
+              id="selected-facility-details"
+              className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs"
+            >
+              <div className="flex items-start justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e8f4f1] text-[#25866e] shadow-xs">
+                    {getLocationIcon(selectedPlace)}
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#287da6]">
+                      {selectedPlace.category}
+                    </span>
+                    <h3 className="text-base font-bold text-[#173d5b]">
+                      {selectedPlace.name}
+                    </h3>
+                  </div>
                 </div>
-                <button onClick={() => setSelected(null)}>
-                  <X size={18} className="text-slate-400" />
+
+                <button
+                  onClick={() => setSelected(null)}
+                  className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                >
+                  <X size={18} />
                 </button>
               </div>
 
-              <p className="mt-3 text-xs leading-6 text-slate-500">
+              <p className="mt-3 text-xs leading-relaxed text-slate-600">
                 {selectedPlace.description}
               </p>
 
+              {/* DETAILS STATS */}
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="rounded-lg bg-slate-50 p-3">
-                  <MapPin size={16} className="text-[#287da6]" />
-                  <p className="mt-2 text-[9px] text-slate-400">Location</p>
-                  <p className="mt-1 text-xs font-semibold">
+                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
+                  <div className="flex items-center gap-1.5 text-[#287da6]">
+                    <MapPin size={15} />
+                    <span className="text-[10px] font-bold uppercase text-slate-400">
+                      Address & Sector
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs font-bold text-[#173d5b]">
                     {selectedPlace.address}
                   </p>
+                  <p className="text-[10px] text-slate-400">{selectedPlace.distance} from you</p>
                 </div>
 
-                <div className="rounded-lg bg-slate-50 p-3">
-                  <Clock size={16} className="text-[#287da6]" />
-                  <p className="mt-2 text-[9px] text-slate-400">Opening hours</p>
-                  <p className="mt-1 text-xs font-semibold">
+                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
+                  <div className="flex items-center gap-1.5 text-[#287da6]">
+                    <Clock size={15} />
+                    <span className="text-[10px] font-bold uppercase text-slate-400">
+                      Operating Hours
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs font-bold text-[#173d5b]">
                     {selectedPlace.hours}
                   </p>
+                  <p className="text-[10px] text-emerald-600 font-semibold">{selectedPlace.status}</p>
                 </div>
 
-                <div className="rounded-lg bg-slate-50 p-3">
-                  <Phone size={16} className="text-[#287da6]" />
-                  <p className="mt-2 text-[9px] text-slate-400">Contact</p>
-                  <p className="mt-1 text-xs font-semibold">
+                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
+                  <div className="flex items-center gap-1.5 text-[#287da6]">
+                    <Phone size={15} />
+                    <span className="text-[10px] font-bold uppercase text-slate-400">
+                      Direct Helpline
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs font-bold text-[#173d5b]">
                     {selectedPlace.phone}
                   </p>
+                  <p className="text-[10px] text-slate-400">Staffed hotline</p>
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              {/* SERVICES LIST */}
+              <div className="mt-4">
+                <span className="text-xs font-semibold text-slate-700 block mb-1.5">
+                  Available Services & Facilities
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {selectedPlace.services.map((svc) => (
+                    <span
+                      key={svc}
+                      className="rounded-lg bg-sky-50 px-3 py-1 text-xs font-semibold text-[#287da6] border border-sky-100"
+                    >
+                      ✓ {svc}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* ACTIONS */}
+              <div className="mt-5 flex flex-wrap gap-2.5 border-t border-slate-100 pt-4">
                 <a
                   href={`tel:${selectedPlace.phone}`}
-                  className="rounded-lg bg-[#287da6] px-4 py-2.5 text-[10px] font-semibold text-white"
+                  className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1e668e] transition"
                 >
-                  Call support centre
+                  <Phone size={13} />
+                  Call Support Center
                 </a>
+
                 <button
                   onClick={() => setSelected(null)}
-                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-[10px] font-semibold"
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
                 >
-                  Close details
+                  Close Details
                 </button>
               </div>
             </div>
@@ -708,10 +866,10 @@ export default function NearbySupportPage() {
 
           {/* FOOTER */}
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[10px] text-slate-400">
-            <p>© 2026 ReliefOS Citizen Support</p>
-            <p className="flex items-center gap-2">
-              <Heart size={13} />
-              Supporting communities together
+            <p>© 2026 ReliefOS Citizen Support · Nearby Support Network</p>
+            <p className="flex items-center gap-1.5">
+              <Heart size={12} className="text-rose-500 fill-rose-500" />
+              Verified humanitarian crisis facilities
             </p>
           </footer>
         </div>
