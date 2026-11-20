@@ -1,217 +1,103 @@
-import { useMemo, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { FormEvent } from "react";
 import {
   Search,
-  Globe,
-  HelpCircle,
-  Bell,
   ChevronRight,
   Plus,
   Download,
-  Menu,
   X,
   SlidersHorizontal,
   CalendarDays,
   MapPin,
   Users,
   Clock,
-  ClipboardList,
-  AlertTriangle,
   CheckCircle2,
+  Server,
+  RefreshCw,
+  AlertTriangle,
+  Trash2,
+  UserPlus,
+  UserMinus,
+  Loader2,
+  HelpCircle,
 } from "lucide-react";
+import { volunteerTasksService } from "../../services/volunteerTasksService";
+import type {
+  VolunteerTaskItem,
+  Priority,
+  TaskStatus,
+  VolunteerTaskTabsCount,
+} from "../../types/volunteerTasks";
 
-// TYPES
-
-type Priority = "Critical" | "High" | "Medium" | "Low";
-
-type TaskStatus =
-  | "In Progress"
-  | "Assigned"
-  | "Open"
-  | "Awaiting Acceptance"
-  | "Completed";
-
-interface Task {
-  id: string;
-  title: string;
-  location: string;
-  skills: string[];
-  priority: Priority;
-  schedule: string;
-  volunteers: string;
-  status: TaskStatus;
-}
-
-// DEMO TASK DATA
-
-const initialTasks: Task[] = [
-  {
-    id: "TASK-782",
-    title: "Evacuation transport support",
-    location: "North Ward",
-    skills: ["Driving", "Rescue"],
-    priority: "Critical",
-    schedule: "Today · 14:00",
-    volunteers: "2 / 3",
-    status: "In Progress",
-  },
-  {
-    id: "TASK-779",
-    title: "Medical point registration",
-    location: "Central Clinic",
-    skills: ["First Aid", "Admin"],
-    priority: "High",
-    schedule: "Today · 15:30",
-    volunteers: "1 / 2",
-    status: "Assigned",
-  },
-  {
-    id: "TASK-774",
-    title: "Food pack distribution",
-    location: "Eastbank Hub",
-    skills: ["Logistics"],
-    priority: "High",
-    schedule: "Today · 16:00",
-    volunteers: "4 / 6",
-    status: "Open",
-  },
-  {
-    id: "TASK-768",
-    title: "Shelter childcare support",
-    location: "Riverton School",
-    skills: ["Childcare"],
-    priority: "Medium",
-    schedule: "Tomorrow · 08:00",
-    volunteers: "0 / 3",
-    status: "Open",
-  },
-  {
-    id: "TASK-761",
-    title: "Multilingual hotline",
-    location: "Remote",
-    skills: ["Translation"],
-    priority: "Medium",
-    schedule: "Tomorrow · 09:00",
-    volunteers: "2 / 4",
-    status: "Awaiting Acceptance",
-  },
-  {
-    id: "TASK-682",
-    title: "Evacuation transport support",
-    location: "North Ward",
-    skills: ["Driving", "Rescue"],
-    priority: "Critical",
-    schedule: "Today · 14:00",
-    volunteers: "2 / 3",
-    status: "In Progress",
-  },
-  {
-    id: "TASK-679",
-    title: "Medical point registration",
-    location: "Central Clinic",
-    skills: ["First Aid", "Admin"],
-    priority: "High",
-    schedule: "Today · 15:30",
-    volunteers: "1 / 2",
-    status: "Assigned",
-  },
-  {
-    id: "TASK-674",
-    title: "Food pack distribution",
-    location: "Eastbank Hub",
-    skills: ["Logistics"],
-    priority: "High",
-    schedule: "Today · 16:00",
-    volunteers: "4 / 6",
-    status: "Open",
-  },
-  {
-    id: "TASK-668",
-    title: "Shelter childcare support",
-    location: "Riverton School",
-    skills: ["Childcare"],
-    priority: "Medium",
-    schedule: "Tomorrow · 08:00",
-    volunteers: "0 / 3",
-    status: "Open",
-  },
-  {
-    id: "TASK-661",
-    title: "Multilingual hotline",
-    location: "Remote",
-    skills: ["Translation"],
-    priority: "Medium",
-    schedule: "Tomorrow · 09:00",
-    volunteers: "2 / 4",
-    status: "Awaiting Acceptance",
-  },
-  {
-    id: "TASK-655",
-    title: "Emergency medical assistance",
-    location: "Central Ward",
-    skills: ["Medical", "First Aid"],
-    priority: "Critical",
-    schedule: "Today · 17:00",
-    volunteers: "1 / 4",
-    status: "Open",
-  },
-  {
-    id: "TASK-648",
-    title: "Warehouse supply management",
-    location: "West District",
-    skills: ["Logistics"],
-    priority: "Low",
-    schedule: "Tomorrow · 10:00",
-    volunteers: "3 / 3",
-    status: "Completed",
-  },
+const defaultTabs = [
+  { label: "All tasks", count: 0 },
+  { label: "Open", count: 0 },
+  { label: "Assigned", count: 0 },
+  { label: "In progress", count: 0 },
+  { label: "Completed", count: 0 },
 ];
-
-// TAB DATA
-
-const tabs = [
-  { label: "All tasks", count: 146 },
-  { label: "Open", count: 74 },
-  { label: "Assigned", count: 32 },
-  { label: "In progress", count: 28 },
-  { label: "Completed", count: 12 },
-];
-
-// MAIN COMPONENT
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState(initialTasks);
+  // Sync and backend status
+  const [isLiveBackend, setIsLiveBackend] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
+  const [notification, setNotification] = useState<string>("");
 
-  const [activeTab, setActiveTab] = useState("All tasks");
-
-  const [search, setSearch] = useState("");
-
-  const [priorityFilter, setPriorityFilter] =
-    useState("All priorities");
-
-  const [locationFilter, setLocationFilter] =
-    useState("All locations");
-
-  const [skillFilter, setSkillFilter] =
-    useState("All skill groups");
-
-  const [scheduleFilter, setScheduleFilter] =
-    useState("Any schedule");
-
-  const [showMoreFilters, setShowMoreFilters] = useState(false);
-
-  const [showCreateModal, setShowCreateModal] = useState(false);
-
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-
-  const [notification, setNotification] = useState("");
-
-  const [currentPage, setCurrentPage] = useState(1);
-
+  // Data state
+  const [tasks, setTasks] = useState<VolunteerTaskItem[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 10;
 
+  const [tabCounts, setTabCounts] = useState<VolunteerTaskTabsCount>({
+    allTasks: 0,
+    open: 0,
+    assigned: 0,
+    inProgress: 0,
+    completed: 0,
+  });
+
+  // Dynamic filter options
+  const [locations, setLocations] = useState<string[]>([
+    "North Ward",
+    "Central Clinic",
+    "Eastbank Hub",
+    "Riverton School",
+    "Remote",
+    "Central Ward",
+    "West District",
+  ]);
+
+  const [skillGroups, setSkillGroups] = useState<string[]>([
+    "Driving",
+    "Rescue",
+    "First Aid",
+    "Admin",
+    "Logistics",
+    "Childcare",
+    "Translation",
+    "Medical",
+  ]);
+
+  // Filters
+  const [activeTab, setActiveTab] = useState<string>("All tasks");
+  const [search, setSearch] = useState<string>("");
+  const [priorityFilter, setPriorityFilter] = useState<string>("All priorities");
+  const [locationFilter, setLocationFilter] = useState<string>("All locations");
+  const [skillFilter, setSkillFilter] = useState<string>("All skill groups");
+  const [scheduleFilter, setScheduleFilter] = useState<string>("Any schedule");
+  const [showMoreFilters, setShowMoreFilters] = useState<boolean>(false);
+
+  // Modals
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [selectedTask, setSelectedTask] = useState<VolunteerTaskItem | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  // New task form state
   const [newTask, setNewTask] = useState({
     title: "",
     location: "",
@@ -222,188 +108,75 @@ export default function TasksPage() {
     volunteers: "3",
   });
 
-  // NOTIFICATION
-
+  // Notifications helper
   const notify = (message: string) => {
     setNotification(message);
-
     window.setTimeout(() => {
       setNotification("");
-    }, 3000);
+    }, 3500);
   };
 
-  // TASK FILTERING
-
-  const filteredTasks = useMemo(() => {
-    return tasks.filter((task) => {
-      const searchMatch =
-        task.id.toLowerCase().includes(search.toLowerCase()) ||
-        task.title.toLowerCase().includes(search.toLowerCase()) ||
-        task.location.toLowerCase().includes(search.toLowerCase()) ||
-        task.skills.join(" ").toLowerCase().includes(search.toLowerCase());
-
-      const priorityMatch =
-        priorityFilter === "All priorities" ||
-        task.priority === priorityFilter;
-
-      const locationMatch =
-        locationFilter === "All locations" ||
-        task.location === locationFilter;
-
-      const skillMatch =
-        skillFilter === "All skill groups" ||
-        task.skills.some(
-          (skill) => skill.toLowerCase() === skillFilter.toLowerCase()
-        );
-
-      const scheduleMatch =
-        scheduleFilter === "Any schedule" ||
-        (scheduleFilter === "Today" &&
-          task.schedule.startsWith("Today")) ||
-        (scheduleFilter === "Tomorrow" &&
-          task.schedule.startsWith("Tomorrow"));
-
-      let tabMatch = true;
-
-      if (activeTab === "Open") {
-        tabMatch = task.status === "Open";
-      } else if (activeTab === "Assigned") {
-        tabMatch =
-          task.status === "Assigned" ||
-          task.status === "Awaiting Acceptance";
-      } else if (activeTab === "In progress") {
-        tabMatch = task.status === "In Progress";
-      } else if (activeTab === "Completed") {
-        tabMatch = task.status === "Completed";
+  // Fetch tasks
+  const loadTasks = useCallback(
+    async (page: number = currentPage, background: boolean = false) => {
+      if (background) {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
       }
 
-      return (
-        searchMatch &&
-        priorityMatch &&
-        locationMatch &&
-        skillMatch &&
-        scheduleMatch &&
-        tabMatch
-      );
-    });
-  }, [
-    tasks,
-    search,
-    priorityFilter,
-    locationFilter,
-    skillFilter,
-    scheduleFilter,
-    activeTab,
-  ]);
+      try {
+        const result = await volunteerTasksService.getTasks({
+          tab: activeTab,
+          search: search.trim() || undefined,
+          priority: priorityFilter !== "All priorities" ? priorityFilter : undefined,
+          location: locationFilter !== "All locations" ? locationFilter : undefined,
+          skill: skillFilter !== "All skill groups" ? skillFilter : undefined,
+          schedule: scheduleFilter !== "Any schedule" ? scheduleFilter : undefined,
+          pageNumber: page,
+          pageSize,
+        });
 
-  // PAGINATION
+        const overview = result.data;
+        setTasks(overview.tasks || []);
+        setTotalCount(overview.totalCount ?? 0);
+        setTotalPages(Math.max(1, overview.totalPages ?? 1));
+        setCurrentPage(overview.pageNumber || page);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredTasks.length / pageSize)
+        if (overview.tabCounts) {
+          setTabCounts(overview.tabCounts);
+        }
+
+        if (overview.locations && overview.locations.length > 0) {
+          setLocations((prev) => Array.from(new Set([...prev, ...overview.locations])));
+        }
+
+        if (overview.skillGroups && overview.skillGroups.length > 0) {
+          setSkillGroups((prev) => Array.from(new Set([...prev, ...overview.skillGroups])));
+        }
+
+        setIsLiveBackend(result.isLiveBackend);
+      } catch (err: unknown) {
+        console.error("Failed to load tasks:", err);
+        notify("Could not load tasks from backend, using fallback data.");
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
+    },
+    [activeTab, search, priorityFilter, locationFilter, skillFilter, scheduleFilter, currentPage]
   );
 
-  const paginatedTasks = filteredTasks.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  // Initial load and filter change trigger
+  useEffect(() => {
+    loadTasks(currentPage);
+  }, [loadTasks, currentPage]);
 
-  // CREATE TASK
-
-  const handleCreateTask = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const task: Task = {
-      id: `TASK-${Math.floor(100 + Math.random() * 900)}`,
-      title: newTask.title,
-      location: newTask.location,
-      skills: newTask.skills
-        .split(",")
-        .map((skill) => skill.trim())
-        .filter(Boolean),
-      priority: newTask.priority,
-      schedule: `${newTask.date} · ${newTask.time}`,
-      volunteers: `0 / ${newTask.volunteers}`,
-      status: "Open",
-    };
-
-    setTasks((prev) => [task, ...prev]);
-
-    setActiveTab("All tasks");
-    setSearch("");
-    setPriorityFilter("All priorities");
-    setLocationFilter("All locations");
-    setSkillFilter("All skill groups");
-    setScheduleFilter("Any schedule");
-    setCurrentPage(1);
-
-    setNewTask({
-      title: "",
-      location: "",
-      skills: "",
-      priority: "Medium",
-      date: "",
-      time: "",
-      volunteers: "3",
-    });
-
-    setShowCreateModal(false);
-
-    notify("New task created successfully!");
+  const handleRefresh = () => {
+    loadTasks(currentPage, true);
   };
 
-  // EXPORT CSV
-
-  const handleExport = () => {
-    const headers = [
-      "Task ID",
-      "Task Title",
-      "Location",
-      "Required Skills",
-      "Priority",
-      "Schedule",
-      "Volunteers",
-      "Status",
-    ];
-
-    const rows = filteredTasks.map((task) => [
-      task.id,
-      task.title,
-      task.location,
-      task.skills.join(" / "),
-      task.priority,
-      task.schedule,
-      task.volunteers,
-      task.status,
-    ]);
-
-    const csv = [headers, ...rows]
-      .map((row) =>
-        row
-          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
-          .join(",")
-      )
-      .join("\n");
-
-    const blob = new Blob(["\uFEFF" + csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "volunteer-tasks.csv";
-    link.click();
-
-    URL.revokeObjectURL(url);
-
-    notify("Tasks exported successfully!");
-  };
-
-  // FILTER RESET
-
+  // Reset all filters
   const resetFilters = () => {
     setSearch("");
     setPriorityFilter("All priorities");
@@ -414,157 +187,279 @@ export default function TasksPage() {
     setCurrentPage(1);
   };
 
-  // PRIORITY STYLE
+  // Create Task
+  const handleCreateTask = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!newTask.title.trim() || !newTask.location.trim()) {
+      notify("Please provide task title and location.");
+      return;
+    }
 
+    setIsSubmitting(true);
+    try {
+      const skillsArray = newTask.skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      const result = await volunteerTasksService.createTask({
+        title: newTask.title.trim(),
+        location: newTask.location.trim(),
+        skills: skillsArray.length > 0 ? skillsArray : ["General Support"],
+        priority: newTask.priority,
+        date: newTask.date,
+        time: newTask.time,
+        volunteers: Number(newTask.volunteers) || 1,
+      });
+
+      setIsLiveBackend(result.isLiveBackend);
+      notify("New task created successfully!");
+
+      setShowCreateModal(false);
+      setNewTask({
+        title: "",
+        location: "",
+        skills: "",
+        priority: "Medium",
+        date: "",
+        time: "",
+        volunteers: "3",
+      });
+
+      // Reload tasks on first page
+      setCurrentPage(1);
+      loadTasks(1, true);
+    } catch (err: unknown) {
+      console.error("Create task failed:", err);
+      notify("Failed to create task.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Export CSV
+  const handleExport = async () => {
+    try {
+      const blob = await volunteerTasksService.exportTasksCsv({
+        tab: activeTab,
+        search: search.trim() || undefined,
+        priority: priorityFilter !== "All priorities" ? priorityFilter : undefined,
+        location: locationFilter !== "All locations" ? locationFilter : undefined,
+        skill: skillFilter !== "All skill groups" ? skillFilter : undefined,
+        schedule: scheduleFilter !== "Any schedule" ? scheduleFilter : undefined,
+      });
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `volunteer-tasks-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      notify("Tasks exported successfully!");
+    } catch (err: unknown) {
+      console.error("Export tasks failed:", err);
+      notify("Failed to export tasks CSV.");
+    }
+  };
+
+  // Update Status
+  const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
+    setIsUpdatingStatus(true);
+    try {
+      const result = await volunteerTasksService.updateTaskStatus(taskId, newStatus);
+      setIsLiveBackend(result.isLiveBackend);
+
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
+      );
+
+      if (selectedTask && selectedTask.id === taskId) {
+        setSelectedTask((prev) => (prev ? { ...prev, status: newStatus } : null));
+      }
+
+      notify(`Task status updated to "${newStatus}"`);
+      // Refresh tab counts
+      volunteerTasksService.getCounts().then((counts) => {
+        if (counts) setTabCounts(counts);
+      });
+    } catch (err: unknown) {
+      console.error("Status update failed:", err);
+      notify("Failed to update task status.");
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  // Adjust volunteer count
+  const handleAdjustVolunteers = async (taskId: string, delta: number) => {
+    try {
+      const result = await volunteerTasksService.adjustVolunteers(taskId, delta);
+      setIsLiveBackend(result.isLiveBackend);
+
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? result.data : t))
+      );
+
+      if (selectedTask && selectedTask.id === taskId) {
+        setSelectedTask(result.data);
+      }
+
+      notify("Volunteer assignment count updated.");
+      volunteerTasksService.getCounts().then((counts) => {
+        if (counts) setTabCounts(counts);
+      });
+    } catch (err: unknown) {
+      console.error("Adjust volunteers failed:", err);
+      notify("Failed to update volunteer count.");
+    }
+  };
+
+  // Delete Task
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      const result = await volunteerTasksService.deleteTask(taskId);
+      setIsLiveBackend(result.isLiveBackend);
+      notify("Task deleted successfully.");
+
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      setConfirmDeleteId(null);
+      setSelectedTask(null);
+
+      loadTasks(currentPage, true);
+    } catch (err: unknown) {
+      console.error("Delete task failed:", err);
+      notify("Failed to delete task.");
+    }
+  };
+
+  // Priority badge styling
   const getPriorityStyle = (priority: Priority) => {
     switch (priority) {
       case "Critical":
         return "bg-[#fde9eb] text-[#d64550]";
-
       case "High":
         return "bg-[#fff2dc] text-[#b87813]";
-
       case "Medium":
         return "bg-[#e8f1f6] text-[#287fa9]";
-
+      case "Low":
       default:
         return "bg-[#e5f5ef] text-[#239879]";
     }
   };
 
-  // STATUS STYLE
-
+  // Status badge styling
   const getStatusStyle = (status: TaskStatus) => {
     switch (status) {
       case "In Progress":
         return "bg-[#e8f1f6] text-[#287fa9]";
-
       case "Assigned":
         return "bg-[#e8f1f6] text-[#287fa9]";
-
       case "Awaiting Acceptance":
         return "bg-[#fff3dc] text-[#b87813]";
-
       case "Completed":
         return "bg-[#e5f5ef] text-[#239879]";
-
+      case "Open":
       default:
-        return "bg-[#e8f1f6] text-[#287fa9]";
+        return "bg-[#f0f4f7] text-[#557086]";
     }
   };
 
-  // TAB COUNTS BASED ON AVAILABLE DATA
-
-  const getTabCount = (label: string, defaultCount: number) => {
-    if (label === "All tasks") return tasks.length;
-
-    if (label === "Open") {
-      return tasks.filter((t) => t.status === "Open").length;
+  // Tab count resolver
+  const getTabCountValue = (label: string): number => {
+    switch (label) {
+      case "All tasks":
+        return tabCounts.allTasks;
+      case "Open":
+        return tabCounts.open;
+      case "Assigned":
+        return tabCounts.assigned;
+      case "In progress":
+        return tabCounts.inProgress;
+      case "Completed":
+        return tabCounts.completed;
+      default:
+        return 0;
     }
-
-    if (label === "Assigned") {
-      return tasks.filter(
-        (t) =>
-          t.status === "Assigned" ||
-          t.status === "Awaiting Acceptance"
-      ).length;
-    }
-
-    if (label === "In progress") {
-      return tasks.filter((t) => t.status === "In Progress").length;
-    }
-
-    if (label === "Completed") {
-      return tasks.filter((t) => t.status === "Completed").length;
-    }
-
-    return defaultCount;
   };
+
+  const tabs = defaultTabs.map((t) => ({
+    label: t.label,
+    count: getTabCountValue(t.label),
+  }));
 
   return (
     <div className="min-h-screen bg-[#eff6f8] text-[#123c5b]">
-
-      
-
-      {/* MOBILE MENU */}
-
-      {showMobileMenu && (
-        <div className="md:hidden bg-white border-b p-4 flex flex-wrap gap-4 text-xs">
-          <span>Greater Riverton</span>
-          <span>Language: EN</span>
-          <span>Notifications: 9</span>
-          <span>Nadia O. · Coordinator</span>
-        </div>
-      )}
-
       {/* MAIN CONTENT */}
-
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
+        {/* BREADCRUMB & BACKEND CONNECTION STATUS */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-2 text-[10px]">
+            <span className="text-[#8296aa]">Operations</span>
+            <ChevronRight size={12} className="text-[#8296aa]" />
+            <span className="text-[#8296aa]">Volunteer Coordination</span>
+            <ChevronRight size={12} className="text-[#8296aa]" />
+            <span className="font-semibold text-[#123c5b]">Tasks</span>
+          </div>
 
-        {/* BREADCRUMB */}
+          <div className="flex items-center gap-2.5">
+            <div
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition-colors ${
+                isLiveBackend
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : "bg-amber-50 text-amber-700 border border-amber-200"
+              }`}
+            >
+              <Server size={12} />
+              <span>{isLiveBackend ? "Live Server (API)" : "Offline Demo"}</span>
+            </div>
 
-        <div className="flex items-center gap-2 text-[9px] mb-8">
-
-          <span className="text-[#8296aa]">Operations</span>
-
-          <ChevronRight size={12} />
-
-          <span className="text-[#8296aa]">
-            Volunteer Coordination
-          </span>
-
-          <ChevronRight size={12} />
-
-          <span className="font-semibold text-[#123c5b]">
-            Tasks
-          </span>
-
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              title="Refresh tasks"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-[10px] text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
+            >
+              <RefreshCw
+                size={12}
+                className={isRefreshing ? "animate-spin text-[#287fa9]" : ""}
+              />
+              <span>Refresh</span>
+            </button>
+          </div>
         </div>
 
         {/* PAGE HEADER */}
-
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7">
-
           <div>
-
-            <h1 className="text-[27px] md:text-[29px] font-normal">
-              Tasks
-            </h1>
-
-            <p className="text-[12px] text-[#718ba0] mt-2">
-              Create response tasks, define requirements, and monitor fulfilment.
+            <h1 className="text-[27px] md:text-[29px] font-normal">Tasks</h1>
+            <p className="text-[12px] text-[#718ba0] mt-1.5">
+              Create response tasks, define requirements, and monitor fulfilment in real-time.
             </p>
-
           </div>
 
           <div className="flex gap-2">
-
             <button
               onClick={handleExport}
-              className="h-[40px] px-4 bg-white border border-[#b9d0dc] rounded-lg flex items-center gap-2 text-[10px] text-[#17648e] hover:bg-[#f5fafc]"
+              className="h-[40px] px-4 bg-white border border-[#b9d0dc] rounded-lg flex items-center gap-2 text-[10px] text-[#17648e] hover:bg-[#f5fafc] transition-colors"
             >
-              <Download size={16} />
+              <Download size={15} />
               Export
             </button>
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[10px] font-semibold"
+              className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[10px] font-semibold transition-colors shadow-xs"
             >
               <Plus size={16} />
               Create task
             </button>
-
           </div>
-
         </div>
 
         {/* TASK STATUS TABS */}
-
         <div className="flex items-center gap-5 border-b border-[#d5e3e9] overflow-x-auto mb-4">
-
           {tabs.map((tab) => (
-
             <button
               key={tab.label}
               onClick={() => {
@@ -577,29 +472,25 @@ export default function TasksPage() {
                   : "border-transparent text-[#8296aa] hover:text-[#287fa9]"
               }`}
             >
-
-              {tab.label}
-
-              <span className="bg-[#e8f1f6] text-[#718ba0] rounded-full px-1.5 py-0.5 text-[8px]">
-                {getTabCount(tab.label, tab.count)}
+              <span>{tab.label}</span>
+              <span
+                className={`rounded-full px-1.5 py-0.5 text-[8px] font-semibold ${
+                  activeTab === tab.label
+                    ? "bg-[#287fa9] text-white"
+                    : "bg-[#e8f1f6] text-[#718ba0]"
+                }`}
+              >
+                {tab.count}
               </span>
-
             </button>
-
           ))}
-
         </div>
 
         {/* FILTER BAR */}
-
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1fr)_112px_113px_123px_118px_88px] gap-2.5 mb-4">
-
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1fr)_120px_130px_130px_120px_95px] gap-2.5 mb-4">
           {/* SEARCH */}
-
           <div className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg flex items-center px-3 gap-3">
-
-            <Search size={17} className="text-[#718ba0]" />
-
+            <Search size={16} className="text-[#718ba0]" />
             <input
               value={search}
               onChange={(e) => {
@@ -609,11 +500,20 @@ export default function TasksPage() {
               placeholder="Search task ID or title..."
               className="w-full outline-none text-[10px] placeholder:text-[#a1b1c0]"
             />
-
+            {search && (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setCurrentPage(1);
+                }}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
 
           {/* PRIORITY */}
-
           <select
             value={priorityFilter}
             onChange={(e) => {
@@ -630,7 +530,6 @@ export default function TasksPage() {
           </select>
 
           {/* LOCATION */}
-
           <select
             value={locationFilter}
             onChange={(e) => {
@@ -640,17 +539,14 @@ export default function TasksPage() {
             className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[10px] outline-none cursor-pointer"
           >
             <option>All locations</option>
-            <option>North Ward</option>
-            <option>Central Clinic</option>
-            <option>Eastbank Hub</option>
-            <option>Riverton School</option>
-            <option>Remote</option>
-            <option>Central Ward</option>
-            <option>West District</option>
+            {locations.map((loc) => (
+              <option key={loc} value={loc}>
+                {loc}
+              </option>
+            ))}
           </select>
 
           {/* SKILLS */}
-
           <select
             value={skillFilter}
             onChange={(e) => {
@@ -660,18 +556,14 @@ export default function TasksPage() {
             className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[10px] outline-none cursor-pointer"
           >
             <option>All skill groups</option>
-            <option>Driving</option>
-            <option>Rescue</option>
-            <option>First Aid</option>
-            <option>Admin</option>
-            <option>Logistics</option>
-            <option>Childcare</option>
-            <option>Translation</option>
-            <option>Medical</option>
+            {skillGroups.map((sk) => (
+              <option key={sk} value={sk}>
+                {sk}
+              </option>
+            ))}
           </select>
 
           {/* SCHEDULE */}
-
           <select
             value={scheduleFilter}
             onChange={(e) => {
@@ -685,336 +577,272 @@ export default function TasksPage() {
             <option>Tomorrow</option>
           </select>
 
-          {/* MORE FILTERS */}
-
+          {/* MORE FILTERS TOGGLE */}
           <button
             onClick={() => setShowMoreFilters(!showMoreFilters)}
             className="h-[40px] bg-white border border-[#b9d0dc] rounded-lg flex items-center justify-center gap-1.5 text-[10px] text-[#17648e] hover:bg-[#f5fafc]"
           >
             <SlidersHorizontal size={13} />
-            More filters
+            <span>Filters</span>
           </button>
-
         </section>
 
-        {/* MORE FILTERS */}
-
+        {/* MORE FILTERS PANEL */}
         {showMoreFilters && (
-          <div className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-4 flex flex-wrap justify-between items-center gap-3">
-
+          <div className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-4 flex flex-wrap justify-between items-center gap-3 shadow-xs">
             <div>
-              <h3 className="text-xs font-semibold">
-                Advanced task filters
-              </h3>
-
-              <p className="text-[10px] text-gray-400 mt-1">
-                Clear all active filters to view every task.
+              <h3 className="text-xs font-semibold text-[#123c5b]">Active Filter Controls</h3>
+              <p className="text-[10px] text-gray-400 mt-0.5">
+                Quickly clear all filters or reset search terms to view all backend tasks.
               </p>
             </div>
-
             <button
               onClick={resetFilters}
-              className="text-[10px] text-[#287fa9] font-semibold"
+              className="text-[10px] text-[#287fa9] hover:underline font-semibold"
             >
               Reset all filters
             </button>
-
           </div>
         )}
 
         {/* TASK TABLE */}
-
         <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-[0_5px_15px_rgba(30,70,90,0.05)] overflow-hidden">
-
           <div className="overflow-x-auto">
-
             <table className="w-full min-w-[1000px] text-left">
-
               {/* TABLE HEADER */}
-
               <thead className="bg-[#f5f8f9] border-b border-[#d5e3e9]">
-
                 <tr className="text-[9px] text-[#718ba0]">
-
-                  <th className="px-3 py-3 font-medium">Task ID</th>
-
-                  <th className="px-3 py-3 font-medium">Task Title</th>
-
-                  <th className="px-3 py-3 font-medium">Location</th>
-
-                  <th className="px-3 py-3 font-medium">Required Skills</th>
-
-                  <th className="px-3 py-3 font-medium">Priority</th>
-
-                  <th className="px-3 py-3 font-medium">Schedule</th>
-
-                  <th className="px-3 py-3 font-medium">Volunteers</th>
-
-                  <th className="px-3 py-3 font-medium">Status</th>
-
-                  <th className="px-3 py-3"></th>
-
+                  <th className="px-3.5 py-3 font-medium">Task ID</th>
+                  <th className="px-3.5 py-3 font-medium">Task Title</th>
+                  <th className="px-3.5 py-3 font-medium">Location</th>
+                  <th className="px-3.5 py-3 font-medium">Required Skills</th>
+                  <th className="px-3.5 py-3 font-medium">Priority</th>
+                  <th className="px-3.5 py-3 font-medium">Schedule</th>
+                  <th className="px-3.5 py-3 font-medium">Volunteers</th>
+                  <th className="px-3.5 py-3 font-medium">Status</th>
+                  <th className="px-3 py-3 w-8"></th>
                 </tr>
-
               </thead>
 
               {/* TABLE BODY */}
-
               <tbody>
-
-                {paginatedTasks.map((task) => (
-
-                  <tr
-                    key={task.id}
-                    onClick={() => setSelectedTask(task)}
-                    className="border-b border-[#e1eaf0] hover:bg-[#f5fafc] cursor-pointer transition-colors"
-                  >
-
-                    <td className="px-3 py-[13px] text-[9px] font-semibold whitespace-nowrap">
-                      {task.id}
-                    </td>
-
-                    <td className="px-3 py-[13px] text-[9px] whitespace-nowrap">
-                      {task.title}
-                    </td>
-
-                    <td className="px-3 py-[13px] text-[9px] whitespace-nowrap">
-                      {task.location}
-                    </td>
-
-                    <td className="px-3 py-[13px] text-[9px] whitespace-nowrap">
-                      {task.skills.join(" · ")}
-                    </td>
-
-                    <td className="px-3 py-[13px]">
-
-                      <span className={`inline-flex px-2 py-1.5 rounded-md text-[8px] font-semibold ${getPriorityStyle(task.priority)}`}>
-                        {task.priority}
-                      </span>
-
-                    </td>
-
-                    <td className="px-3 py-[13px] text-[9px] whitespace-nowrap">
-                      {task.schedule}
-                    </td>
-
-                    <td className="px-3 py-[13px] text-[9px] whitespace-nowrap">
-                      {task.volunteers}
-                    </td>
-
-                    <td className="px-3 py-[13px]">
-
-                      <span className={`inline-flex px-2 py-1.5 rounded-md text-[8px] font-semibold whitespace-nowrap ${getStatusStyle(task.status)}`}>
-                        {task.status}
-                      </span>
-
-                    </td>
-
-                    <td className="px-3 py-[13px]">
-
-                      <ChevronRight
-                        size={15}
-                        className="text-[#718ba0]"
-                      />
-
-                    </td>
-
-                  </tr>
-
-                ))}
-
-                {paginatedTasks.length === 0 && (
+                {isLoading ? (
                   <tr>
-                    <td
-                      colSpan={9}
-                      className="text-center py-12 text-xs text-gray-400"
-                    >
-                      No tasks found.
+                    <td colSpan={9} className="text-center py-16 text-slate-500">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Loader2 size={22} className="animate-spin text-[#287fa9]" />
+                        <span className="text-xs font-medium">Loading volunteer tasks...</span>
+                      </div>
                     </td>
                   </tr>
+                ) : tasks.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="text-center py-14 text-xs text-gray-400">
+                      <div className="flex flex-col items-center gap-2">
+                        <AlertTriangle size={24} className="text-amber-500" />
+                        <p>No volunteer tasks found matching your criteria.</p>
+                        <button
+                          onClick={resetFilters}
+                          className="mt-1 text-[11px] font-semibold text-[#287fa9] hover:underline"
+                        >
+                          Clear all filters
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  tasks.map((task) => (
+                    <tr
+                      key={task.id}
+                      onClick={() => setSelectedTask(task)}
+                      className="border-b border-[#e1eaf0] hover:bg-[#f5fafc] cursor-pointer transition-colors"
+                    >
+                      <td className="px-3.5 py-[13px] text-[9px] font-semibold text-[#17648e] whitespace-nowrap">
+                        {task.id}
+                      </td>
+
+                      <td className="px-3.5 py-[13px] text-[9px] font-medium text-[#123c5b] whitespace-nowrap">
+                        {task.title}
+                      </td>
+
+                      <td className="px-3.5 py-[13px] text-[9px] text-[#557086] whitespace-nowrap">
+                        {task.location}
+                      </td>
+
+                      <td className="px-3.5 py-[13px] text-[9px] text-[#557086] whitespace-nowrap">
+                        {task.skills && task.skills.length > 0
+                          ? task.skills.join(" · ")
+                          : "General"}
+                      </td>
+
+                      <td className="px-3.5 py-[13px]">
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-md text-[8px] font-semibold ${getPriorityStyle(
+                            task.priority
+                          )}`}
+                        >
+                          {task.priority}
+                        </span>
+                      </td>
+
+                      <td className="px-3.5 py-[13px] text-[9px] text-[#557086] whitespace-nowrap">
+                        {task.schedule}
+                      </td>
+
+                      <td className="px-3.5 py-[13px] text-[9px] font-medium text-[#123c5b] whitespace-nowrap">
+                        {task.volunteers}
+                      </td>
+
+                      <td className="px-3.5 py-[13px]">
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-md text-[8px] font-semibold whitespace-nowrap ${getStatusStyle(
+                            task.status
+                          )}`}
+                        >
+                          {task.status}
+                        </span>
+                      </td>
+
+                      <td className="px-3 py-[13px] text-right">
+                        <ChevronRight size={14} className="text-[#8296aa]" />
+                      </td>
+                    </tr>
+                  ))
                 )}
-
               </tbody>
-
             </table>
-
           </div>
 
           {/* PAGINATION */}
-
-          <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-
-            <p className="text-[9px] text-[#8296aa]">
-
-              Showing{" "}
-              {filteredTasks.length === 0
-                ? 0
-                : (currentPage - 1) * pageSize + 1}
-              –
-              {Math.min(
-                currentPage * pageSize,
-                filteredTasks.length
-              )}
-              {" "}of {filteredTasks.length}
-
+          <div className="px-4 py-3 border-t border-[#d5e3e9] flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#fafcfd]">
+            <p className="text-[10px] text-[#8296aa]">
+              Showing {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
+              {Math.min(currentPage * pageSize, totalCount)} of {totalCount} tasks
             </p>
 
-            <div className="flex items-center gap-2">
-
+            <div className="flex items-center gap-1.5">
               <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
-                className="border border-[#d5e2e9] rounded-lg px-3.5 py-2 text-[9px] text-[#287fa9] disabled:opacity-40"
+                disabled={currentPage <= 1 || isLoading}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="border border-[#d5e2e9] bg-white rounded-lg px-3 py-1.5 text-[9px] text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0f7fa]"
               >
                 Previous
               </button>
 
-              {Array.from(
-                { length: Math.min(totalPages, 3) },
-                (_, i) => i + 1
-              ).map((page) => (
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter(
+                  (page) =>
+                    page === 1 ||
+                    page === totalPages ||
+                    Math.abs(page - currentPage) <= 1
+                )
+                .map((page, idx, arr) => {
+                  const prev = arr[idx - 1];
+                  const showEllipsis = prev && page - prev > 1;
 
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-[33px] h-[33px] rounded-lg border text-[9px] ${
-                    currentPage === page
-                      ? "bg-[#287fa9] border-[#287fa9] text-white"
-                      : "border-[#d5e2e9] text-[#123c5b] hover:bg-[#f0f7fa]"
-                  }`}
-                >
-                  {page}
-                </button>
-
-              ))}
+                  return (
+                    <div key={page} className="flex items-center gap-1">
+                      {showEllipsis && (
+                        <span className="text-[10px] text-slate-400 px-1">...</span>
+                      )}
+                      <button
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-[28px] h-[28px] rounded-lg text-[9px] font-medium border ${
+                          currentPage === page
+                            ? "bg-[#287fa9] border-[#287fa9] text-white shadow-xs"
+                            : "border-[#d5e2e9] bg-white text-[#123c5b] hover:bg-[#f0f7fa]"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    </div>
+                  );
+                })}
 
               <button
-                disabled={currentPage >= totalPages}
-                onClick={() => setCurrentPage((p) => p + 1)}
-                className="border border-[#b9d0dc] rounded-lg px-3.5 py-2 text-[9px] text-[#287fa9] disabled:opacity-40"
+                disabled={currentPage >= totalPages || isLoading}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="border border-[#d5e2e9] bg-white rounded-lg px-3 py-1.5 text-[9px] text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0f7fa]"
               >
                 Next
               </button>
-
             </div>
-
           </div>
-
         </section>
-
       </main>
 
       {/* CREATE TASK MODAL */}
-
       {showCreateModal && (
-
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
-          <div className="bg-white w-full max-w-[500px] rounded-xl shadow-2xl overflow-hidden">
-
-            <div className="p-5 border-b flex items-center justify-between">
-
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-[500px] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-[#e1eaf0] flex items-center justify-between">
               <div>
-                <h2 className="text-[17px] font-semibold">
-                  Create new task
-                </h2>
-
-                <p className="text-[10px] text-gray-400 mt-1">
-                  Define the requirements for a response task.
+                <h2 className="text-[16px] font-semibold text-[#123c5b]">Create new task</h2>
+                <p className="text-[10px] text-gray-400 mt-0.5">
+                  Define requirements and schedule for relief response.
                 </p>
               </div>
-
-              <button onClick={() => setShowCreateModal(false)}>
-                <X size={20} />
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="text-slate-400 hover:text-slate-700"
+              >
+                <X size={18} />
               </button>
-
             </div>
 
-            <form onSubmit={handleCreateTask} className="p-5 space-y-4">
-
+            <form onSubmit={handleCreateTask} className="p-5 space-y-3.5">
               {/* TITLE */}
-
               <div>
-                <label className="text-[11px] font-semibold">
-                  Task title
+                <label className="text-[11px] font-semibold text-[#123c5b]">
+                  Task title <span className="text-red-500">*</span>
                 </label>
-
                 <input
                   required
                   value={newTask.title}
-                  onChange={(e) =>
-                    setNewTask({
-                      ...newTask,
-                      title: e.target.value,
-                    })
-                  }
-                  placeholder="Enter task title"
-                  className="w-full mt-2 border border-[#d5e3e9] rounded-lg p-3 text-xs outline-none focus:border-[#287fa9]"
+                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                  placeholder="e.g. Evacuation transport support"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               {/* LOCATION */}
-
               <div>
-                <label className="text-[11px] font-semibold">
-                  Location
+                <label className="text-[11px] font-semibold text-[#123c5b]">
+                  Location <span className="text-red-500">*</span>
                 </label>
-
                 <input
                   required
                   value={newTask.location}
-                  onChange={(e) =>
-                    setNewTask({
-                      ...newTask,
-                      location: e.target.value,
-                    })
-                  }
-                  placeholder="Enter task location"
-                  className="w-full mt-2 border border-[#d5e3e9] rounded-lg p-3 text-xs outline-none focus:border-[#287fa9]"
+                  onChange={(e) => setNewTask({ ...newTask, location: e.target.value })}
+                  placeholder="e.g. North Ward or Central Clinic"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               {/* SKILLS */}
-
               <div>
-                <label className="text-[11px] font-semibold">
-                  Required skills
+                <label className="text-[11px] font-semibold text-[#123c5b]">
+                  Required skills <span className="text-red-500">*</span>
                 </label>
-
                 <input
                   required
                   value={newTask.skills}
-                  onChange={(e) =>
-                    setNewTask({
-                      ...newTask,
-                      skills: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setNewTask({ ...newTask, skills: e.target.value })}
                   placeholder="Driving, Rescue, First Aid"
-                  className="w-full mt-2 border border-[#d5e3e9] rounded-lg p-3 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
                 />
-
-                <p className="text-[9px] text-gray-400 mt-1">
-                  Separate multiple skills using commas.
-                </p>
+                <p className="text-[9px] text-gray-400 mt-1">Separate multiple skills with commas.</p>
               </div>
 
               {/* PRIORITY */}
-
               <div>
-                <label className="text-[11px] font-semibold">
-                  Priority
-                </label>
-
+                <label className="text-[11px] font-semibold text-[#123c5b]">Priority</label>
                 <select
                   value={newTask.priority}
                   onChange={(e) =>
-                    setNewTask({
-                      ...newTask,
-                      priority: e.target.value as Priority,
-                    })
+                    setNewTask({ ...newTask, priority: e.target.value as Priority })
                   }
-                  className="w-full mt-2 border border-[#d5e3e9] rounded-lg p-3 text-xs outline-none"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none cursor-pointer"
                 >
                   <option>Critical</option>
                   <option>High</option>
@@ -1024,204 +852,279 @@ export default function TasksPage() {
               </div>
 
               {/* DATE AND TIME */}
-
               <div className="grid grid-cols-2 gap-3">
-
                 <div>
-                  <label className="text-[11px] font-semibold">
+                  <label className="text-[11px] font-semibold text-[#123c5b]">
                     Schedule date
                   </label>
-
                   <input
-                    required
                     type="date"
                     value={newTask.date}
-                    onChange={(e) =>
-                      setNewTask({
-                        ...newTask,
-                        date: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setNewTask({ ...newTask, date: e.target.value })}
                     min={new Date().toISOString().split("T")[0]}
-                    className="w-full mt-2 border border-[#d5e3e9] rounded-lg p-3 text-xs outline-none"
+                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2 text-xs outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-semibold">
+                  <label className="text-[11px] font-semibold text-[#123c5b]">
                     Schedule time
                   </label>
-
                   <input
-                    required
                     type="time"
                     value={newTask.time}
-                    onChange={(e) =>
-                      setNewTask({
-                        ...newTask,
-                        time: e.target.value,
-                      })
-                    }
-                    className="w-full mt-2 border border-[#d5e3e9] rounded-lg p-3 text-xs outline-none"
+                    onChange={(e) => setNewTask({ ...newTask, time: e.target.value })}
+                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2 text-xs outline-none"
                   />
                 </div>
-
               </div>
 
               {/* VOLUNTEERS */}
-
               <div>
-                <label className="text-[11px] font-semibold">
+                <label className="text-[11px] font-semibold text-[#123c5b]">
                   Required volunteers
                 </label>
-
                 <input
                   type="number"
                   min="1"
+                  max="100"
                   required
                   value={newTask.volunteers}
-                  onChange={(e) =>
-                    setNewTask({
-                      ...newTask,
-                      volunteers: e.target.value,
-                    })
-                  }
-                  className="w-full mt-2 border border-[#d5e3e9] rounded-lg p-3 text-xs outline-none"
+                  onChange={(e) => setNewTask({ ...newTask, volunteers: e.target.value })}
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none"
                 />
               </div>
 
-              {/* ACTION BUTTONS */}
-
-              <div className="flex justify-end gap-2 pt-3">
-
+              {/* ACTIONS */}
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#e1eaf0]">
                 <button
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => setShowCreateModal(false)}
-                  className="border border-[#d5e3e9] rounded-lg px-4 py-2.5 text-xs"
+                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-xs hover:bg-[#f0f7fa]"
                 >
                   Cancel
                 </button>
-
                 <button
                   type="submit"
-                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2.5 text-xs"
+                  disabled={isSubmitting}
+                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50"
                 >
-                  Create task
+                  {isSubmitting && <Loader2 size={13} className="animate-spin" />}
+                  <span>{isSubmitting ? "Creating..." : "Create task"}</span>
                 </button>
-
               </div>
-
             </form>
-
           </div>
-
         </div>
-
       )}
 
       {/* TASK DETAILS MODAL */}
-
       {selectedTask && (
-
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
-          <div className="bg-white w-full max-w-[430px] rounded-xl shadow-2xl overflow-hidden">
-
-            <div className="p-5 border-b flex items-center justify-between">
-
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-[460px] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* MODAL HEADER */}
+            <div className="p-5 border-b border-[#e1eaf0] flex items-center justify-between">
               <div>
-                <h2 className="text-[16px] font-semibold">
-                  Task details
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
+                    {selectedTask.id}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[9px] font-semibold ${getStatusStyle(
+                      selectedTask.status
+                    )}`}
+                  >
+                    {selectedTask.status}
+                  </span>
+                </div>
+                <h2 className="text-[16px] font-semibold text-[#123c5b] mt-1.5">
+                  {selectedTask.title}
                 </h2>
-
-                <p className="text-[10px] text-gray-400 mt-1">
-                  {selectedTask.id}
-                </p>
               </div>
-
-              <button onClick={() => setSelectedTask(null)}>
-                <X size={19} />
+              <button
+                onClick={() => setSelectedTask(null)}
+                className="text-slate-400 hover:text-slate-700"
+              >
+                <X size={18} />
               </button>
-
             </div>
 
-            <div className="p-5 space-y-4">
+            {/* MODAL BODY */}
+            <div className="p-5 space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3 bg-[#f8fbfe] p-3 rounded-lg border border-[#e1eaf0]">
+                <div>
+                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                    <MapPin size={12} className="text-[#287fa9]" /> Location
+                  </div>
+                  <div className="font-semibold text-[#123c5b] mt-0.5">
+                    {selectedTask.location}
+                  </div>
+                </div>
 
-              <h3 className="text-sm font-semibold">
-                {selectedTask.title}
-              </h3>
+                <div>
+                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                    <CalendarDays size={12} className="text-[#287fa9]" /> Schedule
+                  </div>
+                  <div className="font-semibold text-[#123c5b] mt-0.5">
+                    {selectedTask.schedule}
+                  </div>
+                </div>
 
-              <div className="flex items-center gap-2 text-xs">
-                <MapPin size={15} className="text-[#287fa9]" />
-                {selectedTask.location}
+                <div>
+                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                    <AlertTriangle size={12} className="text-[#287fa9]" /> Priority
+                  </div>
+                  <span
+                    className={`inline-flex px-2 py-0.5 rounded mt-1 text-[9px] font-semibold ${getPriorityStyle(
+                      selectedTask.priority
+                    )}`}
+                  >
+                    {selectedTask.priority}
+                  </span>
+                </div>
+
+                <div>
+                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                    <Clock size={12} className="text-[#287fa9]" /> Volunteers
+                  </div>
+                  <div className="font-semibold text-[#123c5b] mt-0.5">
+                    {selectedTask.volunteers}
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 text-xs">
-                <Users size={15} className="text-[#287fa9]" />
-                {selectedTask.skills.join(", ")}
+              {/* SKILLS */}
+              <div>
+                <label className="text-[11px] font-semibold text-[#123c5b] flex items-center gap-1 mb-1">
+                  <Users size={13} className="text-[#287fa9]" /> Required Skills:
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedTask.skills && selectedTask.skills.length > 0 ? (
+                    selectedTask.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="bg-[#e8f1f6] text-[#287fa9] px-2 py-0.5 rounded-full text-[10px] font-medium"
+                      >
+                        {skill}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-gray-400 text-[10px]">General Support</span>
+                  )}
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 text-xs">
-                <CalendarDays size={15} className="text-[#287fa9]" />
-                {selectedTask.schedule}
+              {/* VOLUNTEER ASSIGNMENT ADJUSTMENT */}
+              <div className="pt-2 border-t border-[#e1eaf0]">
+                <label className="text-[11px] font-semibold text-[#123c5b] block mb-2">
+                  Volunteer Capacity & Allocation:
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleAdjustVolunteers(selectedTask.id, 1)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#e8f5ec] text-[#239879] hover:bg-[#d8eedf] rounded-lg text-[10px] font-semibold transition-colors"
+                  >
+                    <UserPlus size={13} />
+                    <span>+1 Assigned</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleAdjustVolunteers(selectedTask.id, -1)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fdebec] text-[#dc3545] hover:bg-[#fbdade] rounded-lg text-[10px] font-semibold transition-colors"
+                  >
+                    <UserMinus size={13} />
+                    <span>-1 Assigned</span>
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 text-xs">
-                <Clock size={15} className="text-[#287fa9]" />
-                Volunteers: {selectedTask.volunteers}
+              {/* QUICK STATUS UPDATE */}
+              <div className="pt-2 border-t border-[#e1eaf0]">
+                <label className="text-[11px] font-semibold text-[#123c5b] block mb-2">
+                  Change Task Status:
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {(
+                    ["Open", "Assigned", "In Progress", "Completed", "Awaiting Acceptance"] as TaskStatus[]
+                  ).map((st) => (
+                    <button
+                      key={st}
+                      disabled={isUpdatingStatus || selectedTask.status === st}
+                      onClick={() => handleStatusChange(selectedTask.id, st)}
+                      className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors ${
+                        selectedTask.status === st
+                          ? "bg-[#287fa9] text-white"
+                          : "border border-[#d5e2e9] bg-white text-[#123c5b] hover:bg-[#f0f7fa]"
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="flex gap-2">
-
-                <span className={`px-3 py-1.5 rounded-md text-[10px] ${getPriorityStyle(selectedTask.priority)}`}>
-                  {selectedTask.priority}
-                </span>
-
-                <span className={`px-3 py-1.5 rounded-md text-[10px] ${getStatusStyle(selectedTask.status)}`}>
-                  {selectedTask.status}
-                </span>
-
-              </div>
-
+              {/* DELETE TASK CONFIRMATION */}
+              {confirmDeleteId === selectedTask.id ? (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700">
+                  <p className="text-[11px] font-semibold">Delete this task permanently?</p>
+                  <p className="text-[10px] text-red-600 mt-0.5">
+                    This will remove {selectedTask.id} from active deployments.
+                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      onClick={() => handleDeleteTask(selectedTask.id)}
+                      className="px-3 py-1 bg-red-600 text-white rounded text-[10px] font-semibold hover:bg-red-700"
+                    >
+                      Yes, delete
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteId(null)}
+                      className="px-3 py-1 bg-white border border-gray-300 rounded text-[10px] text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
 
-            <div className="border-t p-4 flex justify-end">
+            {/* MODAL FOOTER */}
+            <div className="border-t border-[#e1eaf0] p-4 flex items-center justify-between bg-[#fafcfd]">
+              <button
+                onClick={() => setConfirmDeleteId(selectedTask.id)}
+                className="text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
+              >
+                <Trash2 size={13} />
+                <span>Delete</span>
+              </button>
 
               <button
                 onClick={() => setSelectedTask(null)}
-                className="bg-[#287fa9] text-white rounded-lg px-5 py-2.5 text-xs"
+                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-4 py-2 text-xs font-semibold"
               >
-                Close
+                Done
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       )}
 
-      {/* NOTIFICATION */}
-
+      {/* NOTIFICATION TOAST */}
       {notification && (
-
-        <div className="fixed top-5 right-5 z-[100] bg-[#123c5b] text-white rounded-lg px-5 py-3 shadow-xl text-xs flex items-center gap-2">
-
-          <CheckCircle2 size={15} />
-
-          {notification}
-
+        <div className="fixed top-5 right-5 z-[100] bg-[#123c5b] text-white rounded-lg px-4 py-3 shadow-xl text-xs flex items-center gap-2 animate-in slide-in-from-top-3">
+          <CheckCircle2 size={15} className="text-emerald-400" />
+          <span>{notification}</span>
         </div>
-
       )}
 
-      {/* HELP BUTTON */}
-
-      <button className="fixed bottom-4 right-4 w-10 h-10 bg-[#282828] hover:bg-black text-white rounded-full flex items-center justify-center shadow-lg">
-        <HelpCircle size={21} />
+      {/* FLOATING HELP BUTTON */}
+      <button
+        title="Help & Support"
+        className="fixed bottom-4 right-4 w-10 h-10 bg-[#282828] hover:bg-black text-white rounded-full flex items-center justify-center shadow-lg transition-colors cursor-pointer"
+      >
+        <HelpCircle size={20} />
       </button>
-
     </div>
   );
 }

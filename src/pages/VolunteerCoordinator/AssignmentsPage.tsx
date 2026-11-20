@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { ElementType } from "react";
 
 import {
@@ -13,111 +13,23 @@ import {
   Download,
   Filter,
   X,
-  Users,
   MapPin,
   Calendar,
   User,
   CheckCircle2,
   ClipboardList,
+  Server,
+  RefreshCw,
 } from "lucide-react";
 
-// TYPES
-
-type AssignmentStatus =
-  | "Checked In"
-  | "In Progress"
-  | "Awaiting Acceptance"
-  | "Completed";
-
-interface Assignment {
-  id: string;
-  volunteer: string;
-  task: string;
-  location: string;
-  schedule: string;
-  status: AssignmentStatus;
-  progress: number;
-}
-
-// DEMO DATA
-
-const initialAssignments: Assignment[] = [
-  {
-    id: "ASN-4421",
-    volunteer: "Elena Rossi",
-    task: "Evacuation Support",
-    location: "North Ward",
-    schedule: "13:30–18:00",
-    status: "Checked In",
-    progress: 82,
-  },
-  {
-    id: "ASN-4418",
-    volunteer: "Lin Wei",
-    task: "Clinic Support",
-    location: "Central Clinic",
-    schedule: "12:00–20:00",
-    status: "In Progress",
-    progress: 65,
-  },
-  {
-    id: "ASN-4412",
-    volunteer: "Daniel Okafor",
-    task: "Supply Dispatch",
-    location: "West Warehouse",
-    schedule: "10:00–17:00",
-    status: "In Progress",
-    progress: 76,
-  },
-  {
-    id: "ASN-4407",
-    volunteer: "Musa Bello",
-    task: "Rescue Vehicle Standby",
-    location: "North Ward",
-    schedule: "14:00–22:00",
-    status: "Awaiting Acceptance",
-    progress: 0,
-  },
-  {
-    id: "ASN-4402",
-    volunteer: "Sara Khan",
-    task: "Shelter Support",
-    location: "Central Ward",
-    schedule: "09:00–16:00",
-    status: "Checked In",
-    progress: 55,
-  },
-  {
-    id: "ASN-4398",
-    volunteer: "Maya Fernando",
-    task: "Medical Assistance",
-    location: "Central Clinic",
-    schedule: "08:00–16:00",
-    status: "Completed",
-    progress: 100,
-  },
-  {
-    id: "ASN-4392",
-    volunteer: "Theo Martin",
-    task: "Rescue Operations",
-    location: "West District",
-    schedule: "11:00–19:00",
-    status: "In Progress",
-    progress: 45,
-  },
-  {
-    id: "ASN-4387",
-    volunteer: "Abdul Rahman",
-    task: "Transport Support",
-    location: "North Ward",
-    schedule: "14:00–22:00",
-    status: "Awaiting Acceptance",
-    progress: 0,
-  },
-];
+import { assignmentsService } from "../../services/assignmentsService";
+import type {
+  Assignment,
+  AssignmentStatus,
+  AssignmentsStatsDto,
+} from "../../types/assignments";
 
 // STATUS COLORS
-
 const statusStyles: Record<AssignmentStatus, string> = {
   "Checked In": "bg-[#e5f5ef] text-[#159879]",
   "In Progress": "bg-[#e8f1f6] text-[#287fa9]",
@@ -125,39 +37,64 @@ const statusStyles: Record<AssignmentStatus, string> = {
   Completed: "bg-[#e5f5ef] text-[#159879]",
 };
 
-// MAIN COMPONENT
-
 export default function AssignmentsPage() {
-  const [assignments, setAssignments] =
-    useState<Assignment[]>(initialAssignments);
+  // Sync and connection state
+  const [isLiveBackend, setIsLiveBackend] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [notification, setNotification] = useState<string>("");
 
-  const [search, setSearch] = useState("");
+  // Stats
+  const [stats, setStats] = useState<AssignmentsStatsDto>({
+    activeAssignments: 387,
+    awaitingAcceptance: 28,
+    checkedIn: 294,
+    replacementNeeded: 6,
+    tasksCount: 64,
+    expiringSoonAlert: "12 expire within 2 hours",
+    checkedInRate: "76% of active",
+  });
 
-  const [statusFilter, setStatusFilter] =
-    useState("All assignment states");
+  // Table items & pagination
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 4;
 
-  const [taskFilter, setTaskFilter] =
-    useState("All tasks");
+  // Filter options
+  const [availableTasks, setAvailableTasks] = useState<string[]>([
+    "Evacuation Support",
+    "Clinic Support",
+    "Supply Dispatch",
+    "Rescue Vehicle Standby",
+    "Shelter Support",
+    "Medical Assistance",
+    "Transport Support",
+  ]);
+  const [availableLocations, setAvailableLocations] = useState<string[]>([
+    "North Ward",
+    "Central Clinic",
+    "Central Ward",
+    "West Warehouse",
+    "West District",
+    "Eastbank",
+  ]);
 
-  const [locationFilter, setLocationFilter] =
-    useState("All locations");
+  // Filters state
+  const [search, setSearch] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("All assignment states");
+  const [taskFilter, setTaskFilter] = useState<string>("All tasks");
+  const [locationFilter, setLocationFilter] = useState<string>("All locations");
+  const [scheduleFilter, setScheduleFilter] = useState<string>("Today");
+  const [progressFilter, setProgressFilter] = useState<string>("All");
+  const [showMoreFilters, setShowMoreFilters] = useState<boolean>(false);
 
-  const [scheduleFilter, setScheduleFilter] =
-    useState("Today");
+  // Modals state
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const [showMoreFilters, setShowMoreFilters] =
-    useState(false);
-
-  const [showCreateModal, setShowCreateModal] =
-    useState(false);
-
-  const [selectedAssignment, setSelectedAssignment] =
-    useState<Assignment | null>(null);
-
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const [notification, setNotification] = useState("");
-
+  // Form state
   const [newAssignment, setNewAssignment] = useState({
     volunteer: "",
     task: "",
@@ -165,97 +102,71 @@ export default function AssignmentsPage() {
     schedule: "",
   });
 
-  const itemsPerPage = 4;
-
   // NOTIFICATION
-
   const notify = (message: string) => {
     setNotification(message);
-
     window.setTimeout(() => {
       setNotification("");
-    }, 3000);
+    }, 3500);
   };
 
-  // STATISTICS
+  // LOAD DATA
+  const loadData = useCallback(async (page: number = 1) => {
+    try {
+      const parsedProgress =
+        progressFilter === "0" ? 0 : progressFilter === "100" ? 100 : undefined;
 
-  const activeAssignments = assignments.filter(
-    (a) => a.status !== "Completed"
-  ).length;
+      const [statsRes, assignmentsRes, optionsRes] = await Promise.all([
+        assignmentsService.getStats(),
+        assignmentsService.getAssignments({
+          search,
+          status: statusFilter,
+          task: taskFilter,
+          location: locationFilter,
+          schedule: scheduleFilter,
+          progress: parsedProgress,
+          pageNumber: page,
+          pageSize: itemsPerPage,
+        }),
+        assignmentsService.getOptions(),
+      ]);
 
-  const awaitingAcceptance = assignments.filter(
-    (a) => a.status === "Awaiting Acceptance"
-  ).length;
+      setIsLiveBackend(statsRes.isLiveBackend || assignmentsRes.isLiveBackend);
+      setStats(statsRes.data);
+      setAssignments(assignmentsRes.data.items);
+      setTotalCount(assignmentsRes.data.totalCount);
 
-  const checkedIn = assignments.filter(
-    (a) => a.status === "Checked In"
-  ).length;
-
-  const replacementNeeded = 6;
-
-  // FILTER ASSIGNMENTS
-
-  const filteredAssignments = useMemo(() => {
-    return assignments.filter((item) => {
-      const searchMatch = [
-        item.id,
-        item.volunteer,
-        item.task,
-        item.location,
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(search.toLowerCase());
-
-      const statusMatch =
-        statusFilter === "All assignment states" ||
-        item.status === statusFilter;
-
-      const taskMatch =
-        taskFilter === "All tasks" ||
-        item.task === taskFilter;
-
-      const locationMatch =
-        locationFilter === "All locations" ||
-        item.location === locationFilter;
-
-      const scheduleMatch =
-        scheduleFilter === "Any schedule" ||
-        scheduleFilter === "Today" ||
-        item.schedule === scheduleFilter;
-
-      return (
-        searchMatch &&
-        statusMatch &&
-        taskMatch &&
-        locationMatch &&
-        scheduleMatch
-      );
-    });
+      if (optionsRes.tasks.length > 0) setAvailableTasks(optionsRes.tasks);
+      if (optionsRes.locations.length > 0) setAvailableLocations(optionsRes.locations);
+    } catch (err) {
+      console.error("Failed to load assignments", err);
+      notify("Notice: Using offline demonstration dataset.");
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
   }, [
-    assignments,
     search,
     statusFilter,
     taskFilter,
     locationFilter,
     scheduleFilter,
+    progressFilter,
+    itemsPerPage,
   ]);
 
-  // PAGINATION
+  useEffect(() => {
+    loadData(currentPage);
+  }, [loadData, currentPage]);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredAssignments.length / itemsPerPage)
-  );
-
-  const paginatedAssignments = filteredAssignments.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await loadData(currentPage);
+    notify("Assignments updated successfully.");
+  };
 
   // CREATE ASSIGNMENT
-
-  const handleCreateAssignment = () => {
+  const handleCreateAssignment = async () => {
     if (
       !newAssignment.volunteer.trim() ||
       !newAssignment.task ||
@@ -266,92 +177,92 @@ export default function AssignmentsPage() {
       return;
     }
 
-    const assignment: Assignment = {
-      id: `ASN-${Date.now().toString().slice(-4)}`,
-      volunteer: newAssignment.volunteer,
-      task: newAssignment.task,
-      location: newAssignment.location,
-      schedule: newAssignment.schedule,
-      status: "Awaiting Acceptance",
-      progress: 0,
-    };
+    setIsSubmitting(true);
+    try {
+      await assignmentsService.createAssignment({
+        volunteer: newAssignment.volunteer.trim(),
+        task: newAssignment.task,
+        location: newAssignment.location,
+        schedule: newAssignment.schedule.trim(),
+      });
 
-    setAssignments((prev) => [assignment, ...prev]);
+      setNewAssignment({
+        volunteer: "",
+        task: "",
+        location: "",
+        schedule: "",
+      });
 
-    setCurrentPage(1);
+      setStatusFilter("All assignment states");
+      setTaskFilter("All tasks");
+      setLocationFilter("All locations");
+      setScheduleFilter("Today");
+      setSearch("");
+      setShowCreateModal(false);
+      setCurrentPage(1);
 
-    setNewAssignment({
-      volunteer: "",
-      task: "",
-      location: "",
-      schedule: "",
-    });
+      notify("Assignment created successfully!");
+      await loadData(1);
+    } catch (err) {
+      console.error(err);
+      notify("Failed to create assignment.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    setStatusFilter("All assignment states");
-    setTaskFilter("All tasks");
-    setLocationFilter("All locations");
-    setScheduleFilter("Any schedule");
-    setSearch("");
+  // UPDATE STATUS DIRECTLY IN DETAILS MODAL
+  const handleUpdateStatus = async (newStatus: AssignmentStatus) => {
+    if (!selectedAssignment) return;
+    try {
+      const updated = await assignmentsService.updateAssignment(selectedAssignment.id, {
+        status: newStatus,
+        progress: newStatus === "Completed" ? 100 : selectedAssignment.progress,
+      });
 
-    setShowCreateModal(false);
-
-    notify("Assignment created successfully!");
+      if (updated) {
+        setSelectedAssignment(updated);
+        notify(`Assignment updated to ${newStatus}.`);
+        await loadData(currentPage);
+      }
+    } catch (err) {
+      console.error(err);
+      notify("Failed to update assignment.");
+    }
   };
 
   // CSV EXPORT
+  const handleExport = async () => {
+    try {
+      const parsedProgress =
+        progressFilter === "0" ? 0 : progressFilter === "100" ? 100 : undefined;
 
-  const handleExport = () => {
-    const headers = [
-      "Assignment ID",
-      "Volunteer",
-      "Task",
-      "Location",
-      "Schedule",
-      "Status",
-      "Progress",
-    ];
+      const blob = await assignmentsService.exportCsv({
+        search,
+        status: statusFilter,
+        task: taskFilter,
+        location: locationFilter,
+        schedule: scheduleFilter,
+        progress: parsedProgress,
+      });
 
-    const rows = filteredAssignments.map((item) => [
-      item.id,
-      item.volunteer,
-      item.task,
-      item.location,
-      item.schedule,
-      item.status,
-      `${item.progress}%`,
-    ]);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `carelink-assignments-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
 
-    const csv = [headers, ...rows]
-      .map((row) =>
-        row
-          .map(
-            (value) =>
-              `"${String(value).replace(/"/g, '""')}"`
-          )
-          .join(",")
-      )
-      .join("\n");
-
-    const blob = new Blob(["\uFEFF" + csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "carelink-assignments.csv";
-
-    link.click();
-
-    URL.revokeObjectURL(url);
-
-    notify("Assignments exported successfully!");
+      notify("Assignments exported successfully!");
+    } catch (err) {
+      console.error(err);
+      notify("Failed to export assignments.");
+    }
   };
 
-  // STAT CARD
+  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
 
+  // STAT CARD
   const StatCard = ({
     title,
     value,
@@ -365,8 +276,7 @@ export default function AssignmentsPage() {
     icon: ElementType;
     color: string;
   }) => (
-    <div className="bg-white border border-[#d5e3e9] rounded-xl p-3.5 shadow-[0_5px_15px_rgba(30,70,90,0.05)] flex items-center gap-3 min-h-[77px]">
-
+    <div className="bg-white border border-[#d5e3e9] rounded-xl p-3.5 shadow-xs flex items-center gap-3 min-h-[77px]">
       <div
         className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${color}`}
       >
@@ -374,141 +284,123 @@ export default function AssignmentsPage() {
       </div>
 
       <div>
-
-        <p className="text-[9px] text-[#8296aa]">
-          {title}
-        </p>
-
-        <h2 className="text-[22px] leading-7 font-semibold text-[#123c5b]">
-          {value}
-        </h2>
-
-        <p className="text-[8px] text-[#8296aa]">
-          {description}
-        </p>
-
+        <p className="text-[9px] text-[#8296aa]">{title}</p>
+        <h2 className="text-[22px] leading-7 font-semibold text-[#123c5b]">{value}</h2>
+        <p className="text-[8px] text-[#8296aa]">{description}</p>
       </div>
-
     </div>
   );
 
   return (
     <div className="w-full min-h-full bg-[#eff6f8] text-[#123c5b]">
-
       {/* MAIN CONTENT */}
-
       <main className="max-w-[1600px] mx-auto px-6 pt-5 pb-10">
+        {/* BREADCRUMB & STATUS BAR */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] mb-6">
+          <div className="flex items-center gap-2 text-slate-400">
+            <span className="text-[#8296aa]">Operations</span>
+            <ChevronRight size={12} />
+            <span className="text-[#8296aa]">Volunteer Coordination</span>
+            <ChevronRight size={12} />
+            <span className="font-semibold text-[#123c5b]">Assignments</span>
+          </div>
 
-        {/* BREADCRUMB */}
+          <div className="flex items-center gap-2.5">
+            <div
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium ${
+                isLiveBackend
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : "bg-amber-50 text-amber-700 border border-amber-200"
+              }`}
+            >
+              <Server size={12} />
+              <span>{isLiveBackend ? "Live Server (API)" : "Offline Demo"}</span>
+            </div>
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
-
-          <span className="text-[#8296aa]">
-            Operations
-          </span>
-
-          <ChevronRight size={12} />
-
-          <span className="text-[#8296aa]">
-            Volunteer Coordination
-          </span>
-
-          <ChevronRight size={12} />
-
-          <span className="font-semibold">
-            Assignments
-          </span>
-
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              title="Refresh queue"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-[10px] text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
+            >
+              <RefreshCw
+                size={12}
+                className={isRefreshing ? "animate-spin text-[#287fa9]" : ""}
+              />
+              <span>Refresh</span>
+            </button>
+          </div>
         </div>
 
         {/* PAGE HEADER */}
-
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-
           <div>
-
-            <h1 className="text-[25px] font-normal">
-              Assignments
-            </h1>
-
-            <p className="text-[11px] text-[#718ba0] mt-2">
+            <h1 className="text-[25px] font-normal text-[#173e5b]">Assignments</h1>
+            <p className="text-[11px] text-[#718ba0] mt-1.5">
               Track invitations, acceptance, check-in, progress, and completion.
             </p>
-
           </div>
 
           <div className="flex gap-2">
-
             <button
               onClick={handleExport}
-              className="h-[36px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-[9px] text-[#17648e] flex items-center gap-2 hover:bg-[#f5fafc]"
+              className="h-[36px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-[10px] text-[#17648e] flex items-center gap-1.5 hover:bg-[#f5fafc] shadow-xs"
             >
               <Download size={13} />
-              Export
+              <span>Export</span>
             </button>
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-[36px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[9px] font-semibold"
+              className="h-[36px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-1.5 text-[10px] font-semibold shadow-xs"
             >
-              <Plus size={15} />
-              Create assignment
+              <Plus size={14} />
+              <span>Create assignment</span>
             </button>
-
           </div>
-
         </div>
 
         {/* STATISTICS */}
-
-        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-3">
-
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-4">
           <StatCard
             title="Active assignments"
-            value={387 + assignments.length - initialAssignments.length}
-            description="Across 64 tasks"
+            value={stats.activeAssignments}
+            description={`Across ${stats.tasksCount} tasks`}
             icon={Activity}
             color="bg-[#e8f1f6] text-[#287fa9]"
           />
 
           <StatCard
             title="Awaiting acceptance"
-            value={28 + Math.max(0, awaitingAcceptance - 2)}
-            description="12 expire within 2 hours"
+            value={stats.awaitingAcceptance}
+            description={stats.expiringSoonAlert}
             icon={Clock}
             color="bg-[#fff3df] text-[#c17b08]"
           />
 
           <StatCard
             title="Checked in"
-            value={294 + Math.max(0, checkedIn - 2)}
-            description="76% of active"
+            value={stats.checkedIn}
+            description={stats.checkedInRate}
             icon={Check}
             color="bg-[#e5f5ef] text-[#239879]"
           />
 
           <StatCard
             title="Replacement needed"
-            value={replacementNeeded}
+            value={stats.replacementNeeded}
             description="Urgent coordinator action"
             icon={AlertTriangle}
             color="bg-[#fdebec] text-[#dc3545]"
           />
-
         </section>
 
         {/* FILTERS */}
-
-        <section className="mb-3">
-
+        <section className="mb-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[2.2fr_1fr_0.9fr_0.9fr_0.7fr_auto] gap-2">
-
             {/* SEARCH */}
-
-            <div className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 flex items-center gap-2">
-
-              <Search size={15} className="text-[#8296aa]" />
-
+            <div className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 flex items-center gap-2 shadow-xs">
+              <Search size={14} className="text-[#8296aa]" />
               <input
                 value={search}
                 onChange={(e) => {
@@ -516,20 +408,23 @@ export default function AssignmentsPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search assignment, volunteer, or task..."
-                className="w-full text-[9px] outline-none bg-transparent"
+                className="w-full text-[10px] outline-none bg-transparent placeholder:text-slate-400"
               />
-
+              {search && (
+                <button onClick={() => setSearch("")}>
+                  <X size={12} className="text-slate-400 hover:text-slate-600" />
+                </button>
+              )}
             </div>
 
             {/* STATUS */}
-
             <select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[9px] outline-none"
+              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none shadow-xs"
             >
               <option>All assignment states</option>
               <option>Checked In</option>
@@ -539,100 +434,85 @@ export default function AssignmentsPage() {
             </select>
 
             {/* TASK */}
-
             <select
               value={taskFilter}
               onChange={(e) => {
                 setTaskFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[9px] outline-none"
+              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none shadow-xs"
             >
               <option>All tasks</option>
-              {[...new Set(assignments.map((a) => a.task))].map(
-                (task) => (
-                  <option key={task}>{task}</option>
-                )
-              )}
+              {availableTasks.map((task) => (
+                <option key={task} value={task}>
+                  {task}
+                </option>
+              ))}
             </select>
 
             {/* LOCATION */}
-
             <select
               value={locationFilter}
               onChange={(e) => {
                 setLocationFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[9px] outline-none"
+              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none shadow-xs"
             >
               <option>All locations</option>
-              {[...new Set(assignments.map((a) => a.location))].map(
-                (location) => (
-                  <option key={location}>{location}</option>
-                )
-              )}
+              {availableLocations.map((location) => (
+                <option key={location} value={location}>
+                  {location}
+                </option>
+              ))}
             </select>
 
             {/* SCHEDULE */}
-
             <select
               value={scheduleFilter}
               onChange={(e) => {
                 setScheduleFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[9px] outline-none"
+              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none shadow-xs"
             >
               <option>Today</option>
               <option>Any schedule</option>
             </select>
 
             {/* MORE FILTERS */}
-
             <button
-              onClick={() =>
-                setShowMoreFilters(!showMoreFilters)
-              }
-              className={`h-[36px] px-3 border rounded-lg text-[9px] flex items-center justify-center gap-2 ${
+              onClick={() => setShowMoreFilters(!showMoreFilters)}
+              className={`h-[36px] px-3.5 border rounded-lg text-[10px] flex items-center justify-center gap-1.5 shadow-xs transition ${
                 showMoreFilters
-                  ? "bg-[#e8f1f6] border-[#287fa9] text-[#17648e]"
-                  : "bg-white border-[#b9d0dc] text-[#17648e]"
+                  ? "bg-[#e8f1f6] border-[#287fa9] text-[#17648e] font-semibold"
+                  : "bg-white border-[#b9d0dc] text-[#17648e] hover:bg-sky-50"
               }`}
             >
               <Filter size={12} />
-              More filters
+              <span>More filters</span>
             </button>
-
           </div>
 
           {/* EXTRA FILTERS */}
-
           {showMoreFilters && (
-
-            <div className="mt-2 bg-white border border-[#d5e3e9] rounded-lg p-4 flex flex-wrap items-center gap-4">
-
-              <div>
-
-                <p className="text-[9px] text-[#8296aa] mb-2">
-                  Progress
-                </p>
-
+            <div className="mt-2.5 bg-white border border-[#d5e3e9] rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs animate-in fade-in">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-semibold text-slate-600">
+                  Progress Range:
+                </span>
                 <select
-                  className="h-[34px] border border-[#d5e3e9] rounded-lg px-3 text-[9px] outline-none"
+                  value={progressFilter}
                   onChange={(e) => {
-                    const value = e.target.value;
-
-                    if (value === "All") return;
-
-                    setSearch(value);
+                    setProgressFilter(e.target.value);
+                    setCurrentPage(1);
                   }}
+                  className="h-[32px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none bg-white text-slate-700"
                 >
-                  <option value="All">All progress</option>
-                  <option value="0">Not started</option>
-                  <option value="100">Completed</option>
+                  <option value="All">All progress levels</option>
+                  <option value="0">Not started (0%)</option>
+                  <option value="100">Fully completed (100%)</option>
                 </select>
-
               </div>
 
               <button
@@ -642,31 +522,24 @@ export default function AssignmentsPage() {
                   setTaskFilter("All tasks");
                   setLocationFilter("All locations");
                   setScheduleFilter("Today");
+                  setProgressFilter("All");
                   setCurrentPage(1);
+                  notify("Filters reset to default.");
                 }}
-                className="mt-4 text-[9px] text-[#287fa9] underline"
+                className="text-[10px] text-[#287fa9] font-semibold hover:underline"
               >
-                Reset filters
+                Reset all filters
               </button>
-
             </div>
-
           )}
-
         </section>
 
         {/* ASSIGNMENT TABLE */}
-
-        <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-[0_5px_15px_rgba(30,70,90,0.05)] overflow-hidden">
-
+        <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-
             <table className="w-full min-w-[850px] text-left">
-
               <thead>
-
                 <tr className="bg-[#f5f8f9] border-b border-[#d5e3e9]">
-
                   {[
                     "Assignment ID",
                     "Volunteer",
@@ -677,236 +550,166 @@ export default function AssignmentsPage() {
                     "Progress",
                     "",
                   ].map((heading) => (
-
                     <th
                       key={heading}
-                      className="px-3 py-3 text-[8px] font-medium text-[#718ba0] whitespace-nowrap"
+                      className="px-4 py-3.5 text-[9px] font-semibold text-[#718ba0] uppercase tracking-wider whitespace-nowrap"
                     >
                       {heading}
                     </th>
-
                   ))}
-
                 </tr>
-
               </thead>
 
-              <tbody>
-
-                {paginatedAssignments.map((item) => (
-
-                  <tr
-                    key={item.id}
-                    className="border-b border-[#e5edf1] hover:bg-[#f7fafb] transition-colors"
-                  >
-
-                    <td className="px-3 py-3.5 text-[9px] font-semibold whitespace-nowrap">
-                      {item.id}
-                    </td>
-
-                    <td className="px-3 py-3.5 text-[9px] whitespace-nowrap">
-                      {item.volunteer}
-                    </td>
-
-                    <td className="px-3 py-3.5 text-[9px] whitespace-nowrap">
-                      {item.task}
-                    </td>
-
-                    <td className="px-3 py-3.5 text-[9px] whitespace-nowrap">
-                      {item.location}
-                    </td>
-
-                    <td className="px-3 py-3.5 text-[9px] whitespace-nowrap">
-                      {item.schedule}
-                    </td>
-
-                    <td className="px-3 py-3.5 whitespace-nowrap">
-
-                      <span
-                        className={`inline-flex px-2 py-1 rounded-md text-[8px] font-semibold ${
-                          statusStyles[item.status]
-                        }`}
-                      >
-                        {item.status}
-                      </span>
-
-                    </td>
-
-                    <td className="px-3 py-3.5">
-
-                      <span className="inline-flex bg-[#e8f1f6] text-[#287fa9] px-2 py-1 rounded-md text-[8px] font-semibold">
-                        {item.progress}%
-                      </span>
-
-                    </td>
-
-                    <td className="px-3 py-3.5">
-
-                      <button
-                        onClick={() =>
-                          setSelectedAssignment(item)
-                        }
-                        className="p-1 hover:bg-[#e8f1f6] rounded"
-                      >
-                        <ChevronRight
-                          size={15}
-                          className="text-[#718ba0]"
-                        />
-                      </button>
-
-                    </td>
-
-                  </tr>
-
-                ))}
-
-                {paginatedAssignments.length === 0 && (
-
+              <tbody className="divide-y divide-[#e5edf1]">
+                {isLoading ? (
                   <tr>
-
-                    <td
-                      colSpan={8}
-                      className="text-center py-12"
+                    <td colSpan={8} className="text-center py-12 text-xs text-slate-400">
+                      <RefreshCw size={18} className="mx-auto mb-2 animate-spin text-[#287fa9]" />
+                      Loading assignments...
+                    </td>
+                  </tr>
+                ) : assignments.length > 0 ? (
+                  assignments.map((item) => (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-[#f7fafb] transition-colors"
                     >
+                      <td className="px-4 py-3.5 text-[10px] font-bold text-[#173e5b] whitespace-nowrap">
+                        <button
+                          onClick={() => setSelectedAssignment(item)}
+                          className="hover:text-[#287fa9] hover:underline"
+                        >
+                          {item.id}
+                        </button>
+                      </td>
 
-                      <ClipboardList
-                        size={30}
-                        className="mx-auto text-[#9aafbd] mb-3"
-                      />
+                      <td className="px-4 py-3.5 text-[11px] font-medium text-slate-700 whitespace-nowrap">
+                        {item.volunteer}
+                      </td>
 
-                      <p className="text-[11px] font-medium">
-                        No assignments found
-                      </p>
+                      <td className="px-4 py-3.5 text-[10px] whitespace-nowrap text-slate-600">
+                        {item.task}
+                      </td>
 
-                      <p className="text-[9px] text-[#8296aa] mt-1">
+                      <td className="px-4 py-3.5 text-[10px] whitespace-nowrap text-slate-600">
+                        {item.location}
+                      </td>
+
+                      <td className="px-4 py-3.5 text-[10px] whitespace-nowrap text-slate-600">
+                        {item.schedule}
+                      </td>
+
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-md text-[9px] font-semibold ${
+                            statusStyles[item.status]
+                          }`}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-3.5">
+                        <span className="inline-flex bg-[#e8f1f6] text-[#287fa9] px-2 py-0.5 rounded-md text-[9px] font-semibold">
+                          {item.progress}%
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-3.5 text-right">
+                        <button
+                          onClick={() => setSelectedAssignment(item)}
+                          className="p-1 hover:bg-[#e8f1f6] rounded text-[#718ba0] hover:text-[#287fa9]"
+                          title="View assignment details"
+                        >
+                          <ChevronRight size={15} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={8} className="text-center py-12">
+                      <ClipboardList size={28} className="mx-auto text-[#9aafbd] mb-2" />
+                      <p className="text-[11px] font-medium text-slate-700">No assignments found</p>
+                      <p className="text-[9px] text-[#8296aa] mt-0.5">
                         Try changing your search or filters.
                       </p>
-
                     </td>
-
                   </tr>
-
                 )}
-
               </tbody>
-
             </table>
-
           </div>
 
           {/* PAGINATION */}
-
-          <div className="px-3 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-
-            <p className="text-[8px] text-[#8296aa]">
-
-              Showing{" "}
-
-              {filteredAssignments.length === 0
-                ? 0
-                : (currentPage - 1) * itemsPerPage + 1}
-
-              –
-
-              {Math.min(
-                currentPage * itemsPerPage,
-                filteredAssignments.length
-              )}
-
-              {" "}of {filteredAssignments.length}
-
+          <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#d5e3e9] bg-slate-50/50">
+            <p className="text-[10px] text-[#8296aa]">
+              Showing {totalCount === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}
+              {" "}–{" "}
+              {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount} assignments
             </p>
 
             <div className="flex items-center gap-1.5">
-
               <button
                 disabled={currentPage === 1}
-                onClick={() =>
-                  setCurrentPage((p) => p - 1)
-                }
-                className="h-[30px] px-3 border border-[#d5e3e9] rounded-lg text-[8px] disabled:opacity-40"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="h-[30px] px-3 border border-[#d5e3e9] bg-white rounded-lg text-[9px] text-slate-700 disabled:opacity-40 hover:bg-sky-50"
               >
                 Previous
               </button>
 
-              {Array.from(
-                { length: totalPages },
-                (_, i) => i + 1
-              ).map((page) => (
-
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-[29px] h-[29px] rounded-md border text-[9px] ${
+                  className={`w-[29px] h-[29px] rounded-md border text-[9px] transition ${
                     currentPage === page
-                      ? "bg-[#287fa9] text-white border-[#287fa9]"
-                      : "bg-white border-[#d5e3e9] hover:bg-[#f1f8fc]"
+                      ? "bg-[#287fa9] text-white border-[#287fa9] font-semibold"
+                      : "bg-white border-[#d5e3e9] text-slate-700 hover:bg-[#f1f8fc]"
                   }`}
                 >
                   {page}
                 </button>
-
               ))}
 
               <button
-                disabled={currentPage === totalPages}
-                onClick={() =>
-                  setCurrentPage((p) => p + 1)
-                }
-                className="h-[30px] px-3 border border-[#b9d0dc] rounded-lg text-[8px] text-[#17648e] disabled:opacity-40"
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="h-[30px] px-3 border border-[#b9d0dc] bg-white rounded-lg text-[9px] text-[#17648e] disabled:opacity-40 hover:bg-sky-50"
               >
                 Next
               </button>
-
             </div>
-
           </div>
-
         </section>
-
       </main>
 
       {/* CREATE ASSIGNMENT MODAL */}
-
       {showCreateModal && (
-
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
-          <div className="bg-white w-full max-w-[480px] rounded-xl shadow-2xl overflow-hidden">
-
-            <div className="p-5 border-b border-[#d5e3e9] flex items-center justify-between">
-
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4 backdrop-blur-xs">
+          <div className="bg-white w-full max-w-[480px] rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="p-5 border-b border-[#d5e3e9] flex items-center justify-between bg-slate-50">
               <div>
-
-                <h2 className="text-[15px] font-semibold">
-                  Create assignment
-                </h2>
-
-                <p className="text-[9px] text-[#8296aa] mt-1">
+                <h2 className="text-[15px] font-bold text-[#173e5b]">Create Assignment</h2>
+                <p className="text-[10px] text-[#8296aa] mt-0.5">
                   Assign a volunteer to an operational task.
                 </p>
-
               </div>
 
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-1 hover:bg-gray-200 rounded-lg text-slate-400 hover:text-slate-600"
               >
                 <X size={17} />
               </button>
-
             </div>
 
             <div className="p-5 space-y-4">
-
               {/* VOLUNTEER */}
-
               <div>
-
-                <label className="block text-[9px] font-medium mb-2">
-                  Volunteer name
+                <label className="block text-[10px] font-semibold text-slate-700 mb-1.5">
+                  Volunteer Name
                 </label>
-
                 <input
                   value={newAssignment.volunteer}
                   onChange={(e) =>
@@ -916,19 +719,15 @@ export default function AssignmentsPage() {
                     }))
                   }
                   placeholder="Enter volunteer name"
-                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none focus:border-[#287fa9]"
+                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none focus:border-[#287fa9]"
                 />
-
               </div>
 
               {/* TASK */}
-
               <div>
-
-                <label className="block text-[9px] font-medium mb-2">
+                <label className="block text-[10px] font-semibold text-slate-700 mb-1.5">
                   Task
                 </label>
-
                 <select
                   value={newAssignment.task}
                   onChange={(e) =>
@@ -937,31 +736,22 @@ export default function AssignmentsPage() {
                       task: e.target.value,
                     }))
                   }
-                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none bg-white"
+                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none bg-white text-slate-700"
                 >
-
                   <option value="">Select task</option>
-
-                  <option>Evacuation Support</option>
-                  <option>Clinic Support</option>
-                  <option>Supply Dispatch</option>
-                  <option>Rescue Vehicle Standby</option>
-                  <option>Shelter Support</option>
-                  <option>Medical Assistance</option>
-                  <option>Transport Support</option>
-
+                  {availableTasks.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
                 </select>
-
               </div>
 
               {/* LOCATION */}
-
               <div>
-
-                <label className="block text-[9px] font-medium mb-2">
+                <label className="block text-[10px] font-semibold text-slate-700 mb-1.5">
                   Location
                 </label>
-
                 <select
                   value={newAssignment.location}
                   onChange={(e) =>
@@ -970,29 +760,22 @@ export default function AssignmentsPage() {
                       location: e.target.value,
                     }))
                   }
-                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none bg-white"
+                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none bg-white text-slate-700"
                 >
-
                   <option value="">Select location</option>
-                  <option>North Ward</option>
-                  <option>Central Clinic</option>
-                  <option>Central Ward</option>
-                  <option>West Warehouse</option>
-                  <option>West District</option>
-                  <option>Eastbank</option>
-
+                  {availableLocations.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc}
+                    </option>
+                  ))}
                 </select>
-
               </div>
 
               {/* SCHEDULE */}
-
               <div>
-
-                <label className="block text-[9px] font-medium mb-2">
+                <label className="block text-[10px] font-semibold text-slate-700 mb-1.5">
                   Schedule
                 </label>
-
                 <input
                   type="text"
                   value={newAssignment.schedule}
@@ -1003,99 +786,68 @@ export default function AssignmentsPage() {
                     }))
                   }
                   placeholder="e.g. 14:00–20:00"
-                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none focus:border-[#287fa9]"
+                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none focus:border-[#287fa9]"
                 />
-
               </div>
 
-              <div className="bg-[#eaf5f9] p-3 rounded-lg flex gap-2">
-
-                <CheckCircle2
-                  size={15}
-                  className="text-[#287fa9] shrink-0"
-                />
-
-                <p className="text-[9px] text-[#527d96] leading-4">
-                  The volunteer will receive an assignment invitation.
-                  The assignment remains pending until accepted.
+              <div className="bg-[#eaf5f9] p-3 rounded-lg flex gap-2.5 border border-sky-100">
+                <CheckCircle2 size={16} className="text-[#287fa9] shrink-0 mt-0.5" />
+                <p className="text-[10px] text-[#527d96] leading-relaxed">
+                  The volunteer will receive an assignment invitation. The assignment remains
+                  pending until accepted.
                 </p>
-
               </div>
-
             </div>
 
-            <div className="p-4 border-t flex justify-end gap-2">
-
+            <div className="p-4 border-t border-slate-200 flex justify-end gap-2 bg-slate-50">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2.5 border border-[#d5e3e9] rounded-lg text-[10px]"
+                className="px-4 py-2 border border-[#d5e3e9] rounded-lg text-[10px] text-slate-600 hover:bg-white"
               >
                 Cancel
               </button>
 
               <button
                 onClick={handleCreateAssignment}
-                className="px-5 py-2.5 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2"
+                disabled={isSubmitting}
+                className="px-5 py-2 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg text-[10px] font-semibold flex items-center gap-1.5 shadow-xs disabled:opacity-50"
               >
-                <Plus size={13} />
-                Create assignment
+                <Plus size={14} />
+                <span>Create assignment</span>
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       )}
 
       {/* ASSIGNMENT DETAILS MODAL */}
-
       {selectedAssignment && (
-
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-
-          <div className="bg-white w-full max-w-[440px] rounded-xl shadow-2xl overflow-hidden">
-
-            <div className="p-5 border-b border-[#d5e3e9] flex items-center justify-between">
-
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4 backdrop-blur-xs">
+          <div className="bg-white w-full max-w-[440px] rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="p-5 border-b border-[#d5e3e9] flex items-center justify-between bg-slate-50">
               <div>
-
-                <h2 className="text-[15px] font-semibold">
-                  Assignment details
-                </h2>
-
-                <p className="text-[9px] text-[#8296aa] mt-1">
-                  {selectedAssignment.id}
-                </p>
-
+                <h2 className="text-[15px] font-bold text-[#173e5b]">Assignment Details</h2>
+                <p className="text-[10px] text-[#8296aa] mt-0.5">{selectedAssignment.id}</p>
               </div>
 
               <button
                 onClick={() => setSelectedAssignment(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-1 hover:bg-gray-200 rounded-lg text-slate-400 hover:text-slate-600"
               >
                 <X size={17} />
               </button>
-
             </div>
 
             <div className="p-5 space-y-4">
-
               <div className="flex items-center justify-between">
-
-                <span className="text-[9px] text-[#8296aa]">
-                  Assignment status
-                </span>
-
+                <span className="text-[10px] text-[#8296aa] font-medium">Assignment Status</span>
                 <span
-                  className={`px-2 py-1 rounded-md text-[8px] font-semibold ${
+                  className={`px-2.5 py-1 rounded-md text-[9px] font-semibold ${
                     statusStyles[selectedAssignment.status]
                   }`}
                 >
                   {selectedAssignment.status}
                 </span>
-
               </div>
 
               {[
@@ -1120,109 +872,84 @@ export default function AssignmentsPage() {
                   value: selectedAssignment.schedule,
                 },
               ].map((item) => {
-
                 const Icon = item.icon;
-
                 return (
-
                   <div
                     key={item.label}
-                    className="flex items-center gap-3 bg-[#f5f9fb] rounded-lg p-3"
+                    className="flex items-center gap-3 bg-[#f5f9fb] rounded-lg p-3 border border-slate-100"
                   >
-
-                    <Icon
-                      size={16}
-                      className="text-[#287fa9]"
-                    />
-
+                    <Icon size={16} className="text-[#287fa9]" />
                     <div>
-
-                      <p className="text-[8px] text-[#8296aa]">
-                        {item.label}
-                      </p>
-
-                      <p className="text-[10px] font-medium mt-1">
-                        {item.value}
-                      </p>
-
+                      <p className="text-[8px] text-[#8296aa] uppercase font-semibold">{item.label}</p>
+                      <p className="text-[11px] font-medium text-slate-800 mt-0.5">{item.value}</p>
                     </div>
-
                   </div>
-
                 );
-
               })}
 
               {/* PROGRESS */}
-
               <div>
-
                 <div className="flex justify-between mb-2">
-
-                  <span className="text-[9px] text-[#8296aa]">
-                    Assignment progress
-                  </span>
-
-                  <span className="text-[10px] font-semibold">
-                    {selectedAssignment.progress}%
-                  </span>
-
+                  <span className="text-[10px] text-[#8296aa] font-medium">Assignment Progress</span>
+                  <span className="text-[11px] font-bold text-[#173e5b]">{selectedAssignment.progress}%</span>
                 </div>
-
                 <div className="h-2 bg-[#e8eef1] rounded-full overflow-hidden">
-
                   <div
-                    className="h-full bg-[#65bda5] rounded-full"
-                    style={{
-                      width: `${selectedAssignment.progress}%`,
-                    }}
+                    className="h-full bg-[#65bda5] rounded-full transition-all duration-300"
+                    style={{ width: `${selectedAssignment.progress}%` }}
                   />
-
                 </div>
-
               </div>
 
+              {/* ACTION BUTTONS */}
+              <div className="pt-2 flex flex-wrap gap-2">
+                {selectedAssignment.status !== "Completed" && (
+                  <button
+                    onClick={() => handleUpdateStatus("Completed")}
+                    className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-emerald-700 transition"
+                  >
+                    Mark Completed
+                  </button>
+                )}
+                {selectedAssignment.status === "Awaiting Acceptance" && (
+                  <button
+                    onClick={() => handleUpdateStatus("Checked In")}
+                    className="flex-1 rounded-lg bg-[#287fa9] px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-[#17678e] transition"
+                  >
+                    Check In Volunteer
+                  </button>
+                )}
+              </div>
             </div>
 
-            <div className="p-4 border-t flex justify-end">
-
+            <div className="p-4 border-t border-slate-200 flex justify-end bg-slate-50">
               <button
                 onClick={() => setSelectedAssignment(null)}
-                className="bg-[#287fa9] text-white rounded-lg px-5 py-2.5 text-[10px]"
+                className="bg-[#287fa9] text-white rounded-lg px-5 py-2 text-[10px] font-semibold hover:bg-[#17678e]"
               >
                 Close
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       )}
 
-      {/* TOAST */}
-
+      {/* TOAST NOTIFICATION */}
       {notification && (
-
-        <div className="fixed top-5 right-5 z-[100] bg-[#123c5b] text-white rounded-lg px-5 py-3 shadow-xl text-xs flex items-center gap-2">
-
-          <Check size={15} />
-
-          {notification}
-
+        <div className="fixed top-5 right-5 z-[100] bg-[#123c5b] text-white rounded-xl px-5 py-3 shadow-xl text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-2 border border-slate-700">
+          <CheckCircle2 size={16} className="text-emerald-400" />
+          <span>{notification}</span>
         </div>
-
       )}
 
       {/* HELP BUTTON */}
-
-      <button className="fixed bottom-4 right-4 w-10 h-10 bg-[#282828] hover:bg-black text-white rounded-full flex items-center justify-center shadow-lg">
-
-        <HelpCircle size={21} />
-
+      <button
+        onClick={() => notify("Assignments Help: Track and schedule field volunteer assignments.")}
+        className="fixed bottom-4 right-4 w-10 h-10 bg-[#173e5b] hover:bg-[#205175] text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer"
+        title="Help & Info"
+      >
+        <HelpCircle size={18} />
       </button>
-
     </div>
   );
 }
