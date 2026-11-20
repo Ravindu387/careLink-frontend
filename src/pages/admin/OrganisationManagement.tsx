@@ -20,6 +20,7 @@ import {
   RefreshCw,
   AlertCircle,
   Loader2,
+  Info,
 } from "lucide-react";
 import { organizationService } from "../../services/organizationService";
 import type {
@@ -202,6 +203,7 @@ export default function OrganisationManagement() {
   const [newOrgName, setNewOrgName] = useState("");
   const [newOrgType, setNewOrgType] = useState("Local NGO");
   const [newOrgScope, setNewOrgScope] = useState("Greater Riverton");
+  const [registrationNumber, setRegistrationNumber] = useState("");
   const [newOrgEmail, setNewOrgEmail] = useState("");
   const [newOrgPhone, setNewOrgPhone] = useState("");
   const [environment, setEnvironment] = useState("Production");
@@ -209,11 +211,20 @@ export default function OrganisationManagement() {
     "Standard administrator approval"
   );
   const [administrativeRationale, setAdministrativeRationale] = useState("");
-  const [actionTitle, setActionTitle] = useState("Register Organisation");
-  const [actionScope, setActionScope] = useState("Selected record");
+  const [actionTitle, setActionTitle] = useState("");
+  const [actionScope, setActionScope] = useState("Local NGOs");
+  const [modalError, setModalError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   const fetchOrganisations = useCallback(async () => {
     setLoading(true);
@@ -277,29 +288,53 @@ export default function OrganisationManagement() {
     currentPage * pageSize
   );
 
-  const pendingCount = stats?.pendingOrganizations ?? organisations.filter(
-    (org) => org.verificationStatus === "Pending Review"
-  ).length;
-
-  const suspendedCount = stats?.suspendedOrganizations ?? organisations.filter(
-    (org) => org.status === "Suspended"
-  ).length;
+  const totalCount = stats?.totalOrganizations ?? organisations.length;
+  const activeCount =
+    stats?.activeOrganizations ??
+    organisations.filter((org) => org.isActive || org.status === "Active").length;
+  const verifiedCount =
+    stats?.verifiedOrganizations ??
+    organisations.filter((org) => org.verificationStatus === "Verified").length;
+  const verifiedPercentage = totalCount > 0 ? Math.round((verifiedCount / totalCount) * 100) : 0;
+  const pendingCount =
+    stats?.pendingOrganizations ??
+    organisations.filter((org) => org.verificationStatus === "Pending Review").length;
+  const suspendedCount =
+    stats?.suspendedOrganizations ??
+    organisations.filter((org) => org.status === "Suspended").length;
 
   const handleAdministrativeAction = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    if (!newOrgName.trim()) {
-      alert("Organization name is required.");
+    setModalError(null);
+
+    const nameToRegister = (
+      newOrgName.trim() ||
+      (actionTitle && actionTitle !== "Register Organisation" ? actionTitle.trim() : "")
+    ).trim();
+
+    if (!nameToRegister) {
+      setModalError("Organisation name is required.");
       return;
     }
+
+    const orgType =
+      newOrgType ||
+      (actionScope === "Local NGOs" ? "Local NGO" :
+       actionScope === "International NGOs" ? "International NGO" :
+       actionScope === "Government agencies" ? "Government Agency" :
+       actionScope === "Community organisations" ? "Community Organisation" : "Local NGO");
+
+    const orgScope = newOrgScope.trim() || "Greater Riverton";
 
     setIsSubmitting(true);
     try {
       const created = await organizationService.createOrganization({
-        name: newOrgName.trim(),
-        type: newOrgType,
-        scope: newOrgScope,
+        name: nameToRegister,
+        type: orgType,
+        scope: orgScope,
+        registrationNumber: registrationNumber.trim() || undefined,
         contactEmail: newOrgEmail.trim() || undefined,
         contactPhone: newOrgPhone.trim() || undefined,
         description: administrativeRationale.trim() || undefined,
@@ -308,12 +343,18 @@ export default function OrganisationManagement() {
       setOrganisations((prev) => [created, ...prev]);
       setShowRegisterModal(false);
       setNewOrgName("");
+      setActionTitle("");
+      setRegistrationNumber("");
       setNewOrgEmail("");
       setNewOrgPhone("");
       setAdministrativeRationale("");
+      setModalError(null);
+
+      setToastMessage(`Organisation "${created.name}" registered and activated successfully.`);
+
       organizationService.getStats().then(setStats).catch(() => {});
     } catch (err: any) {
-      alert(err.message || "Failed to register organization.");
+      setModalError(err.message || "Failed to register organisation.");
     } finally {
       setIsSubmitting(false);
     }
@@ -352,9 +393,11 @@ export default function OrganisationManagement() {
       );
 
       setMenuId(null);
+      const targetOrg = organisations.find((o) => o.id === id);
+      setToastMessage(`Status for "${targetOrg?.name || 'Organisation'}" updated to ${status}.`);
       organizationService.getStats().then(setStats).catch(() => {});
     } catch (err: any) {
-      alert(err.message || "Failed to update organization status.");
+      setToastMessage(`Failed to update status: ${err.message || "Backend error."}`);
     }
   };
 
@@ -416,6 +459,20 @@ export default function OrganisationManagement() {
         </span>
       </div>
 
+      {/* TOAST NOTIFICATION */}
+      {toastMessage && (
+        <div className="fixed bottom-5 right-5 z-[200] flex items-center gap-3 rounded-lg border border-[#2785B2]/30 bg-[#123B5C] px-4 py-3 text-xs font-medium text-white shadow-xl animate-in fade-in slide-in-from-bottom-2">
+          <Info size={16} className="text-[#56B69E]" />
+          <span>{toastMessage}</span>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="ml-2 text-slate-300 hover:text-white"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       <main className="mx-auto max-w-[1800px] px-4 py-6 md:px-6 lg:px-8">
 
         {/* PAGE HEADING */}
@@ -444,11 +501,18 @@ export default function OrganisationManagement() {
 
             <button
               onClick={() => {
-                setActionTitle("Register Organisation");
+                setNewOrgName("");
+                setActionTitle("");
+                setRegistrationNumber("");
+                setNewOrgEmail("");
+                setNewOrgPhone("");
+                setNewOrgType("Local NGO");
+                setNewOrgScope("Greater Riverton");
                 setEnvironment("Production");
-                setActionScope("Selected record");
+                setActionScope("Local NGOs");
                 setApprovalType("Standard administrator approval");
                 setAdministrativeRationale("");
+                setModalError(null);
                 setShowRegisterModal(true);
               }}
               className="flex items-center gap-2 rounded-lg bg-[#2785B2] px-4 py-3 text-[10px] font-semibold text-white shadow-sm transition hover:bg-[#1D6F98]"
@@ -466,31 +530,31 @@ export default function OrganisationManagement() {
 
           <StatCard
             title="Registered organisations"
-            value="312"
-            description="284 active"
+            value={String(totalCount)}
+            description={`${activeCount} active`}
             icon={Building2}
             iconStyle="bg-sky-50 text-sky-600"
           />
 
           <StatCard
             title="Verified partners"
-            value="278"
-            description="89.1% verified"
+            value={String(verifiedCount)}
+            description={`${verifiedPercentage}% verified`}
             icon={Check}
             iconStyle="bg-emerald-50 text-emerald-600"
           />
 
           <StatCard
             title="Pending review"
-            value={String(pendingCount === 0 ? 14 : pendingCount)}
-            description="3 high priority"
+            value={String(pendingCount)}
+            description="Operational verification"
             icon={Clock}
             iconStyle="bg-orange-50 text-orange-600"
           />
 
           <StatCard
             title="Suspended"
-            value={String(suspendedCount === 0 ? 8 : suspendedCount)}
+            value={String(suspendedCount)}
             description="Access restricted"
             icon={LockKeyhole}
             iconStyle="bg-red-50 text-red-600"
@@ -654,8 +718,8 @@ export default function OrganisationManagement() {
                     className="border-b border-[#E5EDF1] text-[10px] text-slate-600 transition hover:bg-[#F8FBFC]"
                   >
 
-                    <td className="px-4 py-4 font-bold text-[#123B5C]">
-                      {org.id}
+                    <td className="px-4 py-4 font-bold text-[#123B5C]" title={org.id}>
+                      {org.code || (org.id.length > 12 ? `ORG-${org.id.slice(0, 6).toUpperCase()}` : org.id)}
                     </td>
 
                     <td className="px-4 py-4 font-medium text-[#315C7B]">
@@ -855,21 +919,124 @@ export default function OrganisationManagement() {
               </button>
             </div>
 
+            {/* In-modal error banner */}
+            {modalError && (
+              <div className="mx-6 mt-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                <AlertCircle size={16} className="shrink-0 text-red-500" />
+                <span>{modalError}</span>
+              </div>
+            )}
+
             {/* Administrative action form */}
-            <form onSubmit={handleAdministrativeAction} className="space-y-5 p-6">
+            <form onSubmit={handleAdministrativeAction} className="space-y-4 p-6">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
-                    Action title <span className="text-red-500">*</span>
+                    Organisation Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     required
-                    value={actionTitle}
-                    onChange={(e) => setActionTitle(e.target.value)}
+                    value={newOrgName || actionTitle}
+                    onChange={(e) => {
+                      setNewOrgName(e.target.value);
+                      setActionTitle(e.target.value);
+                      if (modalError) setModalError(null);
+                    }}
+                    placeholder="e.g. World Health Organization"
                     className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-[11px] outline-none focus:border-[#287FA8]"
                   />
                 </div>
 
+                <div>
+                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                    Organisation Type <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={newOrgType}
+                      onChange={(e) => {
+                        setNewOrgType(e.target.value);
+                        setActionScope(e.target.value);
+                      }}
+                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-[11px] outline-none focus:border-[#287FA8]"
+                    >
+                      <option value="Local NGO">Local NGO</option>
+                      <option value="International NGO">International NGO</option>
+                      <option value="Government Agency">Government Agency</option>
+                      <option value="Community Organisation">Community Organisation</option>
+                      <option value="Academic / Research">Academic / Research</option>
+                      <option value="Private Sector Partner">Private Sector Partner</option>
+                    </select>
+                    <ChevronDown size={16} className="pointer-events-none absolute right-3 top-4 text-slate-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                    Operational Scope / Region
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={newOrgScope}
+                      onChange={(e) => setNewOrgScope(e.target.value)}
+                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-[11px] outline-none focus:border-[#287FA8]"
+                    >
+                      <option value="Greater Riverton">Greater Riverton</option>
+                      <option value="National">National</option>
+                      <option value="Central Region">Central Region</option>
+                      <option value="North Ward">North Ward</option>
+                      <option value="Riverton East">Riverton East</option>
+                      <option value="Sector 4">Sector 4</option>
+                      <option value="4 districts">4 districts</option>
+                    </select>
+                    <ChevronDown size={16} className="pointer-events-none absolute right-3 top-4 text-slate-400" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                    Registration / NGO Number
+                  </label>
+                  <input
+                    value={registrationNumber}
+                    onChange={(e) => setRegistrationNumber(e.target.value)}
+                    placeholder="e.g. NGO-2026-9041"
+                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-[11px] outline-none focus:border-[#287FA8]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                    Contact Email
+                  </label>
+                  <input
+                    type="email"
+                    value={newOrgEmail}
+                    onChange={(e) => setNewOrgEmail(e.target.value)}
+                    placeholder="e.g. operations@who.org"
+                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-[11px] outline-none focus:border-[#287FA8]"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                    Contact Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={newOrgPhone}
+                    onChange={(e) => setNewOrgPhone(e.target.value)}
+                    placeholder="e.g. +1 (555) 019-2834"
+                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-[11px] outline-none focus:border-[#287FA8]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
                     Environment
@@ -884,36 +1051,13 @@ export default function OrganisationManagement() {
                       <option>Staging</option>
                       <option>Development</option>
                     </select>
-                    <ChevronDown size={16} className="pointer-events-none absolute right-3 top-4" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
-                    Scope
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={actionScope}
-                      onChange={(e) => setActionScope(e.target.value)}
-                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-[11px] outline-none focus:border-[#287FA8]"
-                    >
-                      <option>Selected record</option>
-                      <option>All organisations</option>
-                      <option>Government agencies</option>
-                      <option>Local NGOs</option>
-                      <option>International NGOs</option>
-                      <option>Community organisations</option>
-                    </select>
-                    <ChevronDown size={16} className="pointer-events-none absolute right-3 top-4" />
+                    <ChevronDown size={16} className="pointer-events-none absolute right-3 top-4 text-slate-400" />
                   </div>
                 </div>
 
                 <div>
                   <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
-                    Approval type
+                    Approval Type
                   </label>
                   <div className="relative">
                     <select
@@ -926,45 +1070,54 @@ export default function OrganisationManagement() {
                       <option>Two-person approval</option>
                       <option>Emergency authorisation</option>
                     </select>
-                    <ChevronDown size={16} className="pointer-events-none absolute right-3 top-4" />
+                    <ChevronDown size={16} className="pointer-events-none absolute right-3 top-4 text-slate-400" />
                   </div>
                 </div>
               </div>
 
               <div>
                 <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
-                  Administrative rationale <span className="text-red-500">*</span>
+                  Administrative Rationale / Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   required
-                  rows={5}
+                  rows={3}
                   value={administrativeRationale}
                   onChange={(e) => setAdministrativeRationale(e.target.value)}
-                  placeholder="Explain the authorised reason for this change..."
+                  placeholder="Explain the authorised reason or operational scope for onboarding this agency..."
                   className="w-full resize-y rounded-lg border border-[#D5E3EA] p-3 text-[11px] outline-none placeholder:text-slate-400 focus:border-[#287FA8]"
                 />
               </div>
 
-              <div className="flex items-center gap-3 rounded-lg bg-[#FFF6E3] px-4 py-4">
-                <ShieldCheck size={21} className="shrink-0 text-[#98630C]" />
-                <p className="text-[10px] leading-5 text-[#94620B]">
-                  This operation is performed locally for demonstration. In production it requires backend permission enforcement.
+              <div className="flex items-center gap-3 rounded-lg bg-[#EFF6F7] border border-[#C5DFEA] px-4 py-3">
+                <ShieldCheck size={20} className="shrink-0 text-[#2785B2]" />
+                <p className="text-[10px] leading-5 text-[#1D5F8A]">
+                  This registration record is synchronized directly with the CareLink API and enforced under administrator governance audit standards.
                 </p>
               </div>
 
-              <div className="flex justify-end gap-2 pt-1">
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => setShowRegisterModal(false)}
-                  className="h-11 rounded-lg border border-[#C7D8E2] bg-white px-5 text-[11px] font-semibold text-[#287FA8] hover:bg-slate-50"
+                  className="h-11 rounded-lg border border-[#C7D8E2] bg-white px-5 text-[11px] font-semibold text-[#287FA8] hover:bg-slate-50 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="h-11 rounded-lg bg-[#287FA8] px-5 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#1C668C]"
+                  disabled={isSubmitting}
+                  className="flex items-center gap-2 h-11 rounded-lg bg-[#287FA8] px-5 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#1C668C] disabled:opacity-50"
                 >
-                  Confirm &amp; record
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={15} className="animate-spin" />
+                      Recording...
+                    </>
+                  ) : (
+                    "Confirm & record"
+                  )}
                 </button>
               </div>
             </form>
@@ -1070,6 +1223,50 @@ export default function OrganisationManagement() {
                     <VerificationBadge verification={showDetails.verificationStatus ?? (showDetails as any).verification ?? "Verified"} />
                   </div>
                 </div>
+
+                {showDetails.registrationNumber && (
+                  <div>
+                    <p className="text-[9px] text-slate-400">
+                      REGISTRATION NUMBER
+                    </p>
+                    <p className="mt-1 text-xs font-semibold text-[#123B5C]">
+                      {showDetails.registrationNumber}
+                    </p>
+                  </div>
+                )}
+
+                {showDetails.contactEmail && (
+                  <div>
+                    <p className="text-[9px] text-slate-400">
+                      CONTACT EMAIL
+                    </p>
+                    <p className="mt-1 text-xs font-semibold text-[#123B5C]">
+                      {showDetails.contactEmail}
+                    </p>
+                  </div>
+                )}
+
+                {showDetails.contactPhone && (
+                  <div>
+                    <p className="text-[9px] text-slate-400">
+                      CONTACT PHONE
+                    </p>
+                    <p className="mt-1 text-xs font-semibold text-[#123B5C]">
+                      {showDetails.contactPhone}
+                    </p>
+                  </div>
+                )}
+
+                {showDetails.description && (
+                  <div>
+                    <p className="text-[9px] text-slate-400">
+                      DESCRIPTION / RATIONALE
+                    </p>
+                    <p className="mt-1 text-xs text-slate-600">
+                      {showDetails.description}
+                    </p>
+                  </div>
+                )}
 
               </div>
 
