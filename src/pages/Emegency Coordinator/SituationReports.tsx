@@ -1,5 +1,4 @@
-
-import { useMemo, useState } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   FileText,
   Clock,
@@ -14,116 +13,168 @@ import {
   ChevronRight,
   LayoutTemplate,
   Printer,
+  RefreshCw,
+  RotateCcw,
+  CheckCircle2,
+  Send,
 } from "lucide-react";
+import {
+  situationReportService,
+  type SituationReport,
+  type SituationReportMetrics,
+} from "../../services/situationReportService";
 
-interface Report {
-  id: string;
-  title: string;
-  period: string;
-  status: "Approved" | "Published" | "Draft";
-  preparedBy: string;
-  approvedBy: string;
-  recipients: number;
-  event: string;
-}
-
-const initialReports: Report[] = [
-  {
-    id: "SITREP 024",
-    title: "Greater Riverton Flood Response",
-    period: "22 June 2025 · 08:00–12:00 UTC",
-    status: "Approved",
-    preparedBy: "Operations Analysis Team",
-    approvedBy: "Amina Mensah",
-    recipients: 48,
-    event: "Monsoon Floods 2025",
-  },
-  {
-    id: "SITREP 023",
-    title: "Greater Riverton Flood Response",
-    period: "22 June 2025 · 06:00–08:00 UTC",
-    status: "Published",
-    preparedBy: "Operations Analysis Team",
-    approvedBy: "Amina Mensah",
-    recipients: 48,
-    event: "Monsoon Floods 2025",
-  },
-  {
-    id: "SITREP 022",
-    title: "North Ridge Landslide Response",
-    period: "21 June 2025 · 16:00–20:00 UTC",
-    status: "Approved",
-    preparedBy: "Emergency Coordination Team",
-    approvedBy: "Amina Mensah",
-    recipients: 32,
-    event: "North Ridge Landslide",
-  },
-  {
-    id: "SITREP 021",
-    title: "Eastbank Emergency Response",
-    period: "20 June 2025 · 08:00–12:00 UTC",
-    status: "Draft",
-    preparedBy: "Operations Analysis Team",
-    approvedBy: "Pending approval",
-    recipients: 0,
-    event: "Monsoon Floods 2025",
-  },
-];
-
-const statusStyles: Record<Report["status"], string> = {
+const statusStyles: Record<SituationReport["status"], string> = {
   Approved: "bg-emerald-50 text-emerald-700",
   Published: "bg-sky-50 text-sky-700",
   Draft: "bg-amber-50 text-amber-700",
 };
 
 export default function SituationReports() {
-  const [reports, setReports] = useState(initialReports);
+  const [reports, setReports] = useState<SituationReport[]>([]);
+  const [metrics, setMetrics] = useState<SituationReportMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isLiveConnected, setIsLiveConnected] = useState(false);
 
   const [search, setSearch] = useState("");
   const [eventFilter, setEventFilter] = useState("All crisis events");
   const [statusFilter, setStatusFilter] = useState("All report states");
   const [dateFilter, setDateFilter] = useState("Date range");
 
-  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [selectedReport, setSelectedReport] = useState<SituationReport | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
 
   const [newTitle, setNewTitle] = useState("");
   const [newEvent, setNewEvent] = useState("Monsoon Floods 2025");
+  const [newSummary, setNewSummary] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
-  const filteredReports = useMemo(() => {
-    return reports.filter((report) => {
-      const matchesSearch =
-        `${report.id} ${report.title} ${report.event}`
-          .toLowerCase()
-          .includes(search.toLowerCase());
+  const loadData = useCallback(async () => {
+    try {
+      const [list, met] = await Promise.all([
+        situationReportService.getAll({
+          search: search || undefined,
+          event: eventFilter !== "All crisis events" ? eventFilter : undefined,
+          status: statusFilter !== "All report states" ? statusFilter : undefined,
+          dateRange: dateFilter !== "Date range" ? dateFilter : undefined,
+        }),
+        situationReportService.getMetrics(),
+      ]);
+      setReports(list);
+      setMetrics(met);
+      setIsLiveConnected(true);
+    } catch {
+      setIsLiveConnected(false);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [search, eventFilter, statusFilter, dateFilter]);
 
-      const matchesEvent =
-        eventFilter === "All crisis events" ||
-        report.event === eventFilter;
+  useEffect(() => {
+    let isMounted = true;
+    situationReportService
+      .getAll()
+      .then((list) => {
+        if (isMounted) setReports(list);
+      })
+      .catch(() => {});
 
-      const matchesStatus =
-        statusFilter === "All report states" ||
-        report.status === statusFilter;
+    situationReportService
+      .getMetrics()
+      .then((met) => {
+        if (isMounted) {
+          setMetrics(met);
+          setIsLiveConnected(true);
+        }
+      })
+      .catch(() => {
+        if (isMounted) setIsLiveConnected(false);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
 
-      return matchesSearch && matchesEvent && matchesStatus;
-    });
-  }, [reports, search, eventFilter, statusFilter]);
+    const interval = setInterval(() => {
+      loadData();
+    }, 25000);
 
-  const publishedCount = reports.filter(
-    (r) => r.status === "Approved" || r.status === "Published"
-  ).length;
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [loadData]);
 
-  const draftCount = reports.filter(
-    (r) => r.status === "Draft"
-  ).length;
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadData();
+  };
 
-  const totalRecipients = reports.reduce(
-    (sum, r) => sum + r.recipients,
-    0
-  );
+  const handleResetData = async () => {
+    setRefreshing(true);
+    await situationReportService.reset();
+    await loadData();
+    notify("Situation reports reset to baseline fixtures.");
+  };
 
-  const downloadReport = (report: Report) => {
+  const notify = (msg: string) => {
+    setActionMessage(msg);
+    setTimeout(() => setActionMessage(null), 3500);
+  };
+
+  const createReport = async () => {
+    if (!newTitle.trim()) {
+      notify("Please enter a report title.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const created = await situationReportService.create({
+        title: newTitle.trim(),
+        event: newEvent,
+        executiveSummary: newSummary.trim() || undefined,
+      });
+
+      setShowCreate(false);
+      setNewTitle("");
+      setNewSummary("");
+      notify(`Draft created: ${created.id}`);
+      await loadData();
+    } catch (err: unknown) {
+      const error = err as Error;
+      notify(error.message || "Failed to create report.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleTransitionStatus = async (
+    id: string,
+    newStatus: "Approved" | "Published" | "Draft"
+  ) => {
+    try {
+      const updated = await situationReportService.updateStatus(id, {
+        status: newStatus,
+        approvedBy: newStatus === "Draft" ? "Pending approval" : "Amina Mensah",
+        recipients: newStatus === "Draft" ? 0 : 48,
+      });
+
+      if (selectedReport && selectedReport.id === id) {
+        setSelectedReport(updated);
+      }
+      notify(`${id} status updated to ${newStatus}.`);
+      await loadData();
+    } catch (err: unknown) {
+      const error = err as Error;
+      notify(error.message || "Failed to update report status.");
+    }
+  };
+
+  const downloadReport = (report: SituationReport) => {
     const content = `
 SITUATION REPORT
 
@@ -135,13 +186,15 @@ Status: ${report.status}
 
 Prepared By: ${report.preparedBy}
 Approved By: ${report.approvedBy}
-Partner Recipients: ${report.recipients}
+Partner Recipients: ${report.recipients} organisations
 
-HUMANITARIAN CRISIS MANAGEMENT PLATFORM
+EXECUTIVE SUMMARY:
+${report.executiveSummary ?? "Ongoing coordinated disaster response in lowland and vulnerable sectors. All active personnel operating under unified incident command."}
+
+HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
     `;
 
     const printWindow = window.open("", "_blank");
-
     if (!printWindow) {
       alert("Please allow pop-ups to download the report.");
       return;
@@ -150,23 +203,25 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM
     printWindow.document.write(`
       <html>
         <head>
-          <title>${report.id}</title>
+          <title>${report.id} - Situation Report</title>
           <style>
             body {
               font-family: Arial, sans-serif;
               padding: 40px;
               color: #153f5e;
+              background-color: #ffffff;
             }
-            h1 { color: #153f5e; }
+            h1 { color: #153f5e; border-bottom: 2px solid #287da5; padding-bottom: 10px; }
             pre {
               white-space: pre-wrap;
-              font-size: 14px;
+              font-size: 13px;
               line-height: 1.8;
+              font-family: inherit;
             }
           </style>
         </head>
         <body>
-          <h1>Situation Report</h1>
+          <h1>ReliefOS Situation Report</h1>
           <pre>${content}</pre>
         </body>
       </html>
@@ -176,198 +231,224 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM
     printWindow.print();
   };
 
-  const createReport = () => {
-    if (!newTitle.trim()) {
-      alert("Please enter a report title.");
-      return;
-    }
+  const publishedCount = useMemo(() => {
+    if (metrics) return metrics.publishedCount;
+    return reports.filter((r) => r.status === "Approved" || r.status === "Published").length;
+  }, [metrics, reports]);
 
-    const newReport: Report = {
-      id: `SITREP ${String(reports.length + 25).padStart(3, "0")}`,
-      title: newTitle,
-      period: "09 November 2026 · 08:00–12:00 UTC",
-      status: "Draft",
-      preparedBy: "Operations Analysis Team",
-      approvedBy: "Pending approval",
-      recipients: 0,
-      event: newEvent,
-    };
+  const draftCount = useMemo(() => {
+    if (metrics) return metrics.draftCount;
+    return reports.filter((r) => r.status === "Draft").length;
+  }, [metrics, reports]);
 
-    setReports((previous) => [newReport, ...previous]);
-    setShowCreate(false);
-    setNewTitle("");
-  };
+  const totalRecipients = useMemo(() => {
+    if (metrics) return metrics.totalRecipients;
+    return reports.reduce((sum, r) => sum + r.recipients, 0);
+  }, [metrics, reports]);
 
-  const latestReport =
-    reports.find((report) => report.status === "Approved") || reports[0];
+  const nextDue = metrics?.nextReportDue ?? "2h 18m";
+  const nextReportNumber = metrics?.nextReportId ?? `SITREP ${String(reports.length + 22).padStart(3, "0")}`;
+
+  const latestReport = useMemo(() => {
+    if (metrics?.latestApproved) return metrics.latestApproved;
+    return reports.find((r) => r.status === "Approved") ?? reports[0];
+  }, [metrics, reports]);
 
   return (
     <div className="min-h-screen bg-[#edf4f6] px-4 py-6 sm:px-6 lg:px-7">
+      {/* Toast Notification */}
+      {actionMessage && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl bg-[#153f5e] px-4 py-3 text-xs font-semibold text-white shadow-xl">
+          <CheckCircle2 size={16} className="text-[#70c5ad]" />
+          <span>{actionMessage}</span>
+        </div>
+      )}
 
-      {/* Page heading */}
+      {/* Page Heading */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-
         <div>
-          <h1 className="text-2xl font-medium text-[#153f5e]">
-            Situation Reports
-          </h1>
-
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-[#153f5e]">Situation Reports</h1>
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                isLiveConnected ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+              }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  isLiveConnected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                }`}
+              />
+              {isLiveConnected ? "Live Backend Synchronized" : "Local Cached"}
+            </span>
+          </div>
           <p className="mt-1 text-xs text-slate-500">
-            Create, review, approve, and distribute verified
-            operational situation reports.
+            Create, review, approve, and distribute verified operational situation reports to humanitarian partners.
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleRefresh}
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 transition-colors"
+            title="Refresh reports"
+          >
+            <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+            <span>Refresh</span>
+          </button>
+
+          <button
+            onClick={handleResetData}
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+            title="Reset to default seed fixtures"
+          >
+            <RotateCcw size={13} />
+            <span>Reset</span>
+          </button>
 
           <button
             onClick={() => setShowTemplates(true)}
-            className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] bg-white px-4 py-2.5 text-xs font-medium text-[#175477] hover:bg-sky-50"
+            className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] bg-white px-4 py-2 text-xs font-medium text-[#175477] hover:bg-sky-50 transition-colors"
           >
             <LayoutTemplate size={15} />
-            Templates
+            <span>Templates</span>
           </button>
 
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#216789]"
+            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#153f5e] transition-colors"
           >
             <Plus size={16} />
-            Create report
+            <span>Create Report</span>
           </button>
-
         </div>
       </div>
 
-      {/* Latest approved report */}
+      {/* Latest Approved Report Card */}
       {latestReport && (
-        <div className="mb-4 rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-sm">
-
-          <div className="mb-2 rounded-md bg-emerald-50 px-3 py-1.5 text-[10px] font-bold text-emerald-700">
-            LATEST APPROVED
+        <div className="mb-4 rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-xs">
+          <div className="mb-2 inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-700">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            LATEST APPROVED SITREP
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4">
-
-            <div className="flex-1">
-              <h2 className="text-base font-medium text-[#153f5e]">
+            <div className="flex-1 min-w-[280px]">
+              <h2 className="text-base font-bold text-[#153f5e]">
                 {latestReport.id} · {latestReport.title}
               </h2>
 
-              <p className="mt-1 text-[10px] text-slate-500">
+              <p className="mt-1 text-xs text-slate-500">
                 Reporting period: {latestReport.period}
               </p>
 
-              <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
-
+              <div className="mt-3.5 flex flex-wrap gap-x-8 gap-y-2">
                 <div>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Prepared by
                   </p>
-                  <p className="mt-1 text-xs font-semibold text-[#153f5e]">
+                  <p className="mt-0.5 text-xs font-semibold text-[#153f5e]">
                     {latestReport.preparedBy}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Approved by
                   </p>
-                  <p className="mt-1 text-xs font-semibold text-[#153f5e]">
+                  <p className="mt-0.5 text-xs font-semibold text-[#153f5e]">
                     {latestReport.approvedBy}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Distribution
                   </p>
-                  <p className="mt-1 text-xs font-semibold text-[#153f5e]">
+                  <p className="mt-0.5 text-xs font-semibold text-[#153f5e]">
                     {latestReport.recipients} partner organisations
                   </p>
                 </div>
-
               </div>
             </div>
 
             <div className="flex gap-2">
-
               <button
                 onClick={() => setSelectedReport(latestReport)}
-                className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] px-4 py-2.5 text-xs text-[#175477] hover:bg-sky-50"
+                className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] px-3.5 py-2 text-xs font-medium text-[#175477] hover:bg-sky-50 transition-colors"
               >
                 <Eye size={14} />
-                Preview
+                <span>Preview</span>
               </button>
 
               <button
                 onClick={() => downloadReport(latestReport)}
-                className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#216789]"
+                className="flex items-center gap-2 rounded-lg bg-[#287da5] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#153f5e] transition-colors"
               >
                 <Download size={14} />
-                Download PDF
+                <span>Download PDF</span>
               </button>
-
             </div>
           </div>
         </div>
       )}
 
-      {/* Statistics */}
+      {/* Statistics Cards */}
       <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-
         <StatCard
           icon={FileText}
-          title="Reports published"
+          title="Reports Published"
           value={publishedCount.toString()}
-          subtitle="Current crisis event"
+          subtitle="Current operational cycle"
           color="blue"
         />
 
         <StatCard
           icon={Clock}
-          title="Reports in draft"
+          title="Reports in Draft"
           value={draftCount.toString()}
-          subtitle="Awaiting review"
+          subtitle="Awaiting coordinator review"
           color="amber"
         />
 
         <StatCard
           icon={Building2}
-          title="Partner recipients"
+          title="Partner Recipients"
           value={totalRecipients.toString()}
-          subtitle="Across available reports"
+          subtitle="Receiving telemetry reports"
           color="blue"
         />
 
         <StatCard
           icon={AlertTriangle}
-          title="Next report due"
-          value="2h 18m"
-          subtitle="SITREP 025"
+          title="Next Report Due"
+          value={nextDue}
+          subtitle={nextReportNumber}
           color="amber"
         />
-
       </div>
 
-      {/* Search and filters */}
-      <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(180px,1fr)_auto_auto_auto]">
-
-        <div className="flex items-center gap-2 rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5">
-          <Search size={15} className="text-slate-400" />
-
+      {/* Search and Filters */}
+      <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(200px,1fr)_auto_auto_auto]">
+        <div className="flex items-center gap-2 rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 shadow-2xs">
+          <Search size={15} className="shrink-0 text-slate-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search report number or title..."
+            placeholder="Search report ID, title, or disaster..."
             className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
           />
+          {search && (
+            <button onClick={() => setSearch("")} className="text-slate-400 hover:text-slate-600">
+              <X size={14} />
+            </button>
+          )}
         </div>
 
         <select
           value={eventFilter}
           onChange={(e) => setEventFilter(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-xs text-slate-700 outline-none shadow-2xs"
         >
           <option>All crisis events</option>
           <option>Monsoon Floods 2025</option>
@@ -377,7 +458,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-xs text-slate-700 outline-none shadow-2xs"
         >
           <option>All report states</option>
           <option>Approved</option>
@@ -388,265 +469,321 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM
         <select
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-xs text-slate-700 outline-none shadow-2xs"
         >
           <option>Date range</option>
           <option>Last 7 days</option>
           <option>Last 30 days</option>
         </select>
-
       </div>
 
-      {/* Report list */}
+      {/* Reports List */}
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-
-        {filteredReports.map((report) => (
-
-          <div
-            key={report.id}
-            className="overflow-hidden rounded-xl border border-[#d5e2e9] bg-white shadow-sm transition hover:shadow-md"
-          >
-
-            <div className="flex items-center justify-between border-b border-slate-100 p-4">
-
-              <div className="flex items-center gap-3">
-
-                <div className="rounded-lg bg-[#e8f2f8] p-2.5 text-[#287da5]">
-                  <FileText size={20} />
-                </div>
-
-                <div>
-                  <h3 className="text-xs font-semibold text-[#153f5e]">
-                    {report.id} · {report.title}
-                  </h3>
-
-                  <p className="mt-1 text-[10px] text-slate-400">
-                    {report.period} · {report.recipients} recipients
-                  </p>
-                </div>
-
-              </div>
-
-              <div className="flex items-center gap-2">
-
-                <span className={`rounded-md px-2 py-2 text-[10px] font-semibold ${statusStyles[report.status]}`}>
-                  {report.status}
-                </span>
-
-                <button
-                  onClick={() => setSelectedReport(report)}
-                  className="text-slate-500 hover:text-[#287da5]"
-                >
-                  <ChevronRight size={19} />
-                </button>
-
-              </div>
-            </div>
-
-            <div className="p-4">
-
-              <div className="mb-3 rounded-md bg-emerald-50 px-3 py-2">
-                <p className="text-[9px] font-bold text-emerald-700">
-                  {report.status === "Approved"
-                    ? "APPROVED REPORT"
-                    : report.status === "Published"
-                      ? "PUBLISHED REPORT"
-                      : "DRAFT REPORT"}
-                </p>
-              </div>
-
-              <h3 className="text-sm font-medium text-[#153f5e]">
-                {report.id} · {report.title}
-              </h3>
-
-              <p className="mt-1 text-[10px] text-slate-500">
-                Reporting period: {report.period}
-              </p>
-
-              <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-
-                <div className="flex flex-wrap gap-x-7 gap-y-2">
-
-                  <div>
-                    <p className="text-[10px] text-slate-400">
-                      Prepared by
-                    </p>
-                    <p className="mt-1 text-[10px] font-semibold text-[#153f5e]">
-                      {report.preparedBy}
-                    </p>
+        {loading ? (
+          <div className="col-span-full rounded-xl border border-[#d5e2e9] bg-white py-16 text-center text-xs text-slate-400">
+            <RefreshCw size={24} className="mx-auto mb-2 animate-spin text-[#287da5]" />
+            Loading situation reports...
+          </div>
+        ) : (
+          reports.map((report) => (
+            <div
+              key={report.id}
+              className="overflow-hidden rounded-xl border border-[#d5e2e9] bg-white shadow-xs transition hover:shadow-md"
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 p-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="rounded-lg bg-[#e8f2f8] p-2.5 text-[#287da5] shrink-0">
+                    <FileText size={20} />
                   </div>
 
-                  <div>
-                    <p className="text-[10px] text-slate-400">
-                      Approved by
-                    </p>
-                    <p className="mt-1 text-[10px] font-semibold text-[#153f5e]">
-                      {report.approvedBy}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-[10px] text-slate-400">
-                      Distribution
-                    </p>
-                    <p className="mt-1 text-[10px] font-semibold text-[#153f5e]">
-                      {report.recipients} organisations
+                  <div className="min-w-0">
+                    <h3 className="text-xs font-bold text-[#153f5e] truncate">
+                      {report.id} · {report.title}
+                    </h3>
+                    <p className="mt-0.5 text-[10px] text-slate-400 truncate">
+                      {report.period} · {report.recipients} recipients
                     </p>
                   </div>
-
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2 shrink-0">
+                  <span
+                    className={`rounded-md px-2.5 py-1 text-[10px] font-bold ${
+                      statusStyles[report.status] ?? "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {report.status}
+                  </span>
 
                   <button
                     onClick={() => setSelectedReport(report)}
-                    className="flex items-center gap-1.5 rounded-lg border border-[#c4d7e1] px-3 py-2 text-[10px] text-[#175477] hover:bg-sky-50"
+                    className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-[#287da5]"
+                    title="View details"
                   >
-                    <Eye size={13} />
-                    Preview
+                    <ChevronRight size={18} />
                   </button>
-
-                  <button
-                    onClick={() => downloadReport(report)}
-                    className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3 py-2 text-[10px] font-semibold text-white hover:bg-[#216789]"
-                  >
-                    <Download size={13} />
-                    Download PDF
-                  </button>
-
                 </div>
+              </div>
 
+              <div className="p-4">
+                <h3 className="text-sm font-bold text-[#153f5e] leading-snug">
+                  {report.id} · {report.title}
+                </h3>
+
+                <p className="mt-1 text-xs text-slate-500">
+                  Event: <span className="font-semibold text-slate-700">{report.event}</span> · Period: {report.period}
+                </p>
+
+                {report.executiveSummary && (
+                  <p className="mt-2 text-xs text-slate-600 line-clamp-2 bg-[#f8fafb] rounded-md p-2">
+                    {report.executiveSummary}
+                  </p>
+                )}
+
+                <div className="mt-4 flex flex-wrap items-end justify-between gap-4 border-t border-slate-100 pt-3">
+                  <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Prepared by
+                      </p>
+                      <p className="mt-0.5 text-[11px] font-semibold text-[#153f5e]">
+                        {report.preparedBy}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Approved by
+                      </p>
+                      <p className="mt-0.5 text-[11px] font-semibold text-[#153f5e]">
+                        {report.approvedBy}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Recipients
+                      </p>
+                      <p className="mt-0.5 text-[11px] font-semibold text-[#153f5e]">
+                        {report.recipients} orgs
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {report.status === "Draft" ? (
+                      <button
+                        onClick={() => handleTransitionStatus(report.id, "Approved")}
+                        className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-700 transition-colors"
+                      >
+                        <CheckCircle2 size={12} />
+                        <span>Approve</span>
+                      </button>
+                    ) : report.status === "Approved" ? (
+                      <button
+                        onClick={() => handleTransitionStatus(report.id, "Published")}
+                        className="flex items-center gap-1 rounded-lg bg-[#287da5] px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-[#153f5e] transition-colors"
+                      >
+                        <Send size={12} />
+                        <span>Publish</span>
+                      </button>
+                    ) : null}
+
+                    <button
+                      onClick={() => setSelectedReport(report)}
+                      className="flex items-center gap-1 rounded-lg border border-[#c4d7e1] px-3 py-1.5 text-[11px] font-medium text-[#175477] hover:bg-sky-50 transition-colors"
+                    >
+                      <Eye size={12} />
+                      <span>Preview</span>
+                    </button>
+
+                    <button
+                      onClick={() => downloadReport(report)}
+                      className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <Download size={12} />
+                      <span>PDF</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-        ))}
-
+          ))
+        )}
       </div>
 
-      {filteredReports.length === 0 && (
+      {!loading && reports.length === 0 && (
         <div className="rounded-xl border border-[#d5e2e9] bg-white py-16 text-center">
           <FileText size={32} className="mx-auto mb-3 text-slate-300" />
-          <p className="text-sm font-medium text-slate-600">
-            No reports found
-          </p>
+          <p className="text-sm font-semibold text-slate-700">No reports found</p>
           <p className="mt-1 text-xs text-slate-400">
-            Try changing your search or filters.
+            Try modifying your search keywords or clear applied filters.
           </p>
         </div>
       )}
 
-      {/* Create report modal */}
+      {/* Create Report Modal */}
       {showCreate && (
-        <Modal title="Create situation report" onClose={() => setShowCreate(false)}>
+        <Modal title="Create Situation Report Draft" onClose={() => setShowCreate(false)}>
+          <div className="space-y-3.5">
+            <div>
+              <label className="text-xs font-bold text-slate-700">Report Title</label>
+              <input
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="e.g. Greater Riverton Lowland Evacuation Assessment"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
+              />
+            </div>
 
-          <label className="mb-2 block text-xs font-medium text-slate-600">
-            Report title
-          </label>
+            <div>
+              <label className="text-xs font-bold text-slate-700">Crisis Event</label>
+              <select
+                value={newEvent}
+                onChange={(e) => setNewEvent(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
+              >
+                <option>Monsoon Floods 2025</option>
+                <option>North Ridge Landslide</option>
+                <option>Eastbank Emergency Response</option>
+                <option>Northern Province Heatwave</option>
+              </select>
+            </div>
 
-          <input
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            placeholder="Enter report title"
-            className="mb-4 w-full rounded-lg border border-slate-200 px-3 py-3 text-sm outline-none focus:border-sky-500"
-          />
+            <div>
+              <label className="text-xs font-bold text-slate-700">Executive Summary</label>
+              <textarea
+                rows={3}
+                value={newSummary}
+                onChange={(e) => setNewSummary(e.target.value)}
+                placeholder="Key operational updates, sector casualties, and priority actions..."
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
+              />
+            </div>
 
-          <label className="mb-2 block text-xs font-medium text-slate-600">
-            Crisis event
-          </label>
-
-          <select
-            value={newEvent}
-            onChange={(e) => setNewEvent(e.target.value)}
-            className="mb-5 w-full rounded-lg border border-slate-200 px-3 py-3 text-sm outline-none"
-          >
-            <option>Monsoon Floods 2025</option>
-            <option>North Ridge Landslide</option>
-            <option>Eastbank Emergency Response</option>
-          </select>
-
-          <button
-            onClick={createReport}
-            className="w-full rounded-lg bg-[#287da5] py-3 text-sm font-semibold text-white hover:bg-[#216789]"
-          >
-            Create draft report
-          </button>
-
+            <button
+              disabled={isSubmitting}
+              onClick={createReport}
+              className="mt-2 w-full rounded-lg bg-[#287da5] py-2.5 text-xs font-semibold text-white hover:bg-[#153f5e] transition-colors"
+            >
+              {isSubmitting ? "Creating Draft..." : "Create Draft Report"}
+            </button>
+          </div>
         </Modal>
       )}
 
-      {/* Report preview modal */}
+      {/* Report Preview Modal */}
       {selectedReport && (
-        <Modal title="Situation report preview" onClose={() => setSelectedReport(null)}>
-
-          <div className="mb-4 rounded-lg bg-emerald-50 p-3">
-            <p className="text-[10px] font-bold text-emerald-700">
-              {selectedReport.status.toUpperCase()}
-            </p>
-            <h3 className="mt-2 text-lg font-semibold text-[#153f5e]">
-              {selectedReport.id}
-            </h3>
-            <p className="text-sm text-slate-600">
+        <Modal title="Situation Report Preview" onClose={() => setSelectedReport(null)}>
+          <div className="mb-4 rounded-xl bg-emerald-50 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-emerald-700 tracking-wider">
+                {selectedReport.status.toUpperCase()} SITREP
+              </span>
+              <span className="text-[10px] font-mono text-emerald-800">
+                {selectedReport.id}
+              </span>
+            </div>
+            <h3 className="mt-1 text-base font-bold text-[#153f5e]">
               {selectedReport.title}
+            </h3>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Event: {selectedReport.event} · Period: {selectedReport.period}
             </p>
           </div>
 
-          <div className="space-y-4 text-xs">
-
-            <Detail label="Crisis event" value={selectedReport.event} />
-            <Detail label="Reporting period" value={selectedReport.period} />
-            <Detail label="Prepared by" value={selectedReport.preparedBy} />
-            <Detail label="Approved by" value={selectedReport.approvedBy} />
-            <Detail label="Partner organisations" value={String(selectedReport.recipients)} />
-
+          <div className="space-y-3 text-xs">
+            <Detail label="Crisis Event" value={selectedReport.event} />
+            <Detail label="Reporting Period" value={selectedReport.period} />
+            <Detail label="Prepared By" value={selectedReport.preparedBy} />
+            <Detail label="Approved By" value={selectedReport.approvedBy} />
+            <Detail label="Partner Recipients" value={`${selectedReport.recipients} organisations`} />
+            {selectedReport.executiveSummary && (
+              <div className="pt-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Executive Summary
+                </span>
+                <p className="mt-1 text-xs text-slate-700 bg-slate-50 p-3 rounded-lg leading-relaxed">
+                  {selectedReport.executiveSummary}
+                </p>
+              </div>
+            )}
           </div>
 
-          <button
-            onClick={() => downloadReport(selectedReport)}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-[#287da5] py-3 text-xs font-semibold text-white"
-          >
-            <Printer size={15} />
-            Print / Save as PDF
-          </button>
-
+          <div className="mt-6 flex flex-wrap gap-2">
+            {selectedReport.status === "Draft" && (
+              <button
+                onClick={() => handleTransitionStatus(selectedReport.id, "Approved")}
+                className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 transition-colors"
+              >
+                Approve SITREP
+              </button>
+            )}
+            {selectedReport.status === "Approved" && (
+              <button
+                onClick={() => handleTransitionStatus(selectedReport.id, "Published")}
+                className="flex-1 rounded-lg bg-[#287da5] py-2.5 text-xs font-semibold text-white hover:bg-[#153f5e] transition-colors"
+              >
+                Publish & Distribute
+              </button>
+            )}
+            <button
+              onClick={() => downloadReport(selectedReport)}
+              className="flex items-center justify-center gap-1.5 flex-1 rounded-lg border border-slate-300 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              <Printer size={15} />
+              <span>Print / Save PDF</span>
+            </button>
+          </div>
         </Modal>
       )}
 
-      {/* Templates modal */}
+      {/* Templates Modal */}
       {showTemplates && (
-        <Modal title="Report templates" onClose={() => setShowTemplates(false)}>
-
-          <div className="space-y-3">
-
+        <Modal title="Standard Report Templates" onClose={() => setShowTemplates(false)}>
+          <div className="space-y-2.5">
             {[
-              "Situation Report (SITREP)",
-              "Daily Operations Report",
-              "Resource Distribution Report",
-              "Emergency Assessment Report",
-            ].map((template) => (
-
+              {
+                title: "Situation Report (SITREP)",
+                desc: "Standard 4-hourly incident coordination summary across all sectors.",
+              },
+              {
+                title: "Daily Operations Report",
+                desc: "24-hour tactical assessment of logistics, deployments, and shelter occupancy.",
+              },
+              {
+                title: "Resource Distribution Report",
+                desc: "Warehouse inventory requisitions, supplies dispatched, and remaining rations.",
+              },
+              {
+                title: "Emergency Assessment Report",
+                desc: "Rapid damage assessment covering infrastructure damage and humanitarian needs.",
+              },
+            ].map((tmpl) => (
               <button
-                key={template}
+                key={tmpl.title}
                 onClick={() => {
-                  setNewTitle(template);
+                  setNewTitle(tmpl.title);
                   setShowTemplates(false);
                   setShowCreate(true);
                 }}
-                className="flex w-full items-center justify-between rounded-lg border border-slate-200 p-4 text-left text-xs font-medium text-[#153f5e] hover:bg-sky-50"
+                className="flex w-full items-start justify-between rounded-xl border border-slate-200 p-3.5 text-left transition hover:bg-[#edf4f7] hover:border-[#287da5]/40"
               >
-                <span className="flex items-center gap-3">
-                  <FilePlus size={17} className="text-[#287da5]" />
-                  {template}
-                </span>
-                <ChevronRight size={16} />
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-[#e8f2f8] p-2 text-[#287da5] mt-0.5">
+                    <FilePlus size={16} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#153f5e]">{tmpl.title}</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">{tmpl.desc}</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} className="text-slate-400 mt-1 shrink-0" />
               </button>
-
             ))}
-
           </div>
         </Modal>
       )}
-
     </div>
   );
 }
@@ -666,24 +803,22 @@ function StatCard({
   color: "blue" | "amber";
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-sm">
-
-      <div className={`rounded-lg p-3 ${
-        color === "blue"
-          ? "bg-[#e8f2f8] text-[#287da5]"
-          : "bg-amber-50 text-amber-600"
-      }`}>
+    <div className="flex items-center gap-3 rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-xs">
+      <div
+        className={`rounded-lg p-3 ${
+          color === "blue"
+            ? "bg-[#e8f2f8] text-[#287da5]"
+            : "bg-amber-50 text-amber-600"
+        }`}
+      >
         <Icon size={20} />
       </div>
 
       <div>
-        <p className="text-[10px] text-slate-400">{title}</p>
-        <p className="mt-0.5 text-2xl font-semibold text-[#153f5e]">
-          {value}
-        </p>
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{title}</p>
+        <p className="mt-0.5 text-2xl font-bold text-[#153f5e]">{value}</p>
         <p className="text-[10px] text-slate-400">{subtitle}</p>
       </div>
-
     </div>
   );
 }
@@ -699,21 +834,19 @@ function Modal({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-5 shadow-2xl">
-
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-[#153f5e]">
-            {title}
-          </h2>
-
-          <button onClick={onClose}>
-            <X size={19} className="text-slate-500" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+          <h2 className="text-base font-bold text-[#153f5e]">{title}</h2>
+          <button
+            onClick={onClose}
+            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          >
+            <X size={18} />
           </button>
         </div>
 
         {children}
-
       </div>
     </div>
   );
@@ -721,9 +854,9 @@ function Modal({
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-4 border-b border-slate-100 pb-3">
+    <div className="flex justify-between gap-4 border-b border-slate-100 pb-2">
       <span className="text-slate-400">{label}</span>
-      <span className="text-right font-medium text-[#153f5e]">{value}</span>
+      <span className="text-right font-semibold text-[#153f5e]">{value}</span>
     </div>
   );
 }
