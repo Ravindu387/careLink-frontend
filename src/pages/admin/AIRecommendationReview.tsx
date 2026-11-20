@@ -135,7 +135,7 @@ export default function AIRecommendationReview() {
     return () => {
       isMounted = false;
     };
-  }, [loadListAndMetrics, loadDetail]);
+  }, [loadListAndMetrics, loadDetail, searchParams]);
 
   // Handle auto-clear success toast
   useEffect(() => {
@@ -149,7 +149,6 @@ export default function AIRecommendationReview() {
   const handleSelectRecommendation = (id: string) => {
     setSelectedCaseId(id);
     setSearchParams({ id });
-    loadDetail(id, false);
   };
 
   // Record Decision (Approve or Modified)

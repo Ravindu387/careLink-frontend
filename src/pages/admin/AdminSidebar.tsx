@@ -20,7 +20,12 @@ import {
 } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { aiRecommendationService } from "../../services/aiRecommendationService";
+import { verificationService } from "../../services/verificationService";
+import { securityEventService } from "../../services/securityEventService";
+import { notificationService } from "../../services/notificationService";
 
 const groups = [
   {
@@ -103,6 +108,57 @@ type Props = {
 export default function AdminSidebar({ open, onClose }: Props) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const [aiReviewCount, setAiReviewCount] = useState<number>(8);
+  const [verificationCount, setVerificationCount] = useState<number>(14);
+  const [securityCount, setSecurityCount] = useState<number>(3);
+  const [notificationCount, setNotificationCount] = useState<number>(12);
+
+  useEffect(() => {
+    let isCancelled = false;
+    const fetchBadges = async () => {
+      try {
+        const [aiMetrics, verStats, secStats, notifStats] = await Promise.allSettled([
+          aiRecommendationService.getMetrics(),
+          verificationService.getStats(),
+          securityEventService.getStats(),
+          notificationService.getStats(),
+        ]);
+
+        if (isCancelled) return;
+
+        if (aiMetrics.status === "fulfilled" && aiMetrics.value) {
+          setAiReviewCount(aiMetrics.value.awaitingReviewCount);
+        }
+        if (verStats.status === "fulfilled" && verStats.value) {
+          setVerificationCount(verStats.value.totalPending);
+        }
+        if (secStats.status === "fulfilled" && secStats.value) {
+          setSecurityCount(secStats.value.openEvents);
+        }
+        if (notifStats.status === "fulfilled" && notifStats.value) {
+          setNotificationCount(notifStats.value.unreadCount);
+        }
+      } catch {
+        // keep fallback values
+      }
+    };
+
+    fetchBadges();
+    const interval = setInterval(fetchBadges, 15000);
+    return () => {
+      isCancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const getBadgeValue = (path: string, defaultBadge?: number): number | undefined => {
+    if (path === "/admin/ai-review") return aiReviewCount;
+    if (path === "/admin/verification") return verificationCount;
+    if (path === "/admin/security-events") return securityCount;
+    if (path === "/admin/notifications") return notificationCount;
+    return defaultBadge;
+  };
 
   const handleSignOut = () => {
     logout();
@@ -235,11 +291,14 @@ export default function AdminSidebar({ open, onClose }: Props) {
                             {item.name}
                           </span>
 
-                          {"badge" in item && item.badge !== undefined && (
-                            <span className="flex h-[19px] min-w-[23px] items-center justify-center rounded-full bg-[#E64D5A] px-1.5 text-[9px] font-bold text-white">
-                              {item.badge}
-                            </span>
-                          )}
+                          {(() => {
+                            const badgeVal = getBadgeValue(item.path, item.badge);
+                            return badgeVal !== undefined && badgeVal > 0 ? (
+                              <span className="flex h-[19px] min-w-[23px] items-center justify-center rounded-full bg-[#E64D5A] px-1.5 text-[9px] font-bold text-white">
+                                {badgeVal > 99 ? "99+" : badgeVal}
+                              </span>
+                            ) : null;
+                          })()}
 
                         </>
                       )}
@@ -274,9 +333,11 @@ export default function AdminSidebar({ open, onClose }: Props) {
 
                 <span className="flex-1">Notifications</span>
 
-                <span className="flex h-[19px] min-w-[23px] items-center justify-center rounded-full bg-[#E64D5A] px-1.5 text-[9px] font-bold text-white">
-                  12
-                </span>
+                {notificationCount > 0 && (
+                  <span className="flex h-[19px] min-w-[23px] items-center justify-center rounded-full bg-[#E64D5A] px-1.5 text-[9px] font-bold text-white">
+                    {notificationCount > 99 ? "99+" : notificationCount}
+                  </span>
+                )}
               </NavLink>
 
             </div>
