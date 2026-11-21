@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Heart,
   Check,
@@ -12,16 +13,12 @@ import {
   HandHeart,
   Eye,
   EyeOff,
-<<<<<<< HEAD
   AlertCircle,
   Loader2,
   Mail,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { authService } from "../../services/authService";
-=======
-} from "lucide-react";
->>>>>>> parent of 75fb8ca (feat: add core frontend layout, authentication context, and admin dashboard views)
 
 // Background image slider
 const backgroundImages = [
@@ -39,7 +36,6 @@ type AccountType =
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [currentImage, setCurrentImage] = useState(0);
-<<<<<<< HEAD
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [registeredSuccess, setRegisteredSuccess] = useState(false);
@@ -48,8 +44,6 @@ export default function RegisterPage() {
 
   const { register } = useAuth();
   const navigate = useNavigate();
-=======
->>>>>>> parent of 75fb8ca (feat: add core frontend layout, authentication context, and admin dashboard views)
 
   // Automatically change background image every 4 seconds
   useEffect(() => {
@@ -123,35 +117,37 @@ export default function RegisterPage() {
     }));
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    setError(null);
+
     if (step === 2) {
       if (
-        !formData.firstName ||
-        !formData.lastName ||
-        !formData.email ||
-        !formData.phone ||
+        !formData.firstName.trim() ||
+        !formData.lastName.trim() ||
+        !formData.email.trim() ||
+        !formData.phone.trim() ||
         !formData.password ||
         !formData.confirmPassword
       ) {
-        alert("Please complete all required fields.");
+        setError("Please complete all required fields.");
         return;
       }
 
       if (formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match.");
+        setError("Passwords do not match.");
         return;
       }
 
-      if (formData.password.length < 8) {
-        alert("Password must contain at least 8 characters.");
+      if (formData.password.length < 6) {
+        setError("Password must contain at least 6 characters.");
         return;
       }
 
       if (
         accountType === "organisation" &&
-        !formData.organisationName
+        !formData.organisationName.trim()
       ) {
-        alert("Please enter your organisation name.");
+        setError("Please enter your organisation name.");
         return;
       }
     }
@@ -159,7 +155,6 @@ export default function RegisterPage() {
     if (step < 3) {
       setStep((previous) => previous + 1);
     } else {
-<<<<<<< HEAD
       // Step 3 submission: Call backend API
       setIsLoading(true);
       setError(null);
@@ -203,12 +198,6 @@ export default function RegisterPage() {
       } finally {
         setIsLoading(false);
       }
-=======
-      alert(
-        "Registration completed successfully! Redirecting to sign in."
-      );
-      window.location.href = "/login";
->>>>>>> parent of 75fb8ca (feat: add core frontend layout, authentication context, and admin dashboard views)
     }
   };
 
@@ -398,7 +387,6 @@ export default function RegisterPage() {
                   CREATE AN ACCOUNT · STEP {step} OF 3
                 </p>
 
-<<<<<<< HEAD
                 <div className="grid grid-cols-3 gap-2">
                   {[1, 2, 3].map((number) => (
                     <div
@@ -421,8 +409,6 @@ export default function RegisterPage() {
                 </div>
               )}
 
-=======
->>>>>>> parent of 75fb8ca (feat: add core frontend layout, authentication context, and admin dashboard views)
           {/* STEP 1 */}
           {step === 1 && (
             <div>
@@ -782,11 +768,20 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={handleContinue}
-              className="flex items-center gap-2 rounded-lg bg-[#123B5C] px-5 py-2.5 text-xs font-semibold text-white shadow-md transition hover:bg-[#1D5F8A] active:scale-[0.98]"
+              disabled={isLoading}
+              className="flex items-center gap-2 rounded-lg bg-[#123B5C] px-5 py-2.5 text-xs font-semibold text-white shadow-md transition hover:bg-[#1D5F8A] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {step === 3 ? "Create Account" : "Continue"}
-
-              <ArrowRight size={14} />
+              {isLoading && step === 3 ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Creating Account...</span>
+                </>
+              ) : (
+                <>
+                  <span>{step === 3 ? "Create Account" : "Continue"}</span>
+                  <ArrowRight size={14} />
+                </>
+              )}
             </button>
           </div>
           </>
