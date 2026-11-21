@@ -187,12 +187,12 @@ export default function AdminSidebar({ open, onClose }: Props) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[230px] flex-col overflow-hidden bg-[#153E5D] text-white transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[230px] flex-col overflow-hidden bg-[#153E5D] text-white transition-transform duration-300 lg:static lg:h-full lg:shrink-0 lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* LOGO */}
-        <div className="flex h-[73px] items-center gap-3 border-b border-white/10 px-4">
+        <div className="flex h-[73px] shrink-0 items-center gap-3 border-b border-white/10 px-4">
           <NavLink
             to="/admin/dashboard"
             onClick={onClose}
@@ -223,7 +223,7 @@ export default function AdminSidebar({ open, onClose }: Props) {
         </div>
 
         {/* ACTIVE RESPONSE */}
-        <div className="px-3 pt-3">
+        <div className="shrink-0 px-3 pt-3">
           <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.07] px-3 py-3">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-red-400" />
@@ -309,43 +309,10 @@ export default function AdminSidebar({ open, onClose }: Props) {
               </div>
             </div>
           ))}
-
-          {/* ACCOUNT SECTION */}
-          <div className="mb-4">
-            <h3 className="mb-3 px-3 text-[9px] font-bold tracking-widest text-[#8BAFC5]">
-              ACCOUNT
-            </h3>
-
-            <div className="space-y-1">
-
-              <NavLink
-                to="/admin/notifications"
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `relative flex min-h-[49px] items-center gap-3 rounded-[9px] px-3 text-[11px] transition ${
-                    isActive
-                      ? "bg-[#287FA8] font-semibold text-white before:absolute before:bottom-2 before:left-0 before:top-2 before:w-[3px] before:rounded-r-full before:bg-[#63BDA6]"
-                      : "font-medium text-slate-200 hover:bg-white/10 hover:text-white"
-                  }`
-                }
-              >
-                <Bell size={18} />
-
-                <span className="flex-1">Notifications</span>
-
-                {notificationCount > 0 && (
-                  <span className="flex h-[19px] min-w-[23px] items-center justify-center rounded-full bg-[#E64D5A] px-1.5 text-[9px] font-bold text-white">
-                    {notificationCount > 99 ? "99+" : notificationCount}
-                  </span>
-                )}
-              </NavLink>
-
-            </div>
-          </div>
         </div>
 
         {/* USER PROFILE */}
-        <div className="border-t border-white/10 px-4 py-4">
+        <div className="shrink-0 border-t border-white/10 px-4 py-4">
 
           <NavLink
             to="/"
