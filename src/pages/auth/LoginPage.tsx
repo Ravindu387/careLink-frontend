@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Heart,
   ArrowLeft,
@@ -7,7 +7,10 @@ import {
   ShieldCheck,
   Eye,
   EyeOff,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 // Background image slider
 const backgroundImages = [
@@ -21,8 +24,14 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [currentImage, setCurrentImage] = useState(0);
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Automatically change background image every 4 seconds
   useEffect(() => {
@@ -35,11 +44,8 @@ export default function LoginPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const navigate = useNavigate();
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-<<<<<<< HEAD
     setError(null);
     setIsLoading(true);
 
@@ -74,9 +80,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-=======
-    navigate("/admin/dashboard");
->>>>>>> parent of 75fb8ca (feat: add core frontend layout, authentication context, and admin dashboard views)
   };
 
   return (
@@ -212,6 +215,14 @@ export default function LoginPage() {
             </p>
           </div>
 
+          {/* Error Banner */}
+          {error && (
+            <div className="mb-5 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+              <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-600" />
+              <span>{error}</span>
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -297,9 +308,17 @@ export default function LoginPage() {
             {/* Sign In Button */}
             <button
               type="submit"
-              className="mt-3 flex h-12 w-full items-center justify-center rounded-lg bg-[#123B5C] text-sm font-semibold text-white shadow-md transition hover:bg-[#1D5F8A] active:scale-[0.99]"
+              disabled={isLoading}
+              className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#123B5C] text-sm font-semibold text-white shadow-md transition hover:bg-[#1D5F8A] active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Sign in
+              {isLoading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <span>Sign in</span>
+              )}
             </button>
           </form>
 
