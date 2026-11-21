@@ -52,6 +52,24 @@ export const authService = {
     return res.data || [];
   },
 
+  async resendVerification(email: string): Promise<string> {
+    const res = await request<string>("/auth/resend-verification", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+    return res.message || "Verification email sent successfully.";
+  },
+
+  async verifyEmail(email: string, token: string): Promise<boolean> {
+    const res = await request<boolean>(
+      `/auth/verify-email?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`,
+      {
+        method: "GET",
+      }
+    );
+    return res.data ?? false;
+  },
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);

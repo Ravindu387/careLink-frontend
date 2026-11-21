@@ -60,16 +60,18 @@ export default function LoginPage() {
         return;
       }
 
-      if (
-        userRoles.includes("SystemAdmin") ||
-        userRoles.includes("EmergencyCoordinator") ||
-        userRoles.includes("IncidentManager") ||
-        userRoles.includes("LogisticsManager") ||
-        userRoles.includes("ShelterAdmin")
-      ) {
+      const has = (r: string) => userRoles.some((role: string) => role.toLowerCase() === r.toLowerCase());
+
+      if (has("Admin") || has("SystemAdmin")) {
         navigate("/admin/dashboard", { replace: true });
-      } else if (userRoles.includes("VolunteerCoordinator")) {
-        navigate("/admin/dashboard", { replace: true });
+      } else if (has("EmergencyCoordinator") || has("IncidentManager")) {
+        navigate("/coordinator/dashboard", { replace: true });
+      } else if (has("PartnerOfficer")) {
+        navigate("/partner/dashboard", { replace: true });
+      } else if (has("Volunteer") || has("VolunteerCoordinator")) {
+        navigate("/volunteer/dashboard", { replace: true });
+      } else if (has("Citizen")) {
+        navigate("/citizen/dashboard", { replace: true });
       } else {
         navigate("/", { replace: true });
       }
