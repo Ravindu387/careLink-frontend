@@ -27,12 +27,32 @@ export async function request<T>(
       headers,
     });
 
-    const data: ApiResponse<T> = await response.json();
+    const text = await response.text();
+    let data: ApiResponse<T> | null = null;
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        // Non-JSON response payload
+      }
+    }
 
-    if (!response.ok || !data.success) {
-      const errorMsg =
-        data.message ||
-        (data.errors && data.errors.length > 0 ? data.errors.join(", ") : "An error occurred.");
+    if (!response.ok || !data?.success) {
+      if (response.status === 401) {
+        throw new Error("Your session has expired. Please sign in again.");
+      }
+      if (response.status === 403) {
+        throw new Error("Access denied. Your account does not have permission to perform this action.");
+      }
+
+      const detailedErrors =
+        data?.errors && data.errors.length > 0 ? data.errors.join(". ") : "";
+      let errorMsg =
+        data?.message ||
+        (response.statusText ? `Request failed: ${response.statusText}` : "An error occurred.");
+      if (detailedErrors && !errorMsg.includes(detailedErrors)) {
+        errorMsg = data?.message ? `${data.message}: ${detailedErrors}` : detailedErrors;
+      }
       throw new Error(errorMsg);
     }
 

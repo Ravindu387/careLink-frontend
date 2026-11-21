@@ -6,6 +6,7 @@ export interface User {
   nic?: string;
   address?: string;
   roles: string[];
+  permissions: string[];
   organizationId?: string;
   organizationName?: string;
   isActive: boolean;

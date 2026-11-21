@@ -6,6 +6,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "../pages/public/HomePage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
+import AccessDeniedPage from "../pages/public/AccessDeniedPage";
 
 // Funding Officer Layout & Pages
 import FundingOfficerLayout from "../layouts/FundingOfficerLayout";
@@ -68,6 +69,7 @@ export default function AppRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/access-denied" element={<AccessDeniedPage />} />
           <Route path="/citizen" element={<Navigate to="/" replace />} />
 
           {/* Protected Admin Routes */}

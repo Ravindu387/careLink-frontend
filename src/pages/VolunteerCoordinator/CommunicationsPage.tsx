@@ -261,18 +261,16 @@ export default function CommunicationsPage() {
       <button
         type="button"
         onClick={() => toggleChannel(channel)}
-        className={`h-[37px] px-3 rounded-lg border flex items-center gap-2 text-[10px] transition-all ${
-          selected
-            ? "border-[#287fa9] bg-[#f1f8fc] text-[#17648e]"
-            : "border-[#d5e3e9] bg-white text-[#718ba0] hover:border-[#287fa9]"
-        }`}
+        className={`h-[37px] px-3 rounded-lg border flex items-center gap-2 text-[10px] transition-all ${selected
+          ? "border-[#287fa9] bg-[#f1f8fc] text-[#17648e]"
+          : "border-[#d5e3e9] bg-white text-[#718ba0] hover:border-[#287fa9]"
+          }`}
       >
         <span
-          className={`w-3 h-3 rounded-full border flex items-center justify-center ${
-            selected
-              ? "border-[#287fa9]"
-              : "border-[#aabcc8]"
-          }`}
+          className={`w-3 h-3 rounded-full border flex items-center justify-center ${selected
+            ? "border-[#287fa9]"
+            : "border-[#aabcc8]"
+            }`}
         >
           {selected && (
             <span className="w-1.5 h-1.5 rounded-full bg-[#287fa9]" />

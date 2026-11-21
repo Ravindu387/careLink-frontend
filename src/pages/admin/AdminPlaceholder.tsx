@@ -14,7 +14,7 @@ const titles: Record<string, string> = {
 
 export default function AdminPlaceholder() {
   const { tab = "" } = useParams<{ tab: string }>();
-  const title = titles[tab] || tab.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Admin Workspace";
+  const title = titles[tab] || tab.replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()) || "Admin Workspace";
 
   return (
     <div className="font-sans text-[#123B5C]">

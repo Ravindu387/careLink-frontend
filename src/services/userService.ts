@@ -72,4 +72,19 @@ export const userService = {
     });
     return response.data;
   },
+
+  async updateUserRoles(id: string, roles: string[]) {
+    const response = await request<boolean>(`/users/${id}/roles`, {
+      method: "PUT",
+      body: JSON.stringify({ roles }),
+    });
+    return response.data;
+  },
+
+  async getUserPermissions(id: string) {
+    const response = await request<string[]>(`/users/${id}/permissions`, {
+      method: "GET",
+    });
+    return response.data || [];
+  },
 };

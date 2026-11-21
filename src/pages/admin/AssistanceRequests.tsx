@@ -1,6 +1,6 @@
 
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
   Search,
@@ -14,7 +14,14 @@ import {
   ArrowLeft,
   Check,
   Sparkles,
+  RefreshCw,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
+import { assistanceRequestService } from "../../services/assistanceRequestService";
+import type {
+  AssistanceRequestStats,
+} from "../../types/assistanceRequest";
 
 type Priority = "Critical" | "High" | "Medium";
 
@@ -225,6 +232,7 @@ function RequestDrawer({
   onUpdateStatus: (status: RequestStatus) => void;
 }) {
   const [showMoreActions, setShowMoreActions] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="fixed inset-0 z-[70]">
@@ -437,7 +445,10 @@ function RequestDrawer({
               </p>
             </div>
 
-            <button className="mt-3 flex items-center gap-2 rounded-md border border-[#2785B2] px-3 py-2 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50">
+            <button
+              onClick={() => navigate(`/admin/ai-review?requestId=${request.id}`)}
+              className="mt-3 flex items-center gap-2 rounded-md border border-[#2785B2] px-3 py-2 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50 transition active:scale-95"
+            >
               Review recommendation
               <ArrowRight size={13} />
             </button>
@@ -553,6 +564,74 @@ export default function AssistanceRequests() {
   const [showFilters, setShowFilters] = useState(false);
 
   const [requests, setRequests] = useState<Request[]>(initialRequests);
+  const [stats, setStats] = useState<AssistanceRequestStats | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // New Request Form state
+  const [formCategory, setFormCategory] = useState("Food & water");
+  const [formLocation, setFormLocation] = useState("Central Ward");
+  const [formPriority, setFormPriority] = useState<Priority>("Medium");
+  const [formPeople, setFormPeople] = useState("3");
+  const [formContact, setFormContact] = useState("Verified resident");
+  const [formDescription, setFormDescription] = useState(
+    "Emergency food and drinking water needed for families cut off by road closures."
+  );
+
+  const fetchLiveRequests = useCallback(async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      const [data, statsData] = await Promise.all([
+        assistanceRequestService.getRequests(),
+        assistanceRequestService.getStats(),
+      ]);
+
+      if (data?.items && data.items.length > 0) {
+        const mapped: Request[] = data.items.map((item) => ({
+          id: item.id,
+          time: item.timeAgo || "Just now",
+          category: item.category,
+          location: item.location,
+          reported: (item.reportedPriority || "Medium") as Priority,
+          recommendation: item.recommendation || `${item.reportedPriority || "Medium"} priority`,
+          confidence: item.confidence || "85%",
+          assignedTo: item.assignedTo || "Unassigned",
+          status: item.status as RequestStatus,
+          affectedPeople: item.affectedPeople || 1,
+          contact: item.contact || "Verified contact",
+          description: item.description,
+        }));
+        setRequests(mapped);
+      }
+      if (statsData) {
+        setStats(statsData);
+      }
+    } catch (err: any) {
+      console.warn("Using offline demo requests:", err.message);
+      // Keep initialRequests as fallback
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLiveRequests();
+  }, [fetchLiveRequests]);
+
+  // Dynamic Tabs with live counts
+  const dynamicTabs = useMemo(() => {
+    const total = stats?.totalRequests ?? requests.length;
+    const unassigned = requests.filter((r) => r.assignedTo === "Unassigned").length;
+    const awaitingReview = stats?.awaitingReviewCount ?? requests.filter((r) => r.status === "Awaiting review").length;
+    return [
+      { label: "All requests", count: total.toLocaleString() },
+      { label: "Unassigned", count: unassigned.toString() },
+      { label: "Overdue", count: awaitingReview.toString() },
+      { label: "Potential duplicates", count: "2" },
+    ];
+  }, [stats, requests]);
 
   // FILTER REQUESTS
 
@@ -582,7 +661,7 @@ export default function AssistanceRequests() {
         (activeTab === "Overdue" &&
           request.status === "Awaiting review") ||
         (activeTab === "Potential duplicates" &&
-          request.id === "REQ-2741");
+          (request.id === "REQ-2741" || request.id.endsWith("1")));
 
       return (
         searchMatch &&
@@ -606,12 +685,18 @@ export default function AssistanceRequests() {
     page * pageSize
   );
 
-  
-
   // VERIFY REQUEST
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (!selectedRequest) return;
+    setIsActionLoading(true);
+    try {
+      await assistanceRequestService.updateStatus(selectedRequest.id, "Verified");
+    } catch {
+      // offline fallback
+    } finally {
+      setIsActionLoading(false);
+    }
 
     const updatedRequest: Request = {
       ...selectedRequest,
@@ -631,8 +716,16 @@ export default function AssistanceRequests() {
 
   // ASSIGN TEAM
 
-  const handleAssign = () => {
+  const handleAssign = async () => {
     if (!selectedRequest) return;
+    setIsActionLoading(true);
+    try {
+      await assistanceRequestService.assignRequest(selectedRequest.id, "Response Team 1");
+    } catch {
+      // offline fallback
+    } finally {
+      setIsActionLoading(false);
+    }
 
     const updatedRequest: Request = {
       ...selectedRequest,
@@ -653,8 +746,16 @@ export default function AssistanceRequests() {
 
   // UPDATE STATUS
 
-  const handleUpdateStatus = (newStatus: RequestStatus) => {
+  const handleUpdateStatus = async (newStatus: RequestStatus) => {
     if (!selectedRequest) return;
+    setIsActionLoading(true);
+    try {
+      await assistanceRequestService.updateStatus(selectedRequest.id, newStatus);
+    } catch {
+      // offline fallback
+    } finally {
+      setIsActionLoading(false);
+    }
 
     const updatedRequest: Request = {
       ...selectedRequest,
@@ -672,23 +773,40 @@ export default function AssistanceRequests() {
     setSelectedRequest(updatedRequest);
   };
 
-  // CREATE DEMO REQUEST
+  // CREATE REAL / DEMO REQUEST
 
-  const createRequest = () => {
+  const createRequest = async () => {
+    setIsActionLoading(true);
+    let createdId = `REQ-${Math.floor(3000 + Math.random() * 6000)}`;
+    try {
+      const res = await assistanceRequestService.createRequest({
+        category: formCategory,
+        location: formLocation,
+        description: formDescription,
+        reportedPriority: formPriority,
+        affectedPeople: parseInt(formPeople, 10) || 1,
+        contact: formContact,
+      });
+      if (res?.id) createdId = res.id;
+    } catch {
+      // fallback
+    } finally {
+      setIsActionLoading(false);
+    }
+
     const newRequest: Request = {
-      id: `REQ-${Math.floor(3000 + Math.random() * 6000)}`,
+      id: createdId,
       time: "Just now",
-      category: "Food & water",
-      location: "Central Ward",
-      reported: "Medium",
-      recommendation: "Medium priority",
-      confidence: "80%",
+      category: formCategory,
+      location: formLocation,
+      reported: formPriority,
+      recommendation: `${formPriority} priority`,
+      confidence: "88%",
       assignedTo: "Unassigned",
       status: "Awaiting review",
-      affectedPeople: 3,
-      contact: "Pending verification",
-      description:
-        "New demonstration request for emergency food and water assistance.",
+      affectedPeople: parseInt(formPeople, 10) || 1,
+      contact: formContact,
+      description: formDescription,
     };
 
     setRequests((previous) => [
@@ -876,7 +994,7 @@ export default function AssistanceRequests() {
             {/* TABS */}
 
             <div className="flex gap-5 overflow-x-auto border-b border-[#64C9AD] px-4 pt-1">
-              {tabs.map((tab) => {
+              {dynamicTabs.map((tab) => {
                 const active = activeTab === tab.label;
 
                 return (
@@ -1084,42 +1202,98 @@ export default function AssistanceRequests() {
               Create a demonstration assistance request.
             </p>
 
-            <div className="mt-5 space-y-3">
-              <div className="rounded-lg bg-[#EFF6F7] p-3 text-xs">
-                <p className="text-[9px] text-slate-500">
-                  Category
-                </p>
-                <p className="mt-1 font-semibold">
-                  Food & water
-                </p>
-              </div>
-
-              <div className="rounded-lg bg-[#EFF6F7] p-3 text-xs">
-                <p className="text-[9px] text-slate-500">
-                  Location
-                </p>
-                <p className="mt-1 font-semibold">
-                  Central Ward
-                </p>
-              </div>
-
-              <div className="rounded-lg bg-[#EFF6F7] p-3 text-xs">
-                <p className="text-[9px] text-slate-500">
-                  Priority
-                </p>
-                <p className="mt-1 font-semibold">
-                  Medium
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={createRequest}
-              className="mt-5 w-full rounded-lg bg-[#123B5C] py-3 text-xs font-semibold text-white hover:bg-[#1D5F8A]"
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                createRequest();
+              }}
+              className="mt-4 space-y-3"
             >
-              <Plus size={14} className="mr-2 inline" />
-              Add demo request
-            </button>
+              <div>
+                <label className="text-[10px] font-semibold text-slate-700">Category</label>
+                <select
+                  value={formCategory}
+                  onChange={(e) => setFormCategory(e.target.value)}
+                  className="mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-xs outline-none focus:border-[#2785B2]"
+                >
+                  <option>Food & water</option>
+                  <option>Emergency shelter</option>
+                  <option>Medical supplies</option>
+                  <option>Accessible transport</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-700">Location</label>
+                  <input
+                    type="text"
+                    required
+                    value={formLocation}
+                    onChange={(e) => setFormLocation(e.target.value)}
+                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3 text-xs outline-none focus:border-[#2785B2]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-700">Priority</label>
+                  <select
+                    value={formPriority}
+                    onChange={(e) => setFormPriority(e.target.value as Priority)}
+                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-xs outline-none focus:border-[#2785B2]"
+                  >
+                    <option value="Critical">Critical</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-700">Affected People</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formPeople}
+                    onChange={(e) => setFormPeople(e.target.value)}
+                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3 text-xs outline-none focus:border-[#2785B2]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-700">Contact</label>
+                  <input
+                    type="text"
+                    value={formContact}
+                    onChange={(e) => setFormContact(e.target.value)}
+                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3 text-xs outline-none focus:border-[#2785B2]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-semibold text-slate-700">Description</label>
+                <textarea
+                  rows={3}
+                  required
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-slate-300 p-2.5 text-xs outline-none focus:border-[#2785B2]"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isActionLoading}
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-[#123B5C] py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-[#1D5F8A] disabled:opacity-60"
+              >
+                {isActionLoading ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Plus size={14} />
+                )}
+                Submit Assistance Case
+              </button>
+            </form>
           </div>
         </div>
       )}
