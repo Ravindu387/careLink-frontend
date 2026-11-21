@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
@@ -9,14 +8,43 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import AccessDeniedPage from "../pages/public/AccessDeniedPage";
 
+// Funding Officer Layout & Pages
+import FundingOfficerLayout from "../layouts/FundingOfficerLayout";
+import Campaigns from "../pages/Funding_Officer/Campaigns";
+import DonationRecords from "../pages/Funding_Officer/DonationRecords";
+import DonorManagement from "../pages/Funding_Officer/DonorManagement";
+import Expenditure from "../pages/Funding_Officer/Expenditure";
+import FlaggedTransactions from "../pages/Funding_Officer/FlaggedTransactions";
+import FundAllocations from "../pages/Funding_Officer/FundAllocations";
+import FundingOfficerDashboard from "../pages/Funding_Officer/FundingOfficerDashboard";
+import FundingReportsAnalytics from "../pages/Funding_Officer/FundingReportsAnalytics";
+import NotificationsPage from "../pages/Funding_Officer/NotificationsPage";
+import ResourceContributions from "../pages/Funding_Officer/ResourceContributions";
+import TransparencyReports from "../pages/Funding_Officer/TransparencyReports";
+import FundingSettingsPage from "../pages/Funding_Officer/FundingSettingsPage";
+
+// Shelter Administrator Layout & Pages
+import ShelterLayout from "../layouts/ShelterLayout";
+import ShelterAdminDashboard from "../pages/Shelter_Administrator/ShelterAdminDashboard";
+import ShelterManagement from "../pages/Shelter_Administrator/ShelterManagement";
+import OccupancyManagement from "../pages/Shelter_Administrator/OccupancyManagement";
+import AccommodationRequests from "../pages/Shelter_Administrator/AccommodationRequests";
+import ResidentManagement from "../pages/Shelter_Administrator/ResidentManagement";
+import RoomBedManagement from "../pages/Shelter_Administrator/RoomBedManagement";
+import ResourceInventory from "../pages/Shelter_Administrator/ResourceInventory";
+import StaffManagement from "../pages/Shelter_Administrator/StaffManagement";
+import HealthSafety from "../pages/Shelter_Administrator/HealthSafety";
+import MaintenanceIncidents from "../pages/Shelter_Administrator/MaintenanceIncidents";
+import ReportsAnalytics from "../pages/Shelter_Administrator/ReportsAnalytics";
+import DisasterUpdates from "../pages/Shelter_Administrator/DisasterUpdates";
+import ShelterNotifications from "../pages/Shelter_Administrator/Notifications";
+import SettingsPage from "../pages/Shelter_Administrator/Settings";
+
 // Admin Layout & Pages
 import AdminLayout from "../layouts/AdminLayout";
 import SystemDashboard from "../pages/admin/Dashboard";
 import AssistanceRequests from "../pages/admin/AssistanceRequests";
 import AdminPlaceholder from "../pages/admin/AdminPlaceholder";
-
-// Officer Dashboard
-import OperationsDashboard from "../pages/officer/OperationsDashboard";
 import UserManagement from "../pages/admin/UserManagement";
 import AIRecommendationReview from "../pages/admin/AIRecommendationReview";
 import OrganisationManagement from "../pages/admin/OrganisationManagement";
@@ -27,14 +55,16 @@ import RolesPermissions from "../pages/admin/RolesPermissions";
 import AuditLogs from "../pages/admin/AuditLogs";
 import SystemSettings from "../pages/admin/SystemSettings";
 import ReportsPage from "../pages/admin/ReportsPage";
-import NotificationsPage from "../pages/admin/NotificationsPage";
+import AdminNotificationsPage from "../pages/admin/NotificationsPage";
+
+// Officer Dashboard
+import OperationsDashboard from "../pages/officer/OperationsDashboard";
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -58,7 +88,7 @@ export default function AppRoutes() {
               <Route path="/admin/audit-logs" element={<AuditLogs />} />
               <Route path="/admin/settings" element={<SystemSettings />} />
               <Route path="/admin/reports" element={<ReportsPage />} />
-              <Route path="/admin/notifications" element={<NotificationsPage />} />
+              <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
               <Route path="/admin/:tab" element={<AdminPlaceholder />} />
             </Route>
 
@@ -80,9 +110,120 @@ export default function AppRoutes() {
             />
           </Route>
 
+          {/* Funding Officer Routes */}
+          <Route element={<FundingOfficerLayout />}>
+            <Route
+              path="/funding-officer/campaigns"
+              element={<Campaigns />}
+            />
+            <Route
+              path="/funding-officer/donations"
+              element={<DonationRecords />}
+            />
+            <Route
+              path="/funding-officer/donors"
+              element={<DonorManagement />}
+            />
+            <Route
+              path="/funding-officer/expenditure"
+              element={<Expenditure />}
+            />
+            <Route
+              path="/funding-officer/flagged"
+              element={<FlaggedTransactions />}
+            />
+            <Route
+              path="/funding-officer/allocations"
+              element={<FundAllocations />}
+            />
+            <Route
+              path="/funding-officer/dashboard"
+              element={<FundingOfficerDashboard />}
+            />
+            <Route
+              path="/funding-officer/reports"
+              element={<FundingReportsAnalytics />}
+            />
+            <Route
+              path="/funding-officer/settings"
+              element={<FundingSettingsPage />}
+            />
+            <Route
+              path="/funding-officer/notifications"
+              element={<NotificationsPage />}
+            />
+            <Route
+              path="/funding-officer/resources"
+              element={<ResourceContributions />}
+            />
+            <Route
+              path="/funding-officer/transparency"
+              element={<TransparencyReports />}
+            />
+          </Route>
+
+          {/* Shelter Administrator Routes */}
+          <Route element={<ShelterLayout />}>
+            <Route
+              path="/shelter-admin/dashboard"
+              element={<ShelterAdminDashboard />}
+            />
+            <Route
+              path="/shelter-admin/shelters"
+              element={<ShelterManagement />}
+            />
+            <Route
+              path="/shelter-admin/occupancy"
+              element={<OccupancyManagement />}
+            />
+            <Route
+              path="/shelter-admin/requests"
+              element={<AccommodationRequests />}
+            />
+            <Route
+              path="/shelter-admin/residents"
+              element={<ResidentManagement />}
+            />
+            <Route
+              path="/shelter-admin/rooms"
+              element={<RoomBedManagement />}
+            />
+            <Route
+              path="/shelter-admin/resources"
+              element={<ResourceInventory />}
+            />
+            <Route
+              path="/shelter-admin/staff"
+              element={<StaffManagement />}
+            />
+            <Route
+              path="/shelter-admin/health-safety"
+              element={<HealthSafety />}
+            />
+            <Route
+              path="/shelter-admin/maintenance"
+              element={<MaintenanceIncidents />}
+            />
+            <Route
+              path="/shelter-admin/reports"
+              element={<ReportsAnalytics />}
+            />
+            <Route
+              path="/shelter-admin/disaster-updates"
+              element={<DisasterUpdates />}
+            />
+            <Route
+              path="/shelter-admin/notifications"
+              element={<ShelterNotifications />}
+            />
+            <Route
+              path="/shelter-admin/settings"
+              element={<SettingsPage />}
+            />
+          </Route>
+
           {/* Unknown Routes */}
           <Route path="*" element={<Navigate to="/" replace />} />
-
         </Routes>
       </AuthProvider>
     </BrowserRouter>
