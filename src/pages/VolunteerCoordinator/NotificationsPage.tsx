@@ -441,14 +441,12 @@ export default function NotificationsPage() {
         role="switch"
         aria-checked={checked}
         onClick={onChange}
-        className={`w-10 h-5 rounded-full relative transition-colors shrink-0 ${
-          checked ? "bg-[#287fa9]" : "bg-[#cbd5dc]"
-        }`}
+        className={`w-10 h-5 rounded-full relative transition-colors shrink-0 ${checked ? "bg-[#287fa9]" : "bg-[#cbd5dc]"
+          }`}
       >
         <span
-          className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${
-            checked ? "left-[22px]" : "left-0.5"
-          }`}
+          className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${checked ? "left-[22px]" : "left-0.5"
+            }`}
         />
       </button>
     </div>
@@ -539,12 +537,12 @@ export default function NotificationsPage() {
               tab === "All"
                 ? notifications.length
                 : tab === "Unread"
-                ? unreadCount
-                : tab === "Assignments"
-                ? assignmentCount
-                : tab === "Verification"
-                ? verificationCount
-                : safetyCount;
+                  ? unreadCount
+                  : tab === "Assignments"
+                    ? assignmentCount
+                    : tab === "Verification"
+                      ? verificationCount
+                      : safetyCount;
 
             const active = activeTab === tab;
 
@@ -552,11 +550,10 @@ export default function NotificationsPage() {
               <button
                 key={tab}
                 onClick={() => changeTab(tab)}
-                className={`relative py-3 text-[9px] whitespace-nowrap flex items-center gap-1.5 transition-colors ${
-                  active
-                    ? "text-[#17648e] font-semibold"
-                    : "text-[#8296aa] hover:text-[#17648e]"
-                }`}
+                className={`relative py-3 text-[9px] whitespace-nowrap flex items-center gap-1.5 transition-colors ${active
+                  ? "text-[#17648e] font-semibold"
+                  : "text-[#8296aa] hover:text-[#17648e]"
+                  }`}
               >
                 {tab}
 
@@ -591,11 +588,10 @@ export default function NotificationsPage() {
                 return (
                   <div
                     key={item.id}
-                    className={`relative flex items-center gap-3 px-3 py-4 border-b border-[#d5e3e9] transition-colors ${
-                      item.unread
-                        ? "bg-[#f3f9f8] hover:bg-[#edf6f4]"
-                        : "bg-white hover:bg-[#f8fafb]"
-                    }`}
+                    className={`relative flex items-center gap-3 px-3 py-4 border-b border-[#d5e3e9] transition-colors ${item.unread
+                      ? "bg-[#f3f9f8] hover:bg-[#edf6f4]"
+                      : "bg-white hover:bg-[#f8fafb]"
+                      }`}
                   >
 
                     {/* ICON */}
@@ -717,11 +713,10 @@ export default function NotificationsPage() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`w-[28px] h-[28px] rounded-md border text-[9px] ${
-                      currentPage === page
-                        ? "bg-[#287fa9] text-white border-[#287fa9]"
-                        : "bg-white border-[#d5e3e9] hover:bg-[#f1f8fc]"
-                    }`}
+                    className={`w-[28px] h-[28px] rounded-md border text-[9px] ${currentPage === page
+                      ? "bg-[#287fa9] text-white border-[#287fa9]"
+                      : "bg-white border-[#d5e3e9] hover:bg-[#f1f8fc]"
+                      }`}
                   >
                     {page}
                   </button>
