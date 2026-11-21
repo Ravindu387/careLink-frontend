@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -17,6 +18,7 @@ import {
   X,
   ChevronRight,
 } from "lucide-react";
+import { notificationService } from "../../services/notificationService";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -42,6 +44,25 @@ const navigation = [
 ];
 
 const PartnerOfficerSidebar = ({ isOpen, onClose }: SidebarProps) => {
+  const [unreadNotifications, setUnreadNotifications] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchMetrics = async () => {
+      try {
+        const metrics = await notificationService.getMetrics("partner");
+        if (isMounted) {
+          setUnreadNotifications(metrics.unread);
+        }
+      } catch {
+        // Fallback default
+      }
+    };
+    fetchMetrics();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   return (
     <>
       {isOpen && (
@@ -122,11 +143,17 @@ const PartnerOfficerSidebar = ({ isOpen, onClose }: SidebarProps) => {
                   </span>
                 </span>
 
-                {item.badge !== undefined && (
-                  <span className="ml-2 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[#e84c59] px-1 text-[9px] font-bold text-white">
-                    {item.badge}
-                  </span>
-                )}
+                {(() => {
+                  const badgeValue =
+                    item.label === "Notifications"
+                      ? (unreadNotifications ?? item.badge)
+                      : item.badge;
+                  return badgeValue !== undefined && badgeValue > 0 ? (
+                    <span className="ml-2 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[#e84c59] px-1 text-[9px] font-bold text-white">
+                      {badgeValue}
+                    </span>
+                  ) : null;
+                })()}
               </NavLink>
             );
           })}

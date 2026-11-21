@@ -1,5 +1,4 @@
-
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
   Download,
   Plus,
@@ -10,100 +9,103 @@ import {
   ChevronRight,
   Filter,
   X,
+  RefreshCw,
+  CheckCircle2,
+  AlertCircle,
+  Send,
 } from "lucide-react";
-
-type Crisis = {
-  id: string;
-  event: string;
-  type: string;
-  severity: string;
-  area: string;
-  date: string;
-  sectors: string;
-  status: string;
-};
-
-const crisisData: Crisis[] = [
-  {
-    id: "CR-2025-018",
-    event: "Monsoon Floods 2025",
-    type: "Flood",
-    severity: "Level 4 - Major",
-    area: "Greater Riverton",
-    date: "18 Jun 2025",
-    sectors: "Food · WASH · Shelter",
-    status: "Active",
-  },
-  {
-    id: "CR-2025-014",
-    event: "North Ridge Landslide",
-    type: "Landslide",
-    severity: "Level 3 - Severe",
-    area: "North District",
-    date: "12 Jun 2025",
-    sectors: "Shelter · Protection",
-    status: "Monitoring",
-  },
-  {
-    id: "CR-2025-009",
-    event: "Dengue Outbreak",
-    type: "Disease",
-    severity: "Level 2 - Moderate",
-    area: "Eastbank",
-    date: "28 May 2025",
-    sectors: "Community Health",
-    status: "Active",
-  },
-  {
-    id: "CR-2025-004",
-    event: "Coastal Storm Response",
-    type: "Storm",
-    severity: "Level 1 - Low",
-    area: "West Coast",
-    date: "14 Apr 2025",
-    sectors: "Food Assistance",
-    status: "Completed",
-  },
-  {
-    id: "CR-2025-021",
-    event: "Riverbank Flooding",
-    type: "Flood",
-    severity: "Level 3 - Severe",
-    area: "South District",
-    date: "22 Jun 2025",
-    sectors: "Food · Shelter",
-    status: "Active",
-  },
-  {
-    id: "CR-2025-022",
-    event: "Community Health Emergency",
-    type: "Disease",
-    severity: "Level 2 - Moderate",
-    area: "East District",
-    date: "25 Jun 2025",
-    sectors: "Community Health",
-    status: "Monitoring",
-  },
-];
+import {
+  sharedCrisisEventService,
+  type SharedCrisisEvent,
+  type SharedCrisisMetrics,
+  type CreateCrisisAccessRequestPayload,
+} from "../../services/sharedCrisisEventService";
 
 const tabs = ["All", "Needs action", "Active", "Completed", "Archived"];
 
 const SharedCrisisEvents = () => {
+  const [events, setEvents] = useState<SharedCrisisEvent[]>([]);
+  const [metrics, setMetrics] = useState<SharedCrisisMetrics | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLiveBackend, setIsLiveBackend] = useState(true);
+  const [feedbackMessage, setFeedbackMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
   const [activeTab, setActiveTab] = useState("All");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All event types");
   const [severityFilter, setSeverityFilter] = useState("All severity levels");
   const [areaFilter, setAreaFilter] = useState("All operational areas");
   const [statusFilter, setStatusFilter] = useState("All statuses");
+
   const [page, setPage] = useState(1);
-  const [selectedCrisis, setSelectedCrisis] = useState<Crisis | null>(null);
+  const pageSize = 4;
+
+  const [selectedCrisis, setSelectedCrisis] = useState<SharedCrisisEvent | null>(null);
   const [showRequest, setShowRequest] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
+  const showNotification = (text: string, type: "success" | "error" = "success") => {
+    setFeedbackMessage({ text, type });
+    setTimeout(() => {
+      setFeedbackMessage(null);
+    }, 4000);
+  };
+
+  const loadData = async (silent = false) => {
+    if (!silent) setIsLoading(true);
+    else setIsRefreshing(true);
+
+    try {
+      const [fetchedEvents, fetchedMetrics] = await Promise.all([
+        sharedCrisisEventService.getAll(),
+        sharedCrisisEventService.getMetrics(),
+      ]);
+
+      setEvents(fetchedEvents);
+      setMetrics(fetchedMetrics);
+      setIsLiveBackend(true);
+    } catch (err) {
+      console.warn("Using offline fallback crisis events:", err);
+      setIsLiveBackend(false);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [fetchedEvents, fetchedMetrics] = await Promise.all([
+          sharedCrisisEventService.getAll(),
+          sharedCrisisEventService.getMetrics(),
+        ]);
+        if (isMounted) {
+          setEvents(fetchedEvents);
+          setMetrics(fetchedMetrics);
+          setIsLiveBackend(true);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.warn("Initial load offline:", err);
+          setIsLiveBackend(false);
+        }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const filteredCrises = useMemo(() => {
-    return crisisData.filter((crisis) => {
+    return events.filter((crisis) => {
       const matchesSearch =
-        `${crisis.id} ${crisis.event} ${crisis.area}`
+        `${crisis.id} ${crisis.event} ${crisis.area} ${crisis.sectors}`
           .toLowerCase()
           .includes(search.toLowerCase());
 
@@ -138,9 +140,8 @@ const SharedCrisisEvents = () => {
         matchesStatus
       );
     });
-  }, [activeTab, search, typeFilter, severityFilter, areaFilter, statusFilter]);
+  }, [events, activeTab, search, typeFilter, severityFilter, areaFilter, statusFilter]);
 
-  const pageSize = 4;
   const totalPages = Math.max(1, Math.ceil(filteredCrises.length / pageSize));
 
   const displayedCrises = filteredCrises.slice(
@@ -151,13 +152,14 @@ const SharedCrisisEvents = () => {
   const exportCSV = () => {
     const headers = [
       "Crisis ID",
-      "Event",
+      "Crisis Event",
       "Type",
       "Severity",
       "Area",
       "Start Date",
-      "Sectors",
+      "Our Sectors",
       "Status",
+      "Coordinator",
     ];
 
     const rows = filteredCrises.map((c) => [
@@ -169,46 +171,137 @@ const SharedCrisisEvents = () => {
       c.date,
       c.sectors,
       c.status,
+      c.coordinator || "Unassigned",
     ]);
 
     const csv = [headers, ...rows]
-      .map((row) => row.map((v) => `"${v}"`).join(","))
+      .map((row) =>
+        row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")
+      )
       .join("\n");
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "shared-crisis-events.csv";
+    link.download = `shared-crisis-events-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
+    showNotification("Shared crisis events exported to CSV successfully.");
+  };
+
+  const handleRequestAccessSubmit = async (payload: CreateCrisisAccessRequestPayload) => {
+    try {
+      const res = await sharedCrisisEventService.requestAccess(payload);
+      showNotification(`Access request submitted for '${res.eventName}' (ID: ${res.id}).`);
+      setShowRequest(false);
+      loadData(true);
+    } catch {
+      showNotification("Failed to submit crisis access request. Please try again.", "error");
+    }
+  };
+
+  const resetFilters = () => {
+    setSearch("");
+    setTypeFilter("All event types");
+    setSeverityFilter("All severity levels");
+    setAreaFilter("All operational areas");
+    setStatusFilter("All statuses");
+    setActiveTab("All");
+    setPage(1);
+  };
+
+  // Dynamic tab count helper
+  const getTabCount = (tab: string): number => {
+    if (metrics) {
+      if (tab === "All") return metrics.totalCount;
+      if (tab === "Needs action") return metrics.needsActionCount;
+      if (tab === "Active") return metrics.activeCount;
+      if (tab === "Completed") return metrics.completedCount;
+      if (tab === "Archived") return metrics.archivedCount;
+    }
+    if (tab === "All") return events.length;
+    if (tab === "Active") return events.filter((c) => c.status === "Active").length;
+    if (tab === "Needs action") return events.filter((c) => c.status === "Monitoring").length;
+    if (tab === "Completed") return events.filter((c) => c.status === "Completed").length;
+    if (tab === "Archived") return events.filter((c) => c.status === "Archived").length;
+    return 0;
   };
 
   return (
     <div className="min-h-screen bg-[#eff5f7] p-5 md:p-7">
+      {/* Toast Feedback */}
+      {feedbackMessage && (
+        <div
+          className={`mb-4 flex items-center justify-between rounded-lg p-3 text-xs shadow-sm transition ${
+            feedbackMessage.type === "success"
+              ? "border border-[#8ad1b8] bg-[#e6f7f1] text-[#1e7a5d]"
+              : "border border-[#f5b8b8] bg-[#fdeeee] text-[#b92c2c]"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {feedbackMessage.type === "success" ? (
+              <CheckCircle2 size={16} />
+            ) : (
+              <AlertCircle size={16} />
+            )}
+            <span>{feedbackMessage.text}</span>
+          </div>
+          <button
+            onClick={() => setFeedbackMessage(null)}
+            className="text-slate-400 hover:text-slate-600"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* Page Heading */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="mb-3 text-xs text-slate-500">
-            Partner Coordination
-            <span className="mx-2">›</span>
-            <span className="font-semibold text-slate-800">
-              Shared Crisis Events
+          <div className="mb-2 flex items-center gap-3">
+            <p className="text-xs text-slate-500">
+              Partner Coordination
+              <span className="mx-2">›</span>
+              <span className="font-semibold text-[#153e5b]">Shared Crisis Events</span>
+            </p>
+
+            <span
+              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                isLiveBackend
+                  ? "bg-[#e5f6f0] text-[#299b7d]"
+                  : "bg-[#fff4df] text-[#bd8229]"
+              }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  isLiveBackend ? "bg-[#299b7d]" : "bg-[#bd8229]"
+                }`}
+              />
+              {isLiveBackend ? "Live Backend" : "Offline Cache"}
             </span>
-          </p>
+          </div>
 
           <h1 className="text-2xl font-semibold text-[#153e5b]">
             Shared Crisis Events
           </h1>
 
           <p className="mt-2 text-sm text-slate-500">
-            Review authorised crisis information, coordination structures,
-            and your organisation's response role.
+            Review authorised crisis information, coordination structures, and your organisation's response role.
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => loadData(true)}
+            disabled={isRefreshing}
+            title="Refresh shared crisis events from API"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+          >
+            <RefreshCw size={13} className={isRefreshing ? "animate-spin" : ""} />
+            Sync
+          </button>
+
           <button
             onClick={exportCSV}
             className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
@@ -229,39 +322,37 @@ const SharedCrisisEvents = () => {
 
       {/* Statistics Cards */}
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-
         <StatCard
           icon={<AlertTriangle size={19} />}
           title="Shared events"
-          value="4"
-          subtitle="3 currently active"
+          value={metrics ? String(metrics.sharedEvents) : "4"}
+          subtitle={metrics?.sharedEventsSubtitle ?? "3 currently active"}
           color="blue"
         />
 
         <StatCard
           icon={<AlertTriangle size={19} />}
           title="Major response"
-          value="1"
-          subtitle="Level 4 operation"
+          value={metrics ? String(metrics.majorResponse) : "1"}
+          subtitle={metrics?.majorResponseSubtitle ?? "Level 4 operation"}
           color="red"
         />
 
         <StatCard
           icon={<Map size={20} />}
           title="Districts covered"
-          value="6"
-          subtitle="4 active now"
+          value={metrics ? String(metrics.districtsCovered) : "6"}
+          subtitle={metrics?.districtsCoveredSubtitle ?? "4 active now"}
           color="blue"
         />
 
         <StatCard
           icon={<Check size={20} />}
           title="Coordination sectors"
-          value="4"
-          subtitle="All leads assigned"
+          value={metrics ? String(metrics.coordinationSectors) : "4"}
+          subtitle={metrics?.coordinationSectorsSubtitle ?? "All leads assigned"}
           color="green"
         />
-
       </div>
 
       {/* Tabs */}
@@ -280,18 +371,9 @@ const SharedCrisisEvents = () => {
             }`}
           >
             {tab}
-
-            {tab === "All" && (
-              <span className="ml-2 rounded-full bg-[#e5eff4] px-2 py-0.5 text-[9px]">
-                48
-              </span>
-            )}
-
-            {tab === "Needs action" && (
-              <span className="ml-2 rounded-full bg-[#e5eff4] px-2 py-0.5 text-[9px]">
-                7
-              </span>
-            )}
+            <span className="ml-2 rounded-full bg-[#e5eff4] px-2 py-0.5 text-[9px] font-medium text-slate-600">
+              {getTabCount(tab)}
+            </span>
 
             {activeTab === tab && (
               <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#267ba4]" />
@@ -302,7 +384,6 @@ const SharedCrisisEvents = () => {
 
       {/* Search and Filters */}
       <div className="mb-3 flex flex-col gap-2 xl:flex-row">
-
         <div className="relative min-w-0 flex-1">
           <Search
             size={16}
@@ -315,7 +396,7 @@ const SharedCrisisEvents = () => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            placeholder="Search shared crisis events..."
+            placeholder="Search shared crisis events by ID, event name, area, or sector..."
             className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
           />
         </div>
@@ -397,16 +478,8 @@ const SharedCrisisEvents = () => {
             Filter crisis events using the search and dropdown fields above.
           </p>
           <button
-            onClick={() => {
-              setSearch("");
-              setTypeFilter("All event types");
-              setSeverityFilter("All severity levels");
-              setAreaFilter("All operational areas");
-              setStatusFilter("All statuses");
-              setActiveTab("All");
-              setPage(1);
-            }}
-            className="text-xs font-medium text-[#267ba4]"
+            onClick={resetFilters}
+            className="text-xs font-medium text-[#267ba4] hover:underline"
           >
             Clear all filters
           </button>
@@ -415,10 +488,8 @@ const SharedCrisisEvents = () => {
 
       {/* Crisis Events Table */}
       <div className="overflow-hidden rounded-xl border border-[#d7e5eb] bg-white shadow-sm">
-
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1000px] text-left">
-
             <thead className="bg-[#f5f8fa]">
               <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
                 {[
@@ -440,54 +511,63 @@ const SharedCrisisEvents = () => {
             </thead>
 
             <tbody>
-              {displayedCrises.map((crisis) => (
-                <tr
-                  key={crisis.id}
-                  onClick={() => setSelectedCrisis(crisis)}
-                  className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
-                >
-                  <td className="whitespace-nowrap px-3 py-5 font-semibold text-[#153e5b]">
-                    {crisis.id}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-5">
-                    {crisis.event}
-                  </td>
-
-                  <td className="px-3 py-5">{crisis.type}</td>
-
-                  <td className="whitespace-nowrap px-3 py-5">
-                    {crisis.severity}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-5">
-                    {crisis.area}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-5">
-                    {crisis.date}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-5">
-                    {crisis.sectors}
-                  </td>
-
-                  <td className="px-3 py-5">
-                    <StatusBadge status={crisis.status} />
-                  </td>
-
-                  <td className="px-3 py-5">
-                    <ChevronRight size={17} className="text-[#64849a]" />
-                  </td>
-                </tr>
-              ))}
-
-              {displayedCrises.length === 0 && (
+              {isLoading ? (
                 <tr>
                   <td colSpan={9} className="py-12 text-center text-xs text-slate-400">
-                    No crisis events found.
+                    <div className="flex items-center justify-center gap-2">
+                      <RefreshCw size={15} className="animate-spin text-[#267ba4]" />
+                      <span>Loading shared crisis events...</span>
+                    </div>
                   </td>
                 </tr>
+              ) : displayedCrises.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="py-12 text-center text-xs text-slate-400">
+                    No crisis events match your filter criteria.
+                  </td>
+                </tr>
+              ) : (
+                displayedCrises.map((crisis) => (
+                  <tr
+                    key={crisis.id}
+                    onClick={() => setSelectedCrisis(crisis)}
+                    className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
+                  >
+                    <td className="whitespace-nowrap px-3 py-5 font-semibold text-[#153e5b]">
+                      {crisis.id}
+                    </td>
+
+                    <td className="whitespace-nowrap px-3 py-5 font-medium text-[#153e5b]">
+                      {crisis.event}
+                    </td>
+
+                    <td className="px-3 py-5">{crisis.type}</td>
+
+                    <td className="whitespace-nowrap px-3 py-5">
+                      {crisis.severity}
+                    </td>
+
+                    <td className="whitespace-nowrap px-3 py-5">
+                      {crisis.area}
+                    </td>
+
+                    <td className="whitespace-nowrap px-3 py-5">
+                      {crisis.date}
+                    </td>
+
+                    <td className="whitespace-nowrap px-3 py-5">
+                      {crisis.sectors}
+                    </td>
+
+                    <td className="px-3 py-5">
+                      <StatusBadge status={crisis.status} />
+                    </td>
+
+                    <td className="px-3 py-5 text-right">
+                      <ChevronRight size={17} className="inline text-[#64849a]" />
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
@@ -495,12 +575,11 @@ const SharedCrisisEvents = () => {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-
           <p className="text-[10px] text-slate-400">
             Showing {filteredCrises.length === 0 ? 0 : (page - 1) * pageSize + 1}
             {"–"}
-            {Math.min(page * pageSize, filteredCrises.length)}
-            {" "}of {filteredCrises.length} events
+            {Math.min(page * pageSize, filteredCrises.length)}{" "}
+            of {filteredCrises.length} events
           </p>
 
           <div className="flex items-center gap-1">
@@ -541,35 +620,54 @@ const SharedCrisisEvents = () => {
       {selectedCrisis && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-[#153e5b]">
-                Crisis Event Details
-              </h2>
-              <button onClick={() => setSelectedCrisis(null)}>
-                <X size={20} className="text-slate-500" />
+            <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold text-[#267ba4]">
+                    {selectedCrisis.id}
+                  </span>
+                  <StatusBadge status={selectedCrisis.status} />
+                </div>
+                <h2 className="mt-1 text-lg font-semibold text-[#153e5b]">
+                  Crisis Event Details
+                </h2>
+              </div>
+              <button onClick={() => setSelectedCrisis(null)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
               </button>
             </div>
 
-            <p className="text-xs font-semibold text-[#267ba4]">
-              {selectedCrisis.id}
-            </p>
-
-            <h3 className="mt-2 text-base font-semibold text-[#153e5b]">
+            <h3 className="mb-3 text-base font-semibold text-[#153e5b]">
               {selectedCrisis.event}
             </h3>
 
-            <div className="mt-5 grid grid-cols-2 gap-4 text-xs">
+            {selectedCrisis.description && (
+              <div className="mb-4 rounded-lg bg-[#f8fafc] p-3 text-xs leading-relaxed text-slate-600">
+                {selectedCrisis.description}
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4 text-xs">
               <Detail label="Event Type" value={selectedCrisis.type} />
-              <Detail label="Severity" value={selectedCrisis.severity} />
+              <Detail label="Severity Level" value={selectedCrisis.severity} />
               <Detail label="Operational Area" value={selectedCrisis.area} />
               <Detail label="Start Date" value={selectedCrisis.date} />
-              <Detail label="Our Sectors" value={selectedCrisis.sectors} />
-              <Detail label="Status" value={selectedCrisis.status} />
+              <Detail label="Our Response Sectors" value={selectedCrisis.sectors} />
+              <Detail label="Designated Coordinator" value={selectedCrisis.coordinator || "Amina Mensah"} />
+              <Detail label="Districts Covered" value={`${selectedCrisis.districtsCovered || 1} districts`} />
+              <Detail
+                label="Estimated Affected Population"
+                value={
+                  selectedCrisis.affectedPeopleCount
+                    ? `${selectedCrisis.affectedPeopleCount.toLocaleString()} people`
+                    : "10,000+ people"
+                }
+              />
             </div>
 
             <button
               onClick={() => setSelectedCrisis(null)}
-              className="mt-6 w-full rounded-lg bg-[#267ba4] py-3 text-xs font-medium text-white"
+              className="mt-6 w-full rounded-lg bg-[#267ba4] py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
             >
               Close
             </button>
@@ -579,9 +677,12 @@ const SharedCrisisEvents = () => {
 
       {/* Request Crisis Access Modal */}
       {showRequest && (
-        <RequestAccessModal onClose={() => setShowRequest(false)} />
+        <RequestAccessModal
+          onClose={() => setShowRequest(false)}
+          onSubmit={handleRequestAccessSubmit}
+          availableEvents={events.map((e) => e.event)}
+        />
       )}
-
     </div>
   );
 };
@@ -594,7 +695,7 @@ function StatCard({
   subtitle,
   color,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   value: string;
   subtitle: string;
@@ -608,7 +709,7 @@ function StatCard({
 
   return (
     <div className="flex items-center gap-3 rounded-xl border border-[#d7e5eb] bg-white p-4 shadow-sm">
-      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors[color]}`}>
+      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors[color] || colors.blue}`}>
         {icon}
       </div>
 
@@ -631,7 +732,7 @@ function StatusBadge({ status }: { status: string }) {
   };
 
   return (
-    <span className={`rounded-md px-2 py-1 text-[9px] font-medium ${styles[status] || styles.Archived}`}>
+    <span className={`inline-block rounded-md px-2 py-1 text-[9px] font-medium ${styles[status] || styles.Archived}`}>
       {status}
     </span>
   );
@@ -648,17 +749,27 @@ function Detail({ label, value }: { label: string; value: string }) {
 }
 
 // Request Access Modal
-function RequestAccessModal({ onClose }: { onClose: () => void }) {
+function RequestAccessModal({
+  onClose,
+  onSubmit,
+  availableEvents,
+}: {
+  onClose: () => void;
+  onSubmit: (payload: CreateCrisisAccessRequestPayload) => void;
+  availableEvents: string[];
+}) {
   const [eventName, setEventName] = useState("");
   const [reason, setReason] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    if (!eventName.trim() || !reason.trim()) return;
 
-    if (!eventName || !reason) return;
-
-    alert("Request submitted successfully! (Demo only)");
-    onClose();
+    onSubmit({
+      eventName: eventName.trim(),
+      reason: reason.trim(),
+      partnerName: "Global Relief Network",
+    });
   };
 
   return (
@@ -667,53 +778,69 @@ function RequestAccessModal({ onClose }: { onClose: () => void }) {
         onSubmit={handleSubmit}
         className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
       >
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-[#153e5b]">
-            Request Crisis Access
-          </h2>
-          <button type="button" onClick={onClose}>
-            <X size={20} className="text-slate-500" />
+        <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 className="text-lg font-semibold text-[#153e5b]">
+              Request Crisis Access
+            </h2>
+            <p className="text-[10px] text-slate-500">
+              Submit an official request to access coordination data for this event.
+            </p>
+          </div>
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <X size={20} />
           </button>
         </div>
 
-        <label className="mb-2 block text-xs font-medium text-slate-600">
-          Crisis Event
-        </label>
+        <div className="space-y-4">
+          <div>
+            <label className="mb-2 block text-xs font-medium text-slate-600">
+              Crisis Event *
+            </label>
+            <input
+              required
+              list="crisis-event-list"
+              value={eventName}
+              onChange={(e) => setEventName(e.target.value)}
+              placeholder="Select or enter crisis event name"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+            />
+            <datalist id="crisis-event-list">
+              {availableEvents.map((ev) => (
+                <option key={ev} value={ev} />
+              ))}
+            </datalist>
+          </div>
 
-        <input
-          required
-          value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
-          placeholder="Enter crisis event name"
-          className="mb-4 w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none focus:border-[#267ba4]"
-        />
-
-        <label className="mb-2 block text-xs font-medium text-slate-600">
-          Reason for Access
-        </label>
-
-        <textarea
-          required
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          placeholder="Explain why your organisation needs access..."
-          rows={4}
-          className="w-full resize-none rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none focus:border-[#267ba4]"
-        />
+          <div>
+            <label className="mb-2 block text-xs font-medium text-slate-600">
+              Reason for Access & Response Role *
+            </label>
+            <textarea
+              required
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Explain why your organisation requires coordination access, sector response role, or target beneficiary scope..."
+              rows={4}
+              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+            />
+          </div>
+        </div>
 
         <div className="mt-5 flex justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2 text-xs text-slate-600"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-xs text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="rounded-lg bg-[#267ba4] px-4 py-2 text-xs font-medium text-white"
+            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-4 py-2 text-xs font-medium text-white hover:bg-[#1c668a]"
           >
+            <Send size={13} />
             Submit Request
           </button>
         </div>
