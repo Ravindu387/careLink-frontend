@@ -17,6 +17,11 @@ import {
   ChartNoAxesCombined,
   LogOut,
   Sparkles,
+  Package,
+  Building,
+  UserCheck,
+  Coins,
+  ClipboardList,
 } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
@@ -35,8 +40,6 @@ const groups = [
         name: "System Overview",
         path: "/admin/dashboard",
         icon: LayoutDashboard,
-    
-    
       },
       {
         name: "User Management",
@@ -98,6 +101,41 @@ const groups = [
       },
     ],
   },
+  {
+    title: "OPERATIONS & LOGISTICS",
+    items: [
+      {
+        name: "Crisis Management",
+        path: "/admin/crises",
+        icon: AlertTriangle,
+      },
+      {
+        name: "Assistance Requests",
+        path: "/admin/requests",
+        icon: ClipboardList,
+      },
+      {
+        name: "Resource Inventory",
+        path: "/admin/resources",
+        icon: Package,
+      },
+      {
+        name: "Shelter Network",
+        path: "/admin/shelters",
+        icon: Building,
+      },
+      {
+        name: "Volunteer Directory",
+        path: "/admin/volunteers",
+        icon: UserCheck,
+      },
+      {
+        name: "Donation Records",
+        path: "/admin/donations",
+        icon: Coins,
+      },
+    ],
+  },
 ];
 
 type Props = {
@@ -153,7 +191,7 @@ export default function AdminSidebar({ open, onClose }: Props) {
   }, []);
 
   const getBadgeValue = (path: string, defaultBadge?: number): number | undefined => {
-    if (path === "/admin/ai-review") return aiReviewCount;
+    if (path === "/admin/ai-review" || path === "/admin/ai-recommendations") return aiReviewCount;
     if (path === "/admin/verification") return verificationCount;
     if (path === "/admin/security-events") return securityCount;
     if (path === "/admin/notifications") return notificationCount;
@@ -187,7 +225,7 @@ export default function AdminSidebar({ open, onClose }: Props) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[230px] flex-col overflow-hidden bg-[#153E5D] text-white transition-transform duration-300 lg:static lg:h-full lg:shrink-0 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[250px] flex-col overflow-hidden bg-[#153E5D] text-white transition-transform duration-300 lg:static lg:h-full lg:shrink-0 lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -224,7 +262,11 @@ export default function AdminSidebar({ open, onClose }: Props) {
 
         {/* ACTIVE RESPONSE */}
         <div className="shrink-0 px-3 pt-3">
-          <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.07] px-3 py-3">
+          <NavLink
+            to="/admin/crises"
+            onClick={onClose}
+            className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.07] px-3 py-3 transition hover:bg-white/15"
+          >
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-red-400" />
 
@@ -240,7 +282,7 @@ export default function AdminSidebar({ open, onClose }: Props) {
             </div>
 
             <ChevronRight size={15} />
-          </div>
+          </NavLink>
         </div>
 
         {/* NAVIGATION */}
@@ -287,7 +329,7 @@ export default function AdminSidebar({ open, onClose }: Props) {
                             }
                           />
 
-                          <span className="flex-1 whitespace-nowrap">
+                          <span className="flex-1 truncate">
                             {item.name}
                           </span>
 
