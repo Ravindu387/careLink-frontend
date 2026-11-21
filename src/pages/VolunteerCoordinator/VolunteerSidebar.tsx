@@ -11,7 +11,6 @@ import {
   MessageSquare,
   Bell,
   Settings,
-  Heart,
   ChevronRight,
   X,
   Globe,
