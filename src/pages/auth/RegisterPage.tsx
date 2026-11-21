@@ -15,8 +15,10 @@ import {
   EyeOff,
   AlertCircle,
   Loader2,
+  Mail,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { authService } from "../../services/authService";
 
 // Background image slider
 const backgroundImages = [
@@ -36,6 +38,9 @@ export default function RegisterPage() {
   const [currentImage, setCurrentImage] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [registeredSuccess, setRegisteredSuccess] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -156,13 +161,13 @@ export default function RegisterPage() {
 
       const roleMap: Record<AccountType, string> = {
         citizen: "Citizen",
-        volunteer: "VolunteerCoordinator",
-        organisation: "PartnerOfficer",
-        donor: "Donor",
+        volunteer: "Volunteer",
+        organisation: "Citizen",
+        donor: "Citizen",
       };
 
       try {
-        const authData = await register({
+        const authData: any = await register({
           fullName: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
           email: formData.email.trim(),
           password: formData.password,
@@ -171,17 +176,22 @@ export default function RegisterPage() {
           role: roleMap[accountType] || "Citizen",
         });
 
-        const userRoles = authData.user.roles || [];
-        if (
-          userRoles.includes("SystemAdmin") ||
-          userRoles.includes("EmergencyCoordinator") ||
-          userRoles.includes("IncidentManager") ||
-          userRoles.includes("VolunteerCoordinator") ||
-          userRoles.includes("PartnerOfficer")
-        ) {
-          navigate("/admin/dashboard", { replace: true });
+        if (authData?.token && authData?.user) {
+          const userRoles = authData.user.roles || [];
+          const has = (r: string) => userRoles.some((role: string) => role.toLowerCase() === r.toLowerCase());
+          if (has("Admin") || has("SystemAdmin")) {
+            navigate("/admin/dashboard", { replace: true });
+          } else if (has("EmergencyCoordinator") || has("IncidentManager")) {
+            navigate("/coordinator/dashboard", { replace: true });
+          } else if (has("PartnerOfficer")) {
+            navigate("/partner/dashboard", { replace: true });
+          } else if (has("Volunteer") || has("VolunteerCoordinator")) {
+            navigate("/volunteer/dashboard", { replace: true });
+          } else {
+            navigate("/citizen/dashboard", { replace: true });
+          }
         } else {
-          navigate("/", { replace: true });
+          setRegisteredSuccess(true);
         }
       } catch (err: any) {
         setError(err.message || "Registration failed. Please check your information.");
@@ -323,34 +333,81 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Progress Indicator */}
-          <div className="mb-7">
-
-            <p className="mb-3 text-[10px] font-bold tracking-[0.14em] text-[#2784B5]">
-              CREATE AN ACCOUNT · STEP {step} OF 3
-            </p>
-
-            <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3].map((number) => (
-                <div
-                  key={number}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    step >= number
-                      ? "bg-[#123B5C]"
-                      : "bg-slate-200"
-                  }`}
-                />
-              ))}
+          {registeredSuccess ? (
+            <div className="rounded-xl border border-[#42B99A]/30 bg-white p-8 text-center shadow-md">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#EFF6F7] text-[#123B5C]">
+                <Mail size={32} className="text-[#208D70]" />
+              </div>
+              <h3 className="mt-4 text-xl font-bold text-[#123B5C]">Check your email</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                We've sent a verification link to <strong className="text-[#123B5C]">{formData.email}</strong>.
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                Please check your inbox (and spam folder) and click the link to verify your account before signing in.
+              </p>
+              {resendMessage && (
+                <div className="mt-4 rounded-md bg-[#EFF6F7] p-2.5 text-xs font-medium text-[#123B5C] border border-[#64C9AD]">
+                  {resendMessage}
+                </div>
+              )}
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => navigate("/login")}
+                  className="w-full sm:w-auto rounded-lg bg-[#123B5C] px-5 py-2.5 text-xs font-semibold text-white shadow-md hover:bg-[#1D5F8A] transition"
+                >
+                  Proceed to Sign In
+                </button>
+                <button
+                  type="button"
+                  disabled={isResending}
+                  onClick={async () => {
+                    setIsResending(true);
+                    setResendMessage(null);
+                    try {
+                      const msg = await authService.resendVerification(formData.email);
+                      setResendMessage(msg);
+                    } catch (err: any) {
+                      setResendMessage(err.message || "Could not resend verification email.");
+                    } finally {
+                      setIsResending(false);
+                    }
+                  }}
+                  className="w-full sm:w-auto rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition"
+                >
+                  {isResending ? "Resending..." : "Resend Verification Email"}
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Progress Indicator */}
+              <div className="mb-7">
+                <p className="mb-3 text-[10px] font-bold tracking-[0.14em] text-[#2784B5]">
+                  CREATE AN ACCOUNT · STEP {step} OF 3
+                </p>
 
-          {/* Error Banner */}
-          {error && (
-            <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-              <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-600" />
-              <span>{error}</span>
-            </div>
-          )}
+                <div className="grid grid-cols-3 gap-2">
+                  {[1, 2, 3].map((number) => (
+                    <div
+                      key={number}
+                      className={`h-1 rounded-full transition-all duration-300 ${
+                        step >= number
+                          ? "bg-[#123B5C]"
+                          : "bg-slate-200"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Error Banner */}
+              {error && (
+                <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                  <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-600" />
+                  <span>{error}</span>
+                </div>
+              )}
 
           {/* STEP 1 */}
           {step === 1 && (
@@ -545,7 +602,7 @@ export default function RegisterPage() {
                         onChange={(e) =>
                           updateField("password", e.target.value)
                         }
-                        placeholder="Minimum 8 characters"
+                        placeholder="Minimum 6 characters"
                         className={`${inputClass} pr-10`}
                       />
 
@@ -564,6 +621,9 @@ export default function RegisterPage() {
                         )}
                       </button>
                     </div>
+                    <p className="mt-1 text-[10px] text-slate-400">
+                      Must be at least 6 characters
+                    </p>
                   </div>
 
                   <div>
@@ -724,6 +784,8 @@ export default function RegisterPage() {
               )}
             </button>
           </div>
+          </>
+          )}
 
           {/* Login Link */}
           <p className="mt-6 text-center text-xs text-slate-600">

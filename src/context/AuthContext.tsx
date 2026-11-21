@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 import type { User, LoginPayload, RegisterPayload, AuthResponse } from "../types/auth";
 import { authService } from "../services/authService";
 
@@ -7,6 +7,13 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  roles: string[];
+  permissions: string[];
+  hasRole: (role: string) => boolean;
+  hasAnyRole: (roles: string[]) => boolean;
+  hasPermission: (permission: string) => boolean;
+  hasAnyPermission: (permissions: string[]) => boolean;
+  hasAllPermissions: (permissions: string[]) => boolean;
   login: (payload: LoginPayload) => Promise<AuthResponse>;
   register: (payload: RegisterPayload) => Promise<AuthResponse>;
   logout: () => void;
@@ -20,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(authService.getToken());
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     if (!authService.isAuthenticated()) {
       setUser(null);
       setToken(null);
@@ -40,11 +47,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     refreshUser();
-  }, []);
+  }, [refreshUser]);
 
   const login = async (payload: LoginPayload): Promise<AuthResponse> => {
     const authData = await authService.login(payload);
@@ -66,6 +73,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(null);
   };
 
+  const roles = useMemo(() => user?.roles || [], [user]);
+  const permissions = useMemo(() => user?.permissions || [], [user]);
+
+  const hasRole = useCallback((targetRole: string): boolean => {
+    if (!roles || roles.length === 0) return false;
+    const lower = targetRole.toLowerCase();
+
+    // Check direct match
+    if (roles.some((r) => r.toLowerCase() === lower)) return true;
+
+    // Check alias: "admin" matches "admin" or "systemadmin"
+    if (lower === "admin" || lower === "systemadmin") {
+      return roles.some((r) => {
+        const rLower = r.toLowerCase();
+        return rLower === "admin" || rLower === "systemadmin";
+      });
+    }
+
+    return false;
+  }, [roles]);
+
+  const hasAnyRole = useCallback((targetRoles: string[]): boolean => {
+    if (!targetRoles || targetRoles.length === 0) return true;
+    return targetRoles.some((r) => hasRole(r));
+  }, [hasRole]);
+
+  const hasPermission = useCallback((permission: string): boolean => {
+    if (!user) return false;
+
+    // Admins have access to everything
+    if (hasRole("Admin") || hasRole("SystemAdmin")) {
+      return true;
+    }
+
+    if (!permissions || permissions.length === 0) return false;
+    return permissions.some((p) => p.toLowerCase() === permission.toLowerCase());
+  }, [user, hasRole, permissions]);
+
+  const hasAnyPermission = useCallback((perms: string[]): boolean => {
+    if (!perms || perms.length === 0) return true;
+    if (hasRole("Admin") || hasRole("SystemAdmin")) return true;
+    return perms.some((p) => hasPermission(p));
+  }, [hasRole, hasPermission]);
+
+  const hasAllPermissions = useCallback((perms: string[]): boolean => {
+    if (!perms || perms.length === 0) return true;
+    if (hasRole("Admin") || hasRole("SystemAdmin")) return true;
+    return perms.every((p) => hasPermission(p));
+  }, [hasRole, hasPermission]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -73,6 +130,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         token,
         isAuthenticated: !!token && !!user,
         isLoading,
+        roles,
+        permissions,
+        hasRole,
+        hasAnyRole,
+        hasPermission,
+        hasAnyPermission,
+        hasAllPermissions,
         login,
         register,
         logout,

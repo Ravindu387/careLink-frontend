@@ -9,6 +9,7 @@ export interface UserDetails {
   nic?: string | null;
   address?: string | null;
   roles: string[];
+  permissions?: string[];
   role: string;
   organizationId?: string | null;
   organizationName?: string | null;
