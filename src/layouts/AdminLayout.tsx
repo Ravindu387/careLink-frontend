@@ -9,19 +9,21 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#EFF6F7]">
+    <div className="flex h-screen w-full overflow-hidden bg-[#EFF6F7]">
 
       <AdminSidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="min-w-0 flex-1">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <AdminTopbar
           onMenu={() => setSidebarOpen(true)}
         />
 
-        <Outlet />
+        <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-[#EFF6F7]">
+          <Outlet />
+        </main>
       </div>
 
     </div>
