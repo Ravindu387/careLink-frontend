@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import {
   Check,
   Clock,
@@ -13,26 +13,18 @@ import {
   ShieldCheck,
   FileText,
   Download,
+  RefreshCw,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
+import { verificationService } from "../../services/verificationService";
+import type {
+  VerificationRequestItem,
+  VerificationStats,
+  VerificationStatus,
+} from "../../types/verification";
 
-type RequestStatus =
-  | "Pending Review"
-  | "Additional Info"
-  | "Approved"
-  | "Rejected";
-
-type VerificationRequest = {
-  id: string;
-  applicant: string;
-  type: string;
-  evidence: string;
-  priority: "High" | "Standard";
-  submitted: string;
-  status: RequestStatus;
-  documents: string[];
-};
-
-const initialRequests: VerificationRequest[] = [
+const initialRequests: VerificationRequestItem[] = [
   {
     id: "VER-2048",
     applicant: "Global Relief Network",
@@ -115,17 +107,17 @@ const initialRequests: VerificationRequest[] = [
   },
 ];
 
-const statusStyles: Record<RequestStatus, string> = {
+const statusStyles: Record<VerificationStatus, string> = {
   "Pending Review": "bg-orange-50 text-orange-700",
   "Additional Info": "bg-amber-50 text-amber-700",
   Approved: "bg-emerald-50 text-emerald-700",
   Rejected: "bg-red-50 text-red-600",
 };
 
-function StatusBadge({ status }: { status: RequestStatus }) {
+function StatusBadge({ status }: { status: VerificationStatus }) {
   return (
     <span
-      className={`inline-block whitespace-nowrap rounded-md px-2.5 py-1.5 text-[9px] font-semibold ${statusStyles[status]}`}
+      className={`inline-block whitespace-nowrap rounded-md px-2.5 py-1.5 text-[9px] font-semibold ${statusStyles[status] || "bg-slate-100 text-slate-700"}`}
     >
       {status}
     </span>
@@ -167,8 +159,12 @@ function StatCard({
 }
 
 export default function VerificationQueue() {
-  const [requests, setRequests] =
-    useState<VerificationRequest[]>(initialRequests);
+  const [requests, setRequests] = useState<VerificationRequestItem[]>([]);
+  const [stats, setStats] = useState<VerificationStats | null>(null);
+  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All request types");
@@ -178,7 +174,7 @@ export default function VerificationQueue() {
   const [showMoreFilters, setShowMoreFilters] = useState(false);
 
   const [selectedRequest, setSelectedRequest] =
-    useState<VerificationRequest | null>(null);
+    useState<VerificationRequestItem | null>(null);
 
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [rationale, setRationale] = useState("");
@@ -186,6 +182,29 @@ export default function VerificationQueue() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 4;
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [paged, statData, typeList] = await Promise.all([
+        verificationService.getRequests(),
+        verificationService.getStats(),
+        verificationService.getTypes(),
+      ]);
+      setRequests(paged?.items || []);
+      setStats(statData);
+      setAvailableTypes(typeList);
+    } catch (err: any) {
+      setError(err.message || "Failed to load verification applications from server.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const filteredRequests = useMemo(() => {
     return requests.filter((request) => {
@@ -206,22 +225,9 @@ export default function VerificationQueue() {
         statusFilter === "All states" ||
         request.status === statusFilter;
 
-      const dateMatch =
-        dateFilter === "Date submitted" ||
-        (dateFilter === "Today" &&
-          ["2 hours ago", "5 hours ago"].includes(request.submitted)) ||
-        (dateFilter === "Older" &&
-          !["2 hours ago", "5 hours ago"].includes(request.submitted));
-
-      return (
-        searchMatch &&
-        typeMatch &&
-        priorityMatch &&
-        statusMatch &&
-        dateMatch
-      );
+      return searchMatch && typeMatch && priorityMatch && statusMatch;
     });
-  }, [requests, search, typeFilter, priorityFilter, statusFilter, dateFilter]);
+  }, [requests, search, typeFilter, priorityFilter, statusFilter]);
 
   const totalPages = Math.max(
     1,
@@ -233,31 +239,31 @@ export default function VerificationQueue() {
     currentPage * pageSize
   );
 
-  const pendingCount = requests.filter(
+  const pendingCount = stats?.totalPending ?? requests.filter(
     (r) => r.status === "Pending Review"
   ).length;
 
-  const highPriorityCount = requests.filter(
+  const highPriorityCount = stats?.highPriority ?? requests.filter(
     (r) => r.priority === "High" && r.status === "Pending Review"
   ).length;
 
-  const approvedCount = requests.filter(
+  const approvedCount = stats?.approvedToday ?? requests.filter(
     (r) => r.status === "Approved"
   ).length;
 
-  const additionalInfoCount = requests.filter(
+  const additionalInfoCount = stats?.additionalInfo ?? requests.filter(
     (r) => r.status === "Additional Info"
   ).length;
 
-  const openReview = (request: VerificationRequest) => {
+  const openReview = (request: VerificationRequestItem) => {
     setSelectedRequest(request);
     setRationale("");
     setActionMessage("");
     setActiveMenu(null);
   };
 
-  const updateRequest = (
-    status: RequestStatus,
+  const updateRequest = async (
+    status: VerificationStatus,
     message: string
   ) => {
     if (!selectedRequest) return;
@@ -267,21 +273,37 @@ export default function VerificationQueue() {
       return;
     }
 
-    setRequests((previous) =>
-      previous.map((request) =>
-        request.id === selectedRequest.id
-          ? { ...request, status }
-          : request
-      )
-    );
+    setIsSubmitting(true);
+    setActionMessage("");
 
-    setSelectedRequest({
-      ...selectedRequest,
-      status,
-    });
+    const decisionMap: Record<VerificationStatus, "Approve" | "Reject" | "RequestInfo"> = {
+      Approved: "Approve",
+      Rejected: "Reject",
+      "Additional Info": "RequestInfo",
+      "Pending Review": "RequestInfo",
+    };
 
-    setActionMessage(message);
-    setRationale("");
+    try {
+      const updated = await verificationService.recordDecision(selectedRequest.id, {
+        decision: decisionMap[status] || "Approve",
+        decisionNote: rationale.trim(),
+      });
+
+      setRequests((previous) =>
+        previous.map((request) =>
+          request.id === selectedRequest.id ? updated : request
+        )
+      );
+
+      setSelectedRequest(updated);
+      setActionMessage(message);
+      setRationale("");
+      verificationService.getStats().then(setStats).catch(() => {});
+    } catch (err: any) {
+      setActionMessage(err.message || "Failed to persist verification decision.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const exportCSV = () => {
