@@ -7,11 +7,8 @@ import {
   Plus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
 import { useAuth } from "../../context/AuthContext";
 import { notificationService } from "../../services/notificationService";
-=======
->>>>>>> parent of 75fb8ca (feat: add core frontend layout, authentication context, and admin dashboard views)
 
 type Props = {
   onMenu: () => void;
@@ -21,7 +18,6 @@ export default function AdminTopbar({ onMenu }: Props) {
   const [search, setSearch] = useState("");
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const navigate = useNavigate();
-<<<<<<< HEAD
   const { user } = useAuth();
 
   useEffect(() => {
@@ -54,8 +50,6 @@ export default function AdminTopbar({ onMenu }: Props) {
       .join("")
       .toUpperCase();
   };
-=======
->>>>>>> parent of 75fb8ca (feat: add core frontend layout, authentication context, and admin dashboard views)
 
   return (
     <header className="sticky top-0 z-30 flex h-[62px] items-center justify-between border-b border-[#64C9AD] bg-white px-4 md:px-6">
@@ -116,8 +110,11 @@ export default function AdminTopbar({ onMenu }: Props) {
           New request
         </button>
 
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#123B5C] text-[9px] font-bold text-white">
-          AM
+        <div
+          title={user?.fullName || "User Profile"}
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-[#123B5C] text-[9px] font-bold text-white shadow-sm"
+        >
+          {getInitials(user?.fullName)}
         </div>
       </div>
     </header>
