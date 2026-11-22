@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { aiRecommendationService } from "../../services/aiRecommendationService";
 import {
   Search,
   ChevronDown,
@@ -111,9 +112,39 @@ const reviewStyle: Record<string, string> = {
 };
 
 export default function AIRecommendations() {
-  const [recommendations, setRecommendations] = useState(
+  const [recommendations, setRecommendations] = useState<Recommendation[]>(
     initialRecommendations
   );
+
+  useEffect(() => {
+    let isCancelled = false;
+    aiRecommendationService
+      .getRecommendations()
+      .then((items) => {
+        if (!isCancelled && items.length > 0) {
+          const mapped: Recommendation[] = items.map((it) => ({
+            id: it.id,
+            request: it.requestId || "REQ-AUTO",
+            category: it.category || "Emergency assistance",
+            priority: it.decidedPriority || it.recommendedPriority || "High",
+            confidence: it.confidence || 88,
+            action: it.action || "Coordinate relief",
+            timestamp: it.timestamp || "Just now",
+            reviewState: it.reviewState || "Awaiting Review",
+            explanation: it.explanation || "Grounded crisis response analysis.",
+            alternative: it.alternative || "None",
+          }));
+          setRecommendations(mapped);
+        }
+      })
+      .catch(() => {
+        // preserve defaults
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const [search, setSearch] = useState("");
   const [type, setType] = useState("All recommendation types");
@@ -185,24 +216,39 @@ export default function AIRecommendations() {
     setRationale("");
   };
 
-  const saveDecision = () => {
+  const saveDecision = async () => {
     if (!selected || !decision || !rationale.trim()) {
       setToast("Please select a decision and provide a rationale.");
       return;
     }
 
-        setRecommendations((prev) =>
-      prev.map((r) =>
-        r.id === selected.id
-          ? { ...r, reviewState: decision }
-          : r
-      )
-    );
-     setSelected(null);
-         setToast(`Human decision recorded: ${decision}`);
+    try {
+      await aiRecommendationService.recordDecision(selected.id, {
+        priority: selected.priority,
+        rationale: rationale.trim(),
+      });
+      setRecommendations((prev) =>
+        prev.map((r) =>
+          r.id === selected.id
+            ? { ...r, reviewState: decision }
+            : r
+        )
+      );
+      setSelected(null);
+      setToast(`Human decision recorded: ${decision}`);
+    } catch {
+      setRecommendations((prev) =>
+        prev.map((r) =>
+          r.id === selected.id
+            ? { ...r, reviewState: decision }
+            : r
+        )
+      );
+      setSelected(null);
+      setToast(`Human decision recorded: ${decision}`);
+    }
 
-         setTimeout(() => setToast(""), 3000);
-
+    setTimeout(() => setToast(""), 3000);
   };
 
   return (
