@@ -81,7 +81,7 @@ export default function SystemDashboard() {
       note: summary ? `${summary.shelterCapacityPercentage}% capacity` : "76% capacity",
       icon: Home,
       color: "orange",
-      onClick: () => navigate("/admin/organisations"),
+      onClick: () => navigate("/admin/shelters"),
     },
     {
       label: "Resources available",
@@ -89,7 +89,7 @@ export default function SystemDashboard() {
       note: summary ? `${summary.resourceShortagesCount} shortages` : "3 shortages",
       icon: Box,
       color: "blue",
-      onClick: () => navigate("/admin/integrations"),
+      onClick: () => navigate("/admin/resources"),
     },
   ];
 
@@ -341,9 +341,9 @@ export default function SystemDashboard() {
 
             <div className="grid grid-cols-2 divide-x divide-y divide-[#64C9AD]/40 border-t border-[#64C9AD]/40 sm:grid-cols-4 sm:divide-y-0 bg-[#EFF6F7]/30">
               {[
-                ["1,947", "Total received"],
-                ["1,502", "Fulfilled"],
-                ["77.1%", "Resolution rate"],
+                [chartData.reduce((acc, c) => acc + c.received, 0) > 0 ? chartData.reduce((acc, c) => acc + c.received, 0).toLocaleString() : "1,465", "Total received"],
+                [chartData.reduce((acc, c) => acc + c.fulfilled, 0) > 0 ? chartData.reduce((acc, c) => acc + c.fulfilled, 0).toLocaleString() : "1,194", "Fulfilled"],
+                [chartData.reduce((acc, c) => acc + c.received, 0) > 0 ? `${((chartData.reduce((acc, c) => acc + c.fulfilled, 0) / chartData.reduce((acc, c) => acc + c.received, 0)) * 100).toFixed(1)}%` : "81.5%", "Resolution rate"],
                 ["2h 18m", "Avg. response time"],
               ].map(([value, label]) => (
                 <div key={label} className="px-3.5 py-2.5">

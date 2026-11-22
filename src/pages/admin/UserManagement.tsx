@@ -1294,10 +1294,30 @@ export default function UserManagement() {
                 </div>
 
                 <div>
-                  <p className="text-[9px] text-slate-400">ROLE</p>
-                  <p className="mt-1 text-xs font-medium">
-                    {selectedUser.role}
-                  </p>
+                  <p className="text-[9px] text-slate-400">ASSIGNED ROLE</p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <select
+                      value={selectedUser.role}
+                      onChange={async (e) => {
+                        const newRole = e.target.value;
+                        try {
+                          await userService.updateUserRoles(selectedUser.id, [newRole]);
+                          setSelectedUser({ ...selectedUser, role: newRole });
+                          setSuccessMessage(`Role updated to ${newRole} for ${selectedUser.name}.`);
+                          await loadUsersAndStats();
+                        } catch (err: any) {
+                          setApiError(err.message || "Failed to update user role.");
+                        }
+                      }}
+                      className="h-8 w-full rounded-md border border-slate-200 bg-white px-2.5 text-xs font-medium text-[#123B5C] outline-none focus:border-[#2785B2] focus:ring-1 focus:ring-sky-100"
+                    >
+                      {roles.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div>

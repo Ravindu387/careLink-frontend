@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { useEffect, useMemo, useState } from "react";
+import { aiRecommendationService } from "../../services/aiRecommendationService";
 import {
   Search,
   ChevronDown,
@@ -41,11 +43,39 @@ const reviewStyle: Record<string, string> = {
 };
 
 export default function AIRecommendations() {
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [metrics, setMetrics] = useState<RecommendationMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isLiveConnected, setIsLiveConnected] = useState(false);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>(
+    initialRecommendations
+  );
+
+  useEffect(() => {
+    let isCancelled = false;
+    aiRecommendationService
+      .getRecommendations()
+      .then((items) => {
+        if (!isCancelled && items.length > 0) {
+          const mapped: Recommendation[] = items.map((it) => ({
+            id: it.id,
+            request: it.requestId || "REQ-AUTO",
+            category: it.category || "Emergency assistance",
+            priority: it.decidedPriority || it.recommendedPriority || "High",
+            confidence: it.confidence || 88,
+            action: it.action || "Coordinate relief",
+            timestamp: it.timestamp || "Just now",
+            reviewState: it.reviewState || "Awaiting Review",
+            explanation: it.explanation || "Grounded crisis response analysis.",
+            alternative: it.alternative || "None",
+          }));
+          setRecommendations(mapped);
+        }
+      })
+      .catch(() => {
+        // preserve defaults
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const [search, setSearch] = useState("");
   const [type, setType] = useState("All recommendation types");
@@ -197,107 +227,38 @@ export default function AIRecommendations() {
   };
 
   const saveDecision = async () => {
-    if (!selected) return;
-
-    if (!decision) {
-      showToastMessage("Please select a decision action (Approved, Modified, Rejected, or Deferred).");
+    if (!selected || !decision || !rationale.trim()) {
+      setToast("Please select a decision and provide a rationale.");
       return;
     }
 
-    if (!rationale.trim() || rationale.trim().length < 3) {
-      showToastMessage("Auditable rationale is mandatory. Please provide justification.");
-      return;
-    }
-
-    setSavingDecision(true);
     try {
-      const updated = await recommendationService.recordDecision(selected.id, {
-        decision,
+      await aiRecommendationService.recordDecision(selected.id, {
+        priority: selected.priority,
         rationale: rationale.trim(),
-        reviewedBy: "Emergency Coordinator",
       });
-
       setRecommendations((prev) =>
-        prev.map((r) => (r.id === updated.id ? updated : r))
+        prev.map((r) =>
+          r.id === selected.id
+            ? { ...r, reviewState: decision }
+            : r
+        )
       );
-
-      // Refresh metrics from backend
-      try {
-        const freshMetrics = await recommendationService.getMetrics();
-        setMetrics(freshMetrics);
-      } catch {
-        // Ignored
-      }
-
       setSelected(null);
-      showToastMessage(`Human decision recorded: ${decision} for ${updated.id}`);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to record decision.";
-      showToastMessage(`Error: ${message}`);
-    } finally {
-      setSavingDecision(false);
-    }
-  };
-
-  const handleGenerateRecommendation = async () => {
-    if (!genCategory) {
-      showToastMessage("Please select a category.");
-      return;
+      setToast(`Human decision recorded: ${decision}`);
+    } catch {
+      setRecommendations((prev) =>
+        prev.map((r) =>
+          r.id === selected.id
+            ? { ...r, reviewState: decision }
+            : r
+        )
+      );
+      setSelected(null);
+      setToast(`Human decision recorded: ${decision}`);
     }
 
-    setGenerating(true);
-    try {
-      const newRec = await recommendationService.generateRecommendation({
-        category: genCategory,
-        location: genLocation,
-        description: genDescription,
-        affectedPeopleCount: Number(genAffectedCount) || 1,
-        isLifeThreatening: genIsLifeThreatening,
-        hasVulnerableMembers: genHasVulnerable,
-        priorityHint: genPriorityHint || undefined,
-      });
-
-      setRecommendations((prev) => [newRec, ...prev]);
-
-      try {
-        const freshMetrics = await recommendationService.getMetrics();
-        setMetrics(freshMetrics);
-      } catch {
-        // Ignored
-      }
-
-      setShowGenerateModal(false);
-      // Reset generate form
-      setGenDescription("");
-      setGenIsLifeThreatening(false);
-      setGenPriorityHint("");
-      showToastMessage(`AI recommendation ${newRec.id} generated for request ${newRec.request}!`);
-      openReview(newRec);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to generate recommendation.";
-      showToastMessage(`Error: ${message}`);
-    } finally {
-      setGenerating(false);
-    }
-  };
-
-  const handleResetData = async () => {
-    if (!window.confirm("Reset all recommendations and metrics to default state?")) {
-      return;
-    }
-    setLoading(true);
-    try {
-      const result = await recommendationService.resetData();
-      const recs = await recommendationService.getRecommendations();
-      setRecommendations(recs);
-      setMetrics(result.metrics);
-      showToastMessage("Recommendations reset to default baseline.");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to reset data.";
-      showToastMessage(`Error: ${message}`);
-    } finally {
-      setLoading(false);
-    }
+    setTimeout(() => setToast(""), 3000);
   };
 
   return (

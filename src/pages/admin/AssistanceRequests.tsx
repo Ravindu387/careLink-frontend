@@ -550,7 +550,14 @@ function RequestDrawer({
 export default function AssistanceRequests() {
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("All requests");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => searchParams.get("search") || "");
+
+  useEffect(() => {
+    const q = searchParams.get("search");
+    if (q !== null) {
+      setSearch(q);
+    }
+  }, [searchParams]);
 
   const [priority, setPriority] = useState("Any priority");
   const [category, setCategory] = useState("Any category");

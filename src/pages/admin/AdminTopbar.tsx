@@ -51,6 +51,12 @@ export default function AdminTopbar({ onMenu }: Props) {
       .toUpperCase();
   };
 
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && search.trim()) {
+      navigate(`/admin/requests?search=${encodeURIComponent(search.trim())}`);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-30 flex h-[62px] shrink-0 items-center justify-between border-b border-[#64C9AD] bg-white px-4 md:px-6">
 
@@ -68,6 +74,7 @@ export default function AdminTopbar({ onMenu }: Props) {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
             placeholder="Search requests, people, locations..."
             className="w-full bg-transparent text-[11px] outline-none"
           />

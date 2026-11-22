@@ -78,33 +78,26 @@ export default function PendingVerification() {
       setLoading(true);
     }
 
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/volunteer-verifications/pending`
-        );
+    try {
+      const [res, statsData] = await Promise.all([
+        pendingVerificationService.getApplications({ pageNumber: 1, pageSize: 50 }),
+        pendingVerificationService.getStats(),
+      ]);
 
-        if (!response.ok) {
-          throw new Error("Unable to load verification applications.");
-        }
-
-        const text = await response.text();
-        const data: Application[] = text ? JSON.parse(text) : [];
-
-        setApplications(data);
-        setApiError("");
-      } catch (error) {
-        console.error("API Error:", error);
-
-        // Use demo data if backend is unavailable
-        setApiError(
-          "Backend unavailable. Showing demonstration data."
-        );
-      } finally {
-        setLoading(false);
+      if (res && res.data) {
+        setApplications(res.data.items);
+        setIsLiveBackend(true);
       }
-    };
-
-    fetchApplications();
+      if (statsData && statsData.data) {
+        setStats(statsData.data);
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      setIsLiveBackend(false);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
   }, []);
 
   useEffect(() => {

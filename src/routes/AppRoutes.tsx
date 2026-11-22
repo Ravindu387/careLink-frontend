@@ -80,6 +80,7 @@ export default function AppRoutes() {
               <Route path="/admin/requests" element={<AssistanceRequests />} />
               <Route path="/admin/users" element={<UserManagement />} />
               <Route path="/admin/ai-review" element={<AIRecommendationReview />} />
+              <Route path="/admin/ai-recommendations" element={<AIRecommendationReview />} />
               <Route path="/admin/organisations" element={<OrganisationManagement />} />
               <Route path="/admin/verification" element={<VerificationQueue />} />
               <Route path="/admin/integrations" element={<IntegrationHealth />} />
