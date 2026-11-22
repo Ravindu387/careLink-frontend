@@ -14,6 +14,13 @@ import AdminLayout from "../layouts/AdminLayout";
 import SystemDashboard from "../pages/admin/Dashboard";
 import AssistanceRequests from "../pages/admin/AssistanceRequests";
 import AdminPlaceholder from "../pages/admin/AdminPlaceholder";
+import CrisisEvents from "../pages/Emegency Coordinator/CrisisEvent";
+import ResourceOverview from "../pages/Emegency Coordinator/ResourceOverview";
+import ShelterOverview from "../pages/Emegency Coordinator/ShelterOverview";
+import VolunteerDirectory from "../pages/VolunteerCoordinator/VolunteerDirectory";
+import DonationRecords from "../pages/Funding_Officer/DonationRecords";
+import SituationReports from "../pages/Emegency Coordinator/SituationReports";
+import LiveOperationsMap from "../pages/Emegency Coordinator/LiveOperationsMap";
 
 // Officer Dashboard
 import OperationsDashboard from "../pages/officer/OperationsDashboard";
@@ -50,6 +57,7 @@ export default function AppRoutes() {
               <Route path="/admin/requests" element={<AssistanceRequests />} />
               <Route path="/admin/users" element={<UserManagement />} />
               <Route path="/admin/ai-review" element={<AIRecommendationReview />} />
+              <Route path="/admin/ai-recommendations" element={<AIRecommendationReview />} />
               <Route path="/admin/organisations" element={<OrganisationManagement />} />
               <Route path="/admin/verification" element={<VerificationQueue />} />
               <Route path="/admin/integrations" element={<IntegrationHealth />} />
@@ -59,6 +67,13 @@ export default function AppRoutes() {
               <Route path="/admin/settings" element={<SystemSettings />} />
               <Route path="/admin/reports" element={<ReportsPage />} />
               <Route path="/admin/notifications" element={<NotificationsPage />} />
+              <Route path="/admin/crises" element={<CrisisEvents />} />
+              <Route path="/admin/resources" element={<ResourceOverview />} />
+              <Route path="/admin/shelters" element={<ShelterOverview />} />
+              <Route path="/admin/volunteers" element={<VolunteerDirectory />} />
+              <Route path="/admin/donations" element={<DonationRecords />} />
+              <Route path="/admin/situation-reports" element={<SituationReports />} />
+              <Route path="/admin/operations-map" element={<LiveOperationsMap />} />
               <Route path="/admin/:tab" element={<AdminPlaceholder />} />
             </Route>
 
