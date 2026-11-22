@@ -1,5 +1,11 @@
-
-import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import {
   BriefcaseBusiness,
   Clock,
@@ -15,20 +21,18 @@ import {
   Upload,
   Eye,
   FileCheck,
+  RefreshCw,
+  CheckCircle2,
+  Check,
+  Globe,
+  Share2,
 } from "lucide-react";
-
-type DocumentItem = {
-  id: string;
-  name: string;
-  type: string;
-  owner: string;
-  updated: string;
-  version: string;
-  visibility: string;
-  status: string;
-  fileName?: string;
-  fileUrl?: string;
-};
+import {
+  partnerDocumentService,
+  type DocumentItem,
+  type DocumentMetrics,
+  type CreateDocumentPayload,
+} from "../../services/partnerDocumentService";
 
 const initialDocuments: DocumentItem[] = [
   {
@@ -40,6 +44,8 @@ const initialDocuments: DocumentItem[] = [
     version: "v3.2",
     visibility: "Shared with NDA",
     status: "Published",
+    fileName: "partner_response_plan_floods_v3.2.pdf",
+    fileUrl: "/sample-docs/response_plan.pdf",
   },
   {
     id: "DOC-0408",
@@ -50,6 +56,8 @@ const initialDocuments: DocumentItem[] = [
     version: "v2.1",
     visibility: "8 organisations",
     status: "Published",
+    fileName: "north_ward_distribution_schedule_v2.xlsx",
+    fileUrl: "/sample-docs/distribution_schedule.xlsx",
   },
   {
     id: "DOC-0397",
@@ -60,6 +68,8 @@ const initialDocuments: DocumentItem[] = [
     version: "v1.0",
     visibility: "Internal",
     status: "Approved",
+    fileName: "wash_tech_assessment_kelaniya.pdf",
+    fileUrl: "/sample-docs/wash_assessment.pdf",
   },
   {
     id: "DOC-0388",
@@ -70,6 +80,8 @@ const initialDocuments: DocumentItem[] = [
     version: "v1.4",
     visibility: "NDA · CareLink",
     status: "Awaiting Signature",
+    fileName: "bilateral_data_sharing_nda_carelink.pdf",
+    fileUrl: "/sample-docs/data_agreement.pdf",
   },
   {
     id: "DOC-0382",
@@ -80,6 +92,8 @@ const initialDocuments: DocumentItem[] = [
     version: "v1.2",
     visibility: "Internal",
     status: "Under Review",
+    fileName: "emergency_shelter_capacity_report.pdf",
+    fileUrl: "/sample-docs/shelter_report.pdf",
   },
   {
     id: "DOC-0375",
@@ -90,15 +104,24 @@ const initialDocuments: DocumentItem[] = [
     version: "v2.0",
     visibility: "Shared with NDA",
     status: "Archived",
+    fileName: "mou_food_distribution_wfp_nda.pdf",
+    fileUrl: "/sample-docs/food_mou.pdf",
   },
 ];
 
-const tabs = ["All", "Needs action", "Active", "Completed", "Archived"];
+const tabs = ["All", "Needs action", "Active", "Completed", "Archived"] as const;
 
 const Documents = () => {
-  const [documents, setDocuments] = useState(initialDocuments);
+  const [documents, setDocuments] = useState<DocumentItem[]>(initialDocuments);
+  const [metrics, setMetrics] = useState<DocumentMetrics | null>(null);
+  const [isLiveConnected, setIsLiveConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [bannerMessage, setBannerMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
-  const [activeTab, setActiveTab] = useState("All");
+  const [activeTab, setActiveTab] = useState<string>("All");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All document types");
   const [ownerFilter, setOwnerFilter] = useState("All owners");
@@ -113,6 +136,119 @@ const Documents = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 4;
 
+  const showBanner = (text: string, type: "success" | "error" = "success") => {
+    setBannerMessage({ type, text });
+    setTimeout(() => {
+      setBannerMessage(null);
+    }, 4000);
+  };
+
+  const loadDocuments = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [fetchedDocs, fetchedMetrics] = await Promise.all([
+        partnerDocumentService.getAll(),
+        partnerDocumentService.getMetrics().catch(() => null),
+      ]);
+
+      if (fetchedDocs && fetchedDocs.length > 0) {
+        setDocuments(fetchedDocs);
+        setIsLiveConnected(true);
+      }
+      if (fetchedMetrics) {
+        setMetrics(fetchedMetrics);
+      }
+    } catch (err) {
+      console.warn("Using offline documents fallback:", err);
+      setIsLiveConnected(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const init = async () => {
+      try {
+        const [fetchedDocs, fetchedMetrics] = await Promise.all([
+          partnerDocumentService.getAll(),
+          partnerDocumentService.getMetrics().catch(() => null),
+        ]);
+        if (!active) return;
+        if (fetchedDocs && fetchedDocs.length > 0) {
+          setDocuments(fetchedDocs);
+          setIsLiveConnected(true);
+        }
+        if (fetchedMetrics) {
+          setMetrics(fetchedMetrics);
+        }
+      } catch (err) {
+        if (!active) return;
+        console.warn("Using offline documents fallback:", err);
+        setIsLiveConnected(false);
+      }
+    };
+    init();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Dynamic filter dropdown options
+  const typeOptions = useMemo(() => {
+    const defaultTypes = [
+      "Operational Plan",
+      "Schedule",
+      "Assessment",
+      "Agreement",
+      "Report",
+      "Other",
+    ];
+    const dynamicTypes = documents.map((d) => d.type).filter(Boolean);
+    return [
+      "All document types",
+      ...Array.from(new Set([...defaultTypes, ...dynamicTypes])),
+    ];
+  }, [documents]);
+
+  const ownerOptions = useMemo(() => {
+    const defaultOwners = ["Sara Khan", "Michael Torres", "Nadia Silva"];
+    const dynamicOwners = documents.map((d) => d.owner).filter(Boolean);
+    return [
+      "All owners",
+      ...Array.from(new Set([...defaultOwners, ...dynamicOwners])),
+    ];
+  }, [documents]);
+
+  const visibilityOptions = useMemo(() => {
+    const defaultVis = [
+      "Internal",
+      "Shared with NDA",
+      "8 organisations",
+      "NDA · CareLink",
+    ];
+    const dynamicVis = documents.map((d) => d.visibility).filter(Boolean);
+    return [
+      "All visibility",
+      ...Array.from(new Set([...defaultVis, ...dynamicVis])),
+    ];
+  }, [documents]);
+
+  // Tab counts
+  const tabCounts = useMemo(() => {
+    return {
+      All: documents.length,
+      "Needs action": documents.filter((d) =>
+        ["Awaiting Signature", "Under Review"].includes(d.status)
+      ).length,
+      Active: documents.filter((d) =>
+        ["Published", "Approved"].includes(d.status)
+      ).length,
+      Completed: documents.filter((d) => d.status === "Approved").length,
+      Archived: documents.filter((d) => d.status === "Archived").length,
+    };
+  }, [documents]);
+
   // Search and filters
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc) => {
@@ -122,6 +258,7 @@ const Documents = () => {
         doc.type,
         doc.owner,
         doc.visibility,
+        doc.fileName || "",
       ]
         .join(" ")
         .toLowerCase();
@@ -140,14 +277,11 @@ const Documents = () => {
       return (
         matchesSearch &&
         matchesTab &&
-        (typeFilter === "All document types" ||
-          doc.type === typeFilter) &&
-        (ownerFilter === "All owners" ||
-          doc.owner === ownerFilter) &&
+        (typeFilter === "All document types" || doc.type === typeFilter) &&
+        (ownerFilter === "All owners" || doc.owner === ownerFilter) &&
         (visibilityFilter === "All visibility" ||
           doc.visibility === visibilityFilter) &&
-        (statusFilter === "All statuses" ||
-          doc.status === statusFilter)
+        (statusFilter === "All statuses" || doc.status === statusFilter)
       );
     });
   }, [
@@ -161,10 +295,7 @@ const Documents = () => {
   ]);
 
   // Pagination
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredDocuments.length / pageSize)
-  );
+  const totalPages = Math.max(1, Math.ceil(filteredDocuments.length / pageSize));
 
   const displayedDocuments = filteredDocuments.slice(
     (currentPage - 1) * pageSize,
@@ -182,6 +313,7 @@ const Documents = () => {
       "Version",
       "Visibility",
       "Status",
+      "File Name",
     ];
 
     const rows = filteredDocuments.map((doc) => [
@@ -193,13 +325,12 @@ const Documents = () => {
       doc.version,
       doc.visibility,
       doc.status,
+      doc.fileName || "",
     ]);
 
     const csv = [headers, ...rows]
       .map((row) =>
-        row.map((value) =>
-          `"${String(value).replace(/"/g, '""')}"`
-        ).join(",")
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")
       )
       .join("\n");
 
@@ -209,25 +340,57 @@ const Documents = () => {
 
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-
     link.href = url;
     link.download = "partner-documents.csv";
     link.click();
-
     URL.revokeObjectURL(url);
   };
 
   // Upload document
-  const handleUpload = (doc: DocumentItem) => {
-    setDocuments((prev) => [doc, ...prev]);
-    setActiveTab("All");
-    setSearch("");
-    setTypeFilter("All document types");
-    setOwnerFilter("All owners");
-    setVisibilityFilter("All visibility");
-    setStatusFilter("All statuses");
-    setCurrentPage(1);
-    setShowUploadModal(false);
+  const handleUpload = async (payload: CreateDocumentPayload) => {
+    try {
+      const created = await partnerDocumentService.upload(payload);
+      setDocuments((prev) => [created, ...prev]);
+      setActiveTab("All");
+      setSearch("");
+      setTypeFilter("All document types");
+      setOwnerFilter("All owners");
+      setVisibilityFilter("All visibility");
+      setStatusFilter("All statuses");
+      setCurrentPage(1);
+      setShowUploadModal(false);
+      showBanner(`Document ${created.id} uploaded successfully.`);
+      partnerDocumentService.getMetrics().then(setMetrics).catch(() => null);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Failed to upload document";
+      showBanner(message, "error");
+    }
+  };
+
+  // Status Change Workflow
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    try {
+      const updated = await partnerDocumentService.updateStatus(id, newStatus);
+      setDocuments((prev) =>
+        prev.map((item) => (item.id === id ? updated : item))
+      );
+      if (selectedDocument && selectedDocument.id === id) {
+        setSelectedDocument(updated);
+      }
+      showBanner(`Document ${id} marked as "${newStatus}".`);
+      partnerDocumentService.getMetrics().then(setMetrics).catch(() => null);
+    } catch {
+      setDocuments((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: newStatus } : item
+        )
+      );
+      if (selectedDocument && selectedDocument.id === id) {
+        setSelectedDocument({ ...selectedDocument, status: newStatus });
+      }
+      showBanner(`Document ${id} marked as "${newStatus}".`);
+    }
   };
 
   // Reset filters
@@ -243,30 +406,59 @@ const Documents = () => {
 
   return (
     <div className="min-h-screen bg-[#eff5f7] p-5 md:p-7">
-
       {/* Page Header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-
         <div>
           <p className="mb-3 text-xs text-slate-500">
             Partner Coordination
             <span className="mx-2">›</span>
-            <span className="font-semibold text-[#153e5b]">
-              Documents
-            </span>
+            <span className="font-semibold text-[#153e5b]">Documents</span>
           </p>
 
-          <h1 className="text-2xl font-semibold text-[#153e5b]">
-            Documents
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-semibold text-[#153e5b]">Documents</h1>
+
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+                isLiveConnected
+                  ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border border-slate-200 bg-slate-100 text-slate-600"
+              }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  isLiveConnected
+                    ? "animate-pulse bg-emerald-500"
+                    : "bg-slate-400"
+                }`}
+              />
+              {isLiveConnected ? "Live Connected" : "Local Store"}
+            </span>
+
+            {metrics && (
+              <span className="rounded-full bg-[#e8f2f8] px-2.5 py-0.5 text-[10px] font-medium text-[#267ba4]">
+                {metrics.totalDocuments} Total Documents
+              </span>
+            )}
+          </div>
 
           <p className="mt-2 text-sm text-slate-500">
-            Manage controlled operational plans, assessments,
-            agreements, schedules, and shared files.
+            Manage controlled operational plans, assessments, agreements,
+            schedules, and shared files.
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={loadDocuments}
+            disabled={isLoading}
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            title="Refresh documents list"
+          >
+            <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
+            Refresh
+          </button>
+
           <button
             onClick={exportCSV}
             className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
@@ -285,13 +477,26 @@ const Documents = () => {
         </div>
       </div>
 
+      {/* Action Notification Banner */}
+      {bannerMessage && (
+        <div
+          className={`mb-4 flex items-center gap-2 rounded-lg border p-3.5 text-xs font-medium transition ${
+            bannerMessage.type === "success"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+              : "border-rose-200 bg-rose-50 text-rose-800"
+          }`}
+        >
+          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+          <span>{bannerMessage.text}</span>
+        </div>
+      )}
+
       {/* Statistics Cards */}
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-
         <StatCard
           icon={<BriefcaseBusiness size={20} />}
           title="Active records"
-          value="48"
+          value={String(metrics?.activeRecords ?? 48)}
           subtitle="Organisation-scoped"
           color="blue"
         />
@@ -299,7 +504,12 @@ const Documents = () => {
         <StatCard
           icon={<Clock size={20} />}
           title="Needs review"
-          value="3"
+          value={String(
+            metrics?.needsReview ??
+              documents.filter((d) =>
+                ["Awaiting Signature", "Under Review"].includes(d.status)
+              ).length
+          )}
           subtitle="Assigned to your team"
           color="orange"
         />
@@ -307,7 +517,7 @@ const Documents = () => {
         <StatCard
           icon={<ShieldCheck size={20} />}
           title="Verified"
-          value="96%"
+          value={metrics ? `${metrics.verifiedPercentage}%` : "96%"}
           subtitle="Current assurance"
           color="green"
         />
@@ -315,54 +525,49 @@ const Documents = () => {
         <StatCard
           icon={<AlertTriangle size={20} />}
           title="Due soon"
-          value="2"
+          value={String(metrics?.dueSoon ?? 2)}
           subtitle="Within 30 days"
           color="orange"
         />
-
       </div>
 
       {/* Tabs */}
       <div className="mb-3 flex gap-6 overflow-x-auto border-b border-[#d4e1e7]">
-
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => {
-              setActiveTab(tab);
-              setCurrentPage(1);
-            }}
-            className={`relative whitespace-nowrap pb-4 text-xs ${
-              activeTab === tab
-                ? "font-semibold text-[#267ba4]"
-                : "text-slate-500 hover:text-[#267ba4]"
-            }`}
-          >
-            {tab}
-
-            {tab === "All" && (
-              <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px]">
-                48
+        {tabs.map((tab) => {
+          const count = tabCounts[tab];
+          return (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveTab(tab);
+                setCurrentPage(1);
+              }}
+              className={`relative whitespace-nowrap pb-4 text-xs transition ${
+                activeTab === tab
+                  ? "font-semibold text-[#267ba4]"
+                  : "text-slate-500 hover:text-[#267ba4]"
+              }`}
+            >
+              {tab}
+              <span
+                className={`ml-1.5 rounded-full px-2 py-0.5 text-[9px] font-medium ${
+                  activeTab === tab
+                    ? "bg-[#267ba4] text-white"
+                    : "bg-[#e5eff4] text-[#153e5b]"
+                }`}
+              >
+                {count}
               </span>
-            )}
-
-            {tab === "Needs action" && (
-              <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px]">
-                7
-              </span>
-            )}
-
-            {activeTab === tab && (
-              <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#267ba4]" />
-            )}
-          </button>
-        ))}
-
+              {activeTab === tab && (
+                <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#267ba4]" />
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Search and Filters */}
       <div className="mb-3 flex flex-col gap-2 xl:flex-row">
-
         <div className="relative min-w-0 flex-1">
           <Search
             size={16}
@@ -375,7 +580,7 @@ const Documents = () => {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            placeholder="Search documents..."
+            placeholder="Search documents by title, owner, type, visibility or file name..."
             className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
           />
         </div>
@@ -388,13 +593,9 @@ const Documents = () => {
           }}
           className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
         >
-          <option>All document types</option>
-          <option>Operational Plan</option>
-          <option>Schedule</option>
-          <option>Assessment</option>
-          <option>Agreement</option>
-          <option>Report</option>
-          <option>Other</option>
+          {typeOptions.map((opt) => (
+            <option key={opt}>{opt}</option>
+          ))}
         </select>
 
         <select
@@ -405,10 +606,9 @@ const Documents = () => {
           }}
           className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
         >
-          <option>All owners</option>
-          <option>Sara Khan</option>
-          <option>Michael Torres</option>
-          <option>Nadia Silva</option>
+          {ownerOptions.map((opt) => (
+            <option key={opt}>{opt}</option>
+          ))}
         </select>
 
         <select
@@ -419,11 +619,9 @@ const Documents = () => {
           }}
           className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
         >
-          <option>All visibility</option>
-          <option>Shared with NDA</option>
-          <option>8 organisations</option>
-          <option>Internal</option>
-          <option>NDA · CareLink</option>
+          {visibilityOptions.map((opt) => (
+            <option key={opt}>{opt}</option>
+          ))}
         </select>
 
         <select
@@ -449,7 +647,6 @@ const Documents = () => {
           <Filter size={15} />
           More filters
         </button>
-
       </div>
 
       {/* More Filters */}
@@ -457,16 +654,17 @@ const Documents = () => {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d3e1e8] bg-white p-4">
           <div>
             <p className="text-xs font-semibold text-[#153e5b]">
-              Additional filters
+              Refine controlled documents
             </p>
             <p className="mt-1 text-[10px] text-slate-500">
-              Refine documents using the filters above.
+              Showing {filteredDocuments.length} matching files under active
+              governance.
             </p>
           </div>
 
           <button
             onClick={resetFilters}
-            className="text-xs font-medium text-[#267ba4]"
+            className="text-xs font-medium text-[#267ba4] hover:underline"
           >
             Clear all filters
           </button>
@@ -475,10 +673,8 @@ const Documents = () => {
 
       {/* Documents Table */}
       <div className="overflow-hidden rounded-xl border border-[#d7e5eb] bg-white shadow-sm">
-
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1000px] text-left">
-
             <thead className="bg-[#f5f8fa]">
               <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
                 {[
@@ -510,28 +706,25 @@ const Documents = () => {
                     {doc.id}
                   </td>
 
-                  <td className="whitespace-nowrap px-3 py-4">
+                  <td className="whitespace-nowrap px-3 py-4 font-medium text-[#153e5b]">
                     {doc.name}
                   </td>
 
-                  <td className="whitespace-nowrap px-3 py-4">
-                    {doc.type}
-                  </td>
+                  <td className="whitespace-nowrap px-3 py-4">{doc.type}</td>
 
-                  <td className="whitespace-nowrap px-3 py-4">
-                    {doc.owner}
-                  </td>
+                  <td className="whitespace-nowrap px-3 py-4">{doc.owner}</td>
 
-                  <td className="whitespace-nowrap px-3 py-4">
-                    {doc.updated}
-                  </td>
+                  <td className="whitespace-nowrap px-3 py-4">{doc.updated}</td>
 
-                  <td className="whitespace-nowrap px-3 py-4">
+                  <td className="whitespace-nowrap px-3 py-4 font-mono">
                     {doc.version}
                   </td>
 
                   <td className="whitespace-nowrap px-3 py-4">
-                    {doc.visibility}
+                    <span className="inline-flex items-center gap-1 rounded bg-[#edf3f6] px-2 py-0.5 text-[9px] text-slate-600">
+                      <Globe size={11} className="text-[#267ba4]" />
+                      {doc.visibility}
+                    </span>
                   </td>
 
                   <td className="whitespace-nowrap px-3 py-4">
@@ -539,10 +732,7 @@ const Documents = () => {
                   </td>
 
                   <td className="px-3 py-4">
-                    <ChevronRight
-                      size={17}
-                      className="text-[#64849a]"
-                    />
+                    <ChevronRight size={17} className="text-[#64849a]" />
                   </td>
                 </tr>
               ))}
@@ -553,47 +743,36 @@ const Documents = () => {
                     colSpan={9}
                     className="py-12 text-center text-xs text-slate-400"
                   >
-                    No documents found.
+                    No documents found matching the filter criteria.
                   </td>
                 </tr>
               )}
             </tbody>
-
           </table>
         </div>
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-
           <p className="text-[10px] text-slate-400">
             Showing{" "}
             {filteredDocuments.length === 0
               ? 0
               : (currentPage - 1) * pageSize + 1}
             {"–"}
-            {Math.min(
-              currentPage * pageSize,
-              filteredDocuments.length
-            )}{" "}
-            of {filteredDocuments.length} documents
+            {Math.min(currentPage * pageSize, filteredDocuments.length)} of{" "}
+            {filteredDocuments.length} documents
           </p>
 
           <div className="flex items-center gap-1">
-
             <button
               disabled={currentPage === 1}
-              onClick={() =>
-                setCurrentPage((p) => Math.max(1, p - 1))
-              }
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
 
-            {Array.from(
-              { length: totalPages },
-              (_, i) => i + 1
-            ).map((number) => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
@@ -609,14 +788,11 @@ const Documents = () => {
 
             <button
               disabled={currentPage === totalPages}
-              onClick={() =>
-                setCurrentPage((p) => Math.min(totalPages, p + 1))
-              }
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
-
           </div>
         </div>
       </div>
@@ -626,6 +802,7 @@ const Documents = () => {
         <DocumentDetailsModal
           document={selectedDocument}
           onClose={() => setSelectedDocument(null)}
+          onStatusChange={handleStatusChange}
         />
       )}
 
@@ -636,7 +813,6 @@ const Documents = () => {
           onSubmit={handleUpload}
         />
       )}
-
     </div>
   );
 };
@@ -663,7 +839,9 @@ function StatCard({
 
   return (
     <div className="flex items-center gap-3 rounded-xl border border-[#d7e5eb] bg-white p-4 shadow-sm">
-      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors[color]}`}>
+      <div
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors[color]}`}
+      >
         {icon}
       </div>
 
@@ -687,20 +865,18 @@ function StatusBadge({ status }: { status: string }) {
   };
 
   return (
-    <span className={`rounded-md px-2 py-1 text-[9px] font-medium ${styles[status] || "bg-slate-100 text-slate-500"}`}>
+    <span
+      className={`rounded-md px-2 py-1 text-[9px] font-medium ${
+        styles[status] || "bg-slate-100 text-slate-500"
+      }`}
+    >
       {status}
     </span>
   );
 }
 
 // Detail Item
-function Detail({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-[10px] text-slate-400">{label}</p>
@@ -715,31 +891,30 @@ function Detail({
 function DocumentDetailsModal({
   document,
   onClose,
+  onStatusChange,
 }: {
   document: DocumentItem;
   onClose: () => void;
+  onStatusChange: (id: string, newStatus: string) => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4">
+      <div className="my-auto w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-[#267ba4]">
-              {document.id}
-            </p>
+            <p className="text-xs font-semibold text-[#267ba4]">{document.id}</p>
             <h2 className="mt-1 text-lg font-semibold text-[#153e5b]">
               Document Details
             </h2>
           </div>
 
           <button onClick={onClose}>
-            <X size={20} className="text-slate-500" />
+            <X size={20} className="text-slate-500 hover:text-slate-700" />
           </button>
         </div>
 
         <div className="mb-5 flex items-center gap-3 rounded-lg bg-[#f5f8fa] p-4">
-          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#e8f2f8] text-[#267ba4]">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#e8f2f8] text-[#267ba4]">
             <FileText size={22} />
           </div>
 
@@ -748,7 +923,7 @@ function DocumentDetailsModal({
               {document.name}
             </h3>
             <p className="mt-1 text-xs text-slate-500">
-              {document.type}
+              {document.type} · Version {document.version}
             </p>
           </div>
         </div>
@@ -759,34 +934,84 @@ function DocumentDetailsModal({
           <Detail label="Updated" value={document.updated} />
           <Detail label="Version" value={document.version} />
           <Detail label="Visibility" value={document.visibility} />
-          <Detail label="Status" value={document.status} />
+          <div>
+            <p className="text-[10px] text-slate-400">Status</p>
+            <div className="mt-1">
+              <StatusBadge status={document.status} />
+            </div>
+          </div>
         </div>
 
         {document.fileName && (
           <div className="mt-5 rounded-lg bg-[#f5f8fa] p-3">
-            <p className="text-[10px] text-slate-400">Uploaded file</p>
+            <p className="text-[10px] text-slate-400">Attached File</p>
             <p className="mt-1 break-all text-xs font-medium text-[#153e5b]">
               {document.fileName}
             </p>
           </div>
         )}
 
+        {/* Workflow actions */}
+        <div className="mt-6 border-t border-slate-100 pt-4">
+          <p className="mb-2 text-[10px] font-semibold text-slate-500">
+            Document Actions
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {["Under Review", "Awaiting Signature"].includes(document.status) && (
+              <button
+                onClick={() => onStatusChange(document.id, "Approved")}
+                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+              >
+                <Check size={13} />
+                Approve Document
+              </button>
+            )}
+
+            {document.status === "Approved" && (
+              <button
+                onClick={() => onStatusChange(document.id, "Published")}
+                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+              >
+                <Share2 size={13} />
+                Publish to Network
+              </button>
+            )}
+
+            {document.status !== "Archived" && (
+              <button
+                onClick={() => onStatusChange(document.id, "Archived")}
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-50"
+              >
+                Archive
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="mt-7 flex gap-2">
-          {document.fileUrl && (
+          {document.fileUrl ? (
             <a
               href={document.fileUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] py-3 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
             >
               <Eye size={15} />
               View File
             </a>
+          ) : (
+            <button
+              onClick={() => alert(`Opening ${document.name} in document viewer`)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+            >
+              <Eye size={15} />
+              View File
+            </button>
           )}
 
           <button
             onClick={onClose}
-            className="flex-1 rounded-lg bg-[#267ba4] py-3 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex-1 rounded-lg bg-[#267ba4] py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
           >
             Close
           </button>
@@ -802,7 +1027,7 @@ function UploadDocumentModal({
   onSubmit,
 }: {
   onClose: () => void;
-  onSubmit: (doc: DocumentItem) => void;
+  onSubmit: (payload: CreateDocumentPayload) => void;
 }) {
   const [name, setName] = useState("");
   const [type, setType] = useState("Operational Plan");
@@ -812,30 +1037,21 @@ function UploadDocumentModal({
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!name.trim()) return;
 
-    if (!file) return;
-
-    const fileUrl = URL.createObjectURL(file);
-
-    const newDoc: DocumentItem = {
-      id: `DOC-${Math.floor(1000 + Math.random() * 9000)}`,
-      name,
+    const payload: CreateDocumentPayload = {
+      name: name.trim(),
       type,
       owner,
-      updated: new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      version: "v1.0",
       visibility,
       status: "Under Review",
-      fileName: file.name,
-      fileUrl,
+      version: "v1.0",
+      fileName: file ? file.name : `${name.toLowerCase().replace(/\s+/g, "_")}.pdf`,
+      fileUrl: file ? URL.createObjectURL(file) : "/sample-docs/default.pdf",
+      fileSizeBytes: file ? file.size : 1024000,
     };
 
-    onSubmit(newDoc);
+    onSubmit(payload);
   };
 
   return (
@@ -844,7 +1060,6 @@ function UploadDocumentModal({
         onSubmit={handleSubmit}
         className="my-auto w-full max-w-lg rounded-xl bg-white p-6 shadow-xl"
       >
-
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-[#153e5b]">
@@ -861,28 +1076,27 @@ function UploadDocumentModal({
         </div>
 
         <div className="space-y-4">
-
           <div>
             <label className="mb-2 block text-xs font-medium text-slate-600">
-              Document Name
+              Document Name *
             </label>
             <input
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter document name"
-              className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none focus:border-[#267ba4]"
+              placeholder="e.g. Flood Zone Assessment Report 2025"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div>
             <label className="mb-2 block text-xs font-medium text-slate-600">
-              Document Type
+              Document Type *
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
             >
               <option>Operational Plan</option>
               <option>Schedule</option>
@@ -895,12 +1109,12 @@ function UploadDocumentModal({
 
           <div>
             <label className="mb-2 block text-xs font-medium text-slate-600">
-              Document Owner
+              Document Owner *
             </label>
             <select
               value={owner}
               onChange={(e) => setOwner(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
             >
               <option>Sara Khan</option>
               <option>Michael Torres</option>
@@ -910,12 +1124,12 @@ function UploadDocumentModal({
 
           <div>
             <label className="mb-2 block text-xs font-medium text-slate-600">
-              Visibility
+              Visibility *
             </label>
             <select
               value={visibility}
               onChange={(e) => setVisibility(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
             >
               <option>Internal</option>
               <option>Shared with NDA</option>
@@ -931,7 +1145,6 @@ function UploadDocumentModal({
             </label>
 
             <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#b9d0dc] bg-[#f7fafc] p-6 transition hover:border-[#267ba4]">
-
               {file ? (
                 <>
                   <FileCheck size={30} className="text-emerald-600" />
@@ -946,7 +1159,7 @@ function UploadDocumentModal({
                 <>
                   <Upload size={28} className="text-[#267ba4]" />
                   <p className="mt-2 text-xs font-medium text-[#153e5b]">
-                    Click to upload a file
+                    Click to select a file
                   </p>
                   <p className="mt-1 text-[10px] text-slate-400">
                     PDF, DOC, DOCX, XLS, XLSX
@@ -957,36 +1170,30 @@ function UploadDocumentModal({
               <input
                 type="file"
                 accept=".pdf,.doc,.docx,.xls,.xlsx"
-                required
                 className="hidden"
-                onChange={(e) =>
-                  setFile(e.target.files?.[0] ?? null)
-                }
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               />
             </label>
           </div>
-
         </div>
 
         <div className="mt-6 flex justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            disabled={!file}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2 text-xs font-medium text-white hover:bg-[#1c668a]"
           >
             <Upload size={14} />
             Upload Document
           </button>
         </div>
-
       </form>
     </div>
   );

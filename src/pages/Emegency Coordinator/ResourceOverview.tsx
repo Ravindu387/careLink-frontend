@@ -1,5 +1,4 @@
-
-import { useMemo, useState } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Search,
   Package,
@@ -11,81 +10,15 @@ import {
   Download,
   Plus,
   X,
+  RefreshCw,
+  RotateCcw,
+  Warehouse,
 } from "lucide-react";
-
-interface Resource {
-  id: number;
-  name: string;
-  category: string;
-  location: string;
-  available: number;
-  reserved: number;
-  availability: number;
-  status: string;
-}
-
-const initialResources: Resource[] = [
-  {
-    id: 1,
-    name: "Water - 10L",
-    category: "Food & Water",
-    location: "Central Depot",
-    available: 8420,
-    reserved: 3100,
-    availability: 68,
-    status: "Healthy",
-  },
-  {
-    id: 2,
-    name: "Family Food Packs",
-    category: "Food & Water",
-    location: "North Hub",
-    available: 1284,
-    reserved: 940,
-    availability: 42,
-    status: "Low Stock",
-  },
-  {
-    id: 3,
-    name: "Shelter Kits",
-    category: "Accommodation",
-    location: "Eastbank Store",
-    available: 342,
-    reserved: 218,
-    availability: 61,
-    status: "Healthy",
-  },
-  {
-    id: 4,
-    name: "Trauma Kits",
-    category: "Medical",
-    location: "Central Depot",
-    available: 86,
-    reserved: 64,
-    availability: 25,
-    status: "Critical",
-  },
-  {
-    id: 5,
-    name: "Emergency Blankets",
-    category: "Accommodation",
-    location: "North Hub",
-    available: 760,
-    reserved: 240,
-    availability: 75,
-    status: "Healthy",
-  },
-  {
-    id: 6,
-    name: "First Aid Kits",
-    category: "Medical",
-    location: "Eastbank Store",
-    available: 125,
-    reserved: 90,
-    availability: 35,
-    status: "Low Stock",
-  },
-];
+import {
+  resourceService,
+  type ResourceItem,
+  type ResourceMetrics,
+} from "../../services/resourceService";
 
 const statusStyles: Record<string, string> = {
   Healthy: "bg-emerald-100 text-emerald-700",
@@ -94,47 +27,68 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function ResourceOverview() {
-  const [resources] = useState(initialResources);
+  const [resources, setResources] = useState<ResourceItem[]>([]);
+  const [metrics, setMetrics] = useState<ResourceMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isLiveConnected, setIsLiveConnected] = useState(false);
+
   const [search, setSearch] = useState("");
   const [area, setArea] = useState("All operational areas");
   const [status, setStatus] = useState("All statuses");
   const [availability, setAvailability] = useState("Any availability");
   const [showFilters, setShowFilters] = useState(false);
-  const [selected, setSelected] = useState<Resource | null>(null);
+
+  const [selected, setSelected] = useState<ResourceItem | null>(null);
+
+  // Request Resource Modal
   const [showRequest, setShowRequest] = useState(false);
   const [requestName, setRequestName] = useState("");
   const [requestQty, setRequestQty] = useState("");
   const [requestLocation, setRequestLocation] = useState("Central Depot");
+  const [requestPriority, setRequestPriority] = useState<"Normal" | "High" | "Critical">("High");
+  const [requestNotes, setRequestNotes] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
-  const filteredResources = useMemo(() => {
-    return resources.filter((resource) => {
-      const matchesSearch =
-        `${resource.name} ${resource.category} ${resource.location}`
-          .toLowerCase()
-          .includes(search.toLowerCase());
+  const loadData = useCallback(async () => {
+    try {
+      const [items, met] = await Promise.all([
+        resourceService.getAll({
+          search: search || undefined,
+          area: area !== "All operational areas" ? area : undefined,
+          status: status !== "All statuses" ? status : undefined,
+          availability: availability !== "Any availability" ? availability : undefined,
+        }),
+        resourceService.getMetrics(),
+      ]);
+      setResources(items);
+      setMetrics(met);
+      setIsLiveConnected(true);
+    } catch {
+      setIsLiveConnected(false);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [search, area, status, availability]);
 
-      const matchesArea =
-        area === "All operational areas" ||
-        resource.location === area;
+  useEffect(() => {
+    loadData();
+    const timer = setInterval(loadData, 25000);
+    return () => clearInterval(timer);
+  }, [loadData]);
 
-      const matchesStatus =
-        status === "All statuses" ||
-        resource.status === status;
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadData();
+  };
 
-      const matchesAvailability =
-        availability === "Any availability" ||
-        (availability === "Above 60%" && resource.availability > 60) ||
-        (availability === "Below 60%" && resource.availability <= 60);
-
-      return (
-        matchesSearch &&
-        matchesArea &&
-        matchesStatus &&
-        matchesAvailability
-      );
-    });
-  }, [resources, search, area, status, availability]);
+  const handleResetData = async () => {
+    setRefreshing(true);
+    await resourceService.reset();
+    await loadData();
+  };
 
   const resetFilters = () => {
     setSearch("");
@@ -154,7 +108,7 @@ export default function ResourceOverview() {
       "Status",
     ];
 
-    const rows = filteredResources.map((r) => [
+    const rows = resources.map((r) => [
       r.name,
       r.category,
       r.location,
@@ -172,149 +126,231 @@ export default function ResourceOverview() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "resource-overview.csv";
+    link.download = `carelink-resources-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
-  const submitRequest = () => {
+  const submitRequest = async () => {
     if (!requestName || !requestQty || Number(requestQty) <= 0) {
-      setMessage("Please enter a resource and valid quantity.");
+      setMessage("Please enter a valid resource name and quantity.");
       return;
     }
 
-    setMessage("Resource request submitted successfully.");
-    setRequestName("");
-    setRequestQty("");
+    setIsSubmitting(true);
+    setMessage("");
 
-    setTimeout(() => {
-      setShowRequest(false);
-      setMessage("");
-    }, 1500);
+    try {
+      await resourceService.createRequest({
+        resourceName: requestName,
+        quantity: parseInt(requestQty, 10),
+        operationalArea: requestLocation,
+        priority: requestPriority,
+        notes: requestNotes || undefined,
+      });
+
+      setMessage("Resource request dispatched to warehouse.");
+      setRequestName("");
+      setRequestQty("");
+      setRequestNotes("");
+
+      // Refresh data to reflect updated counts
+      await loadData();
+
+      setTimeout(() => {
+        setShowRequest(false);
+        setMessage("");
+      }, 1400);
+    } catch (err: unknown) {
+      const error = err as Error;
+      setMessage(error.message || "Failed to submit request.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const activeMetrics = useMemo(() => {
+    return (
+      metrics ?? {
+        availabilityPercent: 68,
+        totalWarehouses: 12,
+        criticalShortages: 3,
+        criticalShortagesSummary: "Medical · transport",
+        activeDispatches: 27,
+        arrivingToday: 8,
+        pendingRequests: 43,
+        highPriorityRequests: 12,
+        lastUpdated: "",
+      }
+    );
+  }, [metrics]);
 
   return (
     <div className="min-h-screen bg-[#edf4f7] px-4 py-6 sm:px-6 lg:px-7">
-
       {/* Page heading */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-medium text-[#153f5e]">
-            Resource Overview
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-[#153f5e]">Resource Overview</h1>
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                isLiveConnected ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+              }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  isLiveConnected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                }`}
+              />
+              {isLiveConnected ? "Live Backend Synchronized" : "Local Cached"}
+            </span>
+          </div>
           <p className="mt-1 text-xs text-slate-500">
-            Monitor critical stock, reservations, dispatches, and cross-operation shortages.
+            Monitor critical stock, reservations, dispatches, and cross-operation shortages across all active hubs.
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleRefresh}
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 transition-colors"
+            title="Refresh inventory"
+          >
+            <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+            <span>Refresh</span>
+          </button>
+
+          <button
+            onClick={handleResetData}
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+            title="Reset to default seed fixtures"
+          >
+            <RotateCcw size={13} />
+            <span>Reset</span>
+          </button>
+
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b8d0df] bg-white px-4 py-2.5 text-xs text-[#175477] hover:bg-sky-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b8d0df] bg-white px-3.5 py-2 text-xs font-medium text-[#175477] hover:bg-sky-50 transition-colors"
           >
-            <Download size={15} />
-            Export
+            <Download size={14} />
+            <span>Export CSV</span>
           </button>
 
           <button
             onClick={() => setShowRequest(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#216789]"
+            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#153f5e] transition-colors"
           >
             <Plus size={15} />
-            Request resources
+            <span>Request Resources</span>
           </button>
         </div>
       </div>
 
-      {/* Summary cards */}
+      {/* Summary KPI Cards */}
       <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-
-        <div className="rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-sm">
+        {/* Availability */}
+        <div className="rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-xs">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-sky-100 p-3 text-sky-600">
-              <Package size={19} />
+              <Package size={20} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-500">
-                Resource availability
+              <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+                Resource Availability
               </p>
-              <h2 className="text-2xl font-semibold text-[#153f5e]">68%</h2>
-              <p className="text-[9px] text-slate-400">
-                Across 12 warehouses
+              <h2 className="text-2xl font-bold text-[#153f5e]">
+                {activeMetrics.availabilityPercent}%
+              </h2>
+              <p className="text-[10px] text-slate-400">
+                Across {activeMetrics.totalWarehouses} operational hubs
               </p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-sm">
+        {/* Critical Shortages */}
+        <div className="rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-xs">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-red-100 p-3 text-red-600">
-              <AlertTriangle size={19} />
+              <AlertTriangle size={20} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-500">
-                Critical shortages
+              <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+                Critical Shortages
               </p>
-              <h2 className="text-2xl font-semibold text-[#153f5e]">3</h2>
-              <p className="text-[9px] text-slate-400">
-                Medical · transport
+              <h2 className="text-2xl font-bold text-[#153f5e]">
+                {activeMetrics.criticalShortages}
+              </h2>
+              <p className="text-[10px] text-slate-400">
+                {activeMetrics.criticalShortagesSummary}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-sm">
+        {/* Active Dispatches */}
+        <div className="rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-xs">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-emerald-100 p-3 text-emerald-600">
-              <Truck size={19} />
+              <Truck size={20} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-500">
-                Active dispatches
+              <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+                Active Dispatches
               </p>
-              <h2 className="text-2xl font-semibold text-[#153f5e]">27</h2>
-              <p className="text-[9px] text-slate-400">
-                8 arriving today
+              <h2 className="text-2xl font-bold text-[#153f5e]">
+                {activeMetrics.activeDispatches}
+              </h2>
+              <p className="text-[10px] text-slate-400">
+                {activeMetrics.arrivingToday} arriving today
               </p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-sm">
+        {/* Pending Requests */}
+        <div className="rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-xs">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-amber-100 p-3 text-amber-600">
-              <Clock size={19} />
+              <Clock size={20} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-500">
-                Pending requests
+              <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+                Pending Requests
               </p>
-              <h2 className="text-2xl font-semibold text-[#153f5e]">43</h2>
-              <p className="text-[9px] text-slate-400">
-                12 high priority
+              <h2 className="text-2xl font-bold text-[#153f5e]">
+                {activeMetrics.pendingRequests}
+              </h2>
+              <p className="text-[10px] text-slate-400">
+                {activeMetrics.highPriorityRequests} urgent priority
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Search and filters */}
-      <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(200px,1fr)_repeat(3,minmax(130px,auto))_auto]">
-
-        <div className="flex items-center gap-2 rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5">
+      {/* Search and Filters Bar */}
+      <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_repeat(3,minmax(140px,auto))_auto]">
+        <div className="flex items-center gap-2 rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 shadow-2xs">
           <Search size={15} className="shrink-0 text-slate-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search resources..."
-            className="w-full min-w-0 bg-transparent text-[10px] outline-none placeholder:text-slate-400"
+            placeholder="Search items, categories, or hubs..."
+            className="w-full min-w-0 bg-transparent text-xs outline-none placeholder:text-slate-400"
           />
+          {search && (
+            <button onClick={() => setSearch("")} className="text-slate-400 hover:text-slate-600">
+              <X size={14} />
+            </button>
+          )}
         </div>
 
         <select
           value={area}
           onChange={(e) => setArea(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[10px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-xs text-slate-700 outline-none shadow-2xs"
         >
           <option>All operational areas</option>
           <option>Central Depot</option>
@@ -325,7 +361,7 @@ export default function ResourceOverview() {
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[10px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-xs text-slate-700 outline-none shadow-2xs"
         >
           <option>All statuses</option>
           <option>Healthy</option>
@@ -336,7 +372,7 @@ export default function ResourceOverview() {
         <select
           value={availability}
           onChange={(e) => setAvailability(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[10px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-xs text-slate-700 outline-none shadow-2xs"
         >
           <option>Any availability</option>
           <option>Above 60%</option>
@@ -345,40 +381,40 @@ export default function ResourceOverview() {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 rounded-lg border border-sky-600 bg-white px-3 py-2.5 text-[10px] font-medium text-sky-700 hover:bg-sky-50"
+          className="flex items-center justify-center gap-1.5 rounded-lg border border-[#287da5] bg-white px-3 py-2 text-xs font-semibold text-[#287da5] hover:bg-sky-50 shadow-2xs transition-colors"
         >
           <Filter size={13} />
-          More filters
+          <span>Filters</span>
         </button>
       </div>
 
       {showFilters && (
-        <div className="mb-3 flex items-center justify-between rounded-lg border border-[#d5e2e9] bg-white p-3">
-          <span className="text-[10px] text-slate-500">
-            Manage your resource filters.
+        <div className="mb-3 flex items-center justify-between rounded-lg border border-[#d5e2e9] bg-white p-3 shadow-2xs">
+          <span className="text-xs text-slate-500">
+            Active filters applied: {area !== "All operational areas" ? `Area: ${area} · ` : ""}
+            {status !== "All statuses" ? `Status: ${status} · ` : ""}
+            {availability !== "Any availability" ? `Availability: ${availability}` : "Showing all records"}
           </span>
           <button
             onClick={resetFilters}
-            className="text-[10px] font-semibold text-sky-700 hover:underline"
+            className="text-xs font-semibold text-[#287da5] hover:underline"
           >
             Clear all filters
           </button>
         </div>
       )}
 
-      {/* Resource inventory */}
-      <section className="overflow-hidden rounded-xl border border-[#d5e2e9] bg-white shadow-sm">
+      {/* Inventory Table */}
+      <section className="overflow-hidden rounded-xl border border-[#d5e2e9] bg-white shadow-xs">
         <div className="flex items-center justify-between border-b border-[#d5e2e9] px-4 py-3">
           <div>
-            <h2 className="text-sm font-medium text-[#153f5e]">
-              Resource inventory
-            </h2>
-            <p className="mt-1 text-[9px] text-slate-500">
-              Live operational records · Demonstration data
+            <h2 className="text-sm font-bold text-[#153f5e]">Resource Inventory</h2>
+            <p className="mt-0.5 text-[10px] text-slate-500">
+              Live operational records linked to central warehouses & field supply points
             </p>
           </div>
-          <span className="rounded-md bg-slate-100 px-2 py-1 text-[9px] text-slate-600">
-            {filteredResources.length} resources
+          <span className="rounded-md bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-slate-600">
+            {resources.length} resources
           </span>
         </div>
 
@@ -398,7 +434,7 @@ export default function ResourceOverview() {
                 ].map((heading, index) => (
                   <th
                     key={index}
-                    className="whitespace-nowrap px-3 py-3 text-[9px] font-semibold text-slate-500"
+                    className="whitespace-nowrap px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-500"
                   >
                     {heading}
                   </th>
@@ -406,194 +442,281 @@ export default function ResourceOverview() {
               </tr>
             </thead>
 
-            <tbody>
-              {filteredResources.map((resource) => (
-                <tr
-                  key={resource.id}
-                  onClick={() => setSelected(resource)}
-                  className="cursor-pointer border-b border-slate-100 transition hover:bg-[#f0f6f8]"
-                >
-                  <td className="whitespace-nowrap px-3 py-4 text-[10px] font-semibold text-[#153f5e]">
-                    {resource.name}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-[9px] text-slate-600">
-                    {resource.category}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-[9px] text-slate-600">
-                    {resource.location}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-[9px] text-slate-700">
-                    {resource.available.toLocaleString()}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4 text-[9px] text-slate-700">
-                    {resource.reserved.toLocaleString()}
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4">
-                    <span className="rounded-md bg-sky-100 px-2 py-1 text-[8px] font-semibold text-sky-700">
-                      {resource.availability}%
-                    </span>
-                  </td>
-
-                  <td className="whitespace-nowrap px-3 py-4">
-                    <span className={`rounded-md px-2 py-1 text-[8px] font-semibold ${statusStyles[resource.status]}`}>
-                      {resource.status}
-                    </span>
-                  </td>
-
-                  <td className="px-3 py-4">
-                    <ChevronRight size={15} className="text-slate-500" />
+            <tbody className="divide-y divide-slate-100">
+              {loading ? (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center text-xs text-slate-400">
+                    <RefreshCw size={20} className="mx-auto mb-2 animate-spin text-[#287da5]" />
+                    Loading inventory records...
                   </td>
                 </tr>
-              ))}
+              ) : resources.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center text-xs text-slate-400">
+                    No resources match the selected criteria.
+                  </td>
+                </tr>
+              ) : (
+                resources.map((resource) => (
+                  <tr
+                    key={resource.id}
+                    onClick={() => setSelected(resource)}
+                    className="cursor-pointer transition hover:bg-[#f0f6f8]"
+                  >
+                    <td className="whitespace-nowrap px-4 py-3.5 text-xs font-semibold text-[#153f5e]">
+                      {resource.name}
+                    </td>
+
+                    <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-600">
+                      {resource.category}
+                    </td>
+
+                    <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-600">
+                      {resource.location}
+                    </td>
+
+                    <td className="whitespace-nowrap px-4 py-3.5 text-xs font-medium text-slate-800">
+                      {resource.available.toLocaleString()} {resource.unit ?? "Units"}
+                    </td>
+
+                    <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-500">
+                      {resource.reserved.toLocaleString()}
+                    </td>
+
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-md bg-sky-100 px-2 py-0.5 text-[10px] font-bold text-sky-700">
+                          {resource.availability}%
+                        </span>
+                        <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100">
+                          <div
+                            className={`h-full ${
+                              resource.availability > 60
+                                ? "bg-emerald-500"
+                                : resource.availability >= 30
+                                ? "bg-amber-500"
+                                : "bg-red-500"
+                            }`}
+                            style={{ width: `${Math.min(100, resource.availability)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <span
+                        className={`rounded-md px-2.5 py-1 text-[10px] font-bold ${
+                          statusStyles[resource.status] ?? "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        {resource.status}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-3.5 text-right">
+                      <ChevronRight size={16} className="text-slate-400" />
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
-        {filteredResources.length === 0 && (
-          <div className="py-12 text-center text-xs text-slate-500">
-            No resources found.
-          </div>
-        )}
-
-        <div className="border-t border-slate-100 px-4 py-3">
-          <p className="text-[9px] text-slate-500">
-            Showing {filteredResources.length} resources
-          </p>
+        <div className="border-t border-slate-100 px-4 py-3 text-[10px] text-slate-400">
+          Showing {resources.length} resources across active hubs.
         </div>
       </section>
 
-      {/* Resource details modal */}
+      {/* Resource Details Modal */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
-
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-[#153f5e]">
-                Resource details
-              </h2>
-              <button onClick={() => setSelected(null)}>
-                <X size={19} className="text-slate-500" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Package size={22} className="text-[#287da5]" />
+                <h2 className="text-base font-bold text-[#153f5e]">Resource Details</h2>
+              </div>
+              <button
+                onClick={() => setSelected(null)}
+                className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                <X size={18} />
               </button>
             </div>
 
-            <div className="rounded-lg bg-slate-50 p-4">
-              <Package size={24} className="mb-3 text-sky-600" />
-              <h3 className="font-semibold text-[#153f5e]">
-                {selected.name}
-              </h3>
-              <p className="mt-1 text-xs text-slate-500">
-                {selected.category}
-              </p>
+            <div className="rounded-xl bg-[#edf4f7] p-4">
+              <h3 className="text-base font-bold text-[#153f5e]">{selected.name}</h3>
+              <p className="text-xs text-slate-500 mt-0.5">{selected.category}</p>
 
-              <div className="mt-4 space-y-3 text-xs">
-                <p className="flex justify-between">
-                  Location <span>{selected.location}</span>
-                </p>
-                <p className="flex justify-between">
-                  Available <span>{selected.available.toLocaleString()}</span>
-                </p>
-                <p className="flex justify-between">
-                  Reserved <span>{selected.reserved.toLocaleString()}</span>
-                </p>
-                <p className="flex justify-between">
-                  Availability <span>{selected.availability}%</span>
-                </p>
-                <p className="flex justify-between">
-                  Status
-                  <span className="font-semibold">{selected.status}</span>
-                </p>
+              <div className="mt-4 space-y-2.5 text-xs text-slate-700">
+                <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
+                  <span className="text-slate-500">Warehouse Location:</span>
+                  <span className="font-semibold text-slate-800">{selected.location}</span>
+                </div>
+                <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
+                  <span className="text-slate-500">Available Stock:</span>
+                  <span className="font-bold text-emerald-700">
+                    {selected.available.toLocaleString()} {selected.unit ?? "Units"}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
+                  <span className="text-slate-500">Reserved for Dispatches:</span>
+                  <span className="font-semibold text-slate-800">
+                    {selected.reserved.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
+                  <span className="text-slate-500">Availability Ratio:</span>
+                  <span className="font-bold text-sky-700">{selected.availability}%</span>
+                </div>
+                <div className="flex justify-between pt-1">
+                  <span className="text-slate-500">Inventory Status:</span>
+                  <span className={`rounded px-2 py-0.5 text-[10px] font-bold ${statusStyles[selected.status]}`}>
+                    {selected.status}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <button
-              onClick={() => {
-                setRequestName(selected.name);
-                setShowRequest(true);
-                setSelected(null);
-              }}
-              className="mt-4 w-full rounded-lg bg-[#153f5e] py-3 text-xs font-semibold text-white hover:bg-[#205879]"
-            >
-              Request this resource
-            </button>
+            <div className="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                className="rounded-lg bg-[#287da5] px-4 py-2 text-xs font-semibold text-white hover:bg-[#153f5e]"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Request resources modal */}
+      {/* Request Resources Modal */}
       {showRequest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
-
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-[#153f5e]">
-                  Request resources
-                </h2>
-                <p className="mt-1 text-[10px] text-slate-500">
-                  Create a new operational resource request.
-                </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Warehouse size={22} className="text-[#287da5]" />
+                <h2 className="text-base font-bold text-[#153f5e]">Request Emergency Resources</h2>
               </div>
-              <button onClick={() => setShowRequest(false)}>
-                <X size={19} className="text-slate-500" />
+              <button
+                onClick={() => {
+                  setShowRequest(false);
+                  setMessage("");
+                }}
+                className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                <X size={18} />
               </button>
             </div>
 
-            <div className="space-y-4">
+            {message && (
+              <div
+                className={`mb-3 rounded-lg p-3 text-xs ${
+                  message.includes("success") || message.includes("dispatched")
+                    ? "bg-emerald-50 text-emerald-800"
+                    : "bg-red-50 text-red-800"
+                }`}
+              >
+                {message}
+              </div>
+            )}
+
+            <div className="space-y-3.5">
               <div>
-                <label className="mb-1 block text-[10px] font-medium text-slate-600">
-                  Resource name
-                </label>
+                <label className="text-xs font-bold text-slate-700">Resource Name</label>
                 <input
+                  type="text"
                   value={requestName}
                   onChange={(e) => setRequestName(e.target.value)}
-                  placeholder="Enter resource name"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none focus:border-sky-500"
+                  placeholder="e.g. Clean Drinking Water 10L, Trauma Kits"
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700">Required Quantity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={requestQty}
+                    onChange={(e) => setRequestQty(e.target.value)}
+                    placeholder="e.g. 500"
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700">Destination Hub</label>
+                  <select
+                    value={requestLocation}
+                    onChange={(e) => setRequestLocation(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
+                  >
+                    <option>Central Depot</option>
+                    <option>North Hub</option>
+                    <option>Eastbank Store</option>
+                  </select>
+                </div>
+              </div>
+
               <div>
-                <label className="mb-1 block text-[10px] font-medium text-slate-600">
-                  Quantity required
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={requestQty}
-                  onChange={(e) => setRequestQty(e.target.value)}
-                  placeholder="Enter quantity"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none focus:border-sky-500"
+                <label className="text-xs font-bold text-slate-700">Priority Level</label>
+                <div className="mt-1 grid grid-cols-3 gap-2">
+                  {(["Normal", "High", "Critical"] as const).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setRequestPriority(p)}
+                      className={`rounded-lg border py-2 text-xs font-semibold transition-colors ${
+                        requestPriority === p
+                          ? p === "Critical"
+                            ? "border-red-500 bg-red-50 text-red-700"
+                            : p === "High"
+                            ? "border-amber-500 bg-amber-50 text-amber-700"
+                            : "border-sky-500 bg-sky-50 text-sky-700"
+                          : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700">Operational Notes</label>
+                <textarea
+                  rows={2}
+                  value={requestNotes}
+                  onChange={(e) => setRequestNotes(e.target.value)}
+                  placeholder="Optional mission justification or delivery instructions..."
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
                 />
               </div>
+            </div>
 
-              <div>
-                <label className="mb-1 block text-[10px] font-medium text-slate-600">
-                  Operational area
-                </label>
-                <select
-                  value={requestLocation}
-                  onChange={(e) => setRequestLocation(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none"
-                >
-                  <option>Central Depot</option>
-                  <option>North Hub</option>
-                  <option>Eastbank Store</option>
-                </select>
-              </div>
-
-              {message && (
-                <p className="text-xs text-emerald-600">{message}</p>
-              )}
-
+            <div className="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
               <button
-                onClick={submitRequest}
-                className="w-full rounded-lg bg-[#153f5e] py-3 text-xs font-semibold text-white hover:bg-[#205879]"
+                type="button"
+                onClick={() => {
+                  setShowRequest(false);
+                  setMessage("");
+                }}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
               >
-                Submit resource request
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={submitRequest}
+                className="rounded-lg bg-[#287da5] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#153f5e] transition-colors"
+              >
+                {isSubmitting ? "Submitting..." : "Submit Request"}
               </button>
             </div>
           </div>

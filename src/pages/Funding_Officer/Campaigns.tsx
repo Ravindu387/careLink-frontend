@@ -1,5 +1,4 @@
-
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import {
   Search,
@@ -15,18 +14,16 @@ import {
   Archive,
   CalendarDays,
   Target,
+  Loader2,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
-
-type Campaign = {
-  id: string;
-  name: string;
-  event: string;
-  period: string;
-  raised: number;
-  target: number;
-  status: "Active" | "Completed" | "Archived";
-  endDate: string;
-};
+import { campaignService } from "../../services/campaignService";
+import type {
+  Campaign,
+  CampaignSummary,
+} from "../../types/campaign";
 
 const initialCampaigns: Campaign[] = [
   {
@@ -75,12 +72,12 @@ const formatMoney = (amount: number) => {
   if (amount >= 1000000) {
     return `$${(amount / 1000000).toFixed(2)}M`;
   }
-
   return `$${(amount / 1000).toFixed(0)}K`;
 };
 
 export default function Campaigns() {
-  const [campaigns, setCampaigns] = useState(initialCampaigns);
+  const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
+  const [summary, setSummary] = useState<CampaignSummary | null>(null);
 
   const [search, setSearch] = useState("");
   const [crisisFilter, setCrisisFilter] = useState("All crisis events");
@@ -88,11 +85,20 @@ export default function Campaigns() {
   const [progressFilter, setProgressFilter] = useState("Any progress");
   const [dateFilter, setDateFilter] = useState("Date range");
 
+  const [minTargetInput, setMinTargetInput] = useState("");
+  const [maxTargetInput, setMaxTargetInput] = useState("");
+  const [appliedMinTarget, setAppliedMinTarget] = useState<number | undefined>(undefined);
+  const [appliedMaxTarget, setAppliedMaxTarget] = useState<number | undefined>(undefined);
+
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [newCampaign, setNewCampaign] = useState({
     name: "",
@@ -104,42 +110,68 @@ export default function Campaigns() {
 
   const notify = (message: string) => {
     setToast(message);
-    window.setTimeout(() => setToast(""), 3000);
+    window.setTimeout(() => setToast(""), 3500);
   };
 
+  // FETCH DATA
+  const fetchSummary = useCallback(async () => {
+    try {
+      const data = await campaignService.getCampaignSummary();
+      setSummary(data);
+    } catch {
+      // Fallback calculation from state
+      const active = campaigns.filter((c) => c.status === "Active");
+      const targetSum = active.reduce((acc, c) => acc + c.target, 0);
+      const raisedSum = active.reduce((acc, c) => acc + c.raised, 0);
+      const ending = active.filter((c) => {
+        const remaining = (new Date(c.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+        return remaining >= 0 && remaining <= 14;
+      }).length;
+      setSummary({ activeCampaigns: active.length, combinedTarget: targetSum, totalRaised: raisedSum, endingSoon: ending });
+    }
+  }, [campaigns]);
+
+  const fetchCampaigns = useCallback(async () => {
+    setLoading(true);
+    setErrorMessage("");
+    try {
+      const data = await campaignService.getAllCampaigns();
+      setCampaigns(data);
+    } catch {
+      setErrorMessage("Could not connect to campaigns service. Showing cached records.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCampaigns();
+    fetchSummary();
+  }, [fetchCampaigns, fetchSummary]);
+
   // CALCULATE DASHBOARD STATISTICS
+  const activeCampaigns = campaigns.filter((c) => c.status === "Active");
+  const combinedTarget = summary ? summary.combinedTarget : activeCampaigns.reduce((total, c) => total + c.target, 0);
+  const totalRaised = summary ? summary.totalRaised : activeCampaigns.reduce((total, c) => total + c.raised, 0);
+  const endingSoon = summary
+    ? summary.endingSoon
+    : activeCampaigns.filter((c) => {
+        const remaining = (new Date(c.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+        return remaining >= 0 && remaining <= 14;
+      }).length;
 
-  const activeCampaigns = campaigns.filter(
-    (c) => c.status === "Active"
-  );
-
-  const combinedTarget = activeCampaigns.reduce(
-    (total, c) => total + c.target,
-    0
-  );
-
-  const totalRaised = activeCampaigns.reduce(
-    (total, c) => total + c.raised,
-    0
-  );
-
-  const endingSoon = activeCampaigns.filter((c) => {
-    const remaining =
-      (new Date(c.endDate).getTime() - Date.now()) /
-      (1000 * 60 * 60 * 24);
-
-    return remaining >= 0 && remaining <= 14;
-  }).length;
+  // CRISIS EVENTS LIST
+  const crisisEvents = useMemo(() => {
+    const defaultEvents = ["Monsoon Floods 2025", "Other Emergencies"];
+    const existingEvents = Array.from(new Set(campaigns.map((c) => c.event).filter(Boolean)));
+    const merged = Array.from(new Set([...defaultEvents, ...existingEvents]));
+    return ["All crisis events", ...merged];
+  }, [campaigns]);
 
   // FILTER CAMPAIGNS
-
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((campaign) => {
-      const matchesSearch = (
-        campaign.name +
-        campaign.id +
-        campaign.event
-      )
+      const matchesSearch = (campaign.name + campaign.id + campaign.event)
         .toLowerCase()
         .includes(search.toLowerCase());
 
@@ -148,32 +180,34 @@ export default function Campaigns() {
         : campaign.status !== "Archived";
 
       const matchesCrisis =
-        crisisFilter === "All crisis events" ||
-        campaign.event === crisisFilter;
+        crisisFilter === "All crisis events" || campaign.event === crisisFilter;
 
       const matchesStatus =
-        statusFilter === "All statuses" ||
-        campaign.status === statusFilter;
+        statusFilter === "All statuses" || campaign.status === statusFilter;
 
       const percentage =
-        campaign.target > 0
-          ? (campaign.raised / campaign.target) * 100
-          : 0;
+        campaign.target > 0 ? (campaign.raised / campaign.target) * 100 : 0;
 
       const matchesProgress =
         progressFilter === "Any progress" ||
         (progressFilter === "Below 50%" && percentage < 50) ||
-        (progressFilter === "50% - 75%" &&
-          percentage >= 50 &&
-          percentage <= 75) ||
+        (progressFilter === "50% - 75%" && percentage >= 50 && percentage <= 75) ||
         (progressFilter === "Above 75%" && percentage > 75);
+
+      const matchesMin =
+        appliedMinTarget === undefined || campaign.target >= appliedMinTarget;
+
+      const matchesMax =
+        appliedMaxTarget === undefined || campaign.target <= appliedMaxTarget;
 
       return (
         matchesSearch &&
         matchesArchive &&
         matchesCrisis &&
         matchesStatus &&
-        matchesProgress
+        matchesProgress &&
+        matchesMin &&
+        matchesMax
       );
     });
   }, [
@@ -183,13 +217,12 @@ export default function Campaigns() {
     crisisFilter,
     statusFilter,
     progressFilter,
+    appliedMinTarget,
+    appliedMaxTarget,
   ]);
 
   // CREATE CAMPAIGN
-
-  const handleCreateCampaign = (
-    e: FormEvent<HTMLFormElement>
-  ) => {
+  const handleCreateCampaign = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (
@@ -213,120 +246,134 @@ export default function Campaigns() {
       return;
     }
 
-    const campaign: Campaign = {
-      id: `CAM-${Math.floor(100 + Math.random() * 900)}`,
-      name: newCampaign.name,
-      event: newCampaign.event,
-      period: `${new Date(newCampaign.startDate).toLocaleDateString(
-        "en-GB",
-        { day: "2-digit", month: "short" }
-      )}–${new Date(newCampaign.endDate).toLocaleDateString(
-        "en-GB",
-        { day: "2-digit", month: "short" }
-      )}`,
-      raised: 0,
-      target,
-      status: "Active",
-      endDate: newCampaign.endDate,
-    };
+    setIsSubmitting(true);
+    try {
+      const created = await campaignService.createCampaign({
+        name: newCampaign.name.trim(),
+        event: newCampaign.event.trim(),
+        target,
+        startDate: newCampaign.startDate,
+        endDate: newCampaign.endDate,
+      });
 
-    setCampaigns((previous) => [campaign, ...previous]);
-    setShowArchived(false);
-    setSearch("");
-    setCrisisFilter("All crisis events");
-    setStatusFilter("All statuses");
-    setProgressFilter("Any progress");
+      setCampaigns((previous) => [created, ...previous]);
+      setShowArchived(false);
+      setSearch("");
+      setCrisisFilter("All crisis events");
+      setStatusFilter("All statuses");
+      setProgressFilter("Any progress");
 
-    setNewCampaign({
-      name: "",
-      event: "Monsoon Floods 2025",
-      target: "",
-      startDate: "",
-      endDate: "",
-    });
+      setNewCampaign({
+        name: "",
+        event: "Monsoon Floods 2025",
+        target: "",
+        startDate: "",
+        endDate: "",
+      });
 
-    setShowCreateModal(false);
-    notify("Campaign created successfully.");
+      setShowCreateModal(false);
+      notify("Campaign created successfully.");
+      fetchSummary();
+    } catch {
+      notify("Failed to create campaign. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ARCHIVE CAMPAIGN
-
-  const archiveCampaign = (id: string) => {
-    setCampaigns((previous) =>
-      previous.map((campaign) =>
-        campaign.id === id
-          ? { ...campaign, status: "Archived" }
-          : campaign
-      )
-    );
-
-    setSelectedCampaign(null);
-    notify("Campaign archived successfully.");
+  const archiveCampaign = async (id: string) => {
+    try {
+      const updated = await campaignService.archiveCampaign(id);
+      setCampaigns((previous) =>
+        previous.map((c) => (c.id === id ? updated : c))
+      );
+      setSelectedCampaign(null);
+      notify("Campaign archived successfully.");
+      fetchSummary();
+    } catch {
+      notify("Failed to archive campaign.");
+    }
   };
 
   // RESTORE CAMPAIGN
-
-  const restoreCampaign = (id: string) => {
-    setCampaigns((previous) =>
-      previous.map((campaign) =>
-        campaign.id === id
-          ? { ...campaign, status: "Active" }
-          : campaign
-      )
-    );
-
-    setSelectedCampaign(null);
-    notify("Campaign restored successfully.");
+  const restoreCampaign = async (id: string) => {
+    try {
+      const updated = await campaignService.restoreCampaign(id);
+      setCampaigns((previous) =>
+        previous.map((c) => (c.id === id ? updated : c))
+      );
+      setSelectedCampaign(null);
+      notify("Campaign restored successfully.");
+      fetchSummary();
+    } catch {
+      notify("Failed to restore campaign.");
+    }
   };
 
   // VIEW CAMPAIGN DETAILS
-
   const viewCampaign = (campaign: Campaign) => {
     setSelectedCampaign(campaign);
   };
 
   return (
     <div className="w-full min-h-full bg-[#eef5f7] text-[#123e60] overflow-x-hidden">
-
       {/* MAIN CONTENT */}
-
       <main className="w-full max-w-[1600px] mx-auto px-4 sm:px-5 lg:px-8 py-4 pb-8">
-
         {/* BREADCRUMB */}
-
         <div className="flex items-center gap-2 text-[8px] mb-7">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={10} />
-          <span className="text-slate-500">
-            Funding & Donations
-          </span>
+          <span className="text-slate-500">Funding & Donations</span>
           <ChevronRight size={10} />
           <span className="font-semibold">Campaigns</span>
         </div>
 
+        {/* ERROR BANNER */}
+        {errorMessage && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-lg flex items-center justify-between text-xs animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <AlertCircle size={15} className="text-red-500 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              onClick={() => setErrorMessage("")}
+              className="text-red-400 hover:text-red-600"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
+
         {/* PAGE TITLE */}
-
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-
           <div>
-            <h1 className="text-[21px] font-medium">
-              Campaigns
-            </h1>
-
+            <h1 className="text-[21px] font-medium">Campaigns</h1>
             <p className="text-[9px] text-slate-500 mt-1">
-              Manage humanitarian appeals, targets, material needs,
-              allocation, and public reporting.
+              Manage humanitarian appeals, targets, material needs, allocation, and public reporting.
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                fetchCampaigns();
+                fetchSummary();
+              }}
+              disabled={loading}
+              title="Refresh campaigns"
+              className="h-[31px] px-2.5 bg-white border border-[#b5cbd8] rounded-lg text-[9px] text-[#23749e] flex items-center gap-1.5 hover:bg-slate-50 disabled:opacity-50 transition"
+            >
+              <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
 
             <button
               onClick={() => setShowArchived(!showArchived)}
-              className={`h-[31px] px-3 border rounded-lg text-[9px] flex items-center gap-2 ${
+              className={`h-[31px] px-3 border rounded-lg text-[9px] flex items-center gap-2 transition ${
                 showArchived
                   ? "bg-[#e4f0f5] border-[#23749e] text-[#23749e]"
-                  : "bg-white border-[#b5cbd8] text-[#23749e]"
+                  : "bg-white border-[#b5cbd8] text-[#23749e] hover:bg-slate-50"
               }`}
             >
               <Archive size={12} />
@@ -335,7 +382,7 @@ export default function Campaigns() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-[31px] px-3 bg-[#23749e] text-white rounded-lg text-[9px] font-semibold flex items-center gap-2 hover:bg-[#175c80]"
+              className="h-[31px] px-3 bg-[#23749e] text-white rounded-lg text-[9px] font-semibold flex items-center gap-2 hover:bg-[#175c80] transition"
             >
               <Plus size={13} />
               Create campaign
@@ -344,15 +391,13 @@ export default function Campaigns() {
         </div>
 
         {/* STATISTICS */}
-
         <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5 mb-3">
-
           <StatCard
             icon={<Megaphone size={16} />}
             iconColor="blue"
             title="Active campaigns"
-            value={activeCampaigns.length.toString()}
-            subtitle="4 above 70% target"
+            value={(summary ? summary.activeCampaigns : activeCampaigns.length).toString()}
+            subtitle="Current live appeals"
           />
 
           <StatCard
@@ -382,19 +427,15 @@ export default function Campaigns() {
             value={endingSoon.toString()}
             subtitle="Within 14 days"
           />
-
         </section>
 
         {/* SEARCH AND FILTERS */}
-
         <section className="flex flex-col lg:flex-row gap-2 mb-2.5">
-
           <div className="relative flex-1">
             <Search
               size={13}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
-
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -404,25 +445,16 @@ export default function Campaigns() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex gap-2">
-
             <FilterSelect
               value={crisisFilter}
               onChange={setCrisisFilter}
-              options={[
-                "All crisis events",
-                "Monsoon Floods 2025",
-                "Other Emergencies",
-              ]}
+              options={crisisEvents}
             />
 
             <FilterSelect
               value={statusFilter}
               onChange={setStatusFilter}
-              options={[
-                "All statuses",
-                "Active",
-                "Completed",
-              ]}
+              options={["All statuses", "Active", "Completed"]}
             />
 
             <FilterSelect
@@ -449,7 +481,9 @@ export default function Campaigns() {
 
             <button
               onClick={() => setShowMoreFilters(!showMoreFilters)}
-              className="h-[31px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[8px] flex items-center justify-center gap-1.5 hover:bg-slate-50 whitespace-nowrap"
+              className={`h-[31px] px-3 bg-white border rounded-lg text-[8px] flex items-center justify-center gap-1.5 hover:bg-slate-50 whitespace-nowrap transition ${
+                showMoreFilters ? "border-[#23749e] text-[#23749e]" : "border-[#b5cbd8]"
+              }`}
             >
               <Filter size={11} />
               More filters
@@ -458,18 +492,18 @@ export default function Campaigns() {
         </section>
 
         {/* ADDITIONAL FILTERS */}
-
         {showMoreFilters && (
-          <div className="bg-white border border-[#d5e3e9] rounded-lg p-3 mb-3 flex flex-wrap gap-4 items-end">
-
+          <div className="bg-white border border-[#d5e3e9] rounded-lg p-3 mb-3 flex flex-wrap gap-4 items-end animate-in fade-in">
             <div>
               <label className="block text-[8px] text-slate-500 mb-1">
                 Minimum target ($)
               </label>
               <input
                 type="number"
+                value={minTargetInput}
+                onChange={(e) => setMinTargetInput(e.target.value)}
                 placeholder="Minimum amount"
-                className="h-[30px] border border-[#d5e3e9] rounded-md px-2 text-[9px]"
+                className="h-[30px] border border-[#d5e3e9] rounded-md px-2 text-[9px] outline-none focus:border-[#39ae90]"
               />
             </div>
 
@@ -479,152 +513,159 @@ export default function Campaigns() {
               </label>
               <input
                 type="number"
+                value={maxTargetInput}
+                onChange={(e) => setMaxTargetInput(e.target.value)}
                 placeholder="Maximum amount"
-                className="h-[30px] border border-[#d5e3e9] rounded-md px-2 text-[9px]"
+                className="h-[30px] border border-[#d5e3e9] rounded-md px-2 text-[9px] outline-none focus:border-[#39ae90]"
               />
             </div>
 
-            <button
-              onClick={() => {
-                setShowMoreFilters(false);
-                notify("Additional filters applied.");
-              }}
-              className="bg-[#23749e] text-white rounded-md px-4 py-2 text-[9px]"
-            >
-              Apply filters
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setAppliedMinTarget(minTargetInput ? Number(minTargetInput) : undefined);
+                  setAppliedMaxTarget(maxTargetInput ? Number(maxTargetInput) : undefined);
+                  notify("Target filters applied.");
+                }}
+                className="bg-[#23749e] hover:bg-[#175c80] text-white rounded-md px-4 py-2 text-[9px] transition"
+              >
+                Apply filters
+              </button>
+
+              <button
+                onClick={() => {
+                  setMinTargetInput("");
+                  setMaxTargetInput("");
+                  setAppliedMinTarget(undefined);
+                  setAppliedMaxTarget(undefined);
+                  notify("Target filters reset.");
+                }}
+                className="bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md px-3 py-2 text-[9px] transition"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* LOADING INDICATOR */}
+        {loading && (
+          <div className="flex items-center justify-center py-16 text-slate-400 gap-2">
+            <Loader2 size={18} className="animate-spin text-[#23749e]" />
+            <span className="text-xs">Loading campaign data...</span>
           </div>
         )}
 
         {/* CAMPAIGN CARDS */}
+        {!loading && (
+          <section className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">
+            {filteredCampaigns.map((campaign) => {
+              const percentage =
+                campaign.target > 0
+                  ? (campaign.raised / campaign.target) * 100
+                  : 0;
 
-        <section className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">
-
-          {filteredCampaigns.map((campaign) => {
-            const percentage =
-              campaign.target > 0
-                ? (campaign.raised / campaign.target) * 100
-                : 0;
-
-            return (
-              <article
-                key={campaign.id}
-                className="bg-white border border-[#d5e3e9] rounded-lg shadow-sm p-3.5 hover:shadow-md transition-shadow"
-              >
-
-                {/* CARD TOP */}
-
-                <div className="flex items-center justify-between mb-2.5">
-
-                  <span
-                    className={`px-2 py-1 rounded text-[7px] font-semibold ${
-                      campaign.status === "Active"
-                        ? "bg-[#e4f6f0] text-[#159b79]"
-                        : campaign.status === "Completed"
-                        ? "bg-[#e8f1f6] text-[#23749e]"
-                        : "bg-[#f0f1f3] text-slate-500"
-                    }`}
-                  >
-                    {campaign.status}
-                  </span>
-
-                  <span className="text-[7px] text-slate-400">
-                    {campaign.id}
-                  </span>
-                </div>
-
-                {/* CAMPAIGN DETAILS */}
-
-                <h2 className="text-[11px] font-medium mb-1">
-                  {campaign.name}
-                </h2>
-
-                <p className="text-[8px] text-slate-400 mb-3">
-                  {campaign.event} · {campaign.period}
-                </p>
-
-                {/* AMOUNT AND TARGET */}
-
-                <div className="flex items-center justify-between text-[8px] mb-2">
-
-                  <span>
-                    <strong>{formatMoney(campaign.raised)}</strong>
-                    <span className="text-slate-500 ml-1">
-                      raised
-                    </span>
-                  </span>
-
-                  <span>
-                    Target{" "}
-                    <strong>{formatMoney(campaign.target)}</strong>
-                  </span>
-                </div>
-
-                {/* PROGRESS BAR */}
-
-                <div className="w-full h-[6px] bg-[#e8eef1] rounded-full overflow-hidden">
-
-                  <div
-                    className="h-full bg-[#62b9a0] rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.min(percentage, 100)}%`,
-                    }}
-                  />
-                </div>
-
-                {/* CARD BOTTOM */}
-
-                <div className="flex items-center justify-between mt-2.5">
-
-                  <span className="text-[8px] font-semibold">
-                    {percentage.toFixed(1)}% funded
-                  </span>
-
-                  <div className="flex items-center gap-2">
-
-                    {campaign.status === "Archived" && (
-                      <button
-                        onClick={() => restoreCampaign(campaign.id)}
-                        className="text-[8px] text-[#159b79]"
-                      >
-                        Restore
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => viewCampaign(campaign)}
-                      className="text-[8px] text-[#23749e] flex items-center gap-1 hover:underline"
+              return (
+                <article
+                  key={campaign.id}
+                  className="bg-white border border-[#d5e3e9] rounded-lg shadow-sm p-3.5 hover:shadow-md transition-shadow"
+                >
+                  {/* CARD TOP */}
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span
+                      className={`px-2 py-1 rounded text-[7px] font-semibold ${
+                        campaign.status === "Active"
+                          ? "bg-[#e4f6f0] text-[#159b79]"
+                          : campaign.status === "Completed"
+                          ? "bg-[#e8f1f6] text-[#23749e]"
+                          : "bg-[#f0f1f3] text-slate-500"
+                      }`}
                     >
-                      View campaign
-                      <ChevronRight size={12} />
-                    </button>
+                      {campaign.status}
+                    </span>
+
+                    <span className="text-[7px] text-slate-400">
+                      {campaign.id}
+                    </span>
                   </div>
-                </div>
 
-              </article>
-            );
-          })}
+                  {/* CAMPAIGN DETAILS */}
+                  <h2 className="text-[11px] font-medium mb-1">
+                    {campaign.name}
+                  </h2>
 
-        </section>
+                  <p className="text-[8px] text-slate-400 mb-3">
+                    {campaign.event} · {campaign.period}
+                  </p>
+
+                  {/* AMOUNT AND TARGET */}
+                  <div className="flex items-center justify-between text-[8px] mb-2">
+                    <span>
+                      <strong>{formatMoney(campaign.raised)}</strong>
+                      <span className="text-slate-500 ml-1">raised</span>
+                    </span>
+
+                    <span>
+                      Target <strong>{formatMoney(campaign.target)}</strong>
+                    </span>
+                  </div>
+
+                  {/* PROGRESS BAR */}
+                  <div className="w-full h-[6px] bg-[#e8eef1] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#62b9a0] rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.min(percentage, 100)}%`,
+                      }}
+                    />
+                  </div>
+
+                  {/* CARD BOTTOM */}
+                  <div className="flex items-center justify-between mt-2.5">
+                    <span className="text-[8px] font-semibold">
+                      {percentage.toFixed(1)}% funded
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                      {campaign.status === "Archived" ? (
+                        <button
+                          onClick={() => restoreCampaign(campaign.id)}
+                          className="text-[8px] text-[#159b79] hover:underline"
+                        >
+                          Restore
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => archiveCampaign(campaign.id)}
+                          className="text-[8px] text-slate-400 hover:text-amber-600 transition"
+                        >
+                          Archive
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => viewCampaign(campaign)}
+                        className="text-[8px] text-[#23749e] flex items-center gap-1 hover:underline"
+                      >
+                        View campaign
+                        <ChevronRight size={12} />
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+        )}
 
         {/* EMPTY STATE */}
-
-        {filteredCampaigns.length === 0 && (
+        {!loading && filteredCampaigns.length === 0 && (
           <div className="bg-white border border-[#d5e3e9] rounded-lg py-16 text-center mt-3">
-
-            <Search
-              size={25}
-              className="mx-auto text-slate-300 mb-3"
-            />
-
-            <h3 className="text-[12px] font-medium">
-              No campaigns found
-            </h3>
-
+            <Search size={25} className="mx-auto text-slate-300 mb-3" />
+            <h3 className="text-[12px] font-medium">No campaigns found</h3>
             <p className="text-[9px] text-slate-400 mt-1">
               Try changing your search or filter settings.
             </p>
-
             <button
               onClick={() => {
                 setSearch("");
@@ -632,33 +673,29 @@ export default function Campaigns() {
                 setStatusFilter("All statuses");
                 setProgressFilter("Any progress");
                 setShowArchived(false);
+                setAppliedMinTarget(undefined);
+                setAppliedMaxTarget(undefined);
+                setMinTargetInput("");
+                setMaxTargetInput("");
               }}
-              className="text-[#23749e] text-[9px] mt-3"
+              className="text-[#23749e] text-[9px] mt-3 hover:underline"
             >
               Clear filters
             </button>
           </div>
         )}
-
       </main>
 
       {/* CREATE CAMPAIGN MODAL */}
-
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-[#102d42]/40 flex items-center justify-center p-4">
-
+        <div className="fixed inset-0 z-50 bg-[#102d42]/40 flex items-center justify-center p-4 animate-in fade-in">
           <form
             onSubmit={handleCreateCampaign}
-            className="bg-white rounded-xl shadow-xl w-full max-w-[440px] p-5"
+            className="bg-white rounded-xl shadow-xl w-full max-w-[440px] p-5 animate-in zoom-in-95"
           >
-
             <div className="flex items-center justify-between mb-5">
-
               <div>
-                <h2 className="text-[16px] font-semibold">
-                  Create campaign
-                </h2>
-
+                <h2 className="text-[16px] font-semibold">Create campaign</h2>
                 <p className="text-[9px] text-slate-400 mt-1">
                   Create a new humanitarian fundraising appeal.
                 </p>
@@ -674,7 +711,6 @@ export default function Campaigns() {
             </div>
 
             <div className="space-y-3">
-
               <FormField label="Campaign name">
                 <input
                   required
@@ -686,7 +722,7 @@ export default function Campaigns() {
                     })
                   }
                   placeholder="Enter campaign name"
-                  className="campaign-input"
+                  className="w-full h-8 px-2.5 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
                 />
               </FormField>
 
@@ -699,7 +735,7 @@ export default function Campaigns() {
                       event: e.target.value,
                     })
                   }
-                  className="campaign-input"
+                  className="w-full h-8 px-2 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
                 >
                   <option>Monsoon Floods 2025</option>
                   <option>Other Emergencies</option>
@@ -719,12 +755,11 @@ export default function Campaigns() {
                     })
                   }
                   placeholder="e.g. 500000"
-                  className="campaign-input"
+                  className="w-full h-8 px-2.5 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
                 />
               </FormField>
 
               <div className="grid grid-cols-2 gap-3">
-
                 <FormField label="Start date">
                   <input
                     type="date"
@@ -736,7 +771,7 @@ export default function Campaigns() {
                         startDate: e.target.value,
                       })
                     }
-                    className="campaign-input"
+                    className="w-full h-8 px-2 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
                   />
                 </FormField>
 
@@ -752,49 +787,50 @@ export default function Campaigns() {
                         endDate: e.target.value,
                       })
                     }
-                    className="campaign-input"
+                    className="w-full h-8 px-2 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
                   />
                 </FormField>
-
               </div>
             </div>
 
             <div className="flex justify-end gap-2 mt-6">
-
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px]"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px] hover:bg-slate-50 transition"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold hover:bg-[#175c80]"
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-[#23749e] hover:bg-[#175c80] text-white rounded-lg text-[10px] font-semibold flex items-center gap-1.5 transition disabled:opacity-60"
               >
-                Create campaign
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={13} className="animate-spin" />
+                    <span>Creating...</span>
+                  </>
+                ) : (
+                  <span>Create campaign</span>
+                )}
               </button>
             </div>
-
           </form>
         </div>
       )}
 
       {/* CAMPAIGN DETAILS MODAL */}
-
       {selectedCampaign && (
-        <div className="fixed inset-0 z-50 bg-[#102d42]/40 flex items-center justify-center p-4">
-
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-[430px] p-5">
-
+        <div className="fixed inset-0 z-50 bg-[#102d42]/40 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-[430px] p-5 animate-in zoom-in-95">
             <div className="flex justify-between items-start">
-
               <div>
                 <span className="text-[8px] text-[#23749e] font-semibold">
                   {selectedCampaign.id}
                 </span>
-
                 <h2 className="text-[17px] font-semibold mt-1">
                   {selectedCampaign.name}
                 </h2>
@@ -802,14 +838,13 @@ export default function Campaigns() {
 
               <button
                 onClick={() => setSelectedCampaign(null)}
-                className="text-slate-400"
+                className="text-slate-400 hover:text-slate-600"
               >
                 <X size={18} />
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-5">
-
               <DetailItem
                 label="Amount raised"
                 value={formatMoney(selectedCampaign.raised)}
@@ -833,18 +868,14 @@ export default function Campaigns() {
                 value={selectedCampaign.period}
                 icon={<CalendarDays size={15} />}
               />
-
             </div>
 
             <div className="mt-5">
-
               <div className="flex justify-between text-[9px] mb-2">
                 <span>Funding progress</span>
-
                 <strong>
                   {(
-                    (selectedCampaign.raised /
-                      selectedCampaign.target) *
+                    (selectedCampaign.raised / (selectedCampaign.target || 1)) *
                     100
                   ).toFixed(1)}%
                 </strong>
@@ -856,7 +887,7 @@ export default function Campaigns() {
                   style={{
                     width: `${Math.min(
                       (selectedCampaign.raised /
-                        selectedCampaign.target) *
+                        (selectedCampaign.target || 1)) *
                         100,
                       100
                     )}%`,
@@ -866,22 +897,17 @@ export default function Campaigns() {
             </div>
 
             <div className="flex justify-between mt-6 gap-2">
-
               {selectedCampaign.status === "Archived" ? (
                 <button
-                  onClick={() =>
-                    restoreCampaign(selectedCampaign.id)
-                  }
-                  className="px-4 py-2 bg-[#e4f6f0] text-[#159b79] rounded-lg text-[9px]"
+                  onClick={() => restoreCampaign(selectedCampaign.id)}
+                  className="px-4 py-2 bg-[#e4f6f0] hover:bg-[#d5f0e7] text-[#159b79] rounded-lg text-[9px] font-semibold transition"
                 >
                   Restore campaign
                 </button>
               ) : (
                 <button
-                  onClick={() =>
-                    archiveCampaign(selectedCampaign.id)
-                  }
-                  className="px-4 py-2 bg-[#fff3dd] text-[#bd7b17] rounded-lg text-[9px]"
+                  onClick={() => archiveCampaign(selectedCampaign.id)}
+                  className="px-4 py-2 bg-[#fff3dd] hover:bg-[#ffe9c2] text-[#bd7b17] rounded-lg text-[9px] font-semibold transition"
                 >
                   Archive campaign
                 </button>
@@ -889,7 +915,7 @@ export default function Campaigns() {
 
               <button
                 onClick={() => setSelectedCampaign(null)}
-                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[9px]"
+                className="px-4 py-2 bg-[#23749e] hover:bg-[#175c80] text-white rounded-lg text-[9px] font-semibold transition"
               >
                 Close
               </button>
@@ -899,17 +925,15 @@ export default function Campaigns() {
       )}
 
       {/* TOAST */}
-
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-[10px] flex items-center gap-3">
-          {toast}
-
+        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-[10px] flex items-center gap-3 animate-in fade-in">
+          <CheckCircle2 size={14} className="text-[#62b9a0]" />
+          <span>{toast}</span>
           <button onClick={() => setToast("")}>
             <X size={13} />
           </button>
         </div>
       )}
-
     </div>
   );
 }
@@ -939,23 +963,16 @@ function StatCard({
 
   return (
     <div className="bg-white border border-[#d5e3e9] rounded-lg shadow-sm p-3 flex items-center gap-3 min-h-[64px]">
-
-      <div className={`w-[30px] h-[30px] rounded-lg flex items-center justify-center shrink-0 ${colors[iconColor]}`}>
+      <div
+        className={`w-[30px] h-[30px] rounded-lg flex items-center justify-center shrink-0 ${colors[iconColor]}`}
+      >
         {icon}
       </div>
 
       <div className="min-w-0">
-        <p className="text-[7px] text-slate-400">
-          {title}
-        </p>
-
-        <h3 className="text-[18px] font-bold leading-5">
-          {value}
-        </h3>
-
-        <p className="text-[7px] text-slate-400 mt-0.5">
-          {subtitle}
-        </p>
+        <p className="text-[7px] text-slate-400">{title}</p>
+        <h3 className="text-[18px] font-bold leading-5">{value}</h3>
+        <p className="text-[7px] text-slate-400 mt-0.5">{subtitle}</p>
       </div>
     </div>
   );
@@ -982,13 +999,13 @@ function FilterSelect({
         className="appearance-none w-full lg:w-[105px] h-[31px] bg-white border border-[#d5e3e9] rounded-lg pl-2 pr-6 text-[8px] outline-none focus:border-[#39ae90] cursor-pointer"
       >
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
 
       <ChevronDown
         size={11}
-        className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
+        className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
       />
     </div>
   );
@@ -1007,10 +1024,7 @@ function FormField({
 }) {
   return (
     <label className="block">
-      <span className="block text-[9px] font-medium mb-1.5">
-        {label}
-      </span>
-
+      <span className="block text-[9px] font-medium mb-1.5">{label}</span>
       {children}
     </label>
   );
@@ -1033,14 +1047,10 @@ function DetailItem({
     <div className="bg-[#f5f8f9] rounded-lg p-3">
       <div className="flex items-center gap-2 text-[#23749e] mb-2">
         {icon}
-        <span className="text-[8px] text-slate-500">
-          {label}
-        </span>
+        <span className="text-[8px] text-slate-500">{label}</span>
       </div>
 
-      <p className="text-[10px] font-semibold break-words">
-        {value}
-      </p>
+      <p className="text-[10px] font-semibold break-words">{value}</p>
     </div>
   );
 }

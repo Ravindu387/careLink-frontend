@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
+import { notificationService } from "../../services/notificationService";
 
 interface TopbarProps {
   onMenuClick: () => void;
@@ -23,6 +24,25 @@ const PartnerOfficerTopbar = ({
   const [languageOpen, setLanguageOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [language, setLanguage] = useState("English");
+  const [unreadCount, setUnreadCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchUnread = async () => {
+      try {
+        const metrics = await notificationService.getMetrics("partner");
+        if (isMounted) {
+          setUnreadCount(metrics.unread);
+        }
+      } catch {
+        // Fallback default
+      }
+    };
+    fetchUnread();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-30 flex h-[66px] items-center justify-between border-b border-[#d7e5eb] bg-white px-4 md:px-6">
@@ -106,14 +126,17 @@ const PartnerOfficerTopbar = ({
 
         {/* Notifications */}
         <Link
-          to="/partner/notifications"
+          to="/partner-officer/partner/notifications"
           className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-[#d7e5eb] text-[#496c82] hover:bg-slate-50"
+          title="Notifications"
         >
           <Bell size={18} />
 
-          <span className="absolute -right-1 -top-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-[#e84c59] px-1 text-[8px] font-bold text-white">
-            9
-          </span>
+          {(unreadCount ?? 4) > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-[#e84c59] px-1 text-[8px] font-bold text-white">
+              {unreadCount ?? 4}
+            </span>
+          )}
         </Link>
 
         {/* User profile */}

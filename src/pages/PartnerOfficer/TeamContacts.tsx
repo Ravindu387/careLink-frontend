@@ -1,5 +1,4 @@
-
-import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
   BriefcaseBusiness,
   Clock,
@@ -11,93 +10,43 @@ import {
   Filter,
   ChevronRight,
   X,
+  RefreshCw,
+  Trash2,
+  CheckCircle2,
+  Archive,
+  RotateCcw,
 } from "lucide-react";
-
-type TeamMember = {
-  id: string;
-  name: string;
-  role: string;
-  sector: string;
-  area: string;
-  contact: string;
-  email: string;
-  lastActive: string;
-  status: string;
-};
-
-const initialMembers: TeamMember[] = [
-  {
-    id: "USR-0142",
-    name: "Sara Khan",
-    role: "Partner Officer",
-    sector: "Coordination",
-    area: "Greater Riverton",
-    contact: "+94 77 412 8014",
-    email: "sara.khan@example.org",
-    lastActive: "Online",
-    status: "Active",
-  },
-  {
-    id: "USR-0188",
-    name: "Michael Torres",
-    role: "Programme Manager",
-    sector: "Food Security",
-    area: "Central · North",
-    contact: "+94 77 412 8042",
-    email: "michael.torres@example.org",
-    lastActive: "18 min ago",
-    status: "Active",
-  },
-  {
-    id: "USR-0241",
-    name: "Nafisa Silva",
-    role: "Field Team Lead",
-    sector: "WASH",
-    area: "North Ward",
-    contact: "+94 77 412 8098",
-    email: "nafisa.silva@example.org",
-    lastActive: "6 min ago",
-    status: "Active",
-  },
-  {
-    id: "USR-0284",
-    name: "Ayo Mensah",
-    role: "Protection Officer",
-    sector: "Protection",
-    area: "All districts",
-    contact: "+94 77 412 8063",
-    email: "ayo.mensah@example.org",
-    lastActive: "42 min ago",
-    status: "Active",
-  },
-  {
-    id: "USR-0301",
-    name: "Daniel Perera",
-    role: "Logistics Officer",
-    sector: "Logistics",
-    area: "Eastbank",
-    contact: "+94 77 412 8011",
-    email: "daniel.perera@example.org",
-    lastActive: "Yesterday",
-    status: "Needs Review",
-  },
-  {
-    id: "USR-0315",
-    name: "Amara Fernando",
-    role: "Health Coordinator",
-    sector: "Health",
-    area: "South Ward",
-    contact: "+94 77 412 8055",
-    email: "amara.fernando@example.org",
-    lastActive: "2 hours ago",
-    status: "Active",
-  },
-];
+import {
+  teamContactService,
+  initialTeamMembers,
+  type TeamMember,
+  type TeamContactsMetrics,
+  type CreateTeamMemberPayload,
+} from "../../services/teamContactService";
 
 const tabs = ["All", "Needs action", "Active", "Completed", "Archived"];
 
 const TeamContacts = () => {
-  const [members, setMembers] = useState(initialMembers);
+  const [members, setMembers] = useState<TeamMember[]>(initialTeamMembers);
+  const [metrics, setMetrics] = useState<TeamContactsMetrics>({
+    activeRecords: 48,
+    activeRecordsSubtitle: "Organisation-scoped",
+    needsReview: 3,
+    needsReviewSubtitle: "Assigned to your team",
+    verified: "96%",
+    verifiedSubtitle: "Current assurance",
+    dueSoon: 2,
+    dueSoonSubtitle: "Within 30 days",
+    totalCount: 48,
+    needsActionCount: 7,
+    activeCount: 48,
+    completedCount: 0,
+    archivedCount: 0,
+  });
+
+  const [isLive, setIsLive] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState("All");
   const [search, setSearch] = useState("");
@@ -108,11 +57,64 @@ const TeamContacts = () => {
 
   const [showFilters, setShowFilters] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [selectedMember, setSelectedMember] =
-    useState<TeamMember | null>(null);
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 4;
+
+  const loadData = async () => {
+    setIsSyncing(true);
+    try {
+      const [membersRes, metricsRes] = await Promise.all([
+        teamContactService.getAll(),
+        teamContactService.getMetrics(),
+      ]);
+      setMembers(membersRes.data);
+      setMetrics(metricsRes.data);
+      setIsLive(membersRes.isLive && metricsRes.isLive);
+    } catch {
+      setIsLive(false);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [membersRes, metricsRes] = await Promise.all([
+          teamContactService.getAll(),
+          teamContactService.getMetrics(),
+        ]);
+        if (isMounted) {
+          setMembers(membersRes.data);
+          setMetrics(metricsRes.data);
+          setIsLive(membersRes.isLive && metricsRes.isLive);
+        }
+      } catch {
+        if (isMounted) {
+          setIsLive(false);
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleSync = async () => {
+    await loadData();
+    showToast("Team contacts synced with backend");
+  };
+
+  const showToast = (msg: string) => {
+    setActionMessage(msg);
+    setTimeout(() => {
+      setActionMessage(null);
+    }, 3500);
+  };
 
   // Search and filtering
   const filteredMembers = useMemo(() => {
@@ -124,6 +126,8 @@ const TeamContacts = () => {
         member.sector,
         member.area,
         member.contact,
+        member.email,
+        member.description || "",
       ]
         .join(" ")
         .toLowerCase();
@@ -133,7 +137,7 @@ const TeamContacts = () => {
       const matchesTab =
         activeTab === "All" ||
         (activeTab === "Needs action" &&
-          member.status === "Needs Review") ||
+          (member.status === "Needs Review" || member.status === "Needs Action")) ||
         (activeTab === "Active" && member.status === "Active") ||
         (activeTab === "Completed" && member.status === "Completed") ||
         (activeTab === "Archived" && member.status === "Archived");
@@ -142,12 +146,9 @@ const TeamContacts = () => {
         matchesSearch &&
         matchesTab &&
         (roleFilter === "All roles" || member.role === roleFilter) &&
-        (sectorFilter === "All sectors" ||
-          member.sector === sectorFilter) &&
-        (locationFilter === "All locations" ||
-          member.area.includes(locationFilter)) &&
-        (statusFilter === "All statuses" ||
-          member.status === statusFilter)
+        (sectorFilter === "All sectors" || member.sector === sectorFilter) &&
+        (locationFilter === "All locations" || member.area.includes(locationFilter)) &&
+        (statusFilter === "All statuses" || member.status === statusFilter)
       );
     });
   }, [
@@ -161,10 +162,7 @@ const TeamContacts = () => {
   ]);
 
   // Pagination
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredMembers.length / pageSize)
-  );
+  const totalPages = Math.max(1, Math.ceil(filteredMembers.length / pageSize));
 
   const displayedMembers = filteredMembers.slice(
     (currentPage - 1) * pageSize,
@@ -183,6 +181,7 @@ const TeamContacts = () => {
       "Email",
       "Last Active",
       "Status",
+      "Description",
     ];
 
     const rows = filteredMembers.map((member) => [
@@ -195,13 +194,12 @@ const TeamContacts = () => {
       member.email,
       member.lastActive,
       member.status,
+      member.description || "",
     ]);
 
     const csv = [headers, ...rows]
       .map((row) =>
-        row.map((value) =>
-          `"${String(value).replace(/"/g, '""')}"`
-        ).join(",")
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")
       )
       .join("\n");
 
@@ -213,15 +211,16 @@ const TeamContacts = () => {
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = "team-contacts.csv";
+    link.download = `carelink-team-contacts-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
 
     URL.revokeObjectURL(url);
   };
 
   // Invite new member
-  const handleInvite = (member: TeamMember) => {
-    setMembers((prev) => [member, ...prev]);
+  const handleInvite = async (payload: CreateTeamMemberPayload) => {
+    const result = await teamContactService.create(payload);
+    setMembers((prev) => [result.data, ...prev.filter((m) => m.id !== result.data.id)]);
     setActiveTab("All");
     setSearch("");
     setRoleFilter("All roles");
@@ -230,6 +229,43 @@ const TeamContacts = () => {
     setStatusFilter("All statuses");
     setCurrentPage(1);
     setShowInviteModal(false);
+    showToast(`Team member ${result.data.name} invited (${result.data.id})`);
+    const metricsRes = await teamContactService.getMetrics();
+    setMetrics(metricsRes.data);
+  };
+
+  // Update status
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    const result = await teamContactService.updateStatus(id, newStatus);
+    setMembers((prev) => prev.map((m) => (m.id === id ? result.data : m)));
+    if (selectedMember?.id === id) {
+      setSelectedMember(result.data);
+    }
+    showToast(`Status updated to ${newStatus}`);
+    const metricsRes = await teamContactService.getMetrics();
+    setMetrics(metricsRes.data);
+  };
+
+  // Delete member
+  const handleDeleteMember = async (id: string) => {
+    if (window.confirm(`Are you sure you want to remove team member ${id}?`)) {
+      await teamContactService.delete(id);
+      setMembers((prev) => prev.filter((m) => m.id !== id));
+      setSelectedMember(null);
+      showToast(`Team member ${id} removed`);
+      const metricsRes = await teamContactService.getMetrics();
+      setMetrics(metricsRes.data);
+    }
+  };
+
+  // Reset to seeds
+  const handleResetDefaults = async () => {
+    if (window.confirm("Reset all team contacts to standard seed defaults?")) {
+      await teamContactService.reset();
+      await loadData();
+      resetFilters();
+      showToast("Team contacts reset to defaults");
+    }
   };
 
   // Reset filters
@@ -243,12 +279,39 @@ const TeamContacts = () => {
     setCurrentPage(1);
   };
 
+  // Dynamic tab count helper
+  const getTabCount = (tab: string): number => {
+    switch (tab) {
+      case "All":
+        return metrics.totalCount || members.length;
+      case "Needs action":
+        return (
+          metrics.needsActionCount ||
+          members.filter((m) => m.status === "Needs Review" || m.status === "Needs Action").length
+        );
+      case "Active":
+        return metrics.activeCount || members.filter((m) => m.status === "Active").length;
+      case "Completed":
+        return metrics.completedCount || members.filter((m) => m.status === "Completed").length;
+      case "Archived":
+        return metrics.archivedCount || members.filter((m) => m.status === "Archived").length;
+      default:
+        return 0;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#eff5f7] p-5 md:p-7">
+      {/* Toast notification banner */}
+      {actionMessage && (
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-lg bg-[#153e5b] px-4 py-3 text-xs text-white shadow-lg animate-fadeIn">
+          <CheckCircle2 size={16} className="text-emerald-400" />
+          <span>{actionMessage}</span>
+        </div>
+      )}
 
       {/* Page Header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-
         <div>
           <p className="mb-3 text-xs text-slate-500">
             Partner Coordination
@@ -258,17 +321,44 @@ const TeamContacts = () => {
             </span>
           </p>
 
-          <h1 className="text-2xl font-semibold text-[#153e5b]">
-            Team & Contacts
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-semibold text-[#153e5b]">
+              Team & Contacts
+            </h1>
+
+            {/* Live Backend Connection Indicator */}
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                isLive
+                  ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border border-amber-200 bg-amber-50 text-amber-700"
+              }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  isLive ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                }`}
+              />
+              {isLive ? "Live Backend" : "Offline Cache"}
+            </span>
+          </div>
 
           <p className="mt-2 text-sm text-slate-500">
-            Manage organisation staff, response roles, deployment
-            areas, and coordination contacts.
+            Manage organisation staff, response roles, deployment areas, and coordination contacts.
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleSync}
+            disabled={isSyncing}
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            title="Refresh team contacts from server"
+          >
+            <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
+            Sync
+          </button>
+
           <button
             onClick={exportCSV}
             className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
@@ -289,95 +379,84 @@ const TeamContacts = () => {
 
       {/* Statistics Cards */}
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-
         <StatCard
           icon={<BriefcaseBusiness size={20} />}
           title="Active records"
-          value="48"
-          subtitle="Organisation-scoped"
+          value={String(metrics.activeRecords)}
+          subtitle={metrics.activeRecordsSubtitle || "Organisation-scoped"}
           color="blue"
         />
 
         <StatCard
           icon={<Clock size={20} />}
           title="Needs review"
-          value="3"
-          subtitle="Assigned to your team"
+          value={String(metrics.needsReview)}
+          subtitle={metrics.needsReviewSubtitle || "Assigned to your team"}
           color="orange"
         />
 
         <StatCard
           icon={<ShieldCheck size={20} />}
           title="Verified"
-          value="96%"
-          subtitle="Current assurance"
+          value={metrics.verified || "96%"}
+          subtitle={metrics.verifiedSubtitle || "Current assurance"}
           color="green"
         />
 
         <StatCard
           icon={<AlertTriangle size={20} />}
           title="Due soon"
-          value="2"
-          subtitle="Within 30 days"
+          value={String(metrics.dueSoon)}
+          subtitle={metrics.dueSoonSubtitle || "Within 30 days"}
           color="orange"
         />
-
       </div>
 
       {/* Tabs */}
       <div className="mb-3 flex gap-6 overflow-x-auto border-b border-[#d4e1e7]">
-
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => {
-              setActiveTab(tab);
-              setCurrentPage(1);
-            }}
-            className={`relative whitespace-nowrap pb-4 text-xs ${
-              activeTab === tab
-                ? "font-semibold text-[#267ba4]"
-                : "text-slate-500 hover:text-[#267ba4]"
-            }`}
-          >
-            {tab}
-
-            {tab === "All" && (
-              <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px]">
-                48
-              </span>
-            )}
-
-            {tab === "Needs action" && (
-              <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px]">
-                7
-              </span>
-            )}
-
-            {activeTab === tab && (
-              <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#267ba4]" />
-            )}
-          </button>
-        ))}
-
+        {tabs.map((tab) => {
+          const count = getTabCount(tab);
+          return (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveTab(tab);
+                setCurrentPage(1);
+              }}
+              className={`relative whitespace-nowrap pb-4 text-xs ${
+                activeTab === tab
+                  ? "font-semibold text-[#267ba4]"
+                  : "text-slate-500 hover:text-[#267ba4]"
+              }`}
+            >
+              {tab}
+              {count > 0 && (
+                <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px] font-medium text-slate-700">
+                  {count}
+                </span>
+              )}
+              {activeTab === tab && (
+                <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#267ba4]" />
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Search and Filters */}
       <div className="mb-3 flex flex-col gap-2 xl:flex-row">
-
         <div className="relative min-w-0 flex-1">
           <Search
             size={16}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
           />
-
           <input
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            placeholder="Search team & contacts..."
+            placeholder="Search team & contacts by ID, name, role, sector, location..."
             className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
           />
         </div>
@@ -430,6 +509,7 @@ const TeamContacts = () => {
           <option>North Ward</option>
           <option>Eastbank</option>
           <option>South Ward</option>
+          <option>All districts</option>
         </select>
 
         <select
@@ -454,7 +534,6 @@ const TeamContacts = () => {
           <Filter size={15} />
           More filters
         </button>
-
       </div>
 
       {/* More Filters */}
@@ -462,28 +541,35 @@ const TeamContacts = () => {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d3e1e8] bg-white p-4">
           <div>
             <p className="text-xs font-semibold text-[#153e5b]">
-              Additional filters
+              Additional options
             </p>
             <p className="mt-1 text-[10px] text-slate-500">
-              Refine team records using the filters above.
+              Refine team records, clear search queries, or reset sample data.
             </p>
           </div>
 
-          <button
-            onClick={resetFilters}
-            className="text-xs font-medium text-[#267ba4]"
-          >
-            Clear all filters
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleResetDefaults}
+              className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-800"
+            >
+              <RotateCcw size={13} />
+              Reset Defaults
+            </button>
+            <button
+              onClick={resetFilters}
+              className="text-xs font-semibold text-[#267ba4] hover:underline"
+            >
+              Clear all filters
+            </button>
+          </div>
         </div>
       )}
 
       {/* Team Members Table */}
       <div className="overflow-hidden rounded-xl border border-[#d7e5eb] bg-white shadow-sm">
-
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1050px] text-left">
-
             <thead className="bg-[#f5f8fa]">
               <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
                 {[
@@ -515,7 +601,7 @@ const TeamContacts = () => {
                     {member.id}
                   </td>
 
-                  <td className="whitespace-nowrap px-3 py-4">
+                  <td className="whitespace-nowrap px-3 py-4 font-medium text-slate-800">
                     {member.name}
                   </td>
 
@@ -531,7 +617,7 @@ const TeamContacts = () => {
                     {member.area}
                   </td>
 
-                  <td className="whitespace-nowrap px-3 py-4">
+                  <td className="whitespace-nowrap px-3 py-4 text-slate-500">
                     {member.contact}
                   </td>
 
@@ -558,18 +644,16 @@ const TeamContacts = () => {
                     colSpan={9}
                     className="py-12 text-center text-xs text-slate-400"
                   >
-                    No team members found.
+                    No team members found matching your search criteria.
                   </td>
                 </tr>
               )}
             </tbody>
-
           </table>
         </div>
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-
           <p className="text-[10px] text-slate-400">
             Showing{" "}
             {filteredMembers.length === 0
@@ -584,21 +668,15 @@ const TeamContacts = () => {
           </p>
 
           <div className="flex items-center gap-1">
-
             <button
               disabled={currentPage === 1}
-              onClick={() =>
-                setCurrentPage((p) => Math.max(1, p - 1))
-              }
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
 
-            {Array.from(
-              { length: totalPages },
-              (_, i) => i + 1
-            ).map((number) => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
@@ -614,14 +692,11 @@ const TeamContacts = () => {
 
             <button
               disabled={currentPage === totalPages}
-              onClick={() =>
-                setCurrentPage((p) => Math.min(totalPages, p + 1))
-              }
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
-
           </div>
         </div>
       </div>
@@ -631,6 +706,8 @@ const TeamContacts = () => {
         <MemberDetailsModal
           member={selectedMember}
           onClose={() => setSelectedMember(null)}
+          onStatusChange={handleStatusChange}
+          onDelete={handleDeleteMember}
         />
       )}
 
@@ -641,7 +718,6 @@ const TeamContacts = () => {
           onSubmit={handleInvite}
         />
       )}
-
     </div>
   );
 };
@@ -668,7 +744,7 @@ function StatCard({
 
   return (
     <div className="flex items-center gap-3 rounded-xl border border-[#d7e5eb] bg-white p-4 shadow-sm">
-      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors[color]}`}>
+      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors[color] || colors.blue}`}>
         {icon}
       </div>
 
@@ -686,7 +762,8 @@ function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     Active: "bg-[#e5f6f0] text-[#299b7d]",
     "Needs Review": "bg-[#fff4df] text-[#bd8229]",
-    Completed: "bg-[#e5f6f0] text-[#299b7d]",
+    "Needs Action": "bg-[#fff4df] text-[#bd8229]",
+    Completed: "bg-[#e8f2f8] text-[#2783b1]",
     Archived: "bg-slate-100 text-slate-500",
   };
 
@@ -708,7 +785,7 @@ function Detail({
   return (
     <div>
       <p className="text-[10px] text-slate-400">{label}</p>
-      <p className="mt-1 text-xs font-medium text-[#153e5b]">{value}</p>
+      <p className="mt-1 text-xs font-medium text-[#153e5b] break-words">{value || "—"}</p>
     </div>
   );
 }
@@ -717,14 +794,46 @@ function Detail({
 function MemberDetailsModal({
   member,
   onClose,
+  onStatusChange,
+  onDelete,
 }: {
   member: TeamMember;
   onClose: () => void;
+  onStatusChange: (id: string, status: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+  const [updating, setUpdating] = useState(false);
 
+  const handleUpdate = async (status: string) => {
+    setUpdating(true);
+    try {
+      await onStatusChange(member.id, status);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setUpdating(true);
+    try {
+      await onDelete(member.id);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const initials = member.name
+    ? member.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "U";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4">
+      <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-5 flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-[#267ba4]">
@@ -735,25 +844,28 @@ function MemberDetailsModal({
             </h2>
           </div>
 
-          <button onClick={onClose}>
-            <X size={20} className="text-slate-500" />
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <X size={20} />
           </button>
         </div>
 
         <div className="mb-5 flex items-center gap-3 rounded-lg bg-[#f5f8fa] p-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#267ba4] text-sm font-semibold text-white">
-            {member.name.split(" ").map((n) => n[0]).join("")}
+            {initials}
           </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-[#153e5b]">
-              {member.name}
-            </h3>
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-[#153e5b]">
+                {member.name}
+              </h3>
+              <StatusBadge status={member.status} />
+            </div>
             <p className="mt-1 text-xs text-slate-500">{member.role}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-4">
           <Detail label="Sector" value={member.sector} />
           <Detail label="Operational Area" value={member.area} />
           <Detail label="Phone" value={member.contact} />
@@ -762,9 +874,75 @@ function MemberDetailsModal({
           <Detail label="Status" value={member.status} />
         </div>
 
+        {member.description && (
+          <div className="mt-4 rounded-lg bg-slate-50 p-3">
+            <p className="text-[10px] font-medium text-slate-400">Role & Assignment Notes</p>
+            <p className="mt-1 text-xs text-slate-600">{member.description}</p>
+          </div>
+        )}
+
+        {/* Quick action buttons */}
+        <div className="mt-5 border-t border-slate-100 pt-4">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            Quick Actions
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            {member.status !== "Active" && (
+              <button
+                disabled={updating}
+                onClick={() => handleUpdate("Active")}
+                className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
+              >
+                <CheckCircle2 size={13} />
+                Set Active
+              </button>
+            )}
+
+            {member.status !== "Needs Review" && (
+              <button
+                disabled={updating}
+                onClick={() => handleUpdate("Needs Review")}
+                className="flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50"
+              >
+                <Clock size={13} />
+                Request Review
+              </button>
+            )}
+
+            {member.status !== "Archived" ? (
+              <button
+                disabled={updating}
+                onClick={() => handleUpdate("Archived")}
+                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+              >
+                <Archive size={13} />
+                Archive
+              </button>
+            ) : (
+              <button
+                disabled={updating}
+                onClick={() => handleUpdate("Active")}
+                className="flex items-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+              >
+                <RotateCcw size={13} />
+                Restore
+              </button>
+            )}
+
+            <button
+              disabled={updating}
+              onClick={handleDelete}
+              className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-100 disabled:opacity-50 ml-auto"
+            >
+              <Trash2 size={13} />
+              Remove
+            </button>
+          </div>
+        </div>
+
         <button
           onClick={onClose}
-          className="mt-7 w-full rounded-lg bg-[#267ba4] py-3 text-xs font-medium text-white hover:bg-[#1c668a]"
+          className="mt-6 w-full rounded-lg bg-[#267ba4] py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
         >
           Close
         </button>
@@ -779,7 +957,7 @@ function InviteMemberModal({
   onSubmit,
 }: {
   onClose: () => void;
-  onSubmit: (member: TeamMember) => void;
+  onSubmit: (payload: CreateTeamMemberPayload) => Promise<void>;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -787,23 +965,27 @@ function InviteMemberModal({
   const [role, setRole] = useState("Field Team Lead");
   const [sector, setSector] = useState("WASH");
   const [area, setArea] = useState("North Ward");
+  const [description, setDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const member: TeamMember = {
-      id: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
-      name,
-      role,
-      sector,
-      area,
-      contact: phone,
-      email,
-      lastActive: "Invited",
-      status: "Active",
-    };
-
-    onSubmit(member);
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        name,
+        role,
+        sector,
+        area,
+        contact: phone,
+        email,
+        description: description || undefined,
+        lastActive: "Invited",
+        status: "Active",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -812,65 +994,65 @@ function InviteMemberModal({
         onSubmit={handleSubmit}
         className="my-auto w-full max-w-lg rounded-xl bg-white p-6 shadow-xl"
       >
-
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Invite Team Member
             </h2>
             <p className="mt-1 text-[10px] text-slate-500">
-              Add a new member to your organisation team.
+              Add a new member to your organisation team and sync across response operations.
             </p>
           </div>
 
-          <button type="button" onClick={onClose}>
-            <X size={20} className="text-slate-500" />
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <X size={20} />
           </button>
         </div>
 
         <div className="space-y-4">
-
           <div>
             <label className="mb-2 block text-xs font-medium text-slate-600">
-              Full Name
+              Full Name *
             </label>
             <input
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter full name"
-              className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none focus:border-[#267ba4]"
+              placeholder="e.g. Kasun Jayawardena"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
             />
           </div>
 
-          <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
-              Email Address
-            </label>
-            <input
-              required
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email address"
-              className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none focus:border-[#267ba4]"
-            />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-xs font-medium text-slate-600">
+                Email Address *
+              </label>
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="kasun.j@example.org"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-medium text-slate-600">
+                Phone Number *
+              </label>
+              <input
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+94 77 123 4567"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
-              Phone Number
-            </label>
-            <input
-              required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Enter phone number"
-              className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none focus:border-[#267ba4]"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-xs font-medium text-slate-600">
                 Role
@@ -878,7 +1060,7 @@ function InviteMemberModal({
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
               >
                 <option>Field Team Lead</option>
                 <option>Partner Officer</option>
@@ -896,7 +1078,7 @@ function InviteMemberModal({
               <select
                 value={sector}
                 onChange={(e) => setSector(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
               >
                 <option>WASH</option>
                 <option>Coordination</option>
@@ -915,36 +1097,50 @@ function InviteMemberModal({
             <select
               value={area}
               onChange={(e) => setArea(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-3 text-xs outline-none"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
             >
               <option>North Ward</option>
               <option>Greater Riverton</option>
-              <option>Central Ward</option>
+              <option>Central · North</option>
               <option>Eastbank</option>
               <option>South Ward</option>
               <option>All districts</option>
             </select>
           </div>
 
+          <div>
+            <label className="mb-2 block text-xs font-medium text-slate-600">
+              Assignment Notes / Role Details
+            </label>
+            <textarea
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Brief note on duties, focal point assignments, or field station..."
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+            />
+          </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-2">
           <button
             type="button"
+            disabled={isSubmitting}
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600"
+            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            disabled={isSubmitting}
+            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
           >
+            {isSubmitting && <RefreshCw size={13} className="animate-spin" />}
             Send Invitation
           </button>
         </div>
-
       </form>
     </div>
   );

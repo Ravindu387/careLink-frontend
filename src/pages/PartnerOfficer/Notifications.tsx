@@ -1,5 +1,5 @@
-
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import {
   Bell,
   AlertTriangle,
@@ -14,102 +14,18 @@ import {
   Clock,
   Search,
   CheckCheck,
+  RefreshCw,
+  Radio,
+  ExternalLink,
 } from "lucide-react";
+import {
+  notificationService,
+  type Notification,
+  type NotificationCounts,
+  type NotificationPreferences,
+} from "../../services/notificationService";
 
-type NotificationType =
-  | "Urgent"
-  | "Collaboration"
-  | "Resource"
-  | "Reporting"
-  | "Agreement"
-  | "Team";
 
-type NotificationItem = {
-  id: number;
-  title: string;
-  description: string;
-  time: string;
-  category: NotificationType;
-  unread: boolean;
-  urgent: boolean;
-  details: string;
-  reference: string;
-};
-
-const initialNotifications: NotificationItem[] = [
-  {
-    id: 1,
-    title: "Critical referral awaiting response",
-    description: "REF-2841 · Emergency shelter · 6 people",
-    time: "4 min ago",
-    category: "Urgent",
-    unread: true,
-    urgent: true,
-    reference: "REF-2841",
-    details:
-      "A critical emergency shelter referral has been received from the North Ward. Six affected people require urgent accommodation support. Please review and respond as soon as possible.",
-  },
-  {
-    id: 2,
-    title: "New collaboration request",
-    description: "Mobile water distribution · North Ward",
-    time: "12 min ago",
-    category: "Collaboration",
-    unread: true,
-    urgent: false,
-    reference: "COL-0742",
-    details:
-      "National Disaster Authority has requested collaboration for a mobile water distribution activity in North Ward. Your organisation is requested to provide vehicles and field staff.",
-  },
-  {
-    id: 3,
-    title: "Resource delivery exception",
-    description: "COM-1039 · Partial delivery recorded",
-    time: "28 min ago",
-    category: "Resource",
-    unread: true,
-    urgent: true,
-    reference: "COM-1039",
-    details:
-      "A partial delivery has been recorded for commitment COM-1039. Some water purification tablets have not reached the destination. Please review the delivery status and coordinate with the logistics team.",
-  },
-  {
-    id: 4,
-    title: "Partner report due today",
-    description: "Daily activity report due at 18:00",
-    time: "42 min ago",
-    category: "Reporting",
-    unread: true,
-    urgent: false,
-    reference: "RPT-1042",
-    details:
-      "Your Daily Partner Activity Report for Monsoon Floods 2025 must be submitted today before 18:00. The report is currently 82% complete and three sections require review.",
-  },
-  {
-    id: 5,
-    title: "Agreement review required",
-    description: "Safeguarding attestation due in 18 days",
-    time: "1 hr ago",
-    category: "Agreement",
-    unread: false,
-    urgent: false,
-    reference: "AGR-0038",
-    details:
-      "Your organisation's safeguarding attestation requires review. Please verify the information and submit the updated agreement before the due date.",
-  },
-  {
-    id: 6,
-    title: "Field team checked in",
-    description: "North Ward distribution team · 12 members",
-    time: "2 hr ago",
-    category: "Team",
-    unread: false,
-    urgent: false,
-    reference: "TEAM-0012",
-    details:
-      "The North Ward distribution team has successfully checked in. Twelve team members are currently active in the field and ready to continue the scheduled distribution activity.",
-  },
-];
 
 const tabs = [
   "All",
@@ -120,18 +36,23 @@ const tabs = [
 ];
 
 const Notifications = () => {
-  const [notifications, setNotifications] =
-    useState<NotificationItem[]>(initialNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [metrics, setMetrics] = useState<NotificationCounts | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState("All");
   const [search, setSearch] = useState("");
 
   const [selectedNotification, setSelectedNotification] =
-    useState<NotificationItem | null>(null);
+    useState<Notification | null>(null);
 
   const [showPreferences, setShowPreferences] = useState(false);
+  const [savingPreferences, setSavingPreferences] = useState(false);
 
-  const [preferences, setPreferences] = useState({
+  const [preferences, setPreferences] = useState<NotificationPreferences>({
     urgent: true,
     referrals: true,
     collaboration: true,
@@ -142,13 +63,78 @@ const Notifications = () => {
     push: true,
   });
 
-  const unreadCount = notifications.filter(
-    (n) => n.unread
-  ).length;
+  const loadData = async (showLoadingSpinner = false) => {
+    if (showLoadingSpinner) {
+      setIsLoading(true);
+    } else {
+      setIsSyncing(true);
+    }
 
-  const urgentCount = notifications.filter(
-    (n) => n.urgent && n.unread
-  ).length;
+    try {
+      const [list, countData, prefData] = await Promise.all([
+        notificationService.getAll({ role: "partner" }),
+        notificationService.getMetrics("partner"),
+        notificationService.getPreferences(),
+      ]);
+      setNotifications(list);
+      setMetrics(countData);
+      setPreferences(prefData);
+      setIsConnected(true);
+      setError(null);
+    } catch (err: unknown) {
+      console.warn("Failed to load notifications from API:", err);
+      setIsConnected(false);
+      setError("Working with offline cached notifications.");
+    } finally {
+      setIsLoading(false);
+      setIsSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const init = async () => {
+      try {
+        const [list, countData, prefData] = await Promise.all([
+          notificationService.getAll({ role: "partner" }),
+          notificationService.getMetrics("partner"),
+          notificationService.getPreferences(),
+        ]);
+        if (isMounted) {
+          setNotifications(list);
+          setMetrics(countData);
+          setPreferences(prefData);
+          setIsConnected(true);
+          setError(null);
+        }
+      } catch (err: unknown) {
+        if (isMounted) {
+          console.warn("Initial load from API failed:", err);
+          setIsConnected(false);
+          setError("Working with offline cached notifications.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    init();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const unreadCount = useMemo(() => {
+    return notifications.filter((n) => n.unread).length;
+  }, [notifications]);
+
+  const urgentCount = useMemo(() => {
+    return notifications.filter((n) => n.urgent && n.unread).length;
+  }, [notifications]);
 
   // Filter notifications
   const filteredNotifications = useMemo(() => {
@@ -157,6 +143,7 @@ const Notifications = () => {
         notification.title,
         notification.description,
         notification.reference,
+        notification.details,
       ]
         .join(" ")
         .toLowerCase();
@@ -166,25 +153,48 @@ const Notifications = () => {
       const matchesTab =
         activeTab === "All" ||
         (activeTab === "Unread" && notification.unread) ||
-        (activeTab === "Urgent" && notification.urgent) ||
-        notification.category === activeTab;
+        (activeTab === "Urgent" && (notification.urgent || notification.category.toLowerCase() === "urgent")) ||
+        notification.category.toLowerCase() === activeTab.toLowerCase();
 
       return matchesSearch && matchesTab;
     });
   }, [notifications, activeTab, search]);
 
+  // Tab counts
+  const tabCounts = useMemo(() => {
+    return {
+      All: notifications.length,
+      Unread: unreadCount,
+      Urgent: urgentCount,
+      Collaboration: notifications.filter(
+        (n) => n.category.toLowerCase() === "collaboration"
+      ).length,
+      Reporting: notifications.filter(
+        (n) => n.category.toLowerCase() === "reporting"
+      ).length,
+    };
+  }, [notifications, unreadCount, urgentCount]);
+
   // Mark all as read
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
+    // Optimistic UI update
     setNotifications((prev) =>
       prev.map((notification) => ({
         ...notification,
         unread: false,
       }))
     );
+    try {
+      await notificationService.markAllRead("partner");
+      const newMetrics = await notificationService.getMetrics("partner");
+      setMetrics(newMetrics);
+    } catch (err: unknown) {
+      console.warn("Failed to mark all as read on backend:", err);
+    }
   };
 
   // Mark single notification as read
-  const markAsRead = (id: number) => {
+  const markAsRead = async (id: string) => {
     setNotifications((prev) =>
       prev.map((notification) =>
         notification.id === id
@@ -192,47 +202,84 @@ const Notifications = () => {
           : notification
       )
     );
+    try {
+      await notificationService.markRead(id);
+      const newMetrics = await notificationService.getMetrics("partner");
+      setMetrics(newMetrics);
+    } catch (err: unknown) {
+      console.warn(`Failed to mark notification ${id} as read:`, err);
+    }
   };
 
   // Open notification details
-  const openNotification = (notification: NotificationItem) => {
-    markAsRead(notification.id);
+  const openNotification = (notification: Notification) => {
+    if (notification.unread) {
+      markAsRead(notification.id);
+    }
     setSelectedNotification(notification);
   };
 
-  const togglePreference = (key: keyof typeof preferences) => {
+  const togglePreference = (key: keyof NotificationPreferences) => {
     setPreferences((prev) => ({
       ...prev,
       [key]: !prev[key],
     }));
   };
 
+  const handleSavePreferences = async () => {
+    setSavingPreferences(true);
+    try {
+      const updated = await notificationService.updatePreferences(preferences);
+      setPreferences(updated);
+      setShowPreferences(false);
+    } catch (err: unknown) {
+      console.error("Failed to save preferences on backend:", err);
+      setShowPreferences(false);
+    } finally {
+      setSavingPreferences(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#eff5f7] p-5 md:p-7">
-
       {/* Header */}
       <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
-
         <div>
-          <p className="mb-3 text-xs text-slate-500">
-            Partner Coordination
-            <span className="mx-2">›</span>
-            <span className="font-semibold text-[#153e5b]">
-              Notifications
+          <div className="mb-2 flex items-center gap-2">
+            <p className="text-xs text-slate-500">
+              Partner Coordination
+              <span className="mx-2">›</span>
+              <span className="font-semibold text-[#153e5b]">Notifications</span>
+            </p>
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                isConnected
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : "bg-amber-50 text-amber-700 border border-amber-200"
+              }`}
+            >
+              <Radio size={10} className={isConnected ? "animate-pulse text-emerald-600" : "text-amber-600"} />
+              {isConnected ? "Live Backend" : "Offline Cache"}
             </span>
-          </p>
+          </div>
 
-          <h1 className="text-2xl font-semibold text-[#153e5b]">
-            Notifications
-          </h1>
+          <h1 className="text-2xl font-semibold text-[#153e5b]">Notifications</h1>
 
-          <p className="mt-2 text-sm text-slate-500">
-            Review shared referrals, partner requests, operational
-            exceptions, and reporting deadlines.
+          <p className="mt-1 text-sm text-slate-500">
+            Review shared referrals, partner requests, operational exceptions, and reporting deadlines.
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => loadData(false)}
+            disabled={isSyncing}
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            title="Refresh notifications"
+          >
+            <RefreshCw size={14} className={isSyncing ? "animate-spin text-[#267ba4]" : ""} />
+            Sync
+          </button>
 
           <button
             onClick={markAllAsRead}
@@ -250,25 +297,38 @@ const Notifications = () => {
             <Settings size={15} />
             Preferences
           </button>
-
         </div>
       </div>
 
+      {error && (
+        <div className="mb-4 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={16} className="text-amber-600" />
+            <span>{error}</span>
+          </div>
+          <button
+            onClick={() => loadData(true)}
+            className="font-semibold text-amber-900 underline hover:no-underline"
+          >
+            Retry Connection
+          </button>
+        </div>
+      )}
+
       {/* Summary Cards */}
       <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-
         <SummaryCard
           icon={<Bell size={19} />}
           title="Total notifications"
-          value={String(notifications.length)}
-          subtitle="All notifications"
+          value={metrics ? String(metrics.all) : String(notifications.length)}
+          subtitle="All partner notifications"
           color="blue"
         />
 
         <SummaryCard
           icon={<AlertTriangle size={19} />}
           title="Unread notifications"
-          value={String(unreadCount)}
+          value={metrics ? String(metrics.unread) : String(unreadCount)}
           subtitle="Require your attention"
           color="orange"
         />
@@ -276,11 +336,10 @@ const Notifications = () => {
         <SummaryCard
           icon={<Clock size={19} />}
           title="Urgent notifications"
-          value={String(urgentCount)}
+          value={metrics ? String(metrics.urgent ?? urgentCount) : String(urgentCount)}
           subtitle="Priority actions required"
           color="red"
         />
-
       </div>
 
       {/* Search */}
@@ -302,17 +361,8 @@ const Notifications = () => {
 
       {/* Tabs */}
       <div className="mb-3 flex gap-6 overflow-x-auto border-b border-[#d4e1e7]">
-
         {tabs.map((tab) => {
-          const count =
-            tab === "All"
-              ? notifications.length
-              : tab === "Unread"
-                ? unreadCount
-                : tab === "Urgent"
-                  ? urgentCount
-                  : null;
-
+          const count = tabCounts[tab as keyof typeof tabCounts];
           return (
             <button
               key={tab}
@@ -324,57 +374,54 @@ const Notifications = () => {
               }`}
             >
               {tab}
-
-              {count !== null && (
-                <span className="rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px]">
+              {typeof count === "number" && (
+                <span className="rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px] font-semibold text-[#153e5b]">
                   {count}
                 </span>
               )}
-
               {activeTab === tab && (
                 <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#267ba4]" />
               )}
             </button>
           );
         })}
-
       </div>
 
       {/* Notifications List */}
       <div className="overflow-hidden rounded-xl border border-[#d7e5eb] bg-white shadow-sm">
-
-        {filteredNotifications.map((notification) => (
-          <NotificationRow
-            key={notification.id}
-            notification={notification}
-            onClick={() => openNotification(notification)}
-          />
-        ))}
-
-        {filteredNotifications.length === 0 && (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-16 text-center text-xs text-slate-500 gap-2">
+            <RefreshCw size={18} className="animate-spin text-[#267ba4]" />
+            <span>Loading notifications from backend...</span>
+          </div>
+        ) : filteredNotifications.length > 0 ? (
+          filteredNotifications.map((notification) => (
+            <NotificationRow
+              key={notification.id}
+              notification={notification}
+              onClick={() => openNotification(notification)}
+            />
+          ))
+        ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <Bell size={32} className="mb-3 text-slate-300" />
-
             <h3 className="text-sm font-semibold text-[#153e5b]">
               No notifications found
             </h3>
-
             <p className="mt-2 text-xs text-slate-400">
               There are no notifications matching your selection.
             </p>
-
             <button
               onClick={() => {
                 setActiveTab("All");
                 setSearch("");
               }}
-              className="mt-4 text-xs font-medium text-[#267ba4]"
+              className="mt-4 text-xs font-medium text-[#267ba4] hover:underline"
             >
               Clear filters
             </button>
           </div>
         )}
-
       </div>
 
       {/* Details Modal */}
@@ -390,10 +437,11 @@ const Notifications = () => {
         <PreferencesModal
           preferences={preferences}
           togglePreference={togglePreference}
+          onSave={handleSavePreferences}
+          isSaving={savingPreferences}
           onClose={() => setShowPreferences(false)}
         />
       )}
-
     </div>
   );
 };
@@ -421,8 +469,11 @@ function SummaryCard({
 
   return (
     <div className="flex items-center gap-3 rounded-xl border border-[#d7e5eb] bg-white p-4 shadow-sm">
-
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${colors[color]}`}>
+      <div
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+          colors[color] || colors.blue
+        }`}
+      >
         {icon}
       </div>
 
@@ -431,38 +482,42 @@ function SummaryCard({
         <p className="text-2xl font-bold text-[#153e5b]">{value}</p>
         <p className="text-[9px] text-slate-400">{subtitle}</p>
       </div>
-
     </div>
   );
 }
 
 // Notification Icon
-function NotificationIcon({
-  category,
-}: {
-  category: NotificationType;
-}) {
-  const iconMap: Record<NotificationType, ReactNode> = {
-    Urgent: <AlertTriangle size={19} />,
-    Collaboration: <Handshake size={19} />,
-    Resource: <Package size={19} />,
-    Reporting: <CalendarDays size={19} />,
-    Agreement: <FileText size={19} />,
-    Team: <Users size={19} />,
-  };
+function NotificationIcon({ category }: { category: string }) {
+  const cat = category.toLowerCase();
 
-  const colorMap: Record<NotificationType, string> = {
-    Urgent: "bg-[#fff0f0] text-[#e05252]",
-    Collaboration: "bg-[#f0ebfb] text-[#8661c5]",
-    Resource: "bg-[#fff4df] text-[#c68b24]",
-    Reporting: "bg-[#e8f2f8] text-[#2783b1]",
-    Agreement: "bg-[#fff4df] text-[#bd8229]",
-    Team: "bg-[#e5f6f0] text-[#299b7d]",
-  };
+  let icon: ReactNode = <Bell size={19} />;
+  let colorClass = "bg-[#e8f2f8] text-[#2783b1]";
+
+  if (cat === "urgent" || cat === "critical") {
+    icon = <AlertTriangle size={19} />;
+    colorClass = "bg-[#fff0f0] text-[#e05252]";
+  } else if (cat === "collaboration" || cat === "partner") {
+    icon = <Handshake size={19} />;
+    colorClass = "bg-[#f0ebfb] text-[#8661c5]";
+  } else if (cat === "resource") {
+    icon = <Package size={19} />;
+    colorClass = "bg-[#fff4df] text-[#c68b24]";
+  } else if (cat === "reporting" || cat === "report") {
+    icon = <CalendarDays size={19} />;
+    colorClass = "bg-[#e8f2f8] text-[#2783b1]";
+  } else if (cat === "agreement") {
+    icon = <FileText size={19} />;
+    colorClass = "bg-[#fff4df] text-[#bd8229]";
+  } else if (cat === "team") {
+    icon = <Users size={19} />;
+    colorClass = "bg-[#e5f6f0] text-[#299b7d]";
+  }
 
   return (
-    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colorMap[category]}`}>
-      {iconMap[category]}
+    <div
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colorClass}`}
+    >
+      {icon}
     </div>
   );
 }
@@ -472,9 +527,14 @@ function NotificationRow({
   notification,
   onClick,
 }: {
-  notification: NotificationItem;
+  notification: Notification;
   onClick: () => void;
 }) {
+  const isUrgent =
+    notification.urgent ||
+    notification.category.toLowerCase() === "urgent" ||
+    notification.category.toLowerCase() === "critical";
+
   return (
     <button
       onClick={onClick}
@@ -482,17 +542,15 @@ function NotificationRow({
         notification.unread ? "bg-[#f4faf8]" : "bg-white"
       }`}
     >
-
       <NotificationIcon category={notification.category} />
 
       <div className="min-w-0 flex-1">
-
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-[11px] font-semibold text-[#153e5b]">
             {notification.title}
           </h3>
 
-          {notification.urgent && (
+          {isUrgent && (
             <span className="rounded bg-[#fff0f0] px-1.5 py-0.5 text-[8px] font-semibold text-[#d94b4b]">
               Urgent
             </span>
@@ -503,25 +561,16 @@ function NotificationRow({
           {notification.description}
         </p>
 
-        <p className="mt-1 text-[9px] text-slate-400">
-          {notification.time}
-        </p>
-
+        <p className="mt-1 text-[9px] text-slate-400">{notification.time}</p>
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
-
         {notification.unread && (
           <span className="h-2 w-2 rounded-full bg-[#2783b1]" />
         )}
 
-        <ChevronRight
-          size={19}
-          className="text-[#153e5b]"
-        />
-
+        <ChevronRight size={19} className="text-[#153e5b]" />
       </div>
-
     </button>
   );
 }
@@ -531,65 +580,51 @@ function NotificationDetailsModal({
   notification,
   onClose,
 }: {
-  notification: NotificationItem;
+  notification: Notification;
   onClose: () => void;
 }) {
+  const isUrgent =
+    notification.urgent ||
+    notification.category.toLowerCase() === "urgent" ||
+    notification.category.toLowerCase() === "critical";
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-
       <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
-
         <div className="mb-5 flex items-center justify-between">
-
           <div>
             <p className="text-xs font-semibold text-[#267ba4]">
               Notification Details
             </p>
-
             <h2 className="mt-1 text-lg font-semibold text-[#153e5b]">
               {notification.title}
             </h2>
           </div>
 
-          <button onClick={onClose}>
-            <X size={20} className="text-slate-500" />
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <X size={20} />
           </button>
-
         </div>
 
         <div className="mb-5 flex items-center gap-3 rounded-lg bg-[#f5f8fa] p-4">
-
           <NotificationIcon category={notification.category} />
 
           <div>
             <p className="text-xs font-semibold text-[#153e5b]">
               {notification.category}
             </p>
-
             <p className="mt-1 text-[10px] text-slate-500">
               {notification.time}
             </p>
           </div>
-
         </div>
 
         <div className="space-y-4">
-
-          <Detail
-            label="Reference ID"
-            value={notification.reference}
-          />
-
-          <Detail
-            label="Description"
-            value={notification.description}
-          />
+          <Detail label="Reference ID" value={notification.reference} />
+          <Detail label="Description" value={notification.description} />
 
           <div>
-            <p className="mb-2 text-[10px] text-slate-400">
-              Details
-            </p>
-
+            <p className="mb-2 text-[10px] text-slate-400">Details</p>
             <p className="rounded-lg bg-[#f5f8fa] p-3 text-xs leading-6 text-slate-600">
               {notification.details}
             </p>
@@ -597,25 +632,32 @@ function NotificationDetailsModal({
 
           <Detail
             label="Priority"
-            value={notification.urgent ? "Urgent" : "Normal"}
+            value={isUrgent ? "Urgent" : "Normal"}
           />
 
-          <Detail
-            label="Read status"
-            value="Read"
-          />
-
+          <Detail label="Read status" value="Read" />
         </div>
 
-        <button
-          onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-[#267ba4] py-3 text-xs font-medium text-white hover:bg-[#1c668a]"
-        >
-          Close
-        </button>
+        <div className="mt-6 flex items-center gap-2">
+          {notification.actionUrl && (
+            <Link
+              to={notification.actionUrl}
+              onClick={onClose}
+              className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            >
+              <ExternalLink size={13} />
+              {notification.actionLabel || "Open Action"}
+            </Link>
+          )}
 
+          <button
+            onClick={onClose}
+            className="ml-auto rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+          >
+            Close
+          </button>
+        </div>
       </div>
-
     </div>
   );
 }
@@ -624,25 +666,18 @@ function NotificationDetailsModal({
 function PreferencesModal({
   preferences,
   togglePreference,
+  onSave,
+  isSaving,
   onClose,
 }: {
-  preferences: {
-    urgent: boolean;
-    referrals: boolean;
-    collaboration: boolean;
-    resources: boolean;
-    reporting: boolean;
-    team: boolean;
-    email: boolean;
-    push: boolean;
-  };
-  togglePreference: (
-    key: keyof typeof preferences
-  ) => void;
+  preferences: NotificationPreferences;
+  togglePreference: (key: keyof NotificationPreferences) => void;
+  onSave: () => void;
+  isSaving?: boolean;
   onClose: () => void;
 }) {
   const options: {
-    key: keyof typeof preferences;
+    key: keyof NotificationPreferences;
     label: string;
     description: string;
   }[] = [
@@ -690,40 +725,32 @@ function PreferencesModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4">
-
       <div className="my-auto w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
-
         <div className="mb-5 flex items-center justify-between">
-
           <div>
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Notification Preferences
             </h2>
-
             <p className="mt-1 text-[10px] text-slate-500">
               Manage which notifications you want to receive.
             </p>
           </div>
 
-          <button onClick={onClose}>
-            <X size={20} className="text-slate-500" />
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <X size={20} />
           </button>
-
         </div>
 
         <div className="space-y-1">
-
           {options.map((option) => (
             <div
               key={option.key}
               className="flex items-center justify-between gap-3 border-b border-slate-100 py-3"
             >
-
               <div>
                 <p className="text-xs font-medium text-[#153e5b]">
                   {option.label}
                 </p>
-
                 <p className="mt-1 text-[10px] text-slate-400">
                   {option.description}
                 </p>
@@ -732,37 +759,41 @@ function PreferencesModal({
               <button
                 type="button"
                 role="switch"
-                aria-checked={preferences[option.key]}
+                aria-checked={Boolean(preferences[option.key])}
                 onClick={() => togglePreference(option.key)}
                 className={`relative h-5 w-9 shrink-0 rounded-full transition ${
-                  preferences[option.key]
-                    ? "bg-[#267ba4]"
-                    : "bg-slate-300"
+                  preferences[option.key] ? "bg-[#267ba4]" : "bg-slate-300"
                 }`}
               >
                 <span
                   className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${
-                    preferences[option.key]
-                      ? "left-[18px]"
-                      : "left-0.5"
+                    preferences[option.key] ? "left-[18px]" : "left-0.5"
                   }`}
                 />
               </button>
-
             </div>
           ))}
-
         </div>
 
-        <button
-          onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-[#267ba4] py-3 text-xs font-medium text-white hover:bg-[#1c668a]"
-        >
-          Save Preferences
-        </button>
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600"
+          >
+            Cancel
+          </button>
 
+          <button
+            onClick={onSave}
+            disabled={isSaving}
+            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
+          >
+            {isSaving && <RefreshCw size={14} className="animate-spin" />}
+            Save Preferences
+          </button>
+        </div>
       </div>
-
     </div>
   );
 }
@@ -776,13 +807,8 @@ function Detail({
 }) {
   return (
     <div>
-      <p className="text-[10px] text-slate-400">
-        {label}
-      </p>
-
-      <p className="mt-1 text-xs font-medium text-[#153e5b]">
-        {value}
-      </p>
+      <p className="text-[10px] text-slate-400">{label}</p>
+      <p className="mt-1 text-xs font-medium text-[#153e5b]">{value}</p>
     </div>
   );
 }
