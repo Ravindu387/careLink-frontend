@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -72,6 +73,26 @@ export default function ResourceContributions() {
   const [page, setPage] = useState(1);
   const [toast, setToast] = useState("");
 
+  useEffect(() => {
+    apiClient.get<any>("/resource-contributions").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setContributions(
+          items.map((c: any) => ({
+            id: c.id || c.reference || "DON-88400",
+            donor: c.donor || c.donorName || "Donor",
+            type: c.type || "Material",
+            quantity: c.quantity || c.amount || "100 units",
+            campaign: c.campaign || "Flood Response 2025",
+            received: c.received || c.date || "Today",
+            verification: (c.verification as Contribution["verification"]) || "Verified",
+            allocation: (c.allocation as Contribution["allocation"]) || "Allocated",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   const [newContribution, setNewContribution] = useState({
     donor: "",
     type: "Material",
@@ -141,6 +162,14 @@ export default function ResourceContributions() {
       notify("Please complete all required fields.");
       return;
     }
+
+    apiClient.post("/resource-contributions", {
+      donor: newContribution.donor,
+      type: newContribution.type,
+      quantity: newContribution.quantity,
+      campaign: newContribution.campaign,
+      received: newContribution.received,
+    }).catch(() => {});
 
     const newItem: Contribution = {
       id: `DON-${Math.floor(10000 + Math.random() * 90000)}`,
@@ -344,7 +373,7 @@ export default function ResourceContributions() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-8">
+        <div className="flex items-center gap-2 text-xs mb-8">
 
           <span className="text-slate-500">
             Operations
@@ -368,11 +397,11 @@ export default function ResourceContributions() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
 
           <div>
-            <h1 className="text-[23px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Resource Contributions
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[13px] text-slate-500 mt-1">
               Track donated food, water, medicine, equipment,
               and other material aid.
             </p>
@@ -382,7 +411,7 @@ export default function ResourceContributions() {
 
             <button
               onClick={exportCSV}
-              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-[10px] text-[#23749e] flex items-center gap-2 hover:bg-[#f5fafc]"
+              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-sm text-[#23749e] flex items-center gap-2 hover:bg-[#f5fafc]"
             >
               <Download size={15} />
               Export
@@ -390,7 +419,7 @@ export default function ResourceContributions() {
 
             <button
               onClick={() => setShowModal(true)}
-              className="h-[40px] px-4 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-[#175c80]"
+              className="h-[40px] px-4 bg-[#23749e] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#175c80]"
             >
               <Plus size={16} />
               Record contribution
@@ -417,7 +446,7 @@ export default function ResourceContributions() {
                 setPage(1);
               }}
               placeholder="Search material contributions..."
-              className="w-full h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-10 pr-3 text-[10px] outline-none focus:border-[#35b995]"
+              className="w-full h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-10 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#35b995]"
             />
           </div>
 
@@ -477,7 +506,7 @@ export default function ResourceContributions() {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-[10px] text-[#23749e] flex items-center justify-center gap-2 hover:bg-[#f5fafc] whitespace-nowrap"
+              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-sm text-[#23749e] flex items-center justify-center gap-2 hover:bg-[#f5fafc] whitespace-nowrap"
             >
               <Filter size={14} />
               More filters
@@ -492,11 +521,11 @@ export default function ResourceContributions() {
           <div className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-4 flex flex-wrap items-end gap-4">
 
             <div>
-              <label className="block text-[9px] text-slate-500 mb-1.5">
+              <label className="block text-sm text-slate-500 mb-1.5">
                 Campaign
               </label>
 
-              <select className="h-[34px] border border-[#d5e3e9] rounded-lg px-3 text-[10px]">
+              <select className="h-[34px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px]">
                 <option>All campaigns</option>
                 <option>Flood Response 2025</option>
                 <option>Medical Relief</option>
@@ -504,13 +533,13 @@ export default function ResourceContributions() {
             </div>
 
             <div>
-              <label className="block text-[9px] text-slate-500 mb-1.5">
+              <label className="block text-sm text-slate-500 mb-1.5">
                 Received date
               </label>
 
               <input
                 type="date"
-                className="h-[34px] border border-[#d5e3e9] rounded-lg px-3 text-[10px]"
+                className="h-[34px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px]"
               />
             </div>
 
@@ -519,14 +548,14 @@ export default function ResourceContributions() {
                 setShowFilters(false);
                 notify("Additional filters applied.");
               }}
-              className="h-[34px] px-4 bg-[#23749e] text-white rounded-lg text-[10px]"
+              className="h-[34px] px-4 bg-[#23749e] text-white rounded-lg text-sm"
             >
               Apply filters
             </button>
 
             <button
               onClick={clearFilters}
-              className="h-[34px] px-3 text-[#23749e] text-[10px]"
+              className="h-[34px] px-3 text-[#23749e] text-sm"
             >
               Clear filters
             </button>
@@ -542,11 +571,11 @@ export default function ResourceContributions() {
           <div className="px-4 py-4 flex items-center justify-between border-b border-[#d7e4e9]">
 
             <div>
-              <h2 className="text-[13px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Resource Contributions
               </h2>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 {filteredData.length} demonstration records
               </p>
             </div>
@@ -559,7 +588,7 @@ export default function ResourceContributions() {
                   handleBulkVerify();
                 }
               }}
-              className="h-[40px] px-4 border border-[#b9cfda] rounded-lg text-[9px] text-[#23749e] hover:bg-[#f5fafc]"
+              className="h-[40px] px-4 border border-[#b9cfda] rounded-lg text-sm text-[#23749e] hover:bg-[#f5fafc]"
             >
               Bulk actions
               {selectedRows.length > 0 &&
@@ -603,7 +632,7 @@ export default function ResourceContributions() {
                   ].map((heading) => (
                     <th
                       key={heading}
-                      className="px-3 py-3 text-[9px] font-medium text-slate-500 whitespace-nowrap"
+                      className="px-3 py-3 text-[13px] font-medium text-slate-500 whitespace-nowrap"
                     >
                       {heading}
                     </th>
@@ -630,34 +659,34 @@ export default function ResourceContributions() {
                       />
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] font-semibold whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm font-semibold whitespace-nowrap">
                       {item.id}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {item.donor}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px]">
+                    <td className="px-3 py-4 text-sm">
                       {item.type}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {item.quantity}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {item.campaign}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {item.received}
                     </td>
 
                     <td className="px-3 py-4">
 
                       <span
-                        className={`inline-flex px-2.5 py-1.5 rounded-md text-[9px] font-semibold whitespace-nowrap ${getStatusStyle(
+                        className={`inline-flex px-2.5 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap ${getStatusStyle(
                           item.verification
                         )}`}
                       >
@@ -669,7 +698,7 @@ export default function ResourceContributions() {
                     <td className="px-3 py-4">
 
                       <span
-                        className={`inline-flex px-2.5 py-1.5 rounded-md text-[9px] font-semibold whitespace-nowrap ${getStatusStyle(
+                        className={`inline-flex px-2.5 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap ${getStatusStyle(
                           item.allocation
                         )}`}
                       >
@@ -701,7 +730,7 @@ export default function ResourceContributions() {
                               setSelectedContribution(item);
                               setActiveMenu(null);
                             }}
-                            className="w-full text-left px-3 py-2 text-[10px] hover:bg-[#f1f6f8]"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-[#f1f6f8]"
                           >
                             View details
                           </button>
@@ -711,7 +740,7 @@ export default function ResourceContributions() {
                               onClick={() =>
                                 verifyContribution(item.id)
                               }
-                              className="w-full text-left px-3 py-2 text-[10px] hover:bg-[#f1f6f8]"
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-[#f1f6f8]"
                             >
                               Verify contribution
                             </button>
@@ -722,7 +751,7 @@ export default function ResourceContributions() {
                               onClick={() =>
                                 updateAllocation(item.id)
                               }
-                              className="w-full text-left px-3 py-2 text-[10px] hover:bg-[#f1f6f8]"
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-[#f1f6f8]"
                             >
                               Allocate contribution
                             </button>
@@ -749,17 +778,17 @@ export default function ResourceContributions() {
                         className="mx-auto text-slate-300 mb-3"
                       />
 
-                      <p className="text-[11px] font-medium">
+                      <p className="text-sm font-medium">
                         No contributions found
                       </p>
 
-                      <p className="text-[9px] text-slate-400 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         Try another search or change the filters.
                       </p>
 
                       <button
                         onClick={clearFilters}
-                        className="text-[#23749e] text-[9px] mt-3"
+                        className="text-[#23749e] text-sm mt-3"
                       >
                         Clear filters
                       </button>
@@ -775,7 +804,7 @@ export default function ResourceContributions() {
 
           <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing {filteredData.length > 0 ? (page - 1) * 2 + 1 : 0}–
               {(page - 1) * 2 + filteredData.length} of{" "}
               {filteredData.length === contributions.length
@@ -788,7 +817,7 @@ export default function ResourceContributions() {
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="h-[34px] px-4 border border-[#d5e3e9] rounded-lg text-[9px] disabled:opacity-40"
+                className="h-[34px] px-4 border border-[#d5e3e9] rounded-lg text-sm disabled:opacity-40"
               >
                 Previous
               </button>
@@ -797,7 +826,7 @@ export default function ResourceContributions() {
                 <button
                   key={number}
                   onClick={() => setPage(number)}
-                  className={`w-[34px] h-[34px] border rounded-lg text-[9px] ${
+                  className={`w-[34px] h-[34px] border rounded-lg text-sm ${
                     page === number
                       ? "bg-[#23749e] text-white border-[#23749e]"
                       : "bg-white border-[#d5e3e9]"
@@ -809,7 +838,7 @@ export default function ResourceContributions() {
 
               <button
                 onClick={() => setPage((p) => p + 1)}
-                className="h-[34px] px-4 border border-[#b9cfda] rounded-lg text-[9px] text-[#23749e]"
+                className="h-[34px] px-4 border border-[#b9cfda] rounded-lg text-sm text-[#23749e]"
               >
                 Next
               </button>
@@ -833,11 +862,11 @@ export default function ResourceContributions() {
             <div className="flex justify-between items-start mb-5">
 
               <div>
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Record contribution
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Register a new material or resource donation.
                 </p>
               </div>
@@ -940,14 +969,14 @@ export default function ResourceContributions() {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px]"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold hover:bg-[#175c80]"
+                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-sm font-semibold hover:bg-[#175c80]"
               >
                 Save contribution
               </button>
@@ -968,11 +997,11 @@ export default function ResourceContributions() {
             <div className="flex items-start justify-between mb-5">
 
               <div>
-                <p className="text-[9px] text-[#23749e] font-semibold">
+                <p className="text-xs text-[#23749e] font-semibold">
                   {selectedContribution.id}
                 </p>
 
-                <h2 className="text-[16px] font-semibold mt-1">
+                <h2 className="text-lg sm:text-xl font-semibold mt-1">
                   Contribution details
                 </h2>
               </div>
@@ -999,11 +1028,11 @@ export default function ResourceContributions() {
                   key={label}
                   className="flex justify-between gap-3 border-b border-slate-100 pb-2"
                 >
-                  <span className="text-[9px] text-slate-400">
+                  <span className="text-xs text-slate-400">
                     {label}
                   </span>
 
-                  <span className="text-[9px] font-medium text-right">
+                  <span className="text-xs font-medium text-right">
                     {value}
                   </span>
                 </div>
@@ -1013,7 +1042,7 @@ export default function ResourceContributions() {
 
             <button
               onClick={() => setSelectedContribution(null)}
-              className="w-full mt-5 py-2.5 bg-[#23749e] text-white rounded-lg text-[10px]"
+              className="w-full mt-5 py-2.5 bg-[#23749e] text-white rounded-lg text-sm"
             >
               Close
             </button>
@@ -1025,7 +1054,7 @@ export default function ResourceContributions() {
       {/* TOAST MESSAGE */}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 text-[10px]">
+        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 text-sm">
 
           <CheckCircle2 size={15} />
 
@@ -1060,7 +1089,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none w-full lg:w-[150px] h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#35b995] cursor-pointer"
+        className="appearance-none w-full lg:w-[150px] h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-sm sm:text-[15px] outline-none focus:border-[#35b995] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -1092,7 +1121,7 @@ function FormField({
   return (
     <label className="block">
 
-      <span className="block text-[9px] font-medium mb-1.5">
+      <span className="block text-xs font-medium mb-1.5">
         {label}
       </span>
 

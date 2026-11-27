@@ -1,6 +1,7 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -126,6 +127,28 @@ export default function FlaggedTransactions() {
 
   const [selectedFlag, setSelectedFlag] = useState<Flag | null>(null);
   const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    apiClient.get<any>("/flagged-transactions").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setFlags(
+          items.map((f: any) => ({
+            id: f.id || f.flagCode || "FLG-200",
+            record: f.record || f.recordId || "DON-88398",
+            reason: f.reason || "Flagged transaction",
+            amount: typeof f.amount === "number" ? `$${f.amount.toLocaleString()}` : String(f.amount || "$0"),
+            party: f.party || "Donor",
+            severity: (f.severity as Severity) || "Medium",
+            flagged: f.flagged || f.dateFlagged || "Today",
+            status: (f.status as FlagStatus) || "Under Review",
+            description: f.description || "",
+            investigator: f.investigator || "Not assigned",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
 
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(4);
@@ -286,7 +309,7 @@ export default function FlaggedTransactions() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-8">
+        <div className="flex items-center gap-2 text-xs mb-8">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={11} />
           <span className="text-slate-500">
@@ -303,18 +326,18 @@ export default function FlaggedTransactions() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
 
           <div>
-            <h1 className="text-[24px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Flagged Transactions
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[13px] text-slate-500 mt-1">
               Investigate suspicious donation, allocation, and expenditure records under human control.
             </p>
           </div>
 
           <button
             onClick={() => setShowPolicy(true)}
-            className="h-[37px] px-4 bg-white border border-[#b9cfda] rounded-lg text-[10px] text-[#23749e] hover:bg-[#f5fafc]"
+            className="h-[37px] px-4 bg-white border border-[#b9cfda] rounded-lg text-sm text-[#23749e] hover:bg-[#f5fafc]"
           >
             Investigation policy
           </button>
@@ -332,18 +355,18 @@ export default function FlaggedTransactions() {
             />
 
             <div>
-              <p className="text-[10px] font-semibold text-[#a51e2a]">
+              <p className="text-sm font-semibold text-[#a51e2a]">
                 {openFlags} records require authorised investigation
               </p>
 
-              <p className="text-[9px] text-[#a65d65] mt-0.5">
+              <p className="text-xs text-[#a65d65] mt-0.5">
                 Flags do not prove wrongdoing and must not trigger automatic rejection.
               </p>
             </div>
           </div>
 
           <div className="md:w-[50%] bg-[#fdebed] rounded-md px-3 py-1.5">
-            <p className="text-[8px] font-semibold text-[#b91c1c]">
+            <p className="text-xs font-semibold text-[#b91c1c]">
               {highPriority} high priority
             </p>
           </div>
@@ -405,7 +428,7 @@ export default function FlaggedTransactions() {
                 setPage(1);
               }}
               placeholder="Search flag, transaction, or party..."
-              className="w-full h-[37px] bg-white border border-[#d5e3e9] rounded-lg pl-9 pr-3 text-[9px] outline-none focus:border-[#23749e]"
+              className="w-full h-[37px] bg-white border border-[#d5e3e9] rounded-lg pl-9 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#23749e]"
             />
           </div>
 
@@ -415,7 +438,7 @@ export default function FlaggedTransactions() {
               setRecordType(e.target.value);
               setPage(1);
             }}
-            className="h-[37px] px-3 bg-white border border-[#d5e3e9] rounded-lg text-[9px] min-w-[110px] outline-none"
+            className="h-[37px] px-3 bg-white border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] min-w-[110px] outline-none"
           >
             <option>All record types</option>
             <option>Donations</option>
@@ -429,7 +452,7 @@ export default function FlaggedTransactions() {
               setSeverityFilter(e.target.value);
               setPage(1);
             }}
-            className="h-[37px] px-3 bg-white border border-[#d5e3e9] rounded-lg text-[9px] min-w-[110px] outline-none"
+            className="h-[37px] px-3 bg-white border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] min-w-[110px] outline-none"
           >
             <option>All severities</option>
             <option>High</option>
@@ -443,7 +466,7 @@ export default function FlaggedTransactions() {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="h-[37px] px-3 bg-white border border-[#d5e3e9] rounded-lg text-[9px] min-w-[110px] outline-none"
+            className="h-[37px] px-3 bg-white border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] min-w-[110px] outline-none"
           >
             <option>All statuses</option>
             <option>Investigation Required</option>
@@ -455,7 +478,7 @@ export default function FlaggedTransactions() {
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="h-[37px] px-3 bg-white border border-[#d5e3e9] rounded-lg text-[9px] min-w-[105px] outline-none"
+            className="h-[37px] px-3 bg-white border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] min-w-[105px] outline-none"
           >
             <option>Date flagged</option>
             <option>Newest first</option>
@@ -464,7 +487,7 @@ export default function FlaggedTransactions() {
 
           <button
             onClick={() => setShowMoreFilters(!showMoreFilters)}
-            className={`h-[37px] px-3 border rounded-lg text-[9px] flex items-center justify-center gap-2 whitespace-nowrap ${
+            className={`h-[37px] px-3 border rounded-lg text-sm flex items-center justify-center gap-2 whitespace-nowrap ${
               showMoreFilters
                 ? "bg-[#e8f1f6] border-[#23749e]"
                 : "bg-white border-[#b9cfda]"
@@ -482,10 +505,10 @@ export default function FlaggedTransactions() {
           <div className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3 flex flex-wrap items-center justify-between gap-3">
 
             <div>
-              <p className="text-[9px] font-semibold mb-1">
+              <p className="text-xs font-semibold mb-1">
                 Investigation filters
               </p>
-              <p className="text-[8px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 Refine flagged transaction records.
               </p>
             </div>
@@ -501,14 +524,14 @@ export default function FlaggedTransactions() {
                   setDateFilter("Date flagged");
                   setPage(1);
                 }}
-                className="px-3 py-2 border border-[#d5e3e9] rounded-lg text-[9px]"
+                className="px-3 py-2 border border-[#d5e3e9] rounded-lg text-sm"
               >
                 Clear filters
               </button>
 
               <button
                 onClick={() => setShowMoreFilters(false)}
-                className="px-3 py-2 bg-[#23749e] text-white rounded-lg text-[9px]"
+                className="px-3 py-2 bg-[#23749e] text-white rounded-lg text-sm"
               >
                 Apply
               </button>
@@ -541,7 +564,7 @@ export default function FlaggedTransactions() {
                   ].map((heading) => (
                     <th
                       key={heading}
-                      className="px-3 py-3 text-[8px] font-medium text-slate-500 whitespace-nowrap"
+                      className="px-3 py-3 text-[13px] font-medium text-slate-500 whitespace-nowrap"
                     >
                       {heading}
                     </th>
@@ -559,38 +582,38 @@ export default function FlaggedTransactions() {
                     className="border-b border-[#e5edf1] hover:bg-[#f7fafb] transition-colors"
                   >
 
-                    <td className="px-3 py-3 text-[9px] font-semibold whitespace-nowrap">
+                    <td className="px-3 py-3 text-sm font-semibold whitespace-nowrap">
                       {flag.id}
                     </td>
 
-                    <td className="px-3 py-3 text-[9px] text-[#315d7b]">
+                    <td className="px-3 py-3 text-sm text-[#315d7b]">
                       {flag.record}
                     </td>
 
-                    <td className="px-3 py-3 text-[9px]">
+                    <td className="px-3 py-3 text-sm">
                       {flag.reason}
                     </td>
 
-                    <td className="px-3 py-3 text-[9px] whitespace-nowrap">
+                    <td className="px-3 py-3 text-sm whitespace-nowrap">
                       {flag.amount}
                     </td>
 
-                    <td className="px-3 py-3 text-[9px]">
+                    <td className="px-3 py-3 text-sm">
                       {flag.party}
                     </td>
 
-                    <td className={`px-3 py-3 text-[9px] font-medium ${severityStyle(flag.severity)}`}>
+                    <td className={`px-3 py-3 text-sm font-medium ${severityStyle(flag.severity)}`}>
                       {flag.severity}
                     </td>
 
                     <td className="px-3 py-3">
-                      <span className="inline-block px-2 py-1 bg-[#e8f1f6] text-[#23749e] rounded-md text-[8px] font-semibold whitespace-nowrap">
+                      <span className="inline-block px-2 py-1 bg-[#e8f1f6] text-[#23749e] rounded-md text-xs font-semibold whitespace-nowrap">
                         {flag.flagged}
                       </span>
                     </td>
 
                     <td className="px-3 py-3">
-                      <span className={`inline-block px-2 py-1 rounded-md text-[8px] font-semibold whitespace-nowrap ${statusStyle(flag.status)}`}>
+                      <span className={`inline-block px-2 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${statusStyle(flag.status)}`}>
                         {flag.status}
                       </span>
                     </td>
@@ -619,11 +642,11 @@ export default function FlaggedTransactions() {
                         className="mx-auto text-slate-300 mb-2"
                       />
 
-                      <p className="text-[11px] font-medium">
+                      <p className="text-sm font-medium">
                         No flagged transactions found
                       </p>
 
-                      <p className="text-[9px] text-slate-400 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         Try changing your search or filters.
                       </p>
                     </td>
@@ -638,7 +661,7 @@ export default function FlaggedTransactions() {
 
           <div className="px-3 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing{" "}
               {filteredFlags.length === 0
                 ? 0
@@ -653,7 +676,7 @@ export default function FlaggedTransactions() {
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="h-[30px] px-3 border border-[#d5e3e9] rounded-lg text-[9px] disabled:opacity-40"
+                className="h-[30px] px-3 border border-[#d5e3e9] rounded-lg text-sm disabled:opacity-40"
               >
                 Previous
               </button>
@@ -665,7 +688,7 @@ export default function FlaggedTransactions() {
                 <button
                   key={number}
                   onClick={() => setPage(number)}
-                  className={`w-[29px] h-[30px] rounded-lg text-[9px] border ${
+                  className={`w-[29px] h-[30px] rounded-lg text-sm border ${
                     page === number
                       ? "bg-[#23749e] text-white border-[#23749e]"
                       : "bg-white border-[#d5e3e9]"
@@ -678,7 +701,7 @@ export default function FlaggedTransactions() {
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="h-[30px] px-3 border border-[#d5e3e9] rounded-lg text-[9px] disabled:opacity-40"
+                className="h-[30px] px-3 border border-[#d5e3e9] rounded-lg text-sm disabled:opacity-40"
               >
                 Next
               </button>
@@ -699,11 +722,11 @@ export default function FlaggedTransactions() {
             <ShieldAlert size={22} className="text-red-600" />
           </div>
 
-          <h2 className="text-[16px] font-semibold">
+          <h2 className="text-lg sm:text-xl font-semibold">
             Investigation policy
           </h2>
 
-          <p className="text-[9px] text-slate-400 mt-1 mb-5">
+          <p className="text-xs text-slate-400 mt-1 mb-5">
             Guidelines for reviewing suspicious financial transactions.
           </p>
 
@@ -738,16 +761,16 @@ export default function FlaggedTransactions() {
             ].map((item, index) => (
               <div key={item.title} className="flex gap-3">
 
-                <div className="w-6 h-6 rounded-full bg-[#e8f1f6] text-[#23749e] flex items-center justify-center text-[9px] font-semibold shrink-0">
+                <div className="w-6 h-6 rounded-full bg-[#e8f1f6] text-[#23749e] flex items-center justify-center text-xs font-semibold shrink-0">
                   {index + 1}
                 </div>
 
                 <div>
-                  <h3 className="text-[10px] font-semibold">
+                  <h3 className="text-base font-semibold">
                     {item.title}
                   </h3>
 
-                  <p className="text-[9px] text-slate-500 mt-1 leading-relaxed">
+                  <p className="text-sm text-slate-500 mt-1 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -757,7 +780,7 @@ export default function FlaggedTransactions() {
 
           <button
             onClick={() => setShowPolicy(false)}
-            className="w-full mt-6 h-10 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold"
+            className="w-full mt-6 h-10 bg-[#23749e] text-white rounded-lg text-sm font-semibold"
           >
             Close policy
           </button>
@@ -773,20 +796,20 @@ export default function FlaggedTransactions() {
           <div className="flex items-start justify-between mb-5">
 
             <div>
-              <p className="text-[9px] font-semibold text-[#23749e]">
+              <p className="text-xs font-semibold text-[#23749e]">
                 {selectedFlag.id}
               </p>
 
-              <h2 className="text-[16px] font-semibold mt-1">
+              <h2 className="text-lg sm:text-xl font-semibold mt-1">
                 Transaction investigation
               </h2>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Record reference: {selectedFlag.record}
               </p>
             </div>
 
-            <span className={`px-2 py-1 rounded-md text-[8px] font-semibold ${statusStyle(selectedFlag.status)}`}>
+            <span className={`px-2 py-1 rounded-md text-xs font-semibold ${statusStyle(selectedFlag.status)}`}>
               {selectedFlag.status}
             </span>
           </div>
@@ -831,11 +854,11 @@ export default function FlaggedTransactions() {
 
           <div className="mb-5">
 
-            <h3 className="text-[10px] font-semibold mb-2">
+            <h3 className="text-base font-semibold mb-2">
               Investigation notes
             </h3>
 
-            <p className="text-[9px] text-slate-500 leading-relaxed bg-[#f5f9fa] p-3 rounded-lg">
+            <p className="text-sm text-slate-500 leading-relaxed bg-[#f5f9fa] p-3 rounded-lg">
               {selectedFlag.description}
             </p>
           </div>
@@ -847,7 +870,7 @@ export default function FlaggedTransactions() {
             {selectedFlag.status !== "Resolved" && (
               <button
                 onClick={() => assignInvestigator(selectedFlag.id)}
-                className="w-full h-10 border border-[#d5e3e9] rounded-lg text-[9px] flex items-center justify-center gap-2 hover:bg-[#f5f9fa]"
+                className="w-full h-10 border border-[#d5e3e9] rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-[#f5f9fa]"
               >
                 <UserPlus size={15} />
                 Assign to me / Start review
@@ -860,14 +883,14 @@ export default function FlaggedTransactions() {
                 <>
                   <button
                     onClick={() => updateStatus(selectedFlag.id, "Deferred")}
-                    className="h-10 bg-[#fff3dd] text-[#a66b13] rounded-lg text-[9px] font-semibold"
+                    className="h-10 bg-[#fff3dd] text-[#a66b13] rounded-lg text-sm font-semibold"
                   >
                     Defer
                   </button>
 
                   <button
                     onClick={() => updateStatus(selectedFlag.id, "Resolved")}
-                    className="h-10 bg-[#e5f6f0] text-[#078c70] rounded-lg text-[9px] font-semibold flex items-center justify-center gap-1"
+                    className="h-10 bg-[#e5f6f0] text-[#078c70] rounded-lg text-sm font-semibold flex items-center justify-center gap-1"
                   >
                     <CheckCircle2 size={14} />
                     Resolve
@@ -877,7 +900,7 @@ export default function FlaggedTransactions() {
 
               <button
                 onClick={() => setSelectedFlag(null)}
-                className="h-10 bg-[#23749e] text-white rounded-lg text-[9px] font-semibold col-span-2"
+                className="h-10 bg-[#23749e] text-white rounded-lg text-sm font-semibold col-span-2"
               >
                 Close
               </button>
@@ -890,7 +913,7 @@ export default function FlaggedTransactions() {
       {/* TOAST */}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[100] bg-[#143d5c] text-white rounded-lg px-4 py-3 shadow-xl flex items-center gap-3 text-[10px]">
+        <div className="fixed bottom-5 right-5 z-[100] bg-[#143d5c] text-white rounded-lg px-4 py-3 shadow-xl flex items-center gap-3 text-sm">
           <CheckCircle2 size={15} />
           {toast}
 
@@ -935,7 +958,7 @@ function StatCard({
       </div>
 
       <div>
-        <p className="text-[8px] text-slate-400">
+        <p className="text-xs text-slate-400">
           {label}
         </p>
 
@@ -943,7 +966,7 @@ function StatCard({
           {value}
         </h3>
 
-        <p className="text-[8px] text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-400 mt-0.5">
           {description}
         </p>
       </div>
@@ -1000,11 +1023,11 @@ function DetailRow({
   return (
     <div className="flex items-start justify-between gap-3 border-b border-[#e3ebef] pb-2 last:border-0 last:pb-0">
 
-      <span className="text-[9px] text-slate-500">
+      <span className="text-xs text-slate-500">
         {label}
       </span>
 
-      <span className="text-[9px] font-semibold text-right">
+      <span className="text-xs font-semibold text-right">
         {value}
       </span>
 

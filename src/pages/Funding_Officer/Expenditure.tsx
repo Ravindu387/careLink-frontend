@@ -1,6 +1,7 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -103,6 +104,27 @@ export default function Expenditure() {
   const [toast, setToast] = useState("");
   const [page, setPage] = useState(1);
 
+  useEffect(() => {
+    apiClient.get<any>("/expenditures").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setExpenses(
+          items.map((ex: any) => ({
+            id: ex.id || ex.reference || "EXP-9000",
+            amount: Number(ex.amount ?? 0),
+            description: ex.description || "Expenditure",
+            recipient: ex.recipient || "CareLink",
+            invoice: ex.invoice || ex.invoiceNumber || "INV-4800",
+            date: ex.date || "Today",
+            verification: (ex.verification as Expense["verification"]) || "Verified",
+            paymentStatus: (ex.paymentStatus as Expense["paymentStatus"]) || "Paid",
+            type: ex.type || ex.category || "Shelter",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   const [newExpense, setNewExpense] = useState({
     amount: "",
     description: "",
@@ -178,6 +200,15 @@ export default function Expenditure() {
       notify("Please enter valid expense details.");
       return;
     }
+
+    apiClient.post("/expenditures", {
+      amount,
+      description: newExpense.description,
+      recipient: newExpense.recipient,
+      invoice: newExpense.invoice,
+      date: newExpense.date,
+      type: newExpense.type,
+    }).catch(() => {});
 
     const expense: Expense = {
       id: `EXP-${Math.floor(9000 + Math.random() * 999)}`,
@@ -436,7 +467,7 @@ export default function Expenditure() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-8">
+        <div className="flex items-center gap-2 text-xs mb-8">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={11} />
           <span className="text-slate-500">
@@ -451,11 +482,11 @@ export default function Expenditure() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
 
           <div>
-            <h1 className="text-[25px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Expenditure
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[13px] text-slate-500 mt-1">
               Record and verify humanitarian expenditure against approved allocations.
             </p>
           </div>
@@ -464,7 +495,7 @@ export default function Expenditure() {
 
             <button
               onClick={exportCSV}
-              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-[10px] text-[#23749e] flex items-center gap-2 hover:bg-[#f5fafc]"
+              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-sm text-[#23749e] flex items-center gap-2 hover:bg-[#f5fafc]"
             >
               <Download size={15} />
               Export
@@ -472,7 +503,7 @@ export default function Expenditure() {
 
             <button
               onClick={() => setShowModal(true)}
-              className="h-[40px] px-4 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-[#175c80]"
+              className="h-[40px] px-4 bg-[#23749e] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#175c80]"
             >
               <Plus size={16} />
               Record expense
@@ -499,7 +530,7 @@ export default function Expenditure() {
                 setPage(1);
               }}
               placeholder="Search expense, invoice, or recipient..."
-              className="w-full h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-10 pr-3 text-[10px] outline-none focus:border-[#35b995]"
+              className="w-full h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-10 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#35b995]"
             />
           </div>
 
@@ -561,7 +592,7 @@ export default function Expenditure() {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-[10px] text-[#23749e] flex items-center justify-center gap-2 whitespace-nowrap hover:bg-[#f5fafc]"
+              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-sm text-[#23749e] flex items-center justify-center gap-2 whitespace-nowrap hover:bg-[#f5fafc]"
             >
               <Filter size={14} />
               More filters
@@ -575,34 +606,34 @@ export default function Expenditure() {
           <div className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-4 flex flex-wrap items-end gap-4">
 
             <div>
-              <label className="block text-[9px] text-slate-500 mb-1.5">
+              <label className="block text-sm text-slate-500 mb-1.5">
                 Recipient
               </label>
               <input
                 placeholder="Search recipient"
-                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-[10px]"
+                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px]"
               />
             </div>
 
             <div>
-              <label className="block text-[9px] text-slate-500 mb-1.5">
+              <label className="block text-sm text-slate-500 mb-1.5">
                 Minimum amount
               </label>
               <input
                 type="number"
                 placeholder="Minimum USD"
-                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-[10px]"
+                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px]"
               />
             </div>
 
             <div>
-              <label className="block text-[9px] text-slate-500 mb-1.5">
+              <label className="block text-sm text-slate-500 mb-1.5">
                 Maximum amount
               </label>
               <input
                 type="number"
                 placeholder="Maximum USD"
-                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-[10px]"
+                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px]"
               />
             </div>
 
@@ -611,14 +642,14 @@ export default function Expenditure() {
                 setShowFilters(false);
                 notify("Additional filters applied.");
               }}
-              className="h-[35px] px-4 bg-[#23749e] text-white rounded-lg text-[10px]"
+              className="h-[35px] px-4 bg-[#23749e] text-white rounded-lg text-sm"
             >
               Apply filters
             </button>
 
             <button
               onClick={clearFilters}
-              className="h-[35px] px-3 text-[#23749e] text-[10px]"
+              className="h-[35px] px-3 text-[#23749e] text-sm"
             >
               Clear filters
             </button>
@@ -634,18 +665,18 @@ export default function Expenditure() {
           <div className="px-4 py-4 flex items-center justify-between border-b border-[#d7e4e9]">
 
             <div>
-              <h2 className="text-[13px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Expenditure
               </h2>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 {filteredExpenses.length} demonstration records
               </p>
             </div>
 
             <button
               onClick={bulkVerify}
-              className="h-[40px] px-4 border border-[#b9cfda] rounded-lg text-[9px] text-[#23749e] hover:bg-[#f5fafc]"
+              className="h-[40px] px-4 border border-[#b9cfda] rounded-lg text-sm text-[#23749e] hover:bg-[#f5fafc]"
             >
               Bulk actions
               {selectedRows.length > 0 &&
@@ -688,7 +719,7 @@ export default function Expenditure() {
                   ].map((heading) => (
                     <th
                       key={heading}
-                      className="px-3 py-3 text-[9px] font-medium text-slate-500 whitespace-nowrap"
+                      className="px-3 py-3 text-[13px] font-medium text-slate-500 whitespace-nowrap"
                     >
                       {heading}
                     </th>
@@ -715,33 +746,33 @@ export default function Expenditure() {
                       />
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] font-semibold whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm font-semibold whitespace-nowrap">
                       {expense.id}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {currency(expense.amount)}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {expense.description}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {expense.recipient}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {expense.invoice}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {expense.date}
                     </td>
 
                     <td className="px-3 py-4">
                       <span
-                        className={`inline-flex px-2.5 py-1.5 rounded-md text-[9px] font-semibold whitespace-nowrap ${verificationStyle(
+                        className={`inline-flex px-2.5 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap ${verificationStyle(
                           expense.verification
                         )}`}
                       >
@@ -751,7 +782,7 @@ export default function Expenditure() {
 
                     <td className="px-3 py-4">
                       <span
-                        className={`inline-flex px-2.5 py-1.5 rounded-md text-[9px] font-semibold whitespace-nowrap ${paymentStyle(
+                        className={`inline-flex px-2.5 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap ${paymentStyle(
                           expense.paymentStatus
                         )}`}
                       >
@@ -784,7 +815,7 @@ export default function Expenditure() {
                               setSelectedExpense(expense);
                               setActiveMenu(null);
                             }}
-                            className="w-full text-left px-3 py-2 text-[10px] hover:bg-[#f1f6f8]"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-[#f1f6f8]"
                           >
                             View expense details
                           </button>
@@ -795,7 +826,7 @@ export default function Expenditure() {
                                 onClick={() =>
                                   verifyExpense(expense.id)
                                 }
-                                className="w-full text-left px-3 py-2 text-[10px] text-[#159b79] hover:bg-[#f1f6f8]"
+                                className="w-full text-left px-3 py-2 text-sm text-[#159b79] hover:bg-[#f1f6f8]"
                               >
                                 Verify expense
                               </button>
@@ -804,7 +835,7 @@ export default function Expenditure() {
                                 onClick={() =>
                                   rejectExpense(expense.id)
                                 }
-                                className="w-full text-left px-3 py-2 text-[10px] text-red-500 hover:bg-[#f1f6f8]"
+                                className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-[#f1f6f8]"
                               >
                                 Reject expense
                               </button>
@@ -817,7 +848,7 @@ export default function Expenditure() {
                                 onClick={() =>
                                   markAsPaid(expense.id)
                                 }
-                                className="w-full text-left px-3 py-2 text-[10px] text-[#23749e] hover:bg-[#f1f6f8]"
+                                className="w-full text-left px-3 py-2 text-sm text-[#23749e] hover:bg-[#f1f6f8]"
                               >
                                 Mark as paid
                               </button>
@@ -839,17 +870,17 @@ export default function Expenditure() {
                         className="mx-auto text-slate-300 mb-3"
                       />
 
-                      <p className="text-[11px] font-medium">
+                      <p className="text-sm font-medium">
                         No expenditure records found
                       </p>
 
-                      <p className="text-[9px] text-slate-400 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         Try changing your search or filters.
                       </p>
 
                       <button
                         onClick={clearFilters}
-                        className="text-[#23749e] text-[9px] mt-3"
+                        className="text-[#23749e] text-sm mt-3"
                       >
                         Clear filters
                       </button>
@@ -865,7 +896,7 @@ export default function Expenditure() {
 
           <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing 1–{filteredExpenses.length} of{" "}
               {filteredExpenses.length === expenses.length
                 ? "1,842"
@@ -881,7 +912,7 @@ export default function Expenditure() {
                     Math.max(1, previous - 1)
                   )
                 }
-                className="h-[34px] px-4 border border-[#d5e3e9] rounded-lg text-[9px] disabled:opacity-40"
+                className="h-[34px] px-4 border border-[#d5e3e9] rounded-lg text-sm disabled:opacity-40"
               >
                 Previous
               </button>
@@ -890,7 +921,7 @@ export default function Expenditure() {
                 <button
                   key={number}
                   onClick={() => setPage(number)}
-                  className={`w-[34px] h-[34px] border rounded-lg text-[9px] ${
+                  className={`w-[34px] h-[34px] border rounded-lg text-sm ${
                     page === number
                       ? "bg-[#23749e] text-white border-[#23749e]"
                       : "bg-white border-[#d5e3e9]"
@@ -904,7 +935,7 @@ export default function Expenditure() {
                 onClick={() =>
                   setPage((previous) => previous + 1)
                 }
-                className="h-[34px] px-4 border border-[#b9cfda] rounded-lg text-[9px] text-[#23749e]"
+                className="h-[34px] px-4 border border-[#b9cfda] rounded-lg text-sm text-[#23749e]"
               >
                 Next
               </button>
@@ -926,11 +957,11 @@ export default function Expenditure() {
             <div className="flex justify-between items-start mb-5">
 
               <div>
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Record expense
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Enter the expenditure and invoice details.
                 </p>
               </div>
@@ -1050,7 +1081,7 @@ export default function Expenditure() {
                   className="text-[#23749e] shrink-0"
                 />
 
-                <p className="text-[9px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   Newly recorded expenses will be submitted
                   with <strong>Pending Review</strong> status.
                   Payment will remain on hold until verification.
@@ -1063,14 +1094,14 @@ export default function Expenditure() {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px]"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold hover:bg-[#175c80]"
+                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-sm font-semibold hover:bg-[#175c80]"
               >
                 Save expense
               </button>
@@ -1090,11 +1121,11 @@ export default function Expenditure() {
             <div className="flex items-start justify-between mb-5">
 
               <div>
-                <p className="text-[9px] text-[#23749e] font-semibold">
+                <p className="text-xs text-[#23749e] font-semibold">
                   {selectedExpense.id}
                 </p>
 
-                <h2 className="text-[16px] font-semibold mt-1">
+                <h2 className="text-lg sm:text-xl font-semibold mt-1">
                   Expense details
                 </h2>
               </div>
@@ -1108,7 +1139,7 @@ export default function Expenditure() {
 
             <div className="bg-[#eef5f7] rounded-lg p-4 mb-4">
 
-              <p className="text-[9px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 Expense amount
               </p>
 
@@ -1132,11 +1163,11 @@ export default function Expenditure() {
                   key={label}
                   className="flex justify-between gap-3 border-b border-slate-100 pb-2"
                 >
-                  <span className="text-[9px] text-slate-400">
+                  <span className="text-xs text-slate-400">
                     {label}
                   </span>
 
-                  <span className="text-[9px] font-medium text-right">
+                  <span className="text-xs font-medium text-right">
                     {value}
                   </span>
                 </div>
@@ -1152,7 +1183,7 @@ export default function Expenditure() {
                     onClick={() =>
                       rejectExpense(selectedExpense.id)
                     }
-                    className="px-3 py-2 bg-[#fde9e9] text-red-600 rounded-lg text-[9px]"
+                    className="px-3 py-2 bg-[#fde9e9] text-red-600 rounded-lg text-sm"
                   >
                     Reject
                   </button>
@@ -1161,7 +1192,7 @@ export default function Expenditure() {
                     onClick={() =>
                       verifyExpense(selectedExpense.id)
                     }
-                    className="px-3 py-2 bg-[#e4f6f0] text-[#159b79] rounded-lg text-[9px]"
+                    className="px-3 py-2 bg-[#e4f6f0] text-[#159b79] rounded-lg text-sm"
                   >
                     Verify expense
                   </button>
@@ -1174,7 +1205,7 @@ export default function Expenditure() {
                     onClick={() =>
                       markAsPaid(selectedExpense.id)
                     }
-                    className="px-3 py-2 bg-[#23749e] text-white rounded-lg text-[9px]"
+                    className="px-3 py-2 bg-[#23749e] text-white rounded-lg text-sm"
                   >
                     Mark as paid
                   </button>
@@ -1182,7 +1213,7 @@ export default function Expenditure() {
 
               <button
                 onClick={() => setSelectedExpense(null)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[9px]"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm"
               >
                 Close
               </button>
@@ -1195,7 +1226,7 @@ export default function Expenditure() {
       {/* TOAST NOTIFICATION */}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 text-[10px]">
+        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 text-sm">
 
           <CheckCircle2 size={15} />
 
@@ -1230,7 +1261,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none w-full lg:w-[150px] h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#35b995] cursor-pointer"
+        className="appearance-none w-full lg:w-[150px] h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-sm sm:text-[15px] outline-none focus:border-[#35b995] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -1262,7 +1293,7 @@ function FormField({
   return (
     <label className="block">
 
-      <span className="block text-[9px] font-medium mb-1.5">
+      <span className="block text-xs font-medium mb-1.5">
         {label}
       </span>
 
