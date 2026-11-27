@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 /**
  * Emergency Topbar Service
  * Connects the emergency coordinator topbar with global search, notifications, helplines, and area status.
@@ -137,7 +138,7 @@ const BASE_URL = "/api/emergency-topbar";
 export const emergencyTopbarService = {
   async getState(): Promise<EmergencyTopbarState> {
     try {
-      const response = await fetch(BASE_URL, {
+      const response = await authFetch(BASE_URL, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) throw new Error(`HTTP error ${response.status}`);
@@ -149,7 +150,7 @@ export const emergencyTopbarService = {
 
   async markNotificationRead(id: string): Promise<boolean> {
     try {
-      const response = await fetch(`${BASE_URL}/notifications/${encodeURIComponent(id)}/read`, {
+      const response = await authFetch(`${BASE_URL}/notifications/${encodeURIComponent(id)}/read`, {
         method: "PATCH",
         headers: { Accept: "application/json" },
       });
@@ -161,7 +162,7 @@ export const emergencyTopbarService = {
 
   async markAllNotificationsRead(): Promise<number> {
     try {
-      const response = await fetch(`${BASE_URL}/notifications/mark-all-read`, {
+      const response = await authFetch(`${BASE_URL}/notifications/mark-all-read`, {
         method: "POST",
         headers: { Accept: "application/json" },
       });
@@ -176,7 +177,7 @@ export const emergencyTopbarService = {
   async searchGlobal(query: string): Promise<GlobalSearchResult[]> {
     if (!query || query.trim().length < 2) return [];
     try {
-      const response = await fetch(`${BASE_URL}/search?q=${encodeURIComponent(query.trim())}`, {
+      const response = await authFetch(`${BASE_URL}/search?q=${encodeURIComponent(query.trim())}`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) throw new Error(`HTTP error ${response.status}`);
@@ -188,7 +189,7 @@ export const emergencyTopbarService = {
 
   async updateArea(area: string): Promise<string> {
     try {
-      const response = await fetch(`${BASE_URL}/area`, {
+      const response = await authFetch(`${BASE_URL}/area`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -206,7 +207,7 @@ export const emergencyTopbarService = {
 
   async updateLanguage(lang: string): Promise<string> {
     try {
-      const response = await fetch(`${BASE_URL}/language`, {
+      const response = await authFetch(`${BASE_URL}/language`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -224,7 +225,7 @@ export const emergencyTopbarService = {
 
   async resetState(): Promise<EmergencyTopbarState> {
     try {
-      const response = await fetch(`${BASE_URL}/reset`, {
+      const response = await authFetch(`${BASE_URL}/reset`, {
         method: "POST",
         headers: { Accept: "application/json" },
       });

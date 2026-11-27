@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 /**
  * Emergency Sidebar Service
  * Connects the emergency coordinator sidebar to the CareLink .NET backend.
@@ -104,7 +105,7 @@ const BASE_URL = "/api/emergency-sidebar";
 export const emergencySidebarService = {
   async getState(): Promise<EmergencySidebarState> {
     try {
-      const response = await fetch(BASE_URL, {
+      const response = await authFetch(BASE_URL, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -118,7 +119,7 @@ export const emergencySidebarService = {
 
   async updateDutyStatus(dutyStatus: string): Promise<CoordinatorProfile> {
     try {
-      const response = await fetch(`${BASE_URL}/duty-status`, {
+      const response = await authFetch(`${BASE_URL}/duty-status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +141,7 @@ export const emergencySidebarService = {
 
   async setActiveCrisis(crisisId: string): Promise<ActiveCrisisSummary> {
     try {
-      const response = await fetch(`${BASE_URL}/active-crisis/${encodeURIComponent(crisisId)}`, {
+      const response = await authFetch(`${BASE_URL}/active-crisis/${encodeURIComponent(crisisId)}`, {
         method: "POST",
         headers: { Accept: "application/json" },
       });
@@ -158,7 +159,7 @@ export const emergencySidebarService = {
 
   async markNotificationRead(): Promise<number> {
     try {
-      const response = await fetch(`${BASE_URL}/notifications/read`, {
+      const response = await authFetch(`${BASE_URL}/notifications/read`, {
         method: "POST",
         headers: { Accept: "application/json" },
       });
@@ -174,7 +175,7 @@ export const emergencySidebarService = {
 
   async resetState(): Promise<EmergencySidebarState> {
     try {
-      const response = await fetch(`${BASE_URL}/reset`, {
+      const response = await authFetch(`${BASE_URL}/reset`, {
         method: "POST",
         headers: { Accept: "application/json" },
       });
