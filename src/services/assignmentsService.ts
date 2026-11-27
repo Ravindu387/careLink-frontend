@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   Assignment,
   AssignmentsStatsDto,
@@ -303,7 +303,7 @@ export const assignmentsService = {
       if (query.progress !== undefined) params.append("progress", String(query.progress));
 
       const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5277/api";
-      const res = await fetch(`${API_BASE_URL}/assignments/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/assignments/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }

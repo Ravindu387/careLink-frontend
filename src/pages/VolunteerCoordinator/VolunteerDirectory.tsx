@@ -294,7 +294,7 @@ export default function VolunteerDirectory() {
       <main className="max-w-[1600px] mx-auto px-5 lg:px-[33px] pt-5 pb-10">
         {/* BREADCRUMB & BACKEND CONNECTION STATUS */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div className="flex items-center gap-2 text-[10px]">
+          <div className="flex items-center gap-2 text-sm">
             <span className="text-[#7890a4]">Operations</span>
             <ChevronRight size={13} className="text-[#7890a4]" />
             <span className="text-[#7890a4]">Volunteer Coordination</span>
@@ -304,7 +304,7 @@ export default function VolunteerDirectory() {
 
           <div className="flex items-center gap-2.5">
             <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition-colors ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -318,7 +318,7 @@ export default function VolunteerDirectory() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               title="Refresh directory"
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-[10px] text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-xs text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
             >
               <RefreshCw
                 size={12}
@@ -332,7 +332,7 @@ export default function VolunteerDirectory() {
         {/* PAGE HEADER */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-6">
           <div>
-            <h1 className="text-[27px] md:text-[29px] font-normal tracking-tight">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight">
               Volunteer Directory
             </h1>
             <p className="text-[12px] text-[#718ba0] mt-1.5">
@@ -343,7 +343,7 @@ export default function VolunteerDirectory() {
           <div className="flex items-center gap-2">
             <button
               onClick={handleExport}
-              className="h-[42px] px-4 border border-[#b9d0dc] bg-white hover:bg-[#f5fafc] rounded-lg flex items-center gap-2 text-[11px] text-[#17648e] transition-colors"
+              className="h-[42px] px-4 border border-[#b9d0dc] bg-white hover:bg-[#f5fafc] rounded-lg flex items-center gap-2 text-sm text-[#17648e] transition-colors"
             >
               <Download size={15} />
               Export
@@ -351,7 +351,7 @@ export default function VolunteerDirectory() {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="h-[42px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[11px] font-semibold shadow-xs transition-colors"
+              className="h-[42px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-sm font-semibold shadow-xs transition-colors"
             >
               <Plus size={16} />
               Add volunteer
@@ -369,7 +369,7 @@ export default function VolunteerDirectory() {
           ].map((stat) => (
             <div key={stat.label} className="flex items-center justify-center gap-2 py-1.5">
               <span className="text-[16px] font-bold text-[#123c5b]">{stat.value}</span>
-              <span className="text-[10px] text-[#8296aa]">{stat.label}</span>
+              <span className="text-[13px] text-[#8296aa]">{stat.label}</span>
             </div>
           ))}
         </section>
@@ -386,7 +386,7 @@ export default function VolunteerDirectory() {
                 setCurrentPage(1);
               }}
               placeholder="Search volunteer ID, name, or skill..."
-              className="w-full text-[10px] outline-none placeholder:text-[#a2b2c1]"
+              className="w-full text-sm sm:text-[15px] outline-none placeholder:text-[#a2b2c1]"
             />
             {search && (
               <button
@@ -408,7 +408,7 @@ export default function VolunteerDirectory() {
               setSkillFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-2.5 text-[10px] outline-none cursor-pointer"
+            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-2.5 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>All skills</option>
             {availableSkills.map((sk) => (
@@ -425,7 +425,7 @@ export default function VolunteerDirectory() {
               setLocationFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-2.5 text-[10px] outline-none cursor-pointer"
+            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-2.5 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>All locations</option>
             {availableLocations.map((loc) => (
@@ -442,7 +442,7 @@ export default function VolunteerDirectory() {
               setAvailabilityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-2.5 text-[10px] outline-none cursor-pointer"
+            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-2.5 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>Any availability</option>
             <option>Available now</option>
@@ -456,7 +456,7 @@ export default function VolunteerDirectory() {
               setVerificationFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-2.5 text-[10px] outline-none cursor-pointer"
+            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-2.5 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>All verification states</option>
             <option>Verified</option>
@@ -467,7 +467,7 @@ export default function VolunteerDirectory() {
           {/* MORE FILTERS TOGGLE */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="h-[42px] bg-white border border-[#b9d0dc] hover:bg-[#f5fafc] rounded-lg text-[10px] flex items-center justify-center gap-1.5 text-[#17648e]"
+            className="h-[42px] bg-white border border-[#b9d0dc] hover:bg-[#f5fafc] rounded-lg text-sm flex items-center justify-center gap-1.5 text-[#17648e]"
           >
             <SlidersHorizontal size={13} />
             <span>Filters</span>
@@ -478,14 +478,14 @@ export default function VolunteerDirectory() {
         {showFilters && (
           <div className="bg-white border border-[#d3e2e9] rounded-lg p-3.5 mb-4 flex flex-wrap justify-between items-center gap-3 shadow-2xs">
             <div>
-              <p className="text-xs font-semibold text-[#123c5b]">Active Filter Controls</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">
+              <p className="text-sm font-semibold text-[#123c5b]">Active Filter Controls</p>
+              <p className="text-[13px] text-gray-400 mt-0.5">
                 Reset all filters to view all volunteer records across Riverton.
               </p>
             </div>
             <button
               onClick={resetFilters}
-              className="text-xs text-[#287fa9] hover:underline font-semibold"
+              className="text-sm text-[#287fa9] hover:underline font-semibold"
             >
               Clear all filters
             </button>
@@ -497,8 +497,8 @@ export default function VolunteerDirectory() {
           {/* HEADER & VIEW SWITCH */}
           <div className="px-5 py-3.5 flex items-center justify-between border-b border-[#d5e2e9] bg-[#fafcfd]">
             <div>
-              <h2 className="text-[13px] font-medium text-[#123c5b]">Volunteer records</h2>
-              <p className="text-[9px] text-[#8296aa] mt-0.5">
+              <h2 className="text-base sm:text-lg font-semibold text-[#123c5b]">Volunteer records</h2>
+              <p className="text-xs text-[#8296aa] mt-0.5">
                 {totalCount} matching volunteer profiles
               </p>
             </div>
@@ -542,7 +542,7 @@ export default function VolunteerDirectory() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1050px] text-left">
                 <thead className="bg-[#f5f8f9] border-b border-[#d5e2e9]">
-                  <tr className="text-[9px] text-[#718ba0]">
+                  <tr className="text-sm text-[#718ba0]">
                     <th className="px-3.5 py-3 font-medium">Volunteer ID</th>
                     <th className="px-3.5 py-3 font-medium">Name</th>
                     <th className="px-3.5 py-3 font-medium">Skills</th>
@@ -564,29 +564,29 @@ export default function VolunteerDirectory() {
                         selectedVolunteer?.id === volunteer.id ? "bg-[#f1f8fb]" : ""
                       }`}
                     >
-                      <td className="px-3.5 py-3.5 text-[9px] font-semibold text-[#17648e] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm font-semibold text-[#17648e] whitespace-nowrap">
                         {volunteer.id}
                       </td>
 
-                      <td className="px-3.5 py-3.5 text-[9px] font-medium text-[#123c5b] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm font-medium text-[#123c5b] whitespace-nowrap">
                         {volunteer.name}
                       </td>
 
-                      <td className="px-3.5 py-3.5 text-[9px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                         {volunteer.skills.join(" · ")}
                       </td>
 
-                      <td className="px-3.5 py-3.5 text-[9px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                         {volunteer.location}
                       </td>
 
-                      <td className="px-3.5 py-3.5 text-[9px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                         {volunteer.availability}
                       </td>
 
                       <td className="px-3.5 py-3.5">
                         <span
-                          className={`inline-flex rounded-md px-2 py-1 text-[8px] font-semibold ${verificationStyle(
+                          className={`inline-flex rounded-md px-2 py-1 text-xs font-semibold ${verificationStyle(
                             volunteer.verification
                           )}`}
                         >
@@ -594,12 +594,12 @@ export default function VolunteerDirectory() {
                         </span>
                       </td>
 
-                      <td className="px-3.5 py-3.5 text-[9px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                         {volunteer.assignment}
                       </td>
 
                       <td className="px-3.5 py-3.5">
-                        <span className="inline-flex items-center gap-1 bg-[#e8f1f5] text-[#287fa9] rounded-md px-2 py-1 text-[8px] font-semibold">
+                        <span className="inline-flex items-center gap-1 bg-[#e8f1f5] text-[#287fa9] rounded-md px-2 py-1 text-xs font-semibold">
                           {volunteer.rating !== "—" && <Star size={9} />}
                           {volunteer.rating}
                         </span>
@@ -613,7 +613,7 @@ export default function VolunteerDirectory() {
 
                   {volunteers.length === 0 && (
                     <tr>
-                      <td colSpan={9} className="text-center py-12 text-xs text-gray-400">
+                      <td colSpan={9} className="text-center py-12 text-sm text-gray-400">
                         No volunteer records found matching your filters.
                       </td>
                     </tr>
@@ -636,7 +636,7 @@ export default function VolunteerDirectory() {
                     </div>
 
                     <span
-                      className={`rounded-md px-2 py-0.5 text-[8px] font-semibold ${verificationStyle(
+                      className={`rounded-md px-2 py-0.5 text-xs font-semibold ${verificationStyle(
                         volunteer.verification
                       )}`}
                     >
@@ -644,16 +644,16 @@ export default function VolunteerDirectory() {
                     </span>
                   </div>
 
-                  <h3 className="font-semibold text-xs text-[#123c5b] mt-2.5">{volunteer.name}</h3>
-                  <p className="text-[9px] text-gray-400">{volunteer.id}</p>
+                  <h3 className="font-semibold text-base text-[#123c5b] mt-2.5">{volunteer.name}</h3>
+                  <p className="text-xs text-gray-400">{volunteer.id}</p>
 
-                  <p className="text-[10px] text-[#557086] mt-2.5 truncate">
+                  <p className="text-sm text-[#557086] mt-2.5 truncate">
                     {volunteer.skills.join(" · ")}
                   </p>
 
-                  <p className="text-[9px] text-gray-500 mt-1">{volunteer.location}</p>
+                  <p className="text-xs text-gray-500 mt-1">{volunteer.location}</p>
 
-                  <div className="border-t border-[#e1eaf0] mt-3 pt-2.5 flex justify-between items-center text-[9px]">
+                  <div className="border-t border-[#e1eaf0] mt-3 pt-2.5 flex justify-between items-center text-xs">
                     <span className="text-[#557086] font-medium">{volunteer.availability}</span>
                     <span className="text-[#287fa9] font-bold">★ {volunteer.rating}</span>
                   </div>
@@ -670,7 +670,7 @@ export default function VolunteerDirectory() {
 
           {/* PAGINATION */}
           <div className="border-t border-[#d5e2e9] px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#fafcfd]">
-            <p className="text-[9px] text-[#8296aa]">
+            <p className="text-xs text-[#8296aa]">
               Showing {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
               {Math.min(currentPage * pageSize, totalCount)} of {totalCount} volunteers
             </p>
@@ -679,7 +679,7 @@ export default function VolunteerDirectory() {
               <button
                 disabled={currentPage <= 1 || isLoading}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="border border-[#d3e2e9] bg-white rounded-lg px-3 py-1.5 text-[9px] text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#edf5f8]"
+                className="border border-[#d3e2e9] bg-white rounded-lg px-3 py-1.5 text-sm text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#edf5f8]"
               >
                 Previous
               </button>
@@ -695,10 +695,10 @@ export default function VolunteerDirectory() {
 
                   return (
                     <div key={page} className="flex items-center gap-1">
-                      {showEllipsis && <span className="text-[10px] text-slate-400 px-0.5">...</span>}
+                      {showEllipsis && <span className="text-[13px] text-slate-400 px-0.5">...</span>}
                       <button
                         onClick={() => setCurrentPage(page)}
-                        className={`w-[28px] h-[28px] rounded-lg border text-[9px] font-medium ${
+                        className={`w-[28px] h-[28px] rounded-lg border text-sm font-medium ${
                           currentPage === page
                             ? "bg-[#287fa9] border-[#287fa9] text-white"
                             : "border-[#d3e2e9] bg-white text-[#123c5b] hover:bg-[#edf5f8]"
@@ -713,7 +713,7 @@ export default function VolunteerDirectory() {
               <button
                 disabled={currentPage >= totalPages || isLoading}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="border border-[#b9d0dc] bg-white rounded-lg px-3 py-1.5 text-[9px] text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#edf5f8]"
+                className="border border-[#b9d0dc] bg-white rounded-lg px-3 py-1.5 text-sm text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#edf5f8]"
               >
                 Next
               </button>
@@ -728,8 +728,8 @@ export default function VolunteerDirectory() {
           <div className="bg-white rounded-xl w-full max-w-[450px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between p-5 border-b border-[#e1eaf0]">
               <div>
-                <h2 className="text-[16px] font-semibold text-[#123c5b]">Add new volunteer</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">Register a new volunteer profile.</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">Add new volunteer</h2>
+                <p className="text-[13px] text-gray-400 mt-0.5">Register a new volunteer profile.</p>
               </div>
 
               <button
@@ -742,7 +742,7 @@ export default function VolunteerDirectory() {
 
             <form onSubmit={handleAddVolunteer} className="p-5 space-y-3.5">
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Full name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -750,12 +750,12 @@ export default function VolunteerDirectory() {
                   value={newVolunteer.name}
                   onChange={(e) => setNewVolunteer({ ...newVolunteer, name: e.target.value })}
                   placeholder="e.g. Maria Gonzalez"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Location <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -763,40 +763,40 @@ export default function VolunteerDirectory() {
                   value={newVolunteer.location}
                   onChange={(e) => setNewVolunteer({ ...newVolunteer, location: e.target.value })}
                   placeholder="e.g. Central Ward"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">Skills</label>
+                <label className="text-sm font-semibold text-[#123c5b]">Skills</label>
                 <input
                   value={newVolunteer.skills}
                   onChange={(e) => setNewVolunteer({ ...newVolunteer, skills: e.target.value })}
                   placeholder="First Aid, Logistics, Driving"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
-                <p className="text-[9px] text-gray-400 mt-1">Separate multiple skills using commas.</p>
+                <p className="text-xs text-gray-400 mt-1">Separate multiple skills using commas.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-[#123c5b]">Phone</label>
+                  <label className="text-sm font-semibold text-[#123c5b]">Phone</label>
                   <input
                     value={newVolunteer.phone}
                     onChange={(e) => setNewVolunteer({ ...newVolunteer, phone: e.target.value })}
                     placeholder="+94 77 123 4567"
-                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-semibold text-[#123c5b]">Email</label>
+                  <label className="text-sm font-semibold text-[#123c5b]">Email</label>
                   <input
                     type="email"
                     value={newVolunteer.email}
                     onChange={(e) => setNewVolunteer({ ...newVolunteer, email: e.target.value })}
                     placeholder="volunteer@example.org"
-                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                   />
                 </div>
               </div>
@@ -806,14 +806,14 @@ export default function VolunteerDirectory() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => setShowAddModal(false)}
-                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-xs hover:bg-[#f0f7fa]"
+                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-sm hover:bg-[#f0f7fa]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50"
+                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {isSubmitting && <Loader2 size={13} className="animate-spin" />}
                   <span>{isSubmitting ? "Adding..." : "Add volunteer"}</span>
@@ -830,10 +830,10 @@ export default function VolunteerDirectory() {
           <div className="bg-white rounded-xl p-5 w-full max-w-[440px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="flex justify-between items-center pb-3 border-b border-[#e1eaf0]">
               <div>
-                <span className="text-[10px] font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
+                <span className="text-xs font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
                   {selectedVolunteer.id}
                 </span>
-                <h2 className="font-semibold text-[16px] text-[#123c5b] mt-1">Volunteer Profile</h2>
+                <h2 className="font-semibold text-lg sm:text-xl text-[#123c5b] mt-1">Volunteer Profile</h2>
               </div>
               <button
                 onClick={() => setSelectedVolunteer(null)}
@@ -845,34 +845,34 @@ export default function VolunteerDirectory() {
 
             <div className="mt-4 space-y-3.5 text-xs">
               <div>
-                <p className="text-[10px] text-gray-400">Full name</p>
+                <p className="text-[13px] text-gray-400">Full name</p>
                 <p className="font-semibold text-sm text-[#123c5b]">{selectedVolunteer.name}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 bg-[#f8fbfe] p-3 rounded-lg border border-[#e1eaf0]">
                 <div>
-                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <div className="text-[13px] text-gray-400 flex items-center gap-1">
                     <MapPin size={11} className="text-[#287fa9]" /> Location
                   </div>
                   <p className="font-semibold text-[#123c5b] mt-0.5">{selectedVolunteer.location}</p>
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <div className="text-[13px] text-gray-400 flex items-center gap-1">
                     <Clock size={11} className="text-[#287fa9]" /> Availability
                   </div>
                   <p className="font-semibold text-[#123c5b] mt-0.5">{selectedVolunteer.availability}</p>
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <div className="text-[13px] text-gray-400 flex items-center gap-1">
                     <Briefcase size={11} className="text-[#287fa9]" /> Assignment
                   </div>
                   <p className="font-semibold text-[#123c5b] mt-0.5">{selectedVolunteer.assignment}</p>
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <div className="text-[13px] text-gray-400 flex items-center gap-1">
                     <Star size={11} className="text-[#287fa9]" /> Rating
                   </div>
                   <p className="font-semibold text-[#123c5b] mt-0.5">★ {selectedVolunteer.rating}</p>
@@ -880,7 +880,7 @@ export default function VolunteerDirectory() {
               </div>
 
               {selectedVolunteer.phone || selectedVolunteer.email ? (
-                <div className="space-y-1.5 text-[11px]">
+                <div className="space-y-1.5 text-sm">
                   {selectedVolunteer.phone && (
                     <div className="flex items-center gap-2 text-gray-600">
                       <Phone size={13} className="text-[#287fa9]" />
@@ -897,12 +897,12 @@ export default function VolunteerDirectory() {
               ) : null}
 
               <div>
-                <p className="text-[10px] text-gray-400 mb-1">Skills</p>
+                <p className="text-[13px] text-gray-400 mb-1">Skills</p>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedVolunteer.skills.map((s) => (
                     <span
                       key={s}
-                      className="bg-[#e8f1f6] text-[#287fa9] px-2 py-0.5 rounded text-[10px] font-medium"
+                      className="bg-[#e8f1f6] text-[#287fa9] px-2 py-0.5 rounded text-xs font-medium"
                     >
                       {s}
                     </span>
@@ -912,7 +912,7 @@ export default function VolunteerDirectory() {
 
               {/* QUICK VERIFICATION STATUS ACTION */}
               <div className="pt-2 border-t border-[#e1eaf0]">
-                <p className="text-[10px] font-semibold text-[#123c5b] mb-1.5">
+                <p className="text-sm font-semibold text-[#123c5b] mb-1.5">
                   Verification Status:
                 </p>
                 <div className="flex gap-2">
@@ -920,7 +920,7 @@ export default function VolunteerDirectory() {
                     <button
                       key={st}
                       onClick={() => handleUpdateVerification(selectedVolunteer.id, st)}
-                      className={`px-3 py-1 rounded text-[10px] font-medium transition-colors ${
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                         selectedVolunteer.verification === st
                           ? "bg-[#287fa9] text-white"
                           : "border border-[#d5e2e9] bg-white text-[#123c5b] hover:bg-[#f0f7fa]"
@@ -934,13 +934,13 @@ export default function VolunteerDirectory() {
 
               {/* QUICK AVAILABILITY ACTION */}
               <div className="pt-2 border-t border-[#e1eaf0]">
-                <p className="text-[10px] font-semibold text-[#123c5b] mb-1.5">Quick Availability:</p>
+                <p className="text-sm font-semibold text-[#123c5b] mb-1.5">Quick Availability:</p>
                 <div className="flex gap-2">
                   {["Available now", "Unavailable"].map((av) => (
                     <button
                       key={av}
                       onClick={() => handleUpdateAvailability(selectedVolunteer.id, av)}
-                      className={`px-3 py-1 rounded text-[10px] font-medium transition-colors ${
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                         selectedVolunteer.availability === av
                           ? "bg-[#62b9a0] text-white"
                           : "border border-[#d5e2e9] bg-white text-[#123c5b] hover:bg-[#f0f7fa]"
@@ -954,17 +954,17 @@ export default function VolunteerDirectory() {
 
               {confirmDeleteId === selectedVolunteer.id && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700">
-                  <p className="text-[11px] font-semibold">Remove this volunteer?</p>
+                  <p className="text-sm font-semibold">Remove this volunteer?</p>
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       onClick={() => handleDeleteVolunteer(selectedVolunteer.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded text-[10px] font-semibold hover:bg-red-700"
+                      className="px-3 py-1 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700"
                     >
                       Yes, delete
                     </button>
                     <button
                       onClick={() => setConfirmDeleteId(null)}
-                      className="px-3 py-1 bg-white border border-gray-300 rounded text-[10px] text-gray-700"
+                      className="px-3 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700"
                     >
                       Cancel
                     </button>
@@ -976,7 +976,7 @@ export default function VolunteerDirectory() {
             <div className="mt-5 pt-3 border-t border-[#e1eaf0] flex justify-between items-center">
               <button
                 onClick={() => setConfirmDeleteId(selectedVolunteer.id)}
-                className="text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
+                className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
               >
                 <Trash2 size={13} />
                 <span>Delete</span>
@@ -984,7 +984,7 @@ export default function VolunteerDirectory() {
 
               <button
                 onClick={() => setSelectedVolunteer(null)}
-                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-xs font-semibold"
+                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold"
               >
                 Close
               </button>

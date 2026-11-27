@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   SkillCoverageItem,
   AvailabilityForecast,
@@ -241,7 +241,7 @@ export const skillsAvailabilityService = {
    */
   async exportSkillsCsv(): Promise<Blob> {
     try {
-      const res = await fetch(`${API_BASE_URL}/volunteer/skills-availability/export`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer/skills-availability/export`);
       if (res.ok) {
         return await res.blob();
       }

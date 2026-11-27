@@ -284,9 +284,9 @@ export default function AssignmentsPage() {
       </div>
 
       <div>
-        <p className="text-[9px] text-[#8296aa]">{title}</p>
+        <p className="text-xs text-[#8296aa]">{title}</p>
         <h2 className="text-[22px] leading-7 font-semibold text-[#123c5b]">{value}</h2>
-        <p className="text-[8px] text-[#8296aa]">{description}</p>
+        <p className="text-xs text-[#8296aa]">{description}</p>
       </div>
     </div>
   );
@@ -296,7 +296,7 @@ export default function AssignmentsPage() {
       {/* MAIN CONTENT */}
       <main className="max-w-[1600px] mx-auto px-6 pt-5 pb-10">
         {/* BREADCRUMB & STATUS BAR */}
-        <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm mb-6">
           <div className="flex items-center gap-2 text-slate-400">
             <span className="text-[#8296aa]">Operations</span>
             <ChevronRight size={12} />
@@ -307,7 +307,7 @@ export default function AssignmentsPage() {
 
           <div className="flex items-center gap-2.5">
             <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -321,7 +321,7 @@ export default function AssignmentsPage() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               title="Refresh queue"
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-[10px] text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-xs text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
             >
               <RefreshCw
                 size={12}
@@ -335,8 +335,8 @@ export default function AssignmentsPage() {
         {/* PAGE HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div>
-            <h1 className="text-[25px] font-normal text-[#173e5b]">Assignments</h1>
-            <p className="text-[11px] text-[#718ba0] mt-1.5">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#173e5b]">Assignments</h1>
+            <p className="text-sm text-[#718ba0] mt-1.5">
               Track invitations, acceptance, check-in, progress, and completion.
             </p>
           </div>
@@ -344,7 +344,7 @@ export default function AssignmentsPage() {
           <div className="flex gap-2">
             <button
               onClick={handleExport}
-              className="h-[36px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-[10px] text-[#17648e] flex items-center gap-1.5 hover:bg-[#f5fafc] shadow-xs"
+              className="h-[36px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-sm text-[#17648e] flex items-center gap-1.5 hover:bg-[#f5fafc] shadow-xs"
             >
               <Download size={13} />
               <span>Export</span>
@@ -352,7 +352,7 @@ export default function AssignmentsPage() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-[36px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-1.5 text-[10px] font-semibold shadow-xs"
+              className="h-[36px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-1.5 text-sm font-semibold shadow-xs"
             >
               <Plus size={14} />
               <span>Create assignment</span>
@@ -408,7 +408,7 @@ export default function AssignmentsPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search assignment, volunteer, or task..."
-                className="w-full text-[10px] outline-none bg-transparent placeholder:text-slate-400"
+                className="w-full text-sm sm:text-[15px] outline-none bg-transparent placeholder:text-slate-400"
               />
               {search && (
                 <button onClick={() => setSearch("")}>
@@ -424,7 +424,7 @@ export default function AssignmentsPage() {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none shadow-xs"
+              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] text-slate-700 outline-none shadow-xs"
             >
               <option>All assignment states</option>
               <option>Checked In</option>
@@ -440,7 +440,7 @@ export default function AssignmentsPage() {
                 setTaskFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none shadow-xs"
+              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] text-slate-700 outline-none shadow-xs"
             >
               <option>All tasks</option>
               {availableTasks.map((task) => (
@@ -457,7 +457,7 @@ export default function AssignmentsPage() {
                 setLocationFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none shadow-xs"
+              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] text-slate-700 outline-none shadow-xs"
             >
               <option>All locations</option>
               {availableLocations.map((location) => (
@@ -474,7 +474,7 @@ export default function AssignmentsPage() {
                 setScheduleFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none shadow-xs"
+              className="h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] text-slate-700 outline-none shadow-xs"
             >
               <option>Today</option>
               <option>Any schedule</option>
@@ -483,7 +483,7 @@ export default function AssignmentsPage() {
             {/* MORE FILTERS */}
             <button
               onClick={() => setShowMoreFilters(!showMoreFilters)}
-              className={`h-[36px] px-3.5 border rounded-lg text-[10px] flex items-center justify-center gap-1.5 shadow-xs transition ${
+              className={`h-[36px] px-3.5 border rounded-lg text-sm flex items-center justify-center gap-1.5 shadow-xs transition ${
                 showMoreFilters
                   ? "bg-[#e8f1f6] border-[#287fa9] text-[#17648e] font-semibold"
                   : "bg-white border-[#b9d0dc] text-[#17648e] hover:bg-sky-50"
@@ -498,7 +498,7 @@ export default function AssignmentsPage() {
           {showMoreFilters && (
             <div className="mt-2.5 bg-white border border-[#d5e3e9] rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs animate-in fade-in">
               <div className="flex items-center gap-3">
-                <span className="text-[10px] font-semibold text-slate-600">
+                <span className="text-sm font-semibold text-slate-600">
                   Progress Range:
                 </span>
                 <select
@@ -507,7 +507,7 @@ export default function AssignmentsPage() {
                     setProgressFilter(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="h-[32px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none bg-white text-slate-700"
+                  className="h-[32px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none bg-white text-slate-700"
                 >
                   <option value="All">All progress levels</option>
                   <option value="0">Not started (0%)</option>
@@ -526,7 +526,7 @@ export default function AssignmentsPage() {
                   setCurrentPage(1);
                   notify("Filters reset to default.");
                 }}
-                className="text-[10px] text-[#287fa9] font-semibold hover:underline"
+                className="text-sm text-[#287fa9] font-semibold hover:underline"
               >
                 Reset all filters
               </button>
@@ -552,7 +552,7 @@ export default function AssignmentsPage() {
                   ].map((heading) => (
                     <th
                       key={heading}
-                      className="px-4 py-3.5 text-[9px] font-semibold text-[#718ba0] uppercase tracking-wider whitespace-nowrap"
+                      className="px-4 py-3.5 text-[13px] font-semibold text-[#718ba0] uppercase tracking-wider whitespace-nowrap"
                     >
                       {heading}
                     </th>
@@ -563,7 +563,7 @@ export default function AssignmentsPage() {
               <tbody className="divide-y divide-[#e5edf1]">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-12 text-xs text-slate-400">
+                    <td colSpan={8} className="text-center py-12 text-sm text-slate-400">
                       <RefreshCw size={18} className="mx-auto mb-2 animate-spin text-[#287fa9]" />
                       Loading assignments...
                     </td>
@@ -574,7 +574,7 @@ export default function AssignmentsPage() {
                       key={item.id}
                       className="hover:bg-[#f7fafb] transition-colors"
                     >
-                      <td className="px-4 py-3.5 text-[10px] font-bold text-[#173e5b] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-sm font-bold text-[#173e5b] whitespace-nowrap">
                         <button
                           onClick={() => setSelectedAssignment(item)}
                           className="hover:text-[#287fa9] hover:underline"
@@ -583,25 +583,25 @@ export default function AssignmentsPage() {
                         </button>
                       </td>
 
-                      <td className="px-4 py-3.5 text-[11px] font-medium text-slate-700 whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-sm font-medium text-slate-700 whitespace-nowrap">
                         {item.volunteer}
                       </td>
 
-                      <td className="px-4 py-3.5 text-[10px] whitespace-nowrap text-slate-600">
+                      <td className="px-4 py-3.5 text-sm whitespace-nowrap text-slate-600">
                         {item.task}
                       </td>
 
-                      <td className="px-4 py-3.5 text-[10px] whitespace-nowrap text-slate-600">
+                      <td className="px-4 py-3.5 text-sm whitespace-nowrap text-slate-600">
                         {item.location}
                       </td>
 
-                      <td className="px-4 py-3.5 text-[10px] whitespace-nowrap text-slate-600">
+                      <td className="px-4 py-3.5 text-sm whitespace-nowrap text-slate-600">
                         {item.schedule}
                       </td>
 
                       <td className="px-4 py-3.5 whitespace-nowrap">
                         <span
-                          className={`inline-flex px-2 py-1 rounded-md text-[9px] font-semibold ${
+                          className={`inline-flex px-2 py-1 rounded-md text-xs font-semibold ${
                             statusStyles[item.status]
                           }`}
                         >
@@ -610,7 +610,7 @@ export default function AssignmentsPage() {
                       </td>
 
                       <td className="px-4 py-3.5">
-                        <span className="inline-flex bg-[#e8f1f6] text-[#287fa9] px-2 py-0.5 rounded-md text-[9px] font-semibold">
+                        <span className="inline-flex bg-[#e8f1f6] text-[#287fa9] px-2 py-0.5 rounded-md text-xs font-semibold">
                           {item.progress}%
                         </span>
                       </td>
@@ -630,8 +630,8 @@ export default function AssignmentsPage() {
                   <tr>
                     <td colSpan={8} className="text-center py-12">
                       <ClipboardList size={28} className="mx-auto text-[#9aafbd] mb-2" />
-                      <p className="text-[11px] font-medium text-slate-700">No assignments found</p>
-                      <p className="text-[9px] text-[#8296aa] mt-0.5">
+                      <p className="text-sm font-medium text-slate-700">No assignments found</p>
+                      <p className="text-xs text-[#8296aa] mt-0.5">
                         Try changing your search or filters.
                       </p>
                     </td>
@@ -643,7 +643,7 @@ export default function AssignmentsPage() {
 
           {/* PAGINATION */}
           <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#d5e3e9] bg-slate-50/50">
-            <p className="text-[10px] text-[#8296aa]">
+            <p className="text-[13px] text-[#8296aa]">
               Showing {totalCount === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}
               {" "}–{" "}
               {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount} assignments
@@ -653,7 +653,7 @@ export default function AssignmentsPage() {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="h-[30px] px-3 border border-[#d5e3e9] bg-white rounded-lg text-[9px] text-slate-700 disabled:opacity-40 hover:bg-sky-50"
+                className="h-[30px] px-3 border border-[#d5e3e9] bg-white rounded-lg text-sm text-slate-700 disabled:opacity-40 hover:bg-sky-50"
               >
                 Previous
               </button>
@@ -662,7 +662,7 @@ export default function AssignmentsPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-[29px] h-[29px] rounded-md border text-[9px] transition ${
+                  className={`w-[29px] h-[29px] rounded-md border text-sm transition ${
                     currentPage === page
                       ? "bg-[#287fa9] text-white border-[#287fa9] font-semibold"
                       : "bg-white border-[#d5e3e9] text-slate-700 hover:bg-[#f1f8fc]"
@@ -675,7 +675,7 @@ export default function AssignmentsPage() {
               <button
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="h-[30px] px-3 border border-[#b9d0dc] bg-white rounded-lg text-[9px] text-[#17648e] disabled:opacity-40 hover:bg-sky-50"
+                className="h-[30px] px-3 border border-[#b9d0dc] bg-white rounded-lg text-sm text-[#17648e] disabled:opacity-40 hover:bg-sky-50"
               >
                 Next
               </button>
@@ -690,8 +690,8 @@ export default function AssignmentsPage() {
           <div className="bg-white w-full max-w-[480px] rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-5 border-b border-[#d5e3e9] flex items-center justify-between bg-slate-50">
               <div>
-                <h2 className="text-[15px] font-bold text-[#173e5b]">Create Assignment</h2>
-                <p className="text-[10px] text-[#8296aa] mt-0.5">
+                <h2 className="text-lg sm:text-xl font-bold text-[#173e5b]">Create Assignment</h2>
+                <p className="text-[13px] text-[#8296aa] mt-0.5">
                   Assign a volunteer to an operational task.
                 </p>
               </div>
@@ -707,7 +707,7 @@ export default function AssignmentsPage() {
             <div className="p-5 space-y-4">
               {/* VOLUNTEER */}
               <div>
-                <label className="block text-[10px] font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                   Volunteer Name
                 </label>
                 <input
@@ -719,13 +719,13 @@ export default function AssignmentsPage() {
                     }))
                   }
                   placeholder="Enter volunteer name"
-                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none focus:border-[#287fa9]"
+                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               {/* TASK */}
               <div>
-                <label className="block text-[10px] font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                   Task
                 </label>
                 <select
@@ -736,7 +736,7 @@ export default function AssignmentsPage() {
                       task: e.target.value,
                     }))
                   }
-                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none bg-white text-slate-700"
+                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none bg-white text-slate-700"
                 >
                   <option value="">Select task</option>
                   {availableTasks.map((t) => (
@@ -749,7 +749,7 @@ export default function AssignmentsPage() {
 
               {/* LOCATION */}
               <div>
-                <label className="block text-[10px] font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                   Location
                 </label>
                 <select
@@ -760,7 +760,7 @@ export default function AssignmentsPage() {
                       location: e.target.value,
                     }))
                   }
-                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none bg-white text-slate-700"
+                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none bg-white text-slate-700"
                 >
                   <option value="">Select location</option>
                   {availableLocations.map((loc) => (
@@ -773,7 +773,7 @@ export default function AssignmentsPage() {
 
               {/* SCHEDULE */}
               <div>
-                <label className="block text-[10px] font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                   Schedule
                 </label>
                 <input
@@ -786,13 +786,13 @@ export default function AssignmentsPage() {
                     }))
                   }
                   placeholder="e.g. 14:00–20:00"
-                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none focus:border-[#287fa9]"
+                  className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div className="bg-[#eaf5f9] p-3 rounded-lg flex gap-2.5 border border-sky-100">
                 <CheckCircle2 size={16} className="text-[#287fa9] shrink-0 mt-0.5" />
-                <p className="text-[10px] text-[#527d96] leading-relaxed">
+                <p className="text-sm text-[#527d96] leading-relaxed">
                   The volunteer will receive an assignment invitation. The assignment remains
                   pending until accepted.
                 </p>
@@ -802,7 +802,7 @@ export default function AssignmentsPage() {
             <div className="p-4 border-t border-slate-200 flex justify-end gap-2 bg-slate-50">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 border border-[#d5e3e9] rounded-lg text-[10px] text-slate-600 hover:bg-white"
+                className="px-4 py-2 border border-[#d5e3e9] rounded-lg text-sm text-slate-600 hover:bg-white"
               >
                 Cancel
               </button>
@@ -810,7 +810,7 @@ export default function AssignmentsPage() {
               <button
                 onClick={handleCreateAssignment}
                 disabled={isSubmitting}
-                className="px-5 py-2 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg text-[10px] font-semibold flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+                className="px-5 py-2 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg text-sm font-semibold flex items-center gap-1.5 shadow-xs disabled:opacity-50"
               >
                 <Plus size={14} />
                 <span>Create assignment</span>
@@ -826,8 +826,8 @@ export default function AssignmentsPage() {
           <div className="bg-white w-full max-w-[440px] rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-5 border-b border-[#d5e3e9] flex items-center justify-between bg-slate-50">
               <div>
-                <h2 className="text-[15px] font-bold text-[#173e5b]">Assignment Details</h2>
-                <p className="text-[10px] text-[#8296aa] mt-0.5">{selectedAssignment.id}</p>
+                <h2 className="text-lg sm:text-xl font-bold text-[#173e5b]">Assignment Details</h2>
+                <p className="text-[13px] text-[#8296aa] mt-0.5">{selectedAssignment.id}</p>
               </div>
 
               <button
@@ -840,9 +840,9 @@ export default function AssignmentsPage() {
 
             <div className="p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-[#8296aa] font-medium">Assignment Status</span>
+                <span className="text-[13px] text-[#8296aa] font-medium">Assignment Status</span>
                 <span
-                  className={`px-2.5 py-1 rounded-md text-[9px] font-semibold ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
                     statusStyles[selectedAssignment.status]
                   }`}
                 >
@@ -880,8 +880,8 @@ export default function AssignmentsPage() {
                   >
                     <Icon size={16} className="text-[#287fa9]" />
                     <div>
-                      <p className="text-[8px] text-[#8296aa] uppercase font-semibold">{item.label}</p>
-                      <p className="text-[11px] font-medium text-slate-800 mt-0.5">{item.value}</p>
+                      <p className="text-xs text-[#8296aa] uppercase font-semibold">{item.label}</p>
+                      <p className="text-sm font-medium text-slate-800 mt-0.5">{item.value}</p>
                     </div>
                   </div>
                 );
@@ -890,8 +890,8 @@ export default function AssignmentsPage() {
               {/* PROGRESS */}
               <div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-[10px] text-[#8296aa] font-medium">Assignment Progress</span>
-                  <span className="text-[11px] font-bold text-[#173e5b]">{selectedAssignment.progress}%</span>
+                  <span className="text-[13px] text-[#8296aa] font-medium">Assignment Progress</span>
+                  <span className="text-sm font-bold text-[#173e5b]">{selectedAssignment.progress}%</span>
                 </div>
                 <div className="h-2 bg-[#e8eef1] rounded-full overflow-hidden">
                   <div
@@ -906,7 +906,7 @@ export default function AssignmentsPage() {
                 {selectedAssignment.status !== "Completed" && (
                   <button
                     onClick={() => handleUpdateStatus("Completed")}
-                    className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-emerald-700 transition"
+                    className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 transition"
                   >
                     Mark Completed
                   </button>
@@ -914,7 +914,7 @@ export default function AssignmentsPage() {
                 {selectedAssignment.status === "Awaiting Acceptance" && (
                   <button
                     onClick={() => handleUpdateStatus("Checked In")}
-                    className="flex-1 rounded-lg bg-[#287fa9] px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-[#17678e] transition"
+                    className="flex-1 rounded-lg bg-[#287fa9] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#17678e] transition"
                   >
                     Check In Volunteer
                   </button>
@@ -925,7 +925,7 @@ export default function AssignmentsPage() {
             <div className="p-4 border-t border-slate-200 flex justify-end bg-slate-50">
               <button
                 onClick={() => setSelectedAssignment(null)}
-                className="bg-[#287fa9] text-white rounded-lg px-5 py-2 text-[10px] font-semibold hover:bg-[#17678e]"
+                className="bg-[#287fa9] text-white rounded-lg px-5 py-2 text-sm font-semibold hover:bg-[#17678e]"
               >
                 Close
               </button>

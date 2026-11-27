@@ -238,7 +238,7 @@ export default function AIVolunteerMatchingPage() {
   const CheckItem = ({ children }: { children: ReactNode }) => (
     <div className="flex items-start gap-3">
       <Check size={16} className="text-[#269d80] shrink-0 mt-0.5" />
-      <span className="text-[10px] leading-5 text-slate-700">{children}</span>
+      <span className="text-sm leading-5 text-slate-700">{children}</span>
     </div>
   );
 
@@ -247,7 +247,7 @@ export default function AIVolunteerMatchingPage() {
       {/* MAIN CONTENT */}
       <main className="max-w-[1600px] mx-auto px-6 pt-5 pb-10">
         {/* BREADCRUMB & STATUS BAR */}
-        <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm mb-6">
           <div className="flex items-center gap-2 text-slate-400">
             <span className="text-[#8296aa]">Operations</span>
             <ChevronRight size={12} />
@@ -260,7 +260,7 @@ export default function AIVolunteerMatchingPage() {
 
           <div className="flex items-center gap-2.5">
             <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -274,7 +274,7 @@ export default function AIVolunteerMatchingPage() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               title="Refresh recommendations"
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-[10px] text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-xs text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50 cursor-pointer"
             >
               <RefreshCw
                 size={12}
@@ -288,7 +288,7 @@ export default function AIVolunteerMatchingPage() {
         {/* PAGE HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-[27px] md:text-[28px] font-normal text-[#173e5b]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#173e5b]">
               AI-Assisted Volunteer Matching
             </h1>
             <p className="text-[12px] text-[#718ba0] mt-1.5">
@@ -297,10 +297,10 @@ export default function AIVolunteerMatchingPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="bg-[#f2edfb] text-[#7953c7] border border-[#ddcef5] rounded-md px-3 py-1.5 text-[10px] font-semibold whitespace-nowrap">
+            <span className="bg-[#f2edfb] text-[#7953c7] border border-[#ddcef5] rounded-md px-3 py-1.5 text-sm font-semibold whitespace-nowrap">
               {summary.totalVerifiedCandidates} verified candidates
             </span>
-            <span className="bg-[#e8f1f6] text-[#287fa9] border border-sky-200 rounded-md px-3 py-1.5 text-[10px] font-semibold whitespace-nowrap">
+            <span className="bg-[#e8f1f6] text-[#287fa9] border border-sky-200 rounded-md px-3 py-1.5 text-sm font-semibold whitespace-nowrap">
               {summary.totalOpenTasks} open tasks
             </span>
           </div>
@@ -310,10 +310,10 @@ export default function AIVolunteerMatchingPage() {
         <div className="bg-[#f5f0fc] border border-[#ddcef5] border-l-[3px] border-l-[#7953c7] rounded-lg p-4 flex items-center gap-4 mb-5 shadow-xs">
           <Sparkles size={21} className="text-[#7953c7] shrink-0" />
           <div>
-            <h3 className="text-[11px] font-semibold text-[#6743a9]">
+            <h3 className="text-base font-semibold text-[#6743a9]">
               AI suggestions require human approval
             </h3>
-            <p className="text-[10px] text-[#7953c7] mt-0.5">
+            <p className="text-sm text-[#7953c7] mt-0.5">
               Matching considers verified skills, availability, location, experience, and task suitability. It never assigns volunteers automatically.
             </p>
           </div>
@@ -324,10 +324,10 @@ export default function AIVolunteerMatchingPage() {
           {/* LEFT: TASK SELECTION */}
           <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-xs overflow-hidden flex flex-col min-h-[580px]">
             <div className="px-4 py-4 border-b border-[#d5e3e9]">
-              <h2 className="text-[13px] font-semibold text-[#173e5b]">
+              <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">
                 Select task
               </h2>
-              <p className="text-[9px] text-[#8296aa] mt-1">
+              <p className="text-xs text-[#8296aa] mt-1">
                 Open tasks requiring volunteers ({tasks.length})
               </p>
             </div>
@@ -352,16 +352,16 @@ export default function AIVolunteerMatchingPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="text-[10px] font-semibold leading-4 text-[#173e5b]">
+                        <p className="text-sm font-semibold leading-4 text-[#173e5b]">
                           {task.id} · {task.title}
                         </p>
-                        <p className="text-[9px] text-[#8296aa] mt-1">
+                        <p className="text-xs text-[#8296aa] mt-1">
                           {task.location} · {task.skills.join(" · ")}
                         </p>
                       </div>
 
                       <span
-                        className={`shrink-0 px-2 py-1 rounded-md text-[8px] font-semibold ${getPriorityStyle(
+                        className={`shrink-0 px-2 py-1 rounded-md text-xs font-semibold ${getPriorityStyle(
                           task.priority
                         )}`}
                       >
@@ -382,15 +382,15 @@ export default function AIVolunteerMatchingPage() {
           <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-xs overflow-hidden flex flex-col min-h-[580px]">
             <div className="px-4 py-3 border-b border-[#d5e3e9] flex items-center justify-between">
               <div>
-                <h2 className="text-[13px] font-semibold text-[#173e5b]">
+                <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">
                   Recommended candidates
                 </h2>
-                <p className="text-[9px] text-[#8296aa] mt-0.5">
+                <p className="text-xs text-[#8296aa] mt-0.5">
                   Ranked by suitability for {selectedTask ? selectedTask.id : "task"}
                 </p>
               </div>
 
-              <span className="bg-[#f2edfb] text-[#7953c7] border border-[#ddcef5] rounded-md px-2 py-1 text-[8px] font-semibold">
+              <span className="bg-[#f2edfb] text-[#7953c7] border border-[#ddcef5] rounded-md px-2 py-1 text-xs font-semibold">
                 {summary.modelVersion}
               </span>
             </div>
@@ -403,7 +403,7 @@ export default function AIVolunteerMatchingPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Filter by name, skills, or ID..."
-                  className="bg-transparent outline-none text-[10px] w-full placeholder:text-slate-400"
+                  className="bg-transparent outline-none text-sm sm:text-[15px] w-full placeholder:text-slate-400"
                 />
               </div>
             </div>
@@ -437,27 +437,27 @@ export default function AIVolunteerMatchingPage() {
                     </div>
 
                     {/* AVATAR */}
-                    <div className="w-9 h-9 rounded-full bg-[#e8f1f6] text-[#287fa9] flex items-center justify-center text-[10px] font-bold shrink-0 border border-sky-100">
+                    <div className="w-9 h-9 rounded-full bg-[#e8f1f6] text-[#287fa9] flex items-center justify-center text-sm font-bold shrink-0 border border-sky-100">
                       {candidate.initials}
                     </div>
 
                     {/* DETAILS */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-[11px] font-semibold text-[#173e5b]">
+                        <p className="text-sm font-semibold text-[#173e5b]">
                           {candidate.name}
                         </p>
-                        <span className="text-[9px] text-slate-400 font-mono">
+                        <span className="text-xs text-slate-400 font-mono">
                           ({candidate.id})
                         </span>
                       </div>
 
-                      <p className="text-[9px] text-[#8296aa] mt-0.5 truncate">
+                      <p className="text-xs text-[#8296aa] mt-0.5 truncate">
                         {candidate.skills.join(" · ")} · {candidate.distance}
                       </p>
 
                       <p
-                        className={`text-[9px] font-medium mt-0.5 ${
+                        className={`text-xs font-medium mt-0.5 ${
                           candidate.verified ? "text-[#239879]" : "text-[#d18a20]"
                         }`}
                       >
@@ -470,7 +470,7 @@ export default function AIVolunteerMatchingPage() {
                       <p className="text-[19px] font-bold text-[#7953c7] leading-none">
                         {candidate.score}
                       </p>
-                      <p className="text-[8px] text-[#8296aa] mt-0.5">% match</p>
+                      <p className="text-xs text-[#8296aa] mt-0.5">% match</p>
                     </div>
                   </button>
                 ))
@@ -494,7 +494,7 @@ export default function AIVolunteerMatchingPage() {
                     </div>
 
                     <div>
-                      <p className="text-[9px] font-semibold uppercase tracking-wider text-[#7953c7]">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-[#7953c7]">
                         Suitability score
                       </p>
                       <h2 className="text-[28px] leading-tight font-bold text-[#7953c7]">
@@ -506,7 +506,7 @@ export default function AIVolunteerMatchingPage() {
 
                 {/* EXPLANATION */}
                 <div className="mb-4">
-                  <h3 className="text-[11px] font-bold text-[#173e5b] mb-2.5">
+                  <h3 className="text-base font-bold text-[#173e5b] mb-2.5">
                     Why this candidate?
                   </h3>
 
@@ -519,7 +519,7 @@ export default function AIVolunteerMatchingPage() {
 
                 {/* CANDIDATE EXPERIENCE */}
                 <div className="mb-4">
-                  <h3 className="text-[11px] font-bold text-[#173e5b] mb-2">
+                  <h3 className="text-base font-bold text-[#173e5b] mb-2">
                     Candidate experience
                   </h3>
 
@@ -527,7 +527,7 @@ export default function AIVolunteerMatchingPage() {
                     <div className="bg-[#f5f8f9] rounded-lg p-2.5 border border-slate-100">
                       <div className="flex items-center gap-1.5 text-[#287fa9]">
                         <Award size={13} />
-                        <span className="text-[8px] font-medium">Similar tasks</span>
+                        <span className="text-xs font-medium">Similar tasks</span>
                       </div>
                       <p className="text-[16px] font-bold text-[#173e5b] mt-1">
                         {selectedCandidate.completedTasks}
@@ -537,7 +537,7 @@ export default function AIVolunteerMatchingPage() {
                     <div className="bg-[#f5f8f9] rounded-lg p-2.5 border border-slate-100">
                       <div className="flex items-center gap-1.5 text-[#287fa9]">
                         <MapPin size={13} />
-                        <span className="text-[8px] font-medium">Distance</span>
+                        <span className="text-xs font-medium">Distance</span>
                       </div>
                       <p className="text-[16px] font-bold text-[#173e5b] mt-1">
                         {selectedCandidate.distance}
@@ -548,21 +548,21 @@ export default function AIVolunteerMatchingPage() {
 
                 {/* CONSTRAINTS REVIEWED */}
                 <div className="mb-4">
-                  <h3 className="text-[11px] font-bold text-[#173e5b] mb-2">
+                  <h3 className="text-base font-bold text-[#173e5b] mb-2">
                     Constraints reviewed
                   </h3>
 
                   {selectedCandidate.warning ? (
                     <div className="bg-[#fff5df] border border-amber-200 rounded-lg p-3 flex gap-2">
                       <AlertTriangle size={15} className="text-[#a46b16] shrink-0 mt-0.5" />
-                      <p className="text-[9px] text-[#946015] leading-4">
+                      <p className="text-xs text-[#946015] leading-4">
                         {selectedCandidate.warning}
                       </p>
                     </div>
                   ) : (
                     <div className="bg-[#e5f5ef] border border-emerald-200 rounded-lg p-3 flex gap-2">
                       <ShieldCheck size={15} className="text-[#239879] shrink-0 mt-0.5" />
-                      <p className="text-[9px] text-[#239879] leading-4">
+                      <p className="text-xs text-[#239879] leading-4">
                         Candidate has full compliance verification and zero safety alert flags.
                       </p>
                     </div>
@@ -571,7 +571,7 @@ export default function AIVolunteerMatchingPage() {
 
                 {/* DECISION RATIONALE */}
                 <div className="mb-4">
-                  <label className="text-[10px] font-bold text-[#173e5b] block mb-1.5">
+                  <label className="text-sm font-bold text-[#173e5b] block mb-1.5">
                     Decision rationale
                   </label>
                   <textarea
@@ -579,7 +579,7 @@ export default function AIVolunteerMatchingPage() {
                     onChange={(e) => setRationale(e.target.value)}
                     rows={3}
                     placeholder="Explain why you approve, reject, or defer this match..."
-                    className="w-full border border-[#d5e3e9] rounded-lg p-2.5 text-[10px] leading-4 outline-none resize-none focus:border-[#287fa9]"
+                    className="w-full border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] leading-4 outline-none resize-none focus:border-[#287fa9]"
                   />
                 </div>
 
@@ -588,7 +588,7 @@ export default function AIVolunteerMatchingPage() {
                   <button
                     onClick={() => handleDecision("Deferred")}
                     disabled={isSubmitting}
-                    className="h-[38px] border border-[#b9d0dc] rounded-lg text-[10px] text-[#287fa9] hover:bg-[#f3f8fa] font-semibold disabled:opacity-50 cursor-pointer"
+                    className="h-[38px] border border-[#b9d0dc] rounded-lg text-sm text-[#287fa9] hover:bg-[#f3f8fa] font-semibold disabled:opacity-50 cursor-pointer"
                   >
                     Defer
                   </button>
@@ -596,7 +596,7 @@ export default function AIVolunteerMatchingPage() {
                   <button
                     onClick={() => handleDecision("Rejected")}
                     disabled={isSubmitting}
-                    className="h-[38px] bg-[#bf2026] hover:bg-[#a8181e] text-white rounded-lg text-[10px] font-semibold disabled:opacity-50 cursor-pointer shadow-xs"
+                    className="h-[38px] bg-[#bf2026] hover:bg-[#a8181e] text-white rounded-lg text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-xs"
                   >
                     Reject
                   </button>
@@ -604,14 +604,14 @@ export default function AIVolunteerMatchingPage() {
                   <button
                     onClick={() => handleDecision("Approved")}
                     disabled={!selectedCandidate.verified || isSubmitting}
-                    className="h-[38px] bg-[#287fa9] hover:bg-[#17678e] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg text-[10px] font-semibold shadow-xs cursor-pointer"
+                    className="h-[38px] bg-[#287fa9] hover:bg-[#17678e] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold shadow-xs cursor-pointer"
                   >
                     Approve match
                   </button>
                 </div>
 
                 {!selectedCandidate.verified && (
-                  <p className="text-[9px] text-red-600 font-medium mt-2">
+                  <p className="text-xs text-red-600 font-medium mt-2">
                     Verification required before approval.
                   </p>
                 )}
@@ -636,10 +636,10 @@ export default function AIVolunteerMatchingPage() {
               </div>
 
               <div className="text-left">
-                <h3 className="text-[12px] font-bold text-[#173e5b]">
+                <h3 className="text-base font-bold text-[#173e5b]">
                   Human decision history
                 </h3>
-                <p className="text-[9px] text-[#8296aa] mt-0.5">
+                <p className="text-xs text-[#8296aa] mt-0.5">
                   {decisionHistory.length} recorded decisions
                 </p>
               </div>
@@ -656,7 +656,7 @@ export default function AIVolunteerMatchingPage() {
           {showHistory && (
             <div className="border-t border-[#d5e3e9] divide-y divide-[#e1eaf0]">
               {decisionHistory.length === 0 ? (
-                <p className="p-6 text-[10px] text-slate-400 text-center">
+                <p className="p-6 text-[13px] text-slate-400 text-center">
                   No decisions recorded yet.
                 </p>
               ) : (
@@ -667,27 +667,27 @@ export default function AIVolunteerMatchingPage() {
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="text-[11px] font-bold text-[#173e5b]">
+                        <p className="text-sm font-bold text-[#173e5b]">
                           {record.taskId} {record.taskTitle ? `(${record.taskTitle})` : ""} ·{" "}
                           {record.candidateName || record.candidateId}
                         </p>
-                        <span className="text-[9px] text-slate-400 font-mono">
+                        <span className="text-xs text-slate-400 font-mono">
                           [{record.id}]
                         </span>
                       </div>
 
-                      <p className="text-[10px] text-slate-600 mt-1">
+                      <p className="text-sm text-slate-600 mt-1">
                         {record.rationale}
                       </p>
 
-                      <p className="text-[8px] text-slate-400 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         {record.date}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
                       <span
-                        className={`text-[9px] font-semibold px-3 py-1 rounded-md ${
+                        className={`text-xs font-semibold px-3 py-1 rounded-md ${
                           record.decision === "Approved"
                             ? "bg-[#e5f5ef] text-[#239879] border border-emerald-200"
                             : record.decision === "Rejected"

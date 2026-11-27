@@ -204,7 +204,7 @@ export default function SkillsAvailability() {
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 lg:px-7 pt-5 pb-10">
         {/* BREADCRUMB & API STATUS */}
         <div className="flex items-center justify-between gap-2 mb-8">
-          <div className="flex items-center gap-2 text-[9px]">
+          <div className="flex items-center gap-2 text-xs">
             <span className="text-[#8296aa]">Operations</span>
             <ChevronRight size={12} className="text-[#8296aa]" />
             <span className="text-[#8296aa]">Volunteer Coordination</span>
@@ -215,7 +215,7 @@ export default function SkillsAvailability() {
           {/* BACKEND API STATUS BADGE */}
           <div className="flex items-center gap-2">
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-semibold tracking-wide border shadow-xs ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide border shadow-xs ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                   : "bg-amber-50 text-amber-700 border-amber-200"
@@ -245,10 +245,10 @@ export default function SkillsAvailability() {
         {/* PAGE TITLE */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-[25px] md:text-[27px] font-normal tracking-tight">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight">
               Skills & Availability
             </h1>
-            <p className="text-[11px] text-[#718ba0] mt-2">
+            <p className="text-sm text-[#718ba0] mt-2">
               Understand response capability by skill, schedule, location, and readiness.
             </p>
           </div>
@@ -258,7 +258,7 @@ export default function SkillsAvailability() {
             <button
               type="button"
               onClick={handleExportCSV}
-              className="h-[40px] px-3.5 bg-white border border-[#b9d0dc] hover:bg-[#f5fafc] text-[#17648e] rounded-lg text-[10px] font-medium flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+              className="h-[40px] px-3.5 bg-white border border-[#b9d0dc] hover:bg-[#f5fafc] text-[#17648e] rounded-lg text-sm font-medium flex items-center gap-1.5 transition cursor-pointer shadow-xs"
             >
               <Download size={13} />
               Export CSV
@@ -267,7 +267,7 @@ export default function SkillsAvailability() {
             <button
               type="button"
               onClick={() => setShowRequestModal(true)}
-              className="h-[40px] px-4 bg-white border border-[#b9d0dc] hover:bg-[#f5fafc] rounded-lg text-[10px] text-[#17648e] font-medium transition cursor-pointer shadow-xs"
+              className="h-[40px] px-4 bg-white border border-[#b9d0dc] hover:bg-[#f5fafc] rounded-lg text-sm text-[#17648e] font-medium transition cursor-pointer shadow-xs"
             >
               Request availability
             </button>
@@ -275,7 +275,7 @@ export default function SkillsAvailability() {
             <button
               type="button"
               onClick={() => setShowManageModal(true)}
-              className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg text-[10px] font-semibold transition cursor-pointer shadow-xs"
+              className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg text-sm font-semibold transition cursor-pointer shadow-xs"
             >
               Manage skills
             </button>
@@ -291,11 +291,11 @@ export default function SkillsAvailability() {
             </div>
 
             <div>
-              <p className="text-[8px] text-[#8296aa]">Available today</p>
+              <p className="text-xs text-[#8296aa]">Available today</p>
               <h2 className="text-[23px] font-bold text-[#123c5b] leading-tight">
                 {stats.availableToday.toLocaleString()}
               </h2>
-              <p className="text-[8px] text-[#8296aa]">{stats.availableTodayPercentage}</p>
+              <p className="text-xs text-[#8296aa]">{stats.availableTodayPercentage}</p>
             </div>
           </div>
 
@@ -306,11 +306,11 @@ export default function SkillsAvailability() {
             </div>
 
             <div>
-              <p className="text-[8px] text-[#8296aa]">Available this week</p>
+              <p className="text-xs text-[#8296aa]">Available this week</p>
               <h2 className="text-[23px] font-bold leading-tight">
                 {stats.availableThisWeek.toLocaleString()}
               </h2>
-              <p className="text-[8px] text-[#8296aa]">{stats.availableThisWeekSub}</p>
+              <p className="text-xs text-[#8296aa]">{stats.availableThisWeekSub}</p>
             </div>
           </div>
 
@@ -321,11 +321,11 @@ export default function SkillsAvailability() {
             </div>
 
             <div>
-              <p className="text-[8px] text-[#8296aa]">Critical skill gaps</p>
+              <p className="text-xs text-[#8296aa]">Critical skill gaps</p>
               <h2 className="text-[23px] font-bold leading-tight">
                 {stats.criticalSkillGaps}
               </h2>
-              <p className="text-[8px] text-[#8296aa]">{stats.criticalSkillGapsSummary}</p>
+              <p className="text-xs text-[#8296aa]">{stats.criticalSkillGapsSummary}</p>
             </div>
           </div>
 
@@ -336,11 +336,11 @@ export default function SkillsAvailability() {
             </div>
 
             <div>
-              <p className="text-[8px] text-[#8296aa]">Schedules updated</p>
+              <p className="text-xs text-[#8296aa]">Schedules updated</p>
               <h2 className="text-[23px] font-bold leading-tight">
                 {stats.schedulesUpdatedRate}
               </h2>
-              <p className="text-[8px] text-[#8296aa]">{stats.schedulesUpdatedSub}</p>
+              <p className="text-xs text-[#8296aa]">{stats.schedulesUpdatedSub}</p>
             </div>
           </div>
         </section>
@@ -352,8 +352,8 @@ export default function SkillsAvailability() {
             {/* HEADER */}
             <div className="px-4 py-3.5 border-b border-[#d5e3e9] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h2 className="text-[12px] font-medium">Skill coverage</h2>
-                <p className="text-[8px] text-[#8296aa] mt-0.5">
+                <h2 className="text-base sm:text-lg font-semibold">Skill coverage</h2>
+                <p className="text-xs text-[#8296aa] mt-0.5">
                   Verified volunteers and current availability
                 </p>
               </div>
@@ -364,10 +364,10 @@ export default function SkillsAvailability() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Filter skills..."
-                  className="h-[28px] w-36 px-2.5 text-[9px] border border-[#d5e3e9] rounded-md outline-none focus:border-[#287fa9] bg-[#fbfdfd]"
+                  className="h-[28px] w-36 px-2.5 text-sm sm:text-[15px] border border-[#d5e3e9] rounded-md outline-none focus:border-[#287fa9] bg-[#fbfdfd]"
                 />
 
-                <span className="bg-[#e8f1f7] text-[#287fa9] px-2 py-1 rounded-md text-[8px] font-medium shrink-0">
+                <span className="bg-[#e8f1f7] text-[#287fa9] px-2 py-1 rounded-md text-xs font-medium shrink-0">
                   Live roster
                 </span>
               </div>
@@ -386,10 +386,10 @@ export default function SkillsAvailability() {
                 >
                   {/* SKILL NAME */}
                   <div className="w-[43%] md:w-[42%] min-w-0">
-                    <h3 className="text-[9px] font-semibold text-[#123c5b] truncate">
+                    <h3 className="text-base font-semibold text-[#123c5b] truncate">
                       {skill.name}
                     </h3>
-                    <p className="text-[8px] text-[#8296aa] mt-0.5">
+                    <p className="text-xs text-[#8296aa] mt-0.5">
                       {skill.verified} verified volunteers
                     </p>
                   </div>
@@ -408,10 +408,10 @@ export default function SkillsAvailability() {
 
                   {/* AVAILABLE COUNT */}
                   <div className="w-[65px] shrink-0 text-right sm:text-left">
-                    <h3 className="text-[12px] font-semibold text-[#123c5b]">
+                    <h3 className="text-base font-semibold text-[#123c5b]">
                       {skill.available}
                     </h3>
-                    <p className="text-[8px] text-[#8296aa]">available</p>
+                    <p className="text-xs text-[#8296aa]">available</p>
                   </div>
 
                   <ChevronRight size={17} className="text-[#123c5b] shrink-0" />
@@ -431,18 +431,18 @@ export default function SkillsAvailability() {
             {/* HEADER */}
             <div className="px-4 py-3.5 border-b border-[#d5e3e9] flex items-start justify-between">
               <div>
-                <h2 className="text-[12px] font-medium">Availability forecast</h2>
-                <p className="text-[8px] text-[#8296aa] mt-1">Next seven days</p>
+                <h2 className="text-base sm:text-lg font-semibold">Availability forecast</h2>
+                <p className="text-xs text-[#8296aa] mt-1">Next seven days</p>
               </div>
 
-              <span className="text-[8px] text-[#287fa9] font-medium">Greater Riverton</span>
+              <span className="text-xs text-[#287fa9] font-medium">Greater Riverton</span>
             </div>
 
             {/* FORECAST BARS */}
             <div className="p-4 space-y-[19px]">
               {forecastData.map((item) => (
                 <div key={item.day} className="flex items-center gap-3">
-                  <span className="w-[53px] text-[8px] font-semibold shrink-0 text-[#123c5b]">
+                  <span className="w-[53px] text-xs font-semibold shrink-0 text-[#123c5b]">
                     {item.day}
                   </span>
 
@@ -455,7 +455,7 @@ export default function SkillsAvailability() {
                     />
                   </div>
 
-                  <span className="w-[28px] text-[8px] font-semibold text-right text-[#123c5b]">
+                  <span className="w-[28px] text-xs font-semibold text-right text-[#123c5b]">
                     {item.volunteers}
                   </span>
                 </div>
@@ -466,10 +466,10 @@ export default function SkillsAvailability() {
             <div className="mx-3.5 mt-1 mb-4 bg-[#fff6e5] border border-[#fde8c0] rounded-lg px-3 py-3 flex items-start gap-2.5">
               <AlertTriangle size={17} className="text-[#946000] shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-[9px] font-semibold text-[#946000]">
+                <h3 className="text-base font-semibold text-[#946000]">
                   {warning.title}
                 </h3>
-                <p className="text-[8px] text-[#946000] mt-0.5 leading-relaxed">
+                <p className="text-xs text-[#946000] mt-0.5 leading-relaxed">
                   {warning.description}
                 </p>
               </div>
@@ -492,8 +492,8 @@ export default function SkillsAvailability() {
           <div className="bg-white w-full max-w-[470px] rounded-xl shadow-2xl overflow-hidden">
             <div className="p-5 border-b border-[#d5e3e9] flex items-center justify-between">
               <div>
-                <h2 className="text-[16px] font-semibold">Manage skills</h2>
-                <p className="text-[10px] text-gray-400 mt-1">
+                <h2 className="text-lg sm:text-xl font-semibold">Manage skills</h2>
+                <p className="text-[13px] text-gray-400 mt-1">
                   Add or remove volunteer skill groups.
                 </p>
               </div>
@@ -508,7 +508,7 @@ export default function SkillsAvailability() {
             </div>
 
             <div className="p-5">
-              <label className="text-[11px] font-semibold text-[#123c5b]">
+              <label className="text-sm font-semibold text-[#123c5b]">
                 Add new skill group
               </label>
 
@@ -517,20 +517,20 @@ export default function SkillsAvailability() {
                   value={newSkill}
                   onChange={(e) => setNewSkill(e.target.value)}
                   placeholder="Enter skill name..."
-                  className="flex-1 border border-[#d5e3e9] rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#287fa9] bg-white"
+                  className="flex-1 border border-[#d5e3e9] rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9] bg-white"
                 />
 
                 <button
                   type="button"
                   onClick={handleAddSkill}
-                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-4 flex items-center gap-1 text-xs font-semibold transition cursor-pointer"
+                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-4 flex items-center gap-1 text-sm font-semibold transition cursor-pointer"
                 >
                   <Plus size={15} />
                   Add
                 </button>
               </div>
 
-              <h3 className="text-[11px] font-semibold mt-6 mb-3 text-[#123c5b]">
+              <h3 className="text-base font-semibold mt-6 mb-3 text-[#123c5b]">
                 Existing skill groups
               </h3>
 
@@ -541,8 +541,8 @@ export default function SkillsAvailability() {
                     className="flex items-center justify-between border border-[#e1eaf0] rounded-lg p-3 hover:bg-slate-50 transition"
                   >
                     <div>
-                      <p className="text-[10px] font-medium text-[#123c5b]">{skill.name}</p>
-                      <p className="text-[9px] text-gray-400 mt-0.5">
+                      <p className="text-sm font-medium text-[#123c5b]">{skill.name}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
                         {skill.verified} verified volunteers · {skill.available} available
                       </p>
                     </div>
@@ -564,7 +564,7 @@ export default function SkillsAvailability() {
               <button
                 type="button"
                 onClick={() => setShowManageModal(false)}
-                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-xs font-semibold transition cursor-pointer"
+                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold transition cursor-pointer"
               >
                 Done
               </button>
@@ -579,8 +579,8 @@ export default function SkillsAvailability() {
           <div className="bg-white w-full max-w-[480px] rounded-xl shadow-2xl overflow-hidden">
             <div className="p-5 border-b border-[#d5e3e9] flex items-center justify-between">
               <div>
-                <h2 className="text-[16px] font-semibold">Request availability</h2>
-                <p className="text-[10px] text-gray-400 mt-1">
+                <h2 className="text-lg sm:text-xl font-semibold">Request availability</h2>
+                <p className="text-[13px] text-gray-400 mt-1">
                   Request volunteers for a specific response period.
                 </p>
               </div>
@@ -596,7 +596,7 @@ export default function SkillsAvailability() {
 
             <form onSubmit={handleRequestAvailability} className="p-5 space-y-4">
               <div>
-                <label className="text-[10px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Required skill
                 </label>
 
@@ -608,7 +608,7 @@ export default function SkillsAvailability() {
                       skill: e.target.value,
                     })
                   }
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none bg-white focus:border-[#287fa9] cursor-pointer"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none bg-white focus:border-[#287fa9] cursor-pointer"
                 >
                   {skills.map((skill) => (
                     <option key={skill.name} value={skill.name}>
@@ -619,7 +619,7 @@ export default function SkillsAvailability() {
               </div>
 
               <div>
-                <label className="text-[10px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Required location
                 </label>
 
@@ -633,12 +633,12 @@ export default function SkillsAvailability() {
                     })
                   }
                   placeholder="e.g. Riverton High School Shelter"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none bg-white focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none bg-white focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Required date
                 </label>
 
@@ -653,13 +653,13 @@ export default function SkillsAvailability() {
                     })
                   }
                   min={new Date().toISOString().split("T")[0]}
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none bg-white focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none bg-white focus:border-[#287fa9]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-semibold text-[#123c5b]">
+                  <label className="text-sm font-semibold text-[#123c5b]">
                     Start time
                   </label>
 
@@ -673,12 +673,12 @@ export default function SkillsAvailability() {
                         startTime: e.target.value,
                       })
                     }
-                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none bg-white focus:border-[#287fa9]"
+                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none bg-white focus:border-[#287fa9]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-semibold text-[#123c5b]">
+                  <label className="text-sm font-semibold text-[#123c5b]">
                     End time
                   </label>
 
@@ -692,13 +692,13 @@ export default function SkillsAvailability() {
                         endTime: e.target.value,
                       })
                     }
-                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none bg-white focus:border-[#287fa9]"
+                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none bg-white focus:border-[#287fa9]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Number of volunteers
                 </label>
 
@@ -713,7 +713,7 @@ export default function SkillsAvailability() {
                       volunteers: e.target.value,
                     })
                   }
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none bg-white focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none bg-white focus:border-[#287fa9]"
                 />
               </div>
 
@@ -721,7 +721,7 @@ export default function SkillsAvailability() {
                 <button
                   type="button"
                   onClick={() => setShowRequestModal(false)}
-                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-xs hover:bg-slate-50 transition cursor-pointer"
+                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-sm hover:bg-slate-50 transition cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -729,7 +729,7 @@ export default function SkillsAvailability() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-xs font-semibold transition cursor-pointer disabled:opacity-50"
+                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold transition cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? "Submitting..." : "Submit request"}
                 </button>
@@ -744,7 +744,7 @@ export default function SkillsAvailability() {
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-[400px] rounded-xl shadow-2xl p-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-[15px] font-semibold">Skill details</h2>
+              <h2 className="text-lg sm:text-xl font-semibold">Skill details</h2>
               <button
                 type="button"
                 onClick={() => setShowDetailModal(false)}
@@ -759,24 +759,24 @@ export default function SkillsAvailability() {
                 <Users size={23} className="text-[#36a78b]" />
               </div>
 
-              <h3 className="text-sm font-semibold mt-4 text-[#123c5b]">
+              <h3 className="text-base font-semibold mt-4 text-[#123c5b]">
                 {selectedSkill.name}
               </h3>
 
-              <p className="text-[10px] text-gray-400 mt-1">
+              <p className="text-[13px] text-gray-400 mt-1">
                 Volunteer skill coverage overview
               </p>
 
               <div className="grid grid-cols-2 gap-3 mt-5">
                 <div className="bg-[#f3f7f9] rounded-lg p-3">
-                  <p className="text-[9px] text-gray-400">Verified volunteers</p>
+                  <p className="text-xs text-gray-400">Verified volunteers</p>
                   <h3 className="text-xl font-bold mt-1 text-[#123c5b]">
                     {selectedSkill.verified}
                   </h3>
                 </div>
 
                 <div className="bg-[#f3f7f9] rounded-lg p-3">
-                  <p className="text-[9px] text-gray-400">Available now</p>
+                  <p className="text-xs text-gray-400">Available now</p>
                   <h3 className="text-xl font-bold mt-1 text-[#287fa9]">
                     {selectedSkill.available}
                   </h3>
@@ -784,7 +784,7 @@ export default function SkillsAvailability() {
               </div>
 
               <div className="mt-5">
-                <div className="flex justify-between text-[10px] mb-2">
+                <div className="flex justify-between text-sm mb-2">
                   <span className="text-[#8296aa]">Coverage level</span>
                   <span className="font-semibold text-[#123c5b]">
                     {selectedSkill.percentage}%
@@ -805,7 +805,7 @@ export default function SkillsAvailability() {
             <button
               type="button"
               onClick={() => setShowDetailModal(false)}
-              className="w-full mt-6 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg py-2.5 text-xs font-semibold transition cursor-pointer"
+              className="w-full mt-6 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg py-2.5 text-sm font-semibold transition cursor-pointer"
             >
               Close
             </button>
