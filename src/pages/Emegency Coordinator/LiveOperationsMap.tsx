@@ -283,10 +283,10 @@ export default function LiveOperationsMap() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-semibold text-[#153f5e]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
               Live Operations Map
             </h1>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-800">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Live Connected
             </span>
@@ -303,7 +303,7 @@ export default function LiveOperationsMap() {
             onClick={() => fetchMapData(true)}
             disabled={refreshing || loading}
             title="Refresh operations map data"
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2 text-xs font-medium text-[#175477] hover:bg-sky-50 disabled:opacity-60 transition"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2 text-sm font-medium text-[#175477] hover:bg-sky-50 disabled:opacity-60 transition"
           >
             <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
             <span className="hidden sm:inline">Sync</span>
@@ -312,7 +312,7 @@ export default function LiveOperationsMap() {
           {/* Add Operation Point */}
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3.5 py-2 text-xs font-semibold text-white hover:bg-emerald-800 shadow-sm transition"
+            className="flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3.5 py-2 text-sm font-semibold text-white hover:bg-emerald-800 shadow-sm transition"
           >
             <Plus size={15} />
             <span>Add Point</span>
@@ -321,7 +321,7 @@ export default function LiveOperationsMap() {
           {/* Map Layers Toggle */}
           <button
             onClick={() => setShowLayers(!showLayers)}
-            className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 text-xs font-medium transition ${
+            className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition ${
               showLayers
                 ? "border-[#153f5e] bg-[#153f5e] text-white"
                 : "border-[#b9d0dc] bg-white text-[#175477] hover:bg-sky-50"
@@ -334,7 +334,7 @@ export default function LiveOperationsMap() {
           {/* Share View */}
           <button
             onClick={() => setShowShare(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#216789] shadow-sm transition"
+            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#216789] shadow-sm transition"
           >
             <Share2 size={15} />
             <span>Share</span>
@@ -346,27 +346,27 @@ export default function LiveOperationsMap() {
       {metrics && (
         <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
           <div className="rounded-xl border border-[#d5e2e9] bg-white p-3 shadow-xs">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Total Points</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Total Points</span>
             <p className="mt-0.5 text-lg font-bold text-[#153f5e]">{metrics.totalPoints}</p>
           </div>
           <div className="rounded-xl border border-red-100 bg-red-50/50 p-3 shadow-xs">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-red-600">Critical Requests</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-red-600">Critical Requests</span>
             <p className="mt-0.5 text-lg font-bold text-red-700">{metrics.criticalCount}</p>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3 shadow-xs">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-600">Active Shelters</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-emerald-600">Active Shelters</span>
             <p className="mt-0.5 text-lg font-bold text-emerald-800">{metrics.shelterCount}</p>
           </div>
           <div className="rounded-xl border border-sky-100 bg-sky-50/50 p-3 shadow-xs">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-sky-700">Deployed Teams</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-sky-700">Deployed Teams</span>
             <p className="mt-0.5 text-lg font-bold text-[#153f5e]">{metrics.teamCount}</p>
           </div>
           <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-3 shadow-xs">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-amber-700">Depots & Warehouses</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-amber-700">Depots & Warehouses</span>
             <p className="mt-0.5 text-lg font-bold text-amber-800">{metrics.warehouseCount}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-xs">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">People Impacted</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-slate-400">People Impacted</span>
             <p className="mt-0.5 text-lg font-bold text-[#153f5e]">{metrics.totalPeopleAffected.toLocaleString()}</p>
           </div>
         </div>
@@ -399,7 +399,7 @@ export default function LiveOperationsMap() {
           </div>
           <button
             onClick={() => setRepositionMode(false)}
-            className="rounded bg-sky-800 px-2 py-1 text-[11px] font-medium text-white hover:bg-sky-900"
+            className="rounded bg-sky-800 px-2 py-1 text-xs font-medium text-white hover:bg-sky-900"
           >
             Cancel
           </button>
@@ -414,7 +414,7 @@ export default function LiveOperationsMap() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search location, request ID, facility, or team..."
-            className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+            className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
           />
           {search && (
             <button onClick={() => setSearch("")} className="text-slate-400 hover:text-slate-600">
@@ -426,7 +426,7 @@ export default function LiveOperationsMap() {
         <select
           value={district}
           onChange={(e) => setDistrict(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-700 font-medium outline-none shadow-xs"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-700 font-medium outline-none shadow-xs"
         >
           <option>All districts</option>
           <option>North Ward</option>
@@ -438,7 +438,7 @@ export default function LiveOperationsMap() {
         <select
           value={layer}
           onChange={(e) => setLayer(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-700 font-medium outline-none shadow-xs"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-700 font-medium outline-none shadow-xs"
         >
           <option>All operational layers</option>
           <option>Request</option>
@@ -450,7 +450,7 @@ export default function LiveOperationsMap() {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-700 font-medium outline-none shadow-xs"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-700 font-medium outline-none shadow-xs"
         >
           <option>Any priority</option>
           <option>Critical</option>
@@ -462,7 +462,7 @@ export default function LiveOperationsMap() {
         <button
           onClick={handleResetData}
           title="Reset map points to default initial scenario"
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-500 hover:bg-slate-50 hover:text-slate-700 shadow-xs"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-500 hover:bg-slate-50 hover:text-slate-700 shadow-xs"
         >
           Reset Demo
         </button>
@@ -472,7 +472,7 @@ export default function LiveOperationsMap() {
       {showLayers && (
         <div className="relative z-20 mb-3 rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-md transition-all">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-[#153f5e] flex items-center gap-1.5">
+            <h3 className="text-base font-semibold text-[#153f5e] flex items-center gap-1.5">
               <Layers size={16} />
               Operational map layers
             </h3>
@@ -490,7 +490,7 @@ export default function LiveOperationsMap() {
               return (
                 <label
                   key={key}
-                  className="flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-slate-200 p-3 text-xs text-slate-700 hover:bg-slate-50 transition"
+                  className="flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-slate-200 p-3 text-sm text-slate-700 hover:bg-slate-50 transition"
                 >
                   <div className="flex items-center gap-2">
                     <input
@@ -507,7 +507,7 @@ export default function LiveOperationsMap() {
                     <Icon size={16} className={key === "Request" ? "text-red-600" : key === "Shelter" ? "text-emerald-600" : key === "Warehouse" ? "text-amber-500" : "text-sky-600"} />
                     <span className="font-medium">{key}s</span>
                   </div>
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
                     {count}
                   </span>
                 </label>
@@ -554,37 +554,37 @@ export default function LiveOperationsMap() {
 
         {/* District geographical zones */}
         <div className="absolute left-[4%] top-[6%] rounded-md bg-white/80 px-2.5 py-1 backdrop-blur-xs shadow-2xs border border-white">
-          <span className="text-[10px] font-bold tracking-wider text-slate-600 uppercase">
+          <span className="text-xs font-bold tracking-wider text-slate-600 uppercase">
             NORTH WARD
           </span>
-          <span className="block text-[8px] text-slate-400">Flooded Riverbank Sector</span>
+          <span className="block text-xs text-slate-400">Flooded Riverbank Sector</span>
         </div>
 
         <div className="absolute left-[15%] top-[45%] rounded-md bg-white/80 px-2.5 py-1 backdrop-blur-xs shadow-2xs border border-white">
-          <span className="text-[10px] font-bold tracking-wider text-slate-600 uppercase">
+          <span className="text-xs font-bold tracking-wider text-slate-600 uppercase">
             CENTRAL WARD
           </span>
-          <span className="block text-[8px] text-slate-400">Commercial / Relief HQ</span>
+          <span className="block text-xs text-slate-400">Commercial / Relief HQ</span>
         </div>
 
         <div className="absolute right-[8%] top-[24%] rounded-md bg-white/80 px-2.5 py-1 backdrop-blur-xs shadow-2xs border border-white">
-          <span className="text-[10px] font-bold tracking-wider text-slate-600 uppercase">
+          <span className="text-xs font-bold tracking-wider text-slate-600 uppercase">
             EASTBANK
           </span>
-          <span className="block text-[8px] text-slate-400">Logistics Hub & Supply Depot</span>
+          <span className="block text-xs text-slate-400">Logistics Hub & Supply Depot</span>
         </div>
 
         <div className="absolute bottom-[10%] left-[38%] rounded-md bg-white/80 px-2.5 py-1 backdrop-blur-xs shadow-2xs border border-white">
-          <span className="text-[10px] font-bold tracking-wider text-slate-600 uppercase">
+          <span className="text-xs font-bold tracking-wider text-slate-600 uppercase">
             WEST DISTRICT
           </span>
-          <span className="block text-[8px] text-slate-400">Low-lying Inundation Zone</span>
+          <span className="block text-xs text-slate-400">Low-lying Inundation Zone</span>
         </div>
 
         {/* Compass indicator */}
         <div className="absolute top-4 left-4 z-10 flex items-center gap-1 rounded-lg border border-slate-200 bg-white/90 px-2.5 py-1.5 shadow-2xs backdrop-blur-xs">
           <Compass size={14} className="text-[#153f5e]" />
-          <span className="text-[10px] font-bold text-slate-700">N</span>
+          <span className="text-sm font-bold text-slate-700">N</span>
         </div>
 
         {/* Operational Markers on Map Canvas */}
@@ -634,7 +634,7 @@ export default function LiveOperationsMap() {
                 setLayer("All operational layers");
                 setPriority("Any priority");
               }}
-              className="mt-3 inline-block rounded-lg bg-[#153f5e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1f567e]"
+              className="mt-3 inline-block rounded-lg bg-[#153f5e] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#1f567e]"
             >
               Reset Filters
             </button>
@@ -649,7 +649,7 @@ export default function LiveOperationsMap() {
           >
             <div className="mb-2 flex items-center justify-between">
               <span
-                className={`rounded-md px-2 py-0.5 text-[9px] font-bold tracking-wider ${
+                className={`rounded-md px-2 py-0.5 text-xs font-bold tracking-wider ${
                   selectedPoint.priority === "Critical"
                     ? "bg-red-100 text-red-700"
                     : selectedPoint.priority === "High"
@@ -663,7 +663,7 @@ export default function LiveOperationsMap() {
               </span>
 
               <div className="flex items-center gap-1">
-                <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-600">
+                <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600">
                   {selectedPoint.status}
                 </span>
                 <button
@@ -675,18 +675,18 @@ export default function LiveOperationsMap() {
               </div>
             </div>
 
-            <h3 className="text-sm font-bold text-[#153f5e] leading-snug">
+            <h3 className="text-base font-bold text-[#153f5e] leading-snug">
               {selectedPoint.requestId} · {selectedPoint.title}
             </h3>
 
-            <p className="mt-1 text-[11px] text-slate-500 flex items-center gap-1">
+            <p className="mt-1 text-[13px] text-slate-500 flex items-center gap-1">
               <MapPin size={12} className="text-slate-400 shrink-0" />
               <span>{selectedPoint.location}</span>
             </p>
 
-            <div className="my-3 grid grid-cols-2 gap-2.5 rounded-xl bg-slate-50 p-2.5 border border-slate-100 text-[11px]">
+            <div className="my-3 grid grid-cols-2 gap-2.5 rounded-xl bg-slate-50 p-2.5 border border-slate-100 text-sm">
               <div>
-                <p className="text-[9px] font-medium uppercase text-slate-400">
+                <p className="text-xs font-medium uppercase text-slate-400">
                   {selectedPoint.type === "Shelter" ? "Occupancy" : selectedPoint.type === "Team" ? "Team Size" : "People Affected"}
                 </p>
                 <p className="mt-0.5 font-bold text-[#153f5e]">
@@ -695,7 +695,7 @@ export default function LiveOperationsMap() {
               </div>
 
               <div>
-                <p className="text-[9px] font-medium uppercase text-slate-400">
+                <p className="text-xs font-medium uppercase text-slate-400">
                   AI Confidence
                 </p>
                 <p className="mt-0.5 font-bold text-[#153f5e]">
@@ -704,7 +704,7 @@ export default function LiveOperationsMap() {
               </div>
 
               <div>
-                <p className="text-[9px] font-medium uppercase text-slate-400">
+                <p className="text-xs font-medium uppercase text-slate-400">
                   Nearest Shelter
                 </p>
                 <p className="mt-0.5 font-bold text-[#153f5e] truncate">
@@ -713,7 +713,7 @@ export default function LiveOperationsMap() {
               </div>
 
               <div>
-                <p className="text-[9px] font-medium uppercase text-slate-400">
+                <p className="text-xs font-medium uppercase text-slate-400">
                   Assigned Unit
                 </p>
                 <p className="mt-0.5 font-bold text-sky-800 truncate">
@@ -723,10 +723,10 @@ export default function LiveOperationsMap() {
 
               {selectedPoint.contactPhone && (
                 <div className="col-span-2 pt-1 border-t border-slate-200">
-                  <p className="text-[9px] font-medium uppercase text-slate-400">
+                  <p className="text-xs font-medium uppercase text-slate-400">
                     Contact: {selectedPoint.contactName || "On-site Rep"}
                   </p>
-                  <p className="text-[10px] font-semibold text-slate-700">
+                  <p className="text-sm font-semibold text-slate-700">
                     {selectedPoint.contactPhone}
                   </p>
                 </div>
@@ -734,8 +734,8 @@ export default function LiveOperationsMap() {
 
               {selectedPoint.notes && (
                 <div className="col-span-2 pt-1 border-t border-slate-200">
-                  <p className="text-[9px] font-medium uppercase text-slate-400">Operational Notes</p>
-                  <p className="text-[10px] text-slate-600 line-clamp-2">{selectedPoint.notes}</p>
+                  <p className="text-xs font-medium uppercase text-slate-400">Operational Notes</p>
+                  <p className="text-sm text-slate-600 line-clamp-2">{selectedPoint.notes}</p>
                 </div>
               )}
             </div>
@@ -747,7 +747,7 @@ export default function LiveOperationsMap() {
                   setAssignTeamName(selectedPoint.assignedTeam !== "Unassigned" ? selectedPoint.assignedTeam : AVAILABLE_TEAMS[0]);
                   setShowAssignModal(true);
                 }}
-                className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#153f5e] py-2 text-xs font-semibold text-white hover:bg-[#1d4f73] transition"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#153f5e] py-2 text-sm font-semibold text-white hover:bg-[#1d4f73] transition"
               >
                 <UserCheck size={14} />
                 <span>Assign Field Team</span>
@@ -757,7 +757,7 @@ export default function LiveOperationsMap() {
                 <button
                   onClick={() => setRepositionMode(true)}
                   disabled={repositionLoading}
-                  className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition"
+                  className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
                 >
                   <Crosshair size={13} className="text-sky-600" />
                   <span>Reposition</span>
@@ -767,7 +767,7 @@ export default function LiveOperationsMap() {
                   onClick={() => {
                     notify(`Opened details for ${selectedPoint.requestId}`);
                   }}
-                  className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition"
+                  className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
                 >
                   <span>Open Dossier</span>
                   <ExternalLink size={12} className="text-slate-400" />
@@ -782,7 +782,7 @@ export default function LiveOperationsMap() {
           {Object.entries(markerColors).map(([name, color]) => (
             <div key={name} className="flex items-center gap-1.5">
               <span className={`h-2.5 w-2.5 rounded-full ${color}`} />
-              <span className="text-[10px] font-medium text-slate-700">
+              <span className="text-sm font-medium text-slate-700">
                 {name === "Request" ? "Requests" : name === "Team" ? "Teams" : `${name}s`}
               </span>
             </div>
@@ -790,7 +790,7 @@ export default function LiveOperationsMap() {
         </div>
 
         {/* Map Summary Badge */}
-        <div className="absolute bottom-4 right-4 rounded-xl border border-slate-200 bg-white/95 px-3 py-1.5 text-[10px] font-semibold text-slate-600 shadow-sm backdrop-blur-xs">
+        <div className="absolute bottom-4 right-4 rounded-xl border border-slate-200 bg-white/95 px-3 py-1.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-xs">
           {filteredPoints.length} active operational points
         </div>
       </section>
@@ -815,13 +815,13 @@ export default function LiveOperationsMap() {
 
             <form onSubmit={handleAssignTeam} className="space-y-3">
               <div>
-                <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-1">
                   Select Team / Unit
                 </label>
                 <select
                   value={assignTeamName}
                   onChange={(e) => setAssignTeamName(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-800 outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] text-slate-800 outline-none focus:border-sky-500"
                 >
                   {AVAILABLE_TEAMS.map((t) => (
                     <option key={t} value={t}>{t}</option>
@@ -833,14 +833,14 @@ export default function LiveOperationsMap() {
                 <button
                   type="button"
                   onClick={() => setShowAssignModal(false)}
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={assignLoading}
-                  className="rounded-lg bg-[#287da5] px-4 py-2 text-xs font-semibold text-white hover:bg-[#216789] disabled:opacity-50"
+                  className="rounded-lg bg-[#287da5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#216789] disabled:opacity-50"
                 >
                   {assignLoading ? "Dispatching..." : "Confirm Dispatch"}
                 </button>
@@ -866,23 +866,23 @@ export default function LiveOperationsMap() {
 
             <form onSubmit={handleCreatePoint} className="space-y-3">
               <div>
-                <label className="block text-[11px] font-medium text-slate-700 mb-1">Title</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
                 <input
                   required
                   value={newPoint.title}
                   onChange={(e) => setNewPoint({ ...newPoint, title: e.target.value })}
                   placeholder="e.g. Flash flood rescue, Mobile Clinic"
-                  className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none focus:border-sky-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">Layer Type</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Layer Type</label>
                   <select
                     value={newPoint.type}
                     onChange={(e) => setNewPoint({ ...newPoint, type: e.target.value as any })}
-                    className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                    className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                   >
                     <option value="Request">Request</option>
                     <option value="Shelter">Shelter</option>
@@ -892,11 +892,11 @@ export default function LiveOperationsMap() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">Priority</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Priority</label>
                   <select
                     value={newPoint.priority}
                     onChange={(e) => setNewPoint({ ...newPoint, priority: e.target.value as any })}
-                    className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                    className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                   >
                     <option value="Critical">Critical</option>
                     <option value="High">High</option>
@@ -908,11 +908,11 @@ export default function LiveOperationsMap() {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">District</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">District</label>
                   <select
                     value={newPoint.district}
                     onChange={(e) => setNewPoint({ ...newPoint, district: e.target.value })}
-                    className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                    className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                   >
                     <option>North Ward</option>
                     <option>Central Ward</option>
@@ -922,64 +922,64 @@ export default function LiveOperationsMap() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">Location Details</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Location Details</label>
                   <input
                     required
                     value={newPoint.location}
                     onChange={(e) => setNewPoint({ ...newPoint, location: e.target.value })}
                     placeholder="e.g. Near Bridge 4, North Ward"
-                    className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                    className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">People Count</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">People Count</label>
                   <input
                     type="number"
                     min="0"
                     value={newPoint.people}
                     onChange={(e) => setNewPoint({ ...newPoint, people: parseInt(e.target.value) || 0 })}
-                    className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                    className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">AI Confidence %</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">AI Confidence %</label>
                   <input
                     type="number"
                     min="1"
                     max="100"
                     value={newPoint.confidence}
                     onChange={(e) => setNewPoint({ ...newPoint, confidence: parseInt(e.target.value) || 90 })}
-                    className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                    className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">Map X Position (%)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Map X Position (%)</label>
                   <input
                     type="number"
                     min="5"
                     max="95"
                     value={newPoint.x}
                     onChange={(e) => setNewPoint({ ...newPoint, x: parseFloat(e.target.value) || 50 })}
-                    className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                    className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">Map Y Position (%)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Map Y Position (%)</label>
                   <input
                     type="number"
                     min="5"
                     max="95"
                     value={newPoint.y}
                     onChange={(e) => setNewPoint({ ...newPoint, y: parseFloat(e.target.value) || 50 })}
-                    className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                    className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                   />
                 </div>
               </div>
@@ -988,13 +988,13 @@ export default function LiveOperationsMap() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-lg bg-emerald-700 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-800"
+                  className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800"
                 >
                   Create Point
                 </button>
@@ -1026,12 +1026,12 @@ export default function LiveOperationsMap() {
               <input
                 readOnly
                 value={window.location.href}
-                className="min-w-0 flex-1 rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-700"
+                className="min-w-0 flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] text-slate-700"
               />
 
               <button
                 onClick={handleShare}
-                className="flex items-center gap-1.5 rounded-lg bg-[#153f5e] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#1f567e] transition"
+                className="flex items-center gap-1.5 rounded-lg bg-[#153f5e] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#1f567e] transition"
               >
                 {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
                 <span>{copied ? "Copied" : "Copy"}</span>

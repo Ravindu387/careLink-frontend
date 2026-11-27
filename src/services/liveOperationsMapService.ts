@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 /**
  * Live Operations Map Service
  * Connects the Live Operations Map frontend interface to the CareLink .NET backend.
@@ -337,7 +338,7 @@ export const liveOperationsMapService = {
 
     const query = params.toString() ? `?${params.toString()}` : "";
     try {
-      const response = await fetch(`${ENDPOINT}${query}`, {
+      const response = await authFetch(`${ENDPOINT}${query}`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -373,7 +374,7 @@ export const liveOperationsMapService = {
 
   async getMetrics(): Promise<LiveOperationsMapMetrics | null> {
     try {
-      const response = await fetch(`${ENDPOINT}/metrics`, {
+      const response = await authFetch(`${ENDPOINT}/metrics`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -388,7 +389,7 @@ export const liveOperationsMapService = {
 
   async getById(id: string): Promise<OperationPoint | null> {
     try {
-      const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+      const response = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -401,7 +402,7 @@ export const liveOperationsMapService = {
   },
 
   async create(payload: CreateOperationPointPayload): Promise<OperationPoint> {
-    const response = await fetch(ENDPOINT, {
+    const response = await authFetch(ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -419,7 +420,7 @@ export const liveOperationsMapService = {
   },
 
   async update(id: string, payload: UpdateOperationPointPayload): Promise<OperationPoint> {
-    const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -437,7 +438,7 @@ export const liveOperationsMapService = {
   },
 
   async assignTeam(id: string, payload: AssignTeamPayload): Promise<OperationPoint> {
-    const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}/assign`, {
+    const response = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}/assign`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -455,7 +456,7 @@ export const liveOperationsMapService = {
   },
 
   async updateCoordinates(id: string, payload: UpdateCoordinatesPayload): Promise<OperationPoint> {
-    const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}/coordinates`, {
+    const response = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}/coordinates`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -473,7 +474,7 @@ export const liveOperationsMapService = {
   },
 
   async delete(id: string): Promise<boolean> {
-    const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers: { Accept: "application/json" },
     });
@@ -482,7 +483,7 @@ export const liveOperationsMapService = {
   },
 
   async reset(): Promise<boolean> {
-    const response = await fetch(`${ENDPOINT}/reset`, {
+    const response = await authFetch(`${ENDPOINT}/reset`, {
       method: "POST",
       headers: { Accept: "application/json" },
     });
