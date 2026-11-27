@@ -348,7 +348,7 @@ const FieldActivities = () => {
               <span className="font-semibold text-[#153e5b]">Field Activities</span>
             </p>
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                 isConnected
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -359,7 +359,7 @@ const FieldActivities = () => {
             </span>
           </div>
 
-          <h1 className="text-2xl font-semibold text-[#153e5b]">Field Activities</h1>
+          <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">Field Activities</h1>
 
           <p className="mt-1 text-sm text-slate-500">
             Plan and monitor distributions, assessments, outreach, and service delivery in the field.
@@ -370,7 +370,7 @@ const FieldActivities = () => {
           <button
             onClick={() => loadData(false)}
             disabled={isSyncing}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50 transition disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50 transition disabled:opacity-50"
             title="Refresh from server"
           >
             <RefreshCw size={14} className={isSyncing ? "animate-spin text-[#267ba4]" : ""} />
@@ -379,7 +379,7 @@ const FieldActivities = () => {
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
           >
             <Download size={15} />
             Export
@@ -387,7 +387,7 @@ const FieldActivities = () => {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Plus size={16} />
             Create Field Activity
@@ -456,7 +456,7 @@ const FieldActivities = () => {
                 setActiveTab(tab);
                 setCurrentPage(1);
               }}
-              className={`relative whitespace-nowrap pb-4 text-xs ${
+              className={`relative whitespace-nowrap pb-4 text-sm ${
                 activeTab === tab
                   ? "font-semibold text-[#267ba4]"
                   : "text-slate-500 hover:text-[#267ba4]"
@@ -464,7 +464,7 @@ const FieldActivities = () => {
             >
               {tab}
               {typeof count === "number" && (
-                <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px] font-semibold text-[#153e5b]">
+                <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-xs font-semibold text-[#153e5b]">
                   {count}
                 </span>
               )}
@@ -491,7 +491,7 @@ const FieldActivities = () => {
               setCurrentPage(1);
             }}
             placeholder="Search field activities..."
-            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
+            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
           />
         </div>
 
@@ -501,7 +501,7 @@ const FieldActivities = () => {
             setSectorFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All sectors</option>
           {sectorOptions.map((s) => (
@@ -517,7 +517,7 @@ const FieldActivities = () => {
             setLocationFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All locations</option>
           {locationOptions.map((loc) => (
@@ -533,7 +533,7 @@ const FieldActivities = () => {
             setTeamFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All teams</option>
           {teamOptions.map((t) => (
@@ -549,7 +549,7 @@ const FieldActivities = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All statuses</option>
           <option>In Progress</option>
@@ -562,7 +562,7 @@ const FieldActivities = () => {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
         >
           <Filter size={15} />
           More filters
@@ -573,15 +573,15 @@ const FieldActivities = () => {
       {showFilters && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d3e1e8] bg-white p-4">
           <div>
-            <p className="text-xs font-semibold text-[#153e5b]">Active Filter Summary</p>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="text-sm font-semibold text-[#153e5b]">Active Filter Summary</p>
+            <p className="mt-1 text-[13px] text-slate-500">
               Filtering by: Sector ({sectorFilter}), Location ({locationFilter}), Team ({teamFilter}), Status ({statusFilter}).
             </p>
           </div>
 
           <button
             onClick={resetFilters}
-            className="text-xs font-medium text-[#267ba4] hover:underline"
+            className="text-sm font-medium text-[#267ba4] hover:underline"
           >
             Clear all filters
           </button>
@@ -593,7 +593,7 @@ const FieldActivities = () => {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1000px] text-left">
             <thead className="bg-[#f5f8fa]">
-              <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
+              <tr className="border-b border-[#d7e5eb] text-sm text-slate-500">
                 {[
                   "Activity",
                   "Activity Name",
@@ -615,7 +615,7 @@ const FieldActivities = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={9} className="py-16 text-center text-xs text-slate-500">
+                  <td colSpan={9} className="py-16 text-center text-sm text-slate-500">
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw size={18} className="animate-spin text-[#267ba4]" />
                       <span>Loading field activities from backend...</span>
@@ -627,7 +627,7 @@ const FieldActivities = () => {
                   <tr
                     key={item.id}
                     onClick={() => setSelectedActivity(item)}
-                    className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
+                    className="cursor-pointer border-b border-[#e2ebef] text-sm text-slate-600 transition hover:bg-[#f5fafc]"
                   >
                     <td className="whitespace-nowrap px-3 py-4 font-semibold text-[#153e5b]">
                       {item.id}
@@ -670,7 +670,7 @@ const FieldActivities = () => {
                 <tr>
                   <td
                     colSpan={9}
-                    className="py-12 text-center text-xs text-slate-400"
+                    className="py-12 text-center text-sm text-slate-400"
                   >
                     No field activities found matching criteria.
                   </td>
@@ -682,7 +682,7 @@ const FieldActivities = () => {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[13px] text-slate-400">
             Showing{" "}
             {filteredActivities.length === 0
               ? 0
@@ -696,7 +696,7 @@ const FieldActivities = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
@@ -705,7 +705,7 @@ const FieldActivities = () => {
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
-                className={`h-8 w-8 rounded-lg border text-[10px] font-medium transition ${
+                className={`h-8 w-8 rounded-lg border text-sm font-medium transition ${
                   currentPage === number
                     ? "border-[#267ba4] bg-[#267ba4] text-white"
                     : "border-[#d3e1e8] text-slate-600 hover:bg-slate-50"
@@ -718,7 +718,7 @@ const FieldActivities = () => {
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
@@ -779,9 +779,9 @@ function StatCard({
       </div>
 
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <p className="text-2xl font-bold text-[#153e5b]">{value}</p>
-        <p className="text-[9px] text-slate-400">{subtitle}</p>
+        <p className="text-xs text-slate-400">{subtitle}</p>
       </div>
     </div>
   );
@@ -800,7 +800,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`rounded-md px-2 py-1 text-[9px] font-medium ${
+      className={`rounded-md px-2 py-1 text-xs font-medium ${
         styles[status] || "bg-slate-100 text-slate-500"
       }`}
     >
@@ -819,8 +819,8 @@ function Detail({
 }) {
   return (
     <div>
-      <p className="text-[10px] text-slate-400">{label}</p>
-      <p className="mt-1 text-xs font-medium text-[#153e5b]">{value || "—"}</p>
+      <p className="text-[13px] text-slate-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-[#153e5b]">{value || "—"}</p>
     </div>
   );
 }
@@ -858,7 +858,7 @@ function ActivityDetailsModal({
           </button>
         </div>
 
-        <h3 className="mb-4 text-sm font-semibold text-[#153e5b]">
+        <h3 className="mb-4 text-base font-semibold text-[#153e5b]">
           {activity.name}
         </h3>
 
@@ -891,7 +891,7 @@ function ActivityDetailsModal({
             <button
               disabled={isActionLoading}
               onClick={() => onStatusChange(activity.id, "In Progress")}
-              className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-4 py-2 text-xs font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-4 py-2 text-sm font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
             >
               <Play size={13} />
               Start Operation
@@ -902,7 +902,7 @@ function ActivityDetailsModal({
             <button
               disabled={isActionLoading}
               onClick={() => onStatusChange(activity.id, "Completed")}
-              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
             >
               <Clock size={13} />
               Mark Completed
@@ -913,7 +913,7 @@ function ActivityDetailsModal({
             <button
               disabled={isActionLoading}
               onClick={() => onStatusChange(activity.id, "Completed")}
-              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
             >
               <Clock size={13} />
               Mark Completed
@@ -924,7 +924,7 @@ function ActivityDetailsModal({
             <button
               disabled={isActionLoading}
               onClick={() => onStatusChange(activity.id, "Archived")}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
             >
               <Archive size={13} />
               Archive Activity
@@ -935,7 +935,7 @@ function ActivityDetailsModal({
             <button
               disabled={isActionLoading}
               onClick={() => onStatusChange(activity.id, "Scheduled")}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
             >
               <RotateCcw size={13} />
               Restore Activity
@@ -944,7 +944,7 @@ function ActivityDetailsModal({
 
           <button
             onClick={onClose}
-            className="ml-auto rounded-lg border border-slate-200 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+            className="ml-auto rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
             Close
           </button>
@@ -1015,7 +1015,7 @@ function CreateActivityModal({
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Create Field Activity
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Add a new field operation to the coordination ledger.
             </p>
           </div>
@@ -1027,7 +1027,7 @@ function CreateActivityModal({
 
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1.5 block text-sm font-medium text-slate-600">
               Activity Name *
             </label>
             <input
@@ -1035,12 +1035,12 @@ function CreateActivityModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Household food distribution"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1.5 block text-sm font-medium text-slate-600">
               Location *
             </label>
             <input
@@ -1048,13 +1048,13 @@ function CreateActivityModal({
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g. North Ward - Zone 3"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-sm font-medium text-slate-600">
                 Scheduled Date *
               </label>
               <input
@@ -1062,12 +1062,12 @@ function CreateActivityModal({
                 type="date"
                 value={scheduled}
                 onChange={(e) => setScheduled(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-sm font-medium text-slate-600">
                 Target / Result *
               </label>
               <input
@@ -1075,20 +1075,20 @@ function CreateActivityModal({
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 placeholder="e.g. 420 households"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-sm font-medium text-slate-600">
                 Assigned Team *
               </label>
               <select
                 value={team}
                 onChange={(e) => setTeam(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               >
                 <option>Field Team North</option>
                 <option>WASH Team 2</option>
@@ -1099,13 +1099,13 @@ function CreateActivityModal({
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-sm font-medium text-slate-600">
                 Sector *
               </label>
               <select
                 value={sector}
                 onChange={(e) => setSector(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               >
                 <option>Food Security</option>
                 <option>WASH</option>
@@ -1117,7 +1117,7 @@ function CreateActivityModal({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1.5 block text-sm font-medium text-slate-600">
               Operational Scope / Description
             </label>
             <textarea
@@ -1125,7 +1125,7 @@ function CreateActivityModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief summary of activities, target population, and logistics..."
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
         </div>
@@ -1134,7 +1134,7 @@ function CreateActivityModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
@@ -1142,7 +1142,7 @@ function CreateActivityModal({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
           >
             {isSubmitting && <RefreshCw size={14} className="animate-spin" />}
             Create Activity

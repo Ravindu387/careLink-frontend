@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface Collaboration {
   id: string;
   title: string;
@@ -89,7 +90,7 @@ export const collaborationRequestService = {
     }
 
     const query = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${API_BASE}/api/collaboration-requests${query}`);
+    const response = await authFetch(`${API_BASE}/api/collaboration-requests${query}`);
     if (!response.ok) {
       throw new Error(`Failed to load collaboration requests: ${response.status} ${response.statusText}`);
     }
@@ -97,7 +98,7 @@ export const collaborationRequestService = {
   },
 
   async getMetrics(): Promise<CollaborationMetrics> {
-    const response = await fetch(`${API_BASE}/api/collaboration-requests/metrics`);
+    const response = await authFetch(`${API_BASE}/api/collaboration-requests/metrics`);
     if (!response.ok) {
       throw new Error(`Failed to load collaboration metrics: ${response.status}`);
     }
@@ -105,7 +106,7 @@ export const collaborationRequestService = {
   },
 
   async getById(id: string): Promise<Collaboration> {
-    const response = await fetch(`${API_BASE}/api/collaboration-requests/${encodeURIComponent(id)}`);
+    const response = await authFetch(`${API_BASE}/api/collaboration-requests/${encodeURIComponent(id)}`);
     if (!response.ok) {
       throw new Error(`Failed to load collaboration ${id}: ${response.status}`);
     }
@@ -113,7 +114,7 @@ export const collaborationRequestService = {
   },
 
   async create(payload: CreateCollaborationPayload): Promise<Collaboration> {
-    const response = await fetch(`${API_BASE}/api/collaboration-requests`, {
+    const response = await authFetch(`${API_BASE}/api/collaboration-requests`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -129,7 +130,7 @@ export const collaborationRequestService = {
   },
 
   async update(id: string, payload: UpdateCollaborationPayload): Promise<Collaboration> {
-    const response = await fetch(`${API_BASE}/api/collaboration-requests/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${API_BASE}/api/collaboration-requests/${encodeURIComponent(id)}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -145,7 +146,7 @@ export const collaborationRequestService = {
   },
 
   async updateStatus(id: string, status: string): Promise<Collaboration> {
-    const response = await fetch(`${API_BASE}/api/collaboration-requests/${encodeURIComponent(id)}/status`, {
+    const response = await authFetch(`${API_BASE}/api/collaboration-requests/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -161,7 +162,7 @@ export const collaborationRequestService = {
   },
 
   async delete(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/api/collaboration-requests/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${API_BASE}/api/collaboration-requests/${encodeURIComponent(id)}`, {
       method: "DELETE",
     });
 
@@ -171,7 +172,7 @@ export const collaborationRequestService = {
   },
 
   async reset(): Promise<{ message: string; metrics: CollaborationMetrics }> {
-    const response = await fetch(`${API_BASE}/api/collaboration-requests/reset`, {
+    const response = await authFetch(`${API_BASE}/api/collaboration-requests/reset`, {
       method: "POST",
     });
 

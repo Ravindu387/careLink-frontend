@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface SharedCrisisEvent {
   id: string;
   event: string;
@@ -174,7 +175,7 @@ class SharedCrisisEventService {
       if (filters?.status && filters.status !== "All statuses") params.append("status", filters.status);
 
       const url = params.toString() ? `${API_BASE_URL}?${params.toString()}` : API_BASE_URL;
-      const res = await fetch(url);
+      const res = await authFetch(url);
       if (!res.ok) {
         throw new Error(`Failed to fetch shared crisis events: ${res.statusText}`);
       }
@@ -220,7 +221,7 @@ class SharedCrisisEventService {
 
   public async getMetrics(): Promise<SharedCrisisMetrics> {
     try {
-      const res = await fetch(`${API_BASE_URL}/metrics`);
+      const res = await authFetch(`${API_BASE_URL}/metrics`);
       if (!res.ok) {
         throw new Error(`Failed to fetch shared crisis metrics: ${res.statusText}`);
       }
@@ -232,7 +233,7 @@ class SharedCrisisEventService {
 
   public async getById(id: string): Promise<SharedCrisisEvent | null> {
     try {
-      const res = await fetch(`${API_BASE_URL}/${encodeURIComponent(id)}`);
+      const res = await authFetch(`${API_BASE_URL}/${encodeURIComponent(id)}`);
       if (!res.ok) {
         if (res.status === 404) return null;
         throw new Error(`Failed to fetch crisis event ${id}`);
@@ -259,7 +260,7 @@ class SharedCrisisEventService {
 
   public async requestAccess(payload: CreateCrisisAccessRequestPayload): Promise<CrisisAccessRequestResponse> {
     try {
-      const res = await fetch(`${API_BASE_URL}/access-requests`, {
+      const res = await authFetch(`${API_BASE_URL}/access-requests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -283,7 +284,7 @@ class SharedCrisisEventService {
 
   public async reset(): Promise<boolean> {
     try {
-      const res = await fetch("/api/crisis-events/reset", {
+      const res = await authFetch("/api/crisis-events/reset", {
         method: "POST",
       });
       return res.ok;

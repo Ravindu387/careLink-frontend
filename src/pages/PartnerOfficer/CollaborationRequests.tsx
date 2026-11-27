@@ -411,12 +411,12 @@ const CollaborationRequests = () => {
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold text-[#153e5b]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">
               Collaboration Requests
             </h1>
 
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
                 isLiveConnected
                   ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
                   : "border border-slate-200 bg-slate-100 text-slate-600"
@@ -433,7 +433,7 @@ const CollaborationRequests = () => {
             </span>
 
             {metrics && (
-              <span className="rounded-full bg-[#e8f2f8] px-2.5 py-0.5 text-[10px] font-medium text-[#267ba4]">
+              <span className="rounded-full bg-[#e8f2f8] px-2.5 py-0.5 text-xs font-medium text-[#267ba4]">
                 {metrics.totalCollaborations} Total Requests
               </span>
             )}
@@ -449,7 +449,7 @@ const CollaborationRequests = () => {
           <button
             onClick={loadData}
             disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
             title="Refresh collaboration requests"
           >
             <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
@@ -458,7 +458,7 @@ const CollaborationRequests = () => {
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
           >
             <Download size={15} />
             Export
@@ -466,7 +466,7 @@ const CollaborationRequests = () => {
 
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Plus size={16} />
             Create Collaboration
@@ -549,7 +549,7 @@ const CollaborationRequests = () => {
                 setActiveTab(tab);
                 setCurrentPage(1);
               }}
-              className={`relative whitespace-nowrap pb-4 text-xs transition ${
+              className={`relative whitespace-nowrap pb-4 text-sm transition ${
                 activeTab === tab
                   ? "font-semibold text-[#267ba4]"
                   : "text-slate-500 hover:text-[#267ba4]"
@@ -557,7 +557,7 @@ const CollaborationRequests = () => {
             >
               {tab}
               <span
-                className={`ml-1.5 rounded-full px-2 py-0.5 text-[9px] font-medium ${
+                className={`ml-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
                   activeTab === tab
                     ? "bg-[#267ba4] text-white"
                     : "bg-[#e5eff4] text-[#153e5b]"
@@ -588,7 +588,7 @@ const CollaborationRequests = () => {
               setCurrentPage(1);
             }}
             placeholder="Search collaboration requests, partners, areas, or support..."
-            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
+            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
           />
         </div>
 
@@ -598,7 +598,7 @@ const CollaborationRequests = () => {
             setSectorFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           {sectorOptions.map((opt) => (
             <option key={opt}>{opt}</option>
@@ -611,7 +611,7 @@ const CollaborationRequests = () => {
             setPartnerFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           {partnerOptions.map((opt) => (
             <option key={opt}>{opt}</option>
@@ -624,7 +624,7 @@ const CollaborationRequests = () => {
             setAreaFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           {areaOptions.map((opt) => (
             <option key={opt}>{opt}</option>
@@ -637,7 +637,7 @@ const CollaborationRequests = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All statuses</option>
           <option>Awaiting Response</option>
@@ -649,7 +649,7 @@ const CollaborationRequests = () => {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
         >
           <Filter size={15} />
           More filters
@@ -660,10 +660,10 @@ const CollaborationRequests = () => {
       {showFilters && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d3e1e8] bg-white p-4">
           <div>
-            <p className="text-xs font-semibold text-[#153e5b]">
+            <p className="text-sm font-semibold text-[#153e5b]">
               Refine collaboration requests
             </p>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Filtered results: {filteredData.length} records matching current
               criteria.
             </p>
@@ -671,7 +671,7 @@ const CollaborationRequests = () => {
 
           <button
             onClick={resetFilters}
-            className="text-xs font-medium text-[#267ba4] hover:underline"
+            className="text-sm font-medium text-[#267ba4] hover:underline"
           >
             Clear all filters
           </button>
@@ -683,7 +683,7 @@ const CollaborationRequests = () => {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1050px] text-left">
             <thead className="bg-[#f5f8fa]">
-              <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
+              <tr className="border-b border-[#d7e5eb] text-sm text-slate-500">
                 {[
                   "Request",
                   "Collaboration",
@@ -707,7 +707,7 @@ const CollaborationRequests = () => {
                 <tr
                   key={item.id}
                   onClick={() => setSelected(item)}
-                  className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
+                  className="cursor-pointer border-b border-[#e2ebef] text-sm text-slate-600 transition hover:bg-[#f5fafc]"
                 >
                   <td className="whitespace-nowrap px-3 py-4 font-semibold text-[#153e5b]">
                     {item.id}
@@ -741,7 +741,7 @@ const CollaborationRequests = () => {
                 <tr>
                   <td
                     colSpan={9}
-                    className="py-12 text-center text-xs text-slate-400"
+                    className="py-12 text-center text-sm text-slate-400"
                   >
                     No collaboration requests found matching the current filters.
                   </td>
@@ -753,7 +753,7 @@ const CollaborationRequests = () => {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[13px] text-slate-400">
             Showing{" "}
             {filteredData.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
             {Math.min(currentPage * pageSize, filteredData.length)} of{" "}
@@ -764,7 +764,7 @@ const CollaborationRequests = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
@@ -773,7 +773,7 @@ const CollaborationRequests = () => {
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
-                className={`h-8 w-8 rounded-lg border text-[10px] ${
+                className={`h-8 w-8 rounded-lg border text-sm ${
                   currentPage === number
                     ? "border-[#267ba4] bg-[#267ba4] text-white"
                     : "border-[#d3e1e8] text-slate-600 hover:bg-slate-50"
@@ -786,7 +786,7 @@ const CollaborationRequests = () => {
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
@@ -843,9 +843,9 @@ function StatCard({
       </div>
 
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <p className="text-2xl font-bold text-[#153e5b]">{value}</p>
-        <p className="text-[9px] text-slate-400">{subtitle}</p>
+        <p className="text-xs text-slate-400">{subtitle}</p>
       </div>
     </div>
   );
@@ -863,7 +863,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`rounded-md px-2 py-1 text-[9px] font-medium ${
+      className={`rounded-md px-2 py-1 text-xs font-medium ${
         styles[status] || "bg-slate-100 text-slate-500"
       }`}
     >
@@ -884,11 +884,11 @@ function Detail({
 }) {
   return (
     <div>
-      <p className="flex items-center gap-1.5 text-[10px] text-slate-400">
+      <p className="flex items-center gap-1.5 text-[13px] text-slate-400">
         {icon}
         {label}
       </p>
-      <p className="mt-1 text-xs font-medium text-[#153e5b]">{value}</p>
+      <p className="mt-1 text-sm font-medium text-[#153e5b]">{value}</p>
     </div>
   );
 }
@@ -908,7 +908,7 @@ function DetailsModal({
       <div className="my-auto w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-[#267ba4]">{item.id}</p>
+            <p className="text-sm font-semibold text-[#267ba4]">{item.id}</p>
             <h2 className="mt-1 text-lg font-semibold text-[#153e5b]">
               Collaboration Details
             </h2>
@@ -920,12 +920,12 @@ function DetailsModal({
         </div>
 
         <div className="mb-4 rounded-lg bg-[#f5f8fa] p-3.5">
-          <p className="text-[10px] text-slate-400">Title</p>
-          <h3 className="mt-0.5 text-sm font-semibold text-[#153e5b]">
+          <p className="text-[13px] text-slate-400">Title</p>
+          <h3 className="mt-0.5 text-base font-semibold text-[#153e5b]">
             {item.title}
           </h3>
           {item.description && (
-            <p className="mt-2 text-xs leading-relaxed text-slate-600">
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
               {item.description}
             </p>
           )}
@@ -954,7 +954,7 @@ function DetailsModal({
             value={item.startDate}
           />
           <div>
-            <p className="text-[10px] text-slate-400">Current Status</p>
+            <p className="text-[13px] text-slate-400">Current Status</p>
             <div className="mt-1">
               <StatusBadge status={item.status} />
             </div>
@@ -982,14 +982,14 @@ function DetailsModal({
 
         {/* Status transition action controls */}
         <div className="mt-6 border-t border-slate-100 pt-4">
-          <p className="mb-2 text-[10px] font-semibold text-slate-500">
+          <p className="mb-2 text-[13px] font-semibold text-slate-500">
             Workflow Actions
           </p>
           <div className="flex flex-wrap gap-2">
             {item.status === "Awaiting Response" && (
               <button
                 onClick={() => onStatusChange(item.id, "Accepted")}
-                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
               >
                 <Check size={13} />
                 Accept Request
@@ -999,7 +999,7 @@ function DetailsModal({
             {(item.status === "Awaiting Response" || item.status === "Accepted") && (
               <button
                 onClick={() => onStatusChange(item.id, "In Progress")}
-                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#1c668a]"
               >
                 <ArrowRight size={13} />
                 Mark In Progress
@@ -1009,7 +1009,7 @@ function DetailsModal({
             {item.status === "In Progress" && (
               <button
                 onClick={() => onStatusChange(item.id, "Completed")}
-                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
               >
                 <Check size={13} />
                 Mark Completed
@@ -1019,7 +1019,7 @@ function DetailsModal({
             {item.status !== "Archived" && (
               <button
                 onClick={() => onStatusChange(item.id, "Archived")}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-500 hover:bg-slate-50"
               >
                 Archive
               </button>
@@ -1029,7 +1029,7 @@ function DetailsModal({
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-slate-100 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-200"
+          className="mt-6 w-full rounded-lg bg-slate-100 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-200"
         >
           Close
         </button>
@@ -1085,7 +1085,7 @@ function CreateCollaborationModal({
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Create Collaboration
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Create a new partner collaboration request.
             </p>
           </div>
@@ -1097,7 +1097,7 @@ function CreateCollaborationModal({
 
         <div className="space-y-3.5">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1.5 block text-sm font-medium text-slate-600">
               Collaboration Title *
             </label>
             <input
@@ -1105,12 +1105,12 @@ function CreateCollaborationModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Mobile emergency water bowser service"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1.5 block text-sm font-medium text-slate-600">
               Requesting Partner *
             </label>
             <input
@@ -1118,19 +1118,19 @@ function CreateCollaborationModal({
               value={partner}
               onChange={(e) => setPartner(e.target.value)}
               placeholder="e.g. National Disaster Authority"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-sm font-medium text-slate-600">
                 Sector *
               </label>
               <select
                 value={sector}
                 onChange={(e) => setSector(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>WASH</option>
                 <option>Food Security</option>
@@ -1141,13 +1141,13 @@ function CreateCollaborationModal({
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-sm font-medium text-slate-600">
                 Operational Area *
               </label>
               <select
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>North Ward</option>
                 <option>Central Ward</option>
@@ -1159,7 +1159,7 @@ function CreateCollaborationModal({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1.5 block text-sm font-medium text-slate-600">
               Required Support *
             </label>
             <textarea
@@ -1168,12 +1168,12 @@ function CreateCollaborationModal({
               onChange={(e) => setSupport(e.target.value)}
               placeholder="Describe required capacity, resources, or staffing..."
               rows={2}
-              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1.5 block text-sm font-medium text-slate-600">
               Operational Details / Description
             </label>
             <textarea
@@ -1181,13 +1181,13 @@ function CreateCollaborationModal({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Additional background, requirements, or logistics notes..."
               rows={2}
-              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-sm font-medium text-slate-600">
                 Proposed Start Date *
               </label>
               <input
@@ -1195,31 +1195,31 @@ function CreateCollaborationModal({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-sm font-medium text-slate-600">
                 Contact Name
               </label>
               <input
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
                 placeholder="Focal person"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-sm font-medium text-slate-600">
                 Contact Phone
               </label>
               <input
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
                 placeholder="+94 77 ..."
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               />
             </div>
           </div>
@@ -1229,14 +1229,14 @@ function CreateCollaborationModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="rounded-lg bg-[#267ba4] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             Create Collaboration
           </button>

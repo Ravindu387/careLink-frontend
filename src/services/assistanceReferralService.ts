@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface AssistanceReferral {
   id: string;
   assistance: string;
@@ -263,7 +264,7 @@ export const assistanceReferralService = {
 
       const qs = params.toString();
       const url = qs ? `${ENDPOINT}?${qs}` : ENDPOINT;
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         headers: { Accept: "application/json" },
       });
 
@@ -324,7 +325,7 @@ export const assistanceReferralService = {
 
   async getMetrics(): Promise<{ data: AssistanceReferralMetrics; isLive: boolean }> {
     try {
-      const res = await fetch(`${ENDPOINT}/metrics`, {
+      const res = await authFetch(`${ENDPOINT}/metrics`, {
         headers: { Accept: "application/json" },
       });
 
@@ -342,7 +343,7 @@ export const assistanceReferralService = {
 
   async getById(id: string): Promise<AssistanceReferral | null> {
     try {
-      const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
         headers: { Accept: "application/json" },
       });
 
@@ -361,7 +362,7 @@ export const assistanceReferralService = {
     payload: CreateAssistanceReferralPayload
   ): Promise<{ data: AssistanceReferral; isLive: boolean }> {
     try {
-      const res = await fetch(ENDPOINT, {
+      const res = await authFetch(ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -415,7 +416,7 @@ export const assistanceReferralService = {
     payload: UpdateAssistanceReferralPayload
   ): Promise<{ data: AssistanceReferral; isLive: boolean }> {
     try {
-      const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -465,7 +466,7 @@ export const assistanceReferralService = {
     reason?: string
   ): Promise<{ data: AssistanceReferral; isLive: boolean }> {
     try {
-      const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}/status`, {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -513,7 +514,7 @@ export const assistanceReferralService = {
     assigned: string
   ): Promise<{ data: AssistanceReferral; isLive: boolean }> {
     try {
-      const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}/assign`, {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}/assign`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -545,7 +546,7 @@ export const assistanceReferralService = {
 
   async delete(id: string): Promise<boolean> {
     try {
-      const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
         method: "DELETE",
       });
 
@@ -565,7 +566,7 @@ export const assistanceReferralService = {
 
   async reset(): Promise<boolean> {
     try {
-      await fetch(`${ENDPOINT}/reset`, {
+      await authFetch(`${ENDPOINT}/reset`, {
         method: "POST",
       });
       saveCache(initialReferrals);

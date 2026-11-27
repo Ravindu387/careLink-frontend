@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface FieldActivity {
   id: string;
   name: string;
@@ -152,7 +153,7 @@ class FieldActivityService {
       const queryString = params.toString();
       const url = queryString ? `${API_BASE_URL}?${queryString}` : API_BASE_URL;
 
-      const response = await fetch(url);
+      const response = await authFetch(url);
       if (!response.ok) {
         throw new Error(`Failed to fetch field activities: ${response.statusText}`);
       }
@@ -197,7 +198,7 @@ class FieldActivityService {
 
   async getMetrics(): Promise<FieldActivityMetrics> {
     try {
-      const response = await fetch(`${API_BASE_URL}/metrics`);
+      const response = await authFetch(`${API_BASE_URL}/metrics`);
       if (!response.ok) {
         throw new Error(`Failed to fetch field activity metrics: ${response.statusText}`);
       }
@@ -223,7 +224,7 @@ class FieldActivityService {
   }
 
   async getById(id: string): Promise<FieldActivity> {
-    const response = await fetch(`${API_BASE_URL}/${id}`);
+    const response = await authFetch(`${API_BASE_URL}/${id}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch field activity ${id}: ${response.statusText}`);
     }
@@ -231,7 +232,7 @@ class FieldActivityService {
   }
 
   async create(payload: CreateFieldActivityPayload): Promise<FieldActivity> {
-    const response = await fetch(API_BASE_URL, {
+    const response = await authFetch(API_BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -243,7 +244,7 @@ class FieldActivityService {
   }
 
   async update(id: string, payload: UpdateFieldActivityPayload): Promise<FieldActivity> {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await authFetch(`${API_BASE_URL}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -255,7 +256,7 @@ class FieldActivityService {
   }
 
   async updateStatus(id: string, status: string): Promise<FieldActivity> {
-    const response = await fetch(`${API_BASE_URL}/${id}/status`, {
+    const response = await authFetch(`${API_BASE_URL}/${id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -267,7 +268,7 @@ class FieldActivityService {
   }
 
   async delete(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await authFetch(`${API_BASE_URL}/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -276,7 +277,7 @@ class FieldActivityService {
   }
 
   async reset(): Promise<FieldActivityMetrics> {
-    const response = await fetch(`${API_BASE_URL}/reset`, {
+    const response = await authFetch(`${API_BASE_URL}/reset`, {
       method: "POST",
     });
     if (!response.ok) {
