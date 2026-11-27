@@ -374,11 +374,11 @@ export default function TrainingCertificationsPage() {
         <Icon size={19} />
       </div>
       <div className="min-w-0">
-        <p className="text-[9px] text-[#8296aa]">{title}</p>
+        <p className="text-xs text-[#8296aa]">{title}</p>
         <h2 className="text-[23px] leading-7 font-semibold text-[#123c5b]">
           {value}
         </h2>
-        <p className="text-[8px] text-[#8296aa]">{description}</p>
+        <p className="text-xs text-[#8296aa]">{description}</p>
       </div>
     </div>
   );
@@ -389,7 +389,7 @@ export default function TrainingCertificationsPage() {
       <main className="max-w-[1600px] mx-auto px-6 pt-5 pb-10">
         {/* BREADCRUMB & BACKEND CONNECTION STATUS */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div className="flex items-center gap-2 text-[10px]">
+          <div className="flex items-center gap-2 text-sm">
             <span className="text-[#8296aa]">Operations</span>
             <ChevronRight size={12} className="text-[#8296aa]" />
             <span className="text-[#8296aa]">Volunteer Coordination</span>
@@ -399,7 +399,7 @@ export default function TrainingCertificationsPage() {
 
           <div className="flex items-center gap-2.5">
             <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition-colors ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -413,7 +413,7 @@ export default function TrainingCertificationsPage() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               title="Refresh records"
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-[10px] text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-xs text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
             >
               <RefreshCw
                 size={12}
@@ -427,7 +427,7 @@ export default function TrainingCertificationsPage() {
         {/* PAGE HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-[27px] font-normal">Training & Certifications</h1>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">Training & Certifications</h1>
             <p className="text-[12px] text-[#718ba0] mt-1.5">
               Maintain readiness, mandatory training, and verified qualification records in real-time.
             </p>
@@ -436,7 +436,7 @@ export default function TrainingCertificationsPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setShowUploadModal(true)}
-              className="h-[40px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-[10px] text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-2 transition-colors"
+              className="h-[40px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-sm text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-2 transition-colors"
             >
               <Upload size={14} />
               Upload certificate
@@ -444,7 +444,7 @@ export default function TrainingCertificationsPage() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[10px] font-semibold transition-colors shadow-xs"
+              className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-sm font-semibold transition-colors shadow-xs"
             >
               <Plus size={15} />
               Create training
@@ -494,15 +494,15 @@ export default function TrainingCertificationsPage() {
             {/* HEADER */}
             <div className="px-4 py-4 border-b border-[#d5e3e9] flex items-center justify-between">
               <div>
-                <h2 className="text-[13px] font-medium text-[#123c5b]">Training catalogue</h2>
-                <p className="text-[9px] text-[#8296aa] mt-0.5">
+                <h2 className="text-base sm:text-lg font-semibold text-[#123c5b]">Training catalogue</h2>
+                <p className="text-xs text-[#8296aa] mt-0.5">
                   Current readiness modules ({trainings.length} total)
                 </p>
               </div>
 
               <button
                 onClick={() => setShowManageModal(true)}
-                className="h-[36px] px-3.5 border border-[#b9d0dc] rounded-lg text-[10px] text-[#17648e] hover:bg-[#f5fafc] transition-colors font-medium"
+                className="h-[36px] px-3.5 border border-[#b9d0dc] rounded-lg text-sm text-[#17648e] hover:bg-[#f5fafc] transition-colors font-medium"
               >
                 Manage
               </button>
@@ -516,7 +516,7 @@ export default function TrainingCertificationsPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search training..."
-                  className="w-full bg-transparent outline-none text-[9px]"
+                  className="w-full bg-transparent outline-none text-sm sm:text-[15px]"
                 />
                 {search && (
                   <button onClick={() => setSearch("")} className="text-gray-400 hover:text-gray-600">
@@ -528,7 +528,7 @@ export default function TrainingCertificationsPage() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="border border-[#d5e3e9] rounded-lg px-2 text-[9px] outline-none bg-white cursor-pointer"
+                className="border border-[#d5e3e9] rounded-lg px-2 text-sm sm:text-[15px] outline-none bg-white cursor-pointer"
               >
                 <option>All</option>
                 <option>Active</option>
@@ -537,7 +537,7 @@ export default function TrainingCertificationsPage() {
 
               <button
                 onClick={handleExportTrainings}
-                className="border border-[#d5e3e9] rounded-lg px-3 text-[9px] text-[#287fa9] bg-white hover:bg-[#f0f7fa] flex items-center gap-1"
+                className="border border-[#d5e3e9] rounded-lg px-3 text-sm text-[#287fa9] bg-white hover:bg-[#f0f7fa] flex items-center gap-1"
               >
                 <Download size={11} />
                 <span>Export</span>
@@ -548,7 +548,7 @@ export default function TrainingCertificationsPage() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[530px] text-left">
                 <thead className="bg-[#f5f8f9] border-b border-[#d5e3e9]">
-                  <tr className="text-[9px] text-[#718ba0]">
+                  <tr className="text-sm text-[#718ba0]">
                     <th className="px-3 py-3 font-medium">Course ID</th>
                     <th className="px-3 py-3 font-medium">Course</th>
                     <th className="px-3 py-3 font-medium">Requirement</th>
@@ -572,7 +572,7 @@ export default function TrainingCertificationsPage() {
                     </tr>
                   ) : filteredTrainings.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="text-center py-10 text-xs text-gray-400">
+                      <td colSpan={8} className="text-center py-10 text-sm text-gray-400">
                         No training modules found.
                       </td>
                     </tr>
@@ -583,27 +583,27 @@ export default function TrainingCertificationsPage() {
                         onClick={() => setSelectedTraining(training)}
                         className="border-b border-[#e1eaf0] hover:bg-[#f5fafc] cursor-pointer transition-colors"
                       >
-                        <td className="px-3 py-3.5 text-[9px] font-semibold text-[#17648e] whitespace-nowrap">
+                        <td className="px-3 py-3.5 text-sm font-semibold text-[#17648e] whitespace-nowrap">
                           {training.id}
                         </td>
-                        <td className="px-3 py-3.5 text-[9px] font-medium text-[#123c5b] whitespace-nowrap">
+                        <td className="px-3 py-3.5 text-sm font-medium text-[#123c5b] whitespace-nowrap">
                           {training.name}
                         </td>
-                        <td className="px-3 py-3.5 text-[9px] text-[#557086] whitespace-nowrap">
+                        <td className="px-3 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                           {training.requirement}
                         </td>
-                        <td className="px-3 py-3.5 text-[9px] text-[#557086] whitespace-nowrap">
+                        <td className="px-3 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                           {training.duration}
                         </td>
-                        <td className="px-3 py-3.5 text-[9px] text-[#123c5b]">
+                        <td className="px-3 py-3.5 text-sm text-[#123c5b]">
                           {training.enrolled.toLocaleString()}
                         </td>
-                        <td className="px-3 py-3.5 text-[9px] font-medium text-[#123c5b]">
+                        <td className="px-3 py-3.5 text-sm font-medium text-[#123c5b]">
                           {training.completion}%
                         </td>
                         <td className="px-3 py-3.5">
                           <span
-                            className={`px-2 py-1 rounded-md text-[8px] font-semibold ${
+                            className={`px-2 py-1 rounded-md text-xs font-semibold ${
                               training.status === "Active"
                                 ? "bg-[#e8f1f6] text-[#287fa9]"
                                 : "bg-gray-100 text-gray-500"
@@ -627,8 +627,8 @@ export default function TrainingCertificationsPage() {
           <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-[0_5px_15px_rgba(30,70,90,0.05)] overflow-hidden">
             <div className="px-4 py-4 border-b border-[#d5e3e9] flex items-center justify-between">
               <div>
-                <h2 className="text-[13px] font-medium text-[#123c5b]">Certification attention queue</h2>
-                <p className="text-[9px] text-[#8296aa] mt-0.5">
+                <h2 className="text-base sm:text-lg font-semibold text-[#123c5b]">Certification attention queue</h2>
+                <p className="text-xs text-[#8296aa] mt-0.5">
                   Expiry and validation risks
                 </p>
               </div>
@@ -636,12 +636,12 @@ export default function TrainingCertificationsPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleExportCertificates}
-                  className="h-[32px] px-2.5 border border-[#d5e3e9] rounded-lg text-[9px] text-[#287fa9] bg-white hover:bg-[#f0f7fa] flex items-center gap-1"
+                  className="h-[32px] px-2.5 border border-[#d5e3e9] rounded-lg text-sm text-[#287fa9] bg-white hover:bg-[#f0f7fa] flex items-center gap-1"
                 >
                   <Download size={11} />
                   <span>Export</span>
                 </button>
-                <span className="bg-[#fff3df] text-[#b87813] px-2 py-1 rounded-md text-[8px] font-semibold">
+                <span className="bg-[#fff3df] text-[#b87813] px-2 py-1 rounded-md text-xs font-semibold">
                   {certificates.length} records
                 </span>
               </div>
@@ -650,7 +650,7 @@ export default function TrainingCertificationsPage() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[530px] text-left">
                 <thead className="bg-[#f5f8f9] border-b border-[#d5e3e9]">
-                  <tr className="text-[9px] text-[#718ba0]">
+                  <tr className="text-sm text-[#718ba0]">
                     <th className="px-3 py-3 font-medium">Certificate</th>
                     <th className="px-3 py-3 font-medium">Volunteer</th>
                     <th className="px-3 py-3 font-medium">Qualification</th>
@@ -673,7 +673,7 @@ export default function TrainingCertificationsPage() {
                     </tr>
                   ) : certificates.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="text-center py-10 text-xs text-gray-400">
+                      <td colSpan={7} className="text-center py-10 text-sm text-gray-400">
                         No certificates currently require attention.
                       </td>
                     </tr>
@@ -684,21 +684,21 @@ export default function TrainingCertificationsPage() {
                         onClick={() => setSelectedCertificate(certificate)}
                         className="border-b border-[#e1eaf0] hover:bg-[#f5fafc] cursor-pointer transition-colors"
                       >
-                        <td className="px-3 py-3.5 text-[9px] font-semibold text-[#17648e] whitespace-nowrap">
+                        <td className="px-3 py-3.5 text-sm font-semibold text-[#17648e] whitespace-nowrap">
                           {certificate.id}
                         </td>
-                        <td className="px-3 py-3.5 text-[9px] font-medium text-[#123c5b] whitespace-nowrap">
+                        <td className="px-3 py-3.5 text-sm font-medium text-[#123c5b] whitespace-nowrap">
                           {certificate.volunteer}
                         </td>
-                        <td className="px-3 py-3.5 text-[9px] text-[#557086] whitespace-nowrap">
+                        <td className="px-3 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                           {certificate.qualification}
                         </td>
-                        <td className="px-3 py-3.5 text-[9px] text-[#557086] whitespace-nowrap">
+                        <td className="px-3 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                           {certificate.expiry}
                         </td>
                         <td className="px-3 py-3.5">
                           <span
-                            className={`px-2 py-1 rounded-md text-[8px] font-semibold whitespace-nowrap ${
+                            className={`px-2 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${
                               certificate.status === "Expired"
                                 ? "bg-[#fdebec] text-[#d64550]"
                                 : certificate.status === "Expiring Soon"
@@ -711,7 +711,7 @@ export default function TrainingCertificationsPage() {
                         </td>
                         <td className="px-3 py-3.5">
                           <span
-                            className={`px-2 py-1 rounded-md text-[8px] font-semibold whitespace-nowrap ${getCertificateStyle(
+                            className={`px-2 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${getCertificateStyle(
                               certificate.status
                             )}`}
                           >
@@ -737,8 +737,8 @@ export default function TrainingCertificationsPage() {
           <div className="bg-white w-full max-w-[450px] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#e1eaf0] flex justify-between items-center">
               <div>
-                <h2 className="text-[16px] font-semibold text-[#123c5b]">Create training</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">Create training</h2>
+                <p className="text-[13px] text-gray-400 mt-0.5">
                   Create a new volunteer training module.
                 </p>
               </div>
@@ -752,7 +752,7 @@ export default function TrainingCertificationsPage() {
 
             <form onSubmit={handleCreateTraining} className="p-5 space-y-3.5">
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Training name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -762,18 +762,18 @@ export default function TrainingCertificationsPage() {
                     setNewTraining({ ...newTraining, name: e.target.value })
                   }
                   placeholder="e.g. Flood Response Safety"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">Requirement</label>
+                <label className="text-sm font-semibold text-[#123c5b]">Requirement</label>
                 <select
                   value={newTraining.requirement}
                   onChange={(e) =>
                     setNewTraining({ ...newTraining, requirement: e.target.value })
                   }
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none cursor-pointer"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none cursor-pointer"
                 >
                   <option>Required</option>
                   <option>Skill-based</option>
@@ -782,7 +782,7 @@ export default function TrainingCertificationsPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">Duration</label>
+                <label className="text-sm font-semibold text-[#123c5b]">Duration</label>
                 <input
                   required
                   value={newTraining.duration}
@@ -790,7 +790,7 @@ export default function TrainingCertificationsPage() {
                     setNewTraining({ ...newTraining, duration: e.target.value })
                   }
                   placeholder="e.g. 45 min"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
@@ -799,14 +799,14 @@ export default function TrainingCertificationsPage() {
                   type="button"
                   disabled={isSubmittingTraining}
                   onClick={() => setShowCreateModal(false)}
-                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-xs hover:bg-[#f0f7fa]"
+                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-sm hover:bg-[#f0f7fa]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingTraining}
-                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50"
+                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {isSubmittingTraining && <Loader2 size={13} className="animate-spin" />}
                   <span>{isSubmittingTraining ? "Creating..." : "Create training"}</span>
@@ -823,8 +823,8 @@ export default function TrainingCertificationsPage() {
           <div className="bg-white w-full max-w-[450px] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#e1eaf0] flex justify-between items-center">
               <div>
-                <h2 className="text-[16px] font-semibold text-[#123c5b]">Upload certificate</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">Upload certificate</h2>
+                <p className="text-[13px] text-gray-400 mt-0.5">
                   Add a volunteer qualification record for verification.
                 </p>
               </div>
@@ -838,7 +838,7 @@ export default function TrainingCertificationsPage() {
 
             <form onSubmit={handleUploadCertificate} className="p-5 space-y-3.5">
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Volunteer name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -848,12 +848,12 @@ export default function TrainingCertificationsPage() {
                     setUploadForm({ ...uploadForm, volunteer: e.target.value })
                   }
                   placeholder="Enter volunteer name"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Qualification <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -863,12 +863,12 @@ export default function TrainingCertificationsPage() {
                     setUploadForm({ ...uploadForm, qualification: e.target.value })
                   }
                   placeholder="e.g. First Aid Level 2"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Expiry date <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -878,20 +878,20 @@ export default function TrainingCertificationsPage() {
                   onChange={(e) =>
                     setUploadForm({ ...uploadForm, expiry: e.target.value })
                   }
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Certificate document
                 </label>
                 <label className="mt-1.5 border-2 border-dashed border-[#b9d0dc] rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-[#f5fafc] transition-colors">
                   <Upload size={22} className="text-[#287fa9] mb-1.5" />
-                  <span className="text-[10px] font-medium text-[#123c5b]">
+                  <span className="text-sm font-medium text-[#123c5b]">
                     {certificateFile ? certificateFile.name : "Click to select certificate file"}
                   </span>
-                  <span className="text-[8px] text-gray-400 mt-0.5">
+                  <span className="text-xs text-gray-400 mt-0.5">
                     PDF, JPG, or PNG (Max 10MB)
                   </span>
                   <input
@@ -908,14 +908,14 @@ export default function TrainingCertificationsPage() {
                   type="button"
                   disabled={isSubmittingCert}
                   onClick={() => setShowUploadModal(false)}
-                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-xs hover:bg-[#f0f7fa]"
+                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-sm hover:bg-[#f0f7fa]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingCert}
-                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50"
+                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {isSubmittingCert && <Loader2 size={13} className="animate-spin" />}
                   <span>{isSubmittingCert ? "Uploading..." : "Upload certificate"}</span>
@@ -932,8 +932,8 @@ export default function TrainingCertificationsPage() {
           <div className="bg-white w-full max-w-[480px] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#e1eaf0] flex justify-between items-center">
               <div>
-                <h2 className="text-[16px] font-semibold text-[#123c5b]">Manage training modules</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">Manage training modules</h2>
+                <p className="text-[13px] text-gray-400 mt-0.5">
                   Control training module availability and module activation.
                 </p>
               </div>
@@ -952,8 +952,8 @@ export default function TrainingCertificationsPage() {
                   className="flex items-center justify-between p-3 bg-[#f7fafb] rounded-lg border border-[#e1eaf0]"
                 >
                   <div>
-                    <p className="text-[11px] font-semibold text-[#123c5b]">{training.name}</p>
-                    <p className="text-[9px] text-gray-400 mt-0.5">
+                    <p className="text-sm font-semibold text-[#123c5b]">{training.name}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
                       {training.id} · {training.requirement} · {training.status}
                     </p>
                   </div>
@@ -961,7 +961,7 @@ export default function TrainingCertificationsPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleToggleTrainingStatus(training)}
-                      className={`text-[9px] px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                      className={`text-sm px-3 py-1.5 rounded-lg font-medium transition-colors ${
                         training.status === "Active"
                           ? "bg-[#fdebec] text-[#d64550] hover:bg-[#fad8db]"
                           : "bg-[#e5f5ef] text-[#239879] hover:bg-[#d5ece3]"
@@ -984,7 +984,7 @@ export default function TrainingCertificationsPage() {
             <div className="p-4 border-t border-[#e1eaf0] flex justify-end bg-[#fafcfd]">
               <button
                 onClick={() => setShowManageModal(false)}
-                className="bg-[#287fa9] text-white px-5 py-2 rounded-lg text-xs font-semibold"
+                className="bg-[#287fa9] text-white px-5 py-2 rounded-lg text-sm font-semibold"
               >
                 Done
               </button>
@@ -999,10 +999,10 @@ export default function TrainingCertificationsPage() {
           <div className="bg-white w-full max-w-[440px] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#e1eaf0] flex justify-between items-center">
               <div>
-                <span className="text-[10px] font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
+                <span className="text-xs font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
                   {selectedTraining.id}
                 </span>
-                <h2 className="text-[16px] font-semibold text-[#123c5b] mt-1">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b] mt-1">
                   {selectedTraining.name}
                 </h2>
               </div>
@@ -1036,7 +1036,7 @@ export default function TrainingCertificationsPage() {
               </div>
 
               <div className="pt-2 border-t border-[#e1eaf0]">
-                <div className="flex justify-between text-[10px] mb-1.5">
+                <div className="flex justify-between text-sm mb-1.5">
                   <span className="text-gray-500">Overall completion rate</span>
                   <span className="font-semibold text-[#123c5b]">{selectedTraining.completion}%</span>
                 </div>
@@ -1049,10 +1049,10 @@ export default function TrainingCertificationsPage() {
               </div>
 
               <div className="pt-2 border-t border-[#e1eaf0] flex items-center justify-between">
-                <span className="text-gray-500 text-[11px]">Module Status:</span>
+                <span className="text-gray-500 text-[13px]">Module Status:</span>
                 <button
                   onClick={() => handleToggleTrainingStatus(selectedTraining)}
-                  className={`px-3 py-1 rounded text-[10px] font-semibold transition-colors ${
+                  className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
                     selectedTraining.status === "Active"
                       ? "bg-[#e5f5ef] text-[#239879] hover:bg-[#d4ede3]"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -1064,17 +1064,17 @@ export default function TrainingCertificationsPage() {
 
               {confirmDeleteId === selectedTraining.id && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700">
-                  <p className="text-[11px] font-semibold">Delete this training module?</p>
+                  <p className="text-sm font-semibold">Delete this training module?</p>
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       onClick={() => handleDeleteTraining(selectedTraining.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded text-[10px] font-semibold hover:bg-red-700"
+                      className="px-3 py-1 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700"
                     >
                       Yes, delete
                     </button>
                     <button
                       onClick={() => setConfirmDeleteId(null)}
-                      className="px-3 py-1 bg-white border border-gray-300 rounded text-[10px] text-gray-700"
+                      className="px-3 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700"
                     >
                       Cancel
                     </button>
@@ -1086,14 +1086,14 @@ export default function TrainingCertificationsPage() {
             <div className="p-4 border-t border-[#e1eaf0] flex justify-between items-center bg-[#fafcfd]">
               <button
                 onClick={() => setConfirmDeleteId(selectedTraining.id)}
-                className="text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
+                className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
               >
                 <Trash2 size={13} />
                 <span>Delete</span>
               </button>
               <button
                 onClick={() => setSelectedTraining(null)}
-                className="bg-[#287fa9] text-white px-5 py-2 rounded-lg text-xs font-semibold"
+                className="bg-[#287fa9] text-white px-5 py-2 rounded-lg text-sm font-semibold"
               >
                 Close
               </button>
@@ -1108,10 +1108,10 @@ export default function TrainingCertificationsPage() {
           <div className="bg-white w-full max-w-[440px] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#e1eaf0] flex justify-between items-center">
               <div>
-                <span className="text-[10px] font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
+                <span className="text-xs font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
                   {selectedCertificate.id}
                 </span>
-                <h2 className="text-[16px] font-semibold text-[#123c5b] mt-1">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b] mt-1">
                   Certificate details
                 </h2>
               </div>
@@ -1150,7 +1150,7 @@ export default function TrainingCertificationsPage() {
 
               {/* STATUS CHANGE */}
               <div className="pt-2 border-t border-[#e1eaf0]">
-                <label className="text-[11px] font-semibold text-[#123c5b] block mb-2">
+                <label className="text-sm font-semibold text-[#123c5b] block mb-2">
                   Validation Status:
                 </label>
                 <div className="flex gap-2">
@@ -1158,7 +1158,7 @@ export default function TrainingCertificationsPage() {
                     <button
                       key={st}
                       onClick={() => handleUpdateCertStatus(selectedCertificate.id, st)}
-                      className={`px-3 py-1 rounded text-[10px] font-medium transition-colors ${
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                         selectedCertificate.status === st
                           ? "bg-[#287fa9] text-white"
                           : "border border-[#d5e2e9] bg-white text-[#123c5b] hover:bg-[#f0f7fa]"
@@ -1172,17 +1172,17 @@ export default function TrainingCertificationsPage() {
 
               {confirmDeleteId === selectedCertificate.id && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700">
-                  <p className="text-[11px] font-semibold">Delete this certificate record?</p>
+                  <p className="text-sm font-semibold">Delete this certificate record?</p>
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       onClick={() => handleDeleteCertificate(selectedCertificate.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded text-[10px] font-semibold hover:bg-red-700"
+                      className="px-3 py-1 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700"
                     >
                       Yes, delete
                     </button>
                     <button
                       onClick={() => setConfirmDeleteId(null)}
-                      className="px-3 py-1 bg-white border border-gray-300 rounded text-[10px] text-gray-700"
+                      className="px-3 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700"
                     >
                       Cancel
                     </button>
@@ -1194,14 +1194,14 @@ export default function TrainingCertificationsPage() {
             <div className="p-4 border-t border-[#e1eaf0] flex justify-between items-center bg-[#fafcfd]">
               <button
                 onClick={() => setConfirmDeleteId(selectedCertificate.id)}
-                className="text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
+                className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
               >
                 <Trash2 size={13} />
                 <span>Delete</span>
               </button>
               <button
                 onClick={() => setSelectedCertificate(null)}
-                className="bg-[#287fa9] text-white px-5 py-2 rounded-lg text-xs font-semibold"
+                className="bg-[#287fa9] text-white px-5 py-2 rounded-lg text-sm font-semibold"
               >
                 Close
               </button>

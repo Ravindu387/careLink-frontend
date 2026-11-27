@@ -266,7 +266,7 @@ export default function ActivityTrackingPage() {
       {/* MAIN CONTENT */}
       <main className="max-w-[1600px] mx-auto px-6 pt-5 pb-10">
         {/* BREADCRUMB & STATUS BAR */}
-        <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm mb-6">
           <div className="flex items-center gap-2 text-slate-400">
             <span className="text-[#8296aa]">Operations</span>
             <ChevronRight size={12} />
@@ -277,7 +277,7 @@ export default function ActivityTrackingPage() {
 
           <div className="flex items-center gap-2.5">
             <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -291,7 +291,7 @@ export default function ActivityTrackingPage() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               title="Refresh activity logs"
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-[10px] text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-xs text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
             >
               <RefreshCw
                 size={12}
@@ -305,7 +305,7 @@ export default function ActivityTrackingPage() {
         {/* PAGE HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-[27px] font-normal text-[#173e5b]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#173e5b]">
               Activity Tracking
             </h1>
             <p className="text-[12px] text-[#718ba0] mt-1.5">
@@ -316,7 +316,7 @@ export default function ActivityTrackingPage() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={handleExport}
-              className="h-[38px] px-3.5 bg-white border border-[#b9d0dc] rounded-lg text-[10px] text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-1.5 shadow-xs"
+              className="h-[38px] px-3.5 bg-white border border-[#b9d0dc] rounded-lg text-sm text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-1.5 shadow-xs"
             >
               <Download size={13} />
               <span>Export CSV</span>
@@ -324,14 +324,14 @@ export default function ActivityTrackingPage() {
 
             <button
               onClick={() => setShowCheckIn(true)}
-              className="h-[38px] px-3.5 bg-white border border-[#b9d0dc] rounded-lg text-[10px] text-[#17648e] hover:bg-[#f5fafc] shadow-xs"
+              className="h-[38px] px-3.5 bg-white border border-[#b9d0dc] rounded-lg text-sm text-[#17648e] hover:bg-[#f5fafc] shadow-xs"
             >
               Manual check-in
             </button>
 
             <button
               onClick={() => setShowRecordModal(true)}
-              className="h-[38px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-1.5 text-[10px] font-semibold shadow-xs"
+              className="h-[38px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-1.5 text-sm font-semibold shadow-xs"
             >
               <Plus size={14} />
               <span>Record activity</span>
@@ -345,14 +345,14 @@ export default function ActivityTrackingPage() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-2 h-2 rounded-full bg-[#65c5a8] animate-pulse" />
-                <span className="text-[9px] uppercase tracking-wider text-[#78d9bb] font-semibold">
+                <span className="text-xs uppercase tracking-wider text-[#78d9bb] font-semibold">
                   Field Operations Live
                 </span>
               </div>
-              <h2 className="text-[15px] font-semibold">
+              <h2 className="text-lg sm:text-xl font-semibold">
                 {stats.volunteersCheckedIn} volunteers currently checked in
               </h2>
-              <p className="text-[9px] text-[#b8cbd9] mt-1.5">
+              <p className="text-xs text-[#b8cbd9] mt-1.5">
                 Last sync: {stats.lastSync} · {stats.operationalAreasCount} operational areas active
               </p>
             </div>
@@ -361,21 +361,21 @@ export default function ActivityTrackingPage() {
               <h2 className="text-[22px] font-bold tracking-tight">
                 {stats.hoursToday}
               </h2>
-              <p className="text-[10px] text-[#b8cbd9] mt-0.5">Hours today</p>
+              <p className="text-sm text-[#b8cbd9] mt-0.5">Hours today</p>
             </div>
 
             <div className="md:border-l border-[#ffffff30] md:pl-5">
               <h2 className="text-[22px] font-bold tracking-tight">
                 {stats.tasksOnTrack}
               </h2>
-              <p className="text-[10px] text-[#b8cbd9] mt-0.5">Tasks on track</p>
+              <p className="text-sm text-[#b8cbd9] mt-0.5">Tasks on track</p>
             </div>
 
             <div className="md:border-l border-[#ffffff30] md:pl-5">
               <h2 className="text-[22px] font-bold tracking-tight text-amber-300">
                 {stats.safetyAlerts}
               </h2>
-              <p className="text-[10px] text-[#b8cbd9] mt-0.5">Safety alerts</p>
+              <p className="text-sm text-[#b8cbd9] mt-0.5">Safety alerts</p>
             </div>
           </div>
         </section>
@@ -388,17 +388,17 @@ export default function ActivityTrackingPage() {
               {/* TABLE HEADER */}
               <div className="px-5 py-4 border-b border-[#d5e3e9] flex items-center justify-between">
                 <div>
-                  <h2 className="text-[13px] font-semibold text-[#173e5b]">
+                  <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">
                     Live Activity Log
                   </h2>
-                  <p className="text-[10px] text-[#8296aa] mt-0.5">
+                  <p className="text-[13px] text-[#8296aa] mt-0.5">
                     Today · All operational areas ({totalCount} entries)
                   </p>
                 </div>
 
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`h-[34px] px-3.5 border rounded-lg flex items-center gap-1.5 text-[10px] transition ${
+                  className={`h-[34px] px-3.5 border rounded-lg flex items-center gap-1.5 text-sm transition ${
                     showFilters
                       ? "bg-[#e8f1f6] border-[#287fa9] text-[#287fa9] font-medium"
                       : "border-[#b9d0dc] text-[#17648e] hover:bg-[#f5fafc]"
@@ -413,7 +413,7 @@ export default function ActivityTrackingPage() {
               {showFilters && (
                 <div className="p-4 bg-[#f8fbfc] border-b border-[#d5e3e9] grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in">
                   <div>
-                    <label className="block text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                    <label className="block text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">
                       Activity Type
                     </label>
                     <select
@@ -422,7 +422,7 @@ export default function ActivityTrackingPage() {
                         setActivityFilter(e.target.value);
                         setCurrentPage(1);
                       }}
-                      className="w-full h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none"
+                      className="w-full h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] text-slate-700 outline-none"
                     >
                       <option>All activities</option>
                       <option>Checked in</option>
@@ -435,7 +435,7 @@ export default function ActivityTrackingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                    <label className="block text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">
                       Location
                     </label>
                     <select
@@ -444,7 +444,7 @@ export default function ActivityTrackingPage() {
                         setLocationFilter(e.target.value);
                         setCurrentPage(1);
                       }}
-                      className="w-full h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-slate-700 outline-none"
+                      className="w-full h-[36px] bg-white border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] text-slate-700 outline-none"
                     >
                       <option>All locations</option>
                       {availableLocations.map((loc) => (
@@ -458,7 +458,7 @@ export default function ActivityTrackingPage() {
                   <div className="sm:col-span-2 flex justify-end">
                     <button
                       onClick={resetFilters}
-                      className="text-[10px] text-[#287fa9] font-semibold hover:underline"
+                      className="text-sm text-[#287fa9] font-semibold hover:underline"
                     >
                       Clear all filters
                     </button>
@@ -477,7 +477,7 @@ export default function ActivityTrackingPage() {
                       setCurrentPage(1);
                     }}
                     placeholder="Search activity, volunteer, task ID, location..."
-                    className="bg-transparent outline-none text-[11px] w-full placeholder:text-slate-400"
+                    className="bg-transparent outline-none text-sm sm:text-[15px] w-full placeholder:text-slate-400"
                   />
                   {search && (
                     <button onClick={() => setSearch("")}>
@@ -491,7 +491,7 @@ export default function ActivityTrackingPage() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[680px] text-left">
                   <thead className="bg-[#f5f8f9] border-b border-[#d5e3e9]">
-                    <tr className="text-[10px] text-[#718ba0] font-semibold uppercase tracking-wider">
+                    <tr className="text-[13px] text-[#718ba0] font-semibold uppercase tracking-wider">
                       <th className="px-4 py-3">Time</th>
                       <th className="px-4 py-3">Volunteer</th>
                       <th className="px-4 py-3">Activity</th>
@@ -505,7 +505,7 @@ export default function ActivityTrackingPage() {
                   <tbody className="divide-y divide-[#e1eaf0]">
                     {isLoading ? (
                       <tr>
-                        <td colSpan={7} className="text-center py-12 text-xs text-slate-400">
+                        <td colSpan={7} className="text-center py-12 text-sm text-slate-400">
                           <RefreshCw size={18} className="mx-auto mb-2 animate-spin text-[#287fa9]" />
                           Loading activities...
                         </td>
@@ -517,24 +517,24 @@ export default function ActivityTrackingPage() {
                           onClick={() => setSelectedActivity(item)}
                           className="hover:bg-[#f5fafc] cursor-pointer transition-colors"
                         >
-                          <td className="px-4 py-3.5 text-[10px] font-bold text-[#173e5b] whitespace-nowrap">
+                          <td className="px-4 py-3.5 text-sm font-bold text-[#173e5b] whitespace-nowrap">
                             {item.time}
                           </td>
-                          <td className="px-4 py-3.5 text-[11px] font-medium text-slate-700 whitespace-nowrap">
+                          <td className="px-4 py-3.5 text-sm font-medium text-slate-700 whitespace-nowrap">
                             {item.volunteer}
                           </td>
-                          <td className="px-4 py-3.5 text-[10px] whitespace-nowrap text-slate-600">
+                          <td className="px-4 py-3.5 text-sm whitespace-nowrap text-slate-600">
                             {item.activity}
                           </td>
-                          <td className="px-4 py-3.5 text-[10px] font-mono text-[#287fa9] whitespace-nowrap">
+                          <td className="px-4 py-3.5 text-sm font-mono text-[#287fa9] whitespace-nowrap">
                             {item.task}
                           </td>
-                          <td className="px-4 py-3.5 text-[10px] text-slate-600 whitespace-nowrap">
+                          <td className="px-4 py-3.5 text-sm text-slate-600 whitespace-nowrap">
                             {item.location}
                           </td>
                           <td className="px-4 py-3.5 whitespace-nowrap">
                             <span
-                              className={`inline-flex px-2 py-1 rounded-md text-[9px] font-semibold ${getActivityStyle(
+                              className={`inline-flex px-2 py-1 rounded-md text-xs font-semibold ${getActivityStyle(
                                 item.activity
                               )}`}
                             >
@@ -548,7 +548,7 @@ export default function ActivityTrackingPage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={7} className="text-center py-12 text-xs text-slate-400">
+                        <td colSpan={7} className="text-center py-12 text-sm text-slate-400">
                           No volunteer activities found matching current filters.
                         </td>
                       </tr>
@@ -560,7 +560,7 @@ export default function ActivityTrackingPage() {
 
             {/* PAGINATION */}
             <div className="px-5 py-3 border-t border-[#d5e3e9] flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
-              <p className="text-[10px] text-[#8296aa]">
+              <p className="text-[13px] text-[#8296aa]">
                 Showing {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1}
                 {" "}–{" "}
                 {Math.min(currentPage * pageSize, totalCount)} of {totalCount} records
@@ -570,7 +570,7 @@ export default function ActivityTrackingPage() {
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="border border-[#d5e2e9] bg-white rounded-lg px-3 py-1.5 text-[10px] text-[#287fa9] disabled:opacity-40 hover:bg-sky-50"
+                  className="border border-[#d5e2e9] bg-white rounded-lg px-3 py-1.5 text-sm text-[#287fa9] disabled:opacity-40 hover:bg-sky-50"
                 >
                   Previous
                 </button>
@@ -579,7 +579,7 @@ export default function ActivityTrackingPage() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`w-[30px] h-[30px] rounded-lg border text-[10px] transition ${
+                    className={`w-[30px] h-[30px] rounded-lg border text-sm transition ${
                       currentPage === page
                         ? "bg-[#287fa9] border-[#287fa9] text-white font-semibold"
                         : "border-[#d5e2e9] bg-white text-slate-600 hover:bg-[#f0f7fa]"
@@ -592,7 +592,7 @@ export default function ActivityTrackingPage() {
                 <button
                   disabled={currentPage >= totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="border border-[#b9d0dc] bg-white rounded-lg px-3 py-1.5 text-[10px] text-[#287fa9] disabled:opacity-40 hover:bg-sky-50"
+                  className="border border-[#b9d0dc] bg-white rounded-lg px-3 py-1.5 text-sm text-[#287fa9] disabled:opacity-40 hover:bg-sky-50"
                 >
                   Next
                 </button>
@@ -604,10 +604,10 @@ export default function ActivityTrackingPage() {
           <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-xs overflow-hidden flex flex-col">
             {/* MAP HEADER */}
             <div className="px-5 py-4 border-b border-[#d5e3e9]">
-              <h2 className="text-[13px] font-semibold text-[#173e5b]">
+              <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">
                 Field Presence
               </h2>
-              <p className="text-[10px] text-[#8296aa] mt-0.5">
+              <p className="text-[13px] text-[#8296aa] mt-0.5">
                 Checked-in volunteers across operational areas
               </p>
             </div>
@@ -642,16 +642,16 @@ export default function ActivityTrackingPage() {
               </div>
 
               {/* AREA LABELS */}
-              <span className="absolute top-[12%] left-[6%] text-[9px] font-semibold text-[#728d87] tracking-wider">
+              <span className="absolute top-[12%] left-[6%] text-xs font-semibold text-[#728d87] tracking-wider">
                 NORTH WARD
               </span>
-              <span className="absolute top-[30%] right-[7%] text-[9px] font-semibold text-[#728d87] tracking-wider">
+              <span className="absolute top-[30%] right-[7%] text-xs font-semibold text-[#728d87] tracking-wider">
                 EASTBANK
               </span>
-              <span className="absolute top-[52%] left-[45%] text-[9px] font-semibold text-[#728d87] tracking-wider">
+              <span className="absolute top-[52%] left-[45%] text-xs font-semibold text-[#728d87] tracking-wider">
                 CENTRAL
               </span>
-              <span className="absolute bottom-[10%] left-[7%] text-[9px] font-semibold text-[#728d87] tracking-wider">
+              <span className="absolute bottom-[10%] left-[7%] text-xs font-semibold text-[#728d87] tracking-wider">
                 WEST DISTRICT
               </span>
 
@@ -662,7 +662,7 @@ export default function ActivityTrackingPage() {
                   onClick={() =>
                     notify(`${area.name}: ${area.count} volunteers currently checked in.`)
                   }
-                  className={`absolute ${area.position} w-[34px] h-[34px] rounded-full bg-[#287fa9] border-[3px] border-white text-white text-[10px] font-bold flex items-center justify-center shadow-md hover:scale-110 transition-transform z-10 cursor-pointer`}
+                  className={`absolute ${area.position} w-[34px] h-[34px] rounded-full bg-[#287fa9] border-[3px] border-white text-white text-xs font-bold flex items-center justify-center shadow-md hover:scale-110 transition-transform z-10 cursor-pointer`}
                   title={`${area.name}: ${area.count} volunteers`}
                 >
                   {area.count}
@@ -675,9 +675,9 @@ export default function ActivityTrackingPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#287fa9]" />
-                  <span className="text-[11px] text-slate-700">Medical teams</span>
+                  <span className="text-sm text-slate-700">Medical teams</span>
                 </div>
-                <span className="text-[11px] font-bold text-[#173e5b]">
+                <span className="text-sm font-bold text-[#173e5b]">
                   {stats.presenceSummary.medicalTeams}
                 </span>
               </div>
@@ -685,9 +685,9 @@ export default function ActivityTrackingPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#65bda5]" />
-                  <span className="text-[11px] text-slate-700">Logistics</span>
+                  <span className="text-sm text-slate-700">Logistics</span>
                 </div>
-                <span className="text-[11px] font-bold text-[#173e5b]">
+                <span className="text-sm font-bold text-[#173e5b]">
                   {stats.presenceSummary.logistics}
                 </span>
               </div>
@@ -695,9 +695,9 @@ export default function ActivityTrackingPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#efa53b]" />
-                  <span className="text-[11px] text-slate-700">Shelter support</span>
+                  <span className="text-sm text-slate-700">Shelter support</span>
                 </div>
-                <span className="text-[11px] font-bold text-[#173e5b]">
+                <span className="text-sm font-bold text-[#173e5b]">
                   {stats.presenceSummary.shelterSupport}
                 </span>
               </div>
@@ -712,10 +712,10 @@ export default function ActivityTrackingPage() {
           <div className="bg-white w-full max-w-[450px] rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
               <div>
-                <h2 className="text-[15px] font-bold text-[#173e5b]">
+                <h2 className="text-lg sm:text-xl font-bold text-[#173e5b]">
                   Manual Volunteer Check-in
                 </h2>
-                <p className="text-[10px] text-slate-400 mt-0.5">
+                <p className="text-[13px] text-slate-400 mt-0.5">
                   Record on-site attendance for a deployed volunteer.
                 </p>
               </div>
@@ -730,7 +730,7 @@ export default function ActivityTrackingPage() {
 
             <form onSubmit={handleManualCheckIn} className="p-5 space-y-4">
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Volunteer Name
                 </label>
                 <input
@@ -743,12 +743,12 @@ export default function ActivityTrackingPage() {
                     })
                   }
                   placeholder="e.g. Elena Rossi"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Task ID
                 </label>
                 <input
@@ -761,12 +761,12 @@ export default function ActivityTrackingPage() {
                     })
                   }
                   placeholder="e.g. TASK-782"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Location
                 </label>
                 <input
@@ -779,12 +779,12 @@ export default function ActivityTrackingPage() {
                     })
                   }
                   placeholder="e.g. North Ward"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Verification Method
                 </label>
                 <select
@@ -795,7 +795,7 @@ export default function ActivityTrackingPage() {
                       verification: e.target.value,
                     })
                   }
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none bg-white"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none bg-white"
                 >
                   <option>GPS verified</option>
                   <option>Coordinator verified</option>
@@ -807,7 +807,7 @@ export default function ActivityTrackingPage() {
                 <button
                   type="button"
                   onClick={() => setShowCheckIn(false)}
-                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-xs text-slate-600 hover:bg-slate-50"
+                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
@@ -815,7 +815,7 @@ export default function ActivityTrackingPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#287fa9] text-white rounded-lg px-5 py-2 text-xs font-semibold hover:bg-[#17678e] shadow-xs disabled:opacity-50"
+                  className="bg-[#287fa9] text-white rounded-lg px-5 py-2 text-sm font-semibold hover:bg-[#17678e] shadow-xs disabled:opacity-50"
                 >
                   Confirm Check-in
                 </button>
@@ -831,10 +831,10 @@ export default function ActivityTrackingPage() {
           <div className="bg-white w-full max-w-[450px] rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
               <div>
-                <h2 className="text-[15px] font-bold text-[#173e5b]">
+                <h2 className="text-lg sm:text-xl font-bold text-[#173e5b]">
                   Record Volunteer Activity
                 </h2>
-                <p className="text-[10px] text-slate-400 mt-0.5">
+                <p className="text-[13px] text-slate-400 mt-0.5">
                   Log field events, progress notes, or schedule breaks.
                 </p>
               </div>
@@ -849,7 +849,7 @@ export default function ActivityTrackingPage() {
 
             <form onSubmit={handleRecordActivity} className="p-5 space-y-4">
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Volunteer Name
                 </label>
                 <input
@@ -862,12 +862,12 @@ export default function ActivityTrackingPage() {
                     })
                   }
                   placeholder="e.g. Daniel Okafor"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Activity Type
                 </label>
                 <select
@@ -878,7 +878,7 @@ export default function ActivityTrackingPage() {
                       activity: e.target.value as ActivityType,
                     })
                   }
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none bg-white"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none bg-white"
                 >
                   <option>Checked in</option>
                   <option>Progress update</option>
@@ -890,7 +890,7 @@ export default function ActivityTrackingPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Task ID
                 </label>
                 <input
@@ -903,12 +903,12 @@ export default function ActivityTrackingPage() {
                     })
                   }
                   placeholder="e.g. TASK-761"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Location
                 </label>
                 <input
@@ -921,12 +921,12 @@ export default function ActivityTrackingPage() {
                     })
                   }
                   placeholder="e.g. West Warehouse"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Verification Details
                 </label>
                 <input
@@ -938,7 +938,7 @@ export default function ActivityTrackingPage() {
                     })
                   }
                   placeholder="e.g. 76% complete / GPS verified"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
@@ -946,7 +946,7 @@ export default function ActivityTrackingPage() {
                 <button
                   type="button"
                   onClick={() => setShowRecordModal(false)}
-                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-xs text-slate-600 hover:bg-slate-50"
+                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
@@ -954,7 +954,7 @@ export default function ActivityTrackingPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#287fa9] text-white rounded-lg px-5 py-2 text-xs font-semibold hover:bg-[#17678e] shadow-xs disabled:opacity-50"
+                  className="bg-[#287fa9] text-white rounded-lg px-5 py-2 text-sm font-semibold hover:bg-[#17678e] shadow-xs disabled:opacity-50"
                 >
                   Save Activity
                 </button>
@@ -970,10 +970,10 @@ export default function ActivityTrackingPage() {
           <div className="bg-white w-full max-w-[420px] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
               <div>
-                <h2 className="text-[15px] font-bold text-[#173e5b]">
+                <h2 className="text-lg sm:text-xl font-bold text-[#173e5b]">
                   Activity Details
                 </h2>
-                <p className="text-[10px] text-slate-400 mt-0.5">
+                <p className="text-[13px] text-slate-400 mt-0.5">
                   {selectedActivity.id}
                 </p>
               </div>
@@ -1019,7 +1019,7 @@ export default function ActivityTrackingPage() {
 
               <div className="pt-2">
                 <span
-                  className={`inline-flex px-3 py-1 rounded-md text-[10px] font-semibold ${getActivityStyle(
+                  className={`inline-flex px-3 py-1 rounded-md text-sm font-semibold ${getActivityStyle(
                     selectedActivity.activity
                   )}`}
                 >
@@ -1039,14 +1039,14 @@ export default function ActivityTrackingPage() {
                     await loadData(currentPage);
                   }
                 }}
-                className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3 py-1.5 rounded-lg text-xs font-medium border border-rose-200 transition cursor-pointer"
+                className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3 py-1.5 rounded-lg text-sm font-medium border border-rose-200 transition cursor-pointer"
               >
                 Delete record
               </button>
 
               <button
                 onClick={() => setSelectedActivity(null)}
-                className="bg-[#287fa9] text-white rounded-lg px-5 py-2 text-xs font-semibold hover:bg-[#17678e] shadow-xs cursor-pointer"
+                className="bg-[#287fa9] text-white rounded-lg px-5 py-2 text-sm font-semibold hover:bg-[#17678e] shadow-xs cursor-pointer"
               >
                 Close
               </button>

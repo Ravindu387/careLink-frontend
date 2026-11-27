@@ -73,9 +73,9 @@ function StatCard({ title, value, description, icon: Icon, color }: StatCardProp
       </div>
 
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold text-[#8296aa] uppercase tracking-wider">{title}</p>
+        <p className="text-xs font-semibold text-[#8296aa] uppercase tracking-wider">{title}</p>
         <h2 className="text-[22px] leading-7 font-bold text-[#123c5b] mt-0.5">{value}</h2>
-        <p className="text-[9px] text-[#527d96]">{description}</p>
+        <p className="text-xs text-[#527d96]">{description}</p>
       </div>
     </div>
   );
@@ -246,7 +246,7 @@ export default function ReportsAnalyticsPage() {
       {/* MAIN CONTAINER */}
       <main className="max-w-[1600px] mx-auto px-6 pt-5 pb-10">
         {/* BREADCRUMB */}
-        <div className="flex items-center gap-2 text-[10px] mb-6">
+        <div className="flex items-center gap-2 text-sm mb-6">
           <span className="text-[#8296aa]">Operations</span>
           <ChevronRight size={12} />
           <span className="text-[#8296aa]">Volunteer Coordination</span>
@@ -258,13 +258,13 @@ export default function ReportsAnalyticsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-[26px] font-semibold text-[#123c5b]">
+              <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#123c5b]">
                 Reports & Analytics
               </h1>
 
               {/* LIVE BACKEND STATUS BADGE */}
               <div
-                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wide ${
+                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide ${
                   isLiveBackend
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                     : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -285,7 +285,7 @@ export default function ReportsAnalyticsPage() {
             <button
               onClick={() => loadData(true)}
               disabled={isRefreshing}
-              className="h-[38px] px-3.5 bg-white border border-[#d5e3e9] rounded-lg text-[11px] font-medium text-[#17648e] hover:bg-[#f5fafc] disabled:opacity-50 flex items-center gap-1.5 transition-colors"
+              className="h-[38px] px-3.5 bg-white border border-[#d5e3e9] rounded-lg text-sm font-medium text-[#17648e] hover:bg-[#f5fafc] disabled:opacity-50 flex items-center gap-1.5 transition-colors"
               title="Refresh reports data"
             >
               <RefreshCw size={13} className={isRefreshing ? "animate-spin" : ""} />
@@ -295,7 +295,7 @@ export default function ReportsAnalyticsPage() {
             {/* PRINT BUTTON */}
             <button
               onClick={handlePrint}
-              className="h-[38px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-[11px] font-medium text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-2 transition-colors"
+              className="h-[38px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-sm font-medium text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-2 transition-colors"
             >
               <Printer size={13} />
               <span>Print</span>
@@ -304,7 +304,7 @@ export default function ReportsAnalyticsPage() {
             {/* EXPORT REPORT BUTTON */}
             <button
               onClick={handleExportOverview}
-              className="h-[38px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[11px] font-semibold shadow-xs transition-colors"
+              className="h-[38px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-sm font-semibold shadow-xs transition-colors"
             >
               <Download size={13} />
               <span>Export report</span>
@@ -317,13 +317,13 @@ export default function ReportsAnalyticsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_auto] gap-3 items-end">
             {/* DATE RANGE */}
             <div>
-              <label className="block text-[10px] font-bold text-[#123c5b] uppercase tracking-wider mb-1.5">
+              <label className="block text-sm font-bold text-[#123c5b] uppercase tracking-wider mb-1.5">
                 Date range
               </label>
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
-                className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none focus:border-[#287fa9] bg-white transition-colors cursor-pointer"
+                className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9] bg-white transition-colors cursor-pointer"
               >
                 <option>18-25 June 2025</option>
                 <option>Last 7 days</option>
@@ -336,13 +336,13 @@ export default function ReportsAnalyticsPage() {
 
             {/* OPERATIONAL AREA */}
             <div>
-              <label className="block text-[10px] font-bold text-[#123c5b] uppercase tracking-wider mb-1.5">
+              <label className="block text-sm font-bold text-[#123c5b] uppercase tracking-wider mb-1.5">
                 Operational area
               </label>
               <select
                 value={operationalArea}
                 onChange={(e) => setOperationalArea(e.target.value)}
-                className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none focus:border-[#287fa9] bg-white transition-colors cursor-pointer"
+                className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9] bg-white transition-colors cursor-pointer"
               >
                 <option>All areas</option>
                 <option>North Ward</option>
@@ -355,13 +355,13 @@ export default function ReportsAnalyticsPage() {
 
             {/* SKILL GROUP */}
             <div>
-              <label className="block text-[10px] font-bold text-[#123c5b] uppercase tracking-wider mb-1.5">
+              <label className="block text-sm font-bold text-[#123c5b] uppercase tracking-wider mb-1.5">
                 Skill group
               </label>
               <select
                 value={skillGroup}
                 onChange={(e) => setSkillGroup(e.target.value)}
-                className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-[11px] outline-none focus:border-[#287fa9] bg-white transition-colors cursor-pointer"
+                className="w-full h-[38px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9] bg-white transition-colors cursor-pointer"
               >
                 <option>All skills</option>
                 <option>Logistics</option>
@@ -376,7 +376,7 @@ export default function ReportsAnalyticsPage() {
             {/* APPLY BUTTON */}
             <button
               onClick={handleApplyFilters}
-              className="h-[38px] px-5 border border-[#b9d0dc] hover:bg-[#f1f8fc] rounded-lg text-[11px] text-[#17648e] font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="h-[38px] px-5 border border-[#b9d0dc] hover:bg-[#f1f8fc] rounded-lg text-sm text-[#17648e] font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <Filter size={13} />
               <span>Apply filters</span>
@@ -425,15 +425,15 @@ export default function ReportsAnalyticsPage() {
           <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-[0_5px_15px_rgba(30,70,90,0.04)] overflow-hidden">
             <div className="px-5 py-4 border-b border-[#d5e3e9] flex items-center justify-between bg-[#fbfdfe]">
               <div>
-                <h2 className="text-[13px] font-semibold text-[#123c5b]">
+                <h2 className="text-base sm:text-lg font-semibold text-[#123c5b]">
                   Task completion trend
                 </h2>
-                <p className="text-[10px] text-[#8296aa] mt-0.5">
+                <p className="text-[13px] text-[#8296aa] mt-0.5">
                   Created versus completed tasks across {appliedFilters.operationalArea}
                 </p>
               </div>
 
-              <span className="bg-[#e5f5ef] text-[#239879] px-2.5 py-1 rounded-md text-[9px] font-semibold border border-[#c4e8dc]">
+              <span className="bg-[#e5f5ef] text-[#239879] px-2.5 py-1 rounded-md text-xs font-semibold border border-[#c4e8dc]">
                 Target exceeded
               </span>
             </div>
@@ -501,7 +501,7 @@ export default function ReportsAnalyticsPage() {
               </div>
 
               {/* TIMELINE DATES */}
-              <div className="flex justify-between text-[10px] text-[#8296aa] mt-2 pt-2 border-t border-[#f1f5f8]">
+              <div className="flex justify-between text-[13px] text-[#8296aa] mt-2 pt-2 border-t border-[#f1f5f8]">
                 {trendData.map((item) => (
                   <span key={item.date} className="font-medium">
                     {item.date}
@@ -514,10 +514,10 @@ export default function ReportsAnalyticsPage() {
           {/* HOURS BY SKILL GROUP */}
           <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-[0_5px_15px_rgba(30,70,90,0.04)] overflow-hidden flex flex-col">
             <div className="px-5 py-4 border-b border-[#d5e3e9] bg-[#fbfdfe]">
-              <h2 className="text-[13px] font-semibold text-[#123c5b]">
+              <h2 className="text-base sm:text-lg font-semibold text-[#123c5b]">
                 Hours by skill group
               </h2>
-              <p className="text-[10px] text-[#8296aa] mt-0.5">
+              <p className="text-[13px] text-[#8296aa] mt-0.5">
                 {analytics.volunteerHours.toLocaleString()} contributed hours
               </p>
             </div>
@@ -525,7 +525,7 @@ export default function ReportsAnalyticsPage() {
             <div className="p-5 space-y-4.5 flex-1 flex flex-col justify-around">
               {skillData.map((skill) => (
                 <div key={skill.name} className="flex items-center gap-3">
-                  <span className="text-[10px] font-medium text-[#123c5b] w-[85px] shrink-0 truncate">
+                  <span className="text-sm font-medium text-[#123c5b] w-[85px] shrink-0 truncate">
                     {skill.name}
                   </span>
 
@@ -538,7 +538,7 @@ export default function ReportsAnalyticsPage() {
                     />
                   </div>
 
-                  <span className="text-[10px] font-bold text-[#17648e] w-[45px] text-right">
+                  <span className="text-sm font-bold text-[#17648e] w-[45px] text-right">
                     {skill.hours.toLocaleString()}h
                   </span>
                 </div>
@@ -551,13 +551,13 @@ export default function ReportsAnalyticsPage() {
         <section>
           <div className="mb-3.5 flex items-center justify-between">
             <div>
-              <h2 className="text-[14px] font-semibold text-[#123c5b]">Report Library</h2>
-              <p className="text-[10px] text-[#8296aa] mt-0.5">
+              <h2 className="text-base sm:text-lg font-semibold text-[#123c5b]">Report Library</h2>
+              <p className="text-[13px] text-[#8296aa] mt-0.5">
                 Select an operational reporting module to inspect metrics or export filtered datasets.
               </p>
             </div>
 
-            <span className="text-[10px] text-[#8296aa] bg-slate-100 px-2 py-0.5 rounded font-medium">
+            <span className="text-xs text-[#8296aa] bg-slate-100 px-2 py-0.5 rounded font-medium">
               {reportsList.length} report modules
             </span>
           </div>
@@ -578,10 +578,10 @@ export default function ReportsAnalyticsPage() {
                     </div>
 
                     <div className="min-w-0">
-                      <p className="text-[11px] font-semibold text-[#123c5b] group-hover:text-[#287fa9] transition-colors truncate">
+                      <p className="text-sm font-semibold text-[#123c5b] group-hover:text-[#287fa9] transition-colors truncate">
                         {report.title}
                       </p>
-                      <p className="text-[9px] text-[#8296aa] truncate mt-0.5">
+                      <p className="text-xs text-[#8296aa] truncate mt-0.5">
                         {report.category}
                       </p>
                     </div>
@@ -613,10 +613,10 @@ export default function ReportsAnalyticsPage() {
                 </div>
 
                 <div>
-                  <h2 className="text-[15px] font-semibold text-[#123c5b]">
+                  <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">
                     {selectedReport.title}
                   </h2>
-                  <p className="text-[10px] text-[#8296aa] mt-0.5">
+                  <p className="text-[13px] text-[#8296aa] mt-0.5">
                     {selectedReport.category}
                   </p>
                 </div>
@@ -632,12 +632,12 @@ export default function ReportsAnalyticsPage() {
 
             {/* MODAL BODY */}
             <div className="p-5 space-y-4">
-              <p className="text-[11px] text-[#55728b] leading-5">
+              <p className="text-sm text-[#55728b] leading-5">
                 {selectedReport.description}
               </p>
 
               {/* FILTER CONTEXT */}
-              <div className="bg-[#f5f9fb] border border-[#e1eaf0] rounded-lg p-3.5 space-y-2 text-[10px]">
+              <div className="bg-[#f5f9fb] border border-[#e1eaf0] rounded-lg p-3.5 space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <CalendarDays size={14} className="text-[#287fa9]" />
                   <span className="text-[#8296aa]">Date range:</span>
@@ -660,7 +660,7 @@ export default function ReportsAnalyticsPage() {
               {/* SNAPSHOT METRICS */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg">
-                  <p className="text-[9px] font-bold text-[#8296aa] uppercase tracking-wider">
+                  <p className="text-xs font-bold text-[#8296aa] uppercase tracking-wider">
                     Tasks in scope
                   </p>
                   <p className="text-[20px] font-bold text-[#123c5b] mt-0.5">
@@ -669,7 +669,7 @@ export default function ReportsAnalyticsPage() {
                 </div>
 
                 <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg">
-                  <p className="text-[9px] font-bold text-[#8296aa] uppercase tracking-wider">
+                  <p className="text-xs font-bold text-[#8296aa] uppercase tracking-wider">
                     Contributed Hours
                   </p>
                   <p className="text-[20px] font-bold text-[#159879] mt-0.5">
@@ -681,7 +681,7 @@ export default function ReportsAnalyticsPage() {
               {/* INFORMATION NOTICE */}
               <div className="bg-[#eaf5f9] border border-[#d1e8f2] rounded-lg p-3 flex items-start gap-2.5">
                 <FileText size={16} className="text-[#287fa9] shrink-0 mt-0.5" />
-                <p className="text-[10px] text-[#527d96] leading-4">
+                <p className="text-sm text-[#527d96] leading-4">
                   Exporting will package all volunteer log records for {selectedReport.title} into a formatted CSV spreadsheet ready for stakeholder review and operational audits.
                 </p>
               </div>
@@ -691,14 +691,14 @@ export default function ReportsAnalyticsPage() {
             <div className="p-4 border-t border-[#d5e3e9] bg-[#fbfdfe] flex justify-end gap-2.5">
               <button
                 onClick={() => setSelectedReport(null)}
-                className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-[11px] font-medium text-[#123c5b] hover:bg-slate-50 transition-colors"
+                className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-sm font-medium text-[#123c5b] hover:bg-slate-50 transition-colors"
               >
                 Close
               </button>
 
               <button
                 onClick={() => handleExportReportItem(selectedReport)}
-                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-[11px] font-semibold flex items-center gap-2 transition-colors shadow-xs"
+                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold flex items-center gap-2 transition-colors shadow-xs"
               >
                 <Download size={13} />
                 <span>Export CSV data</span>

@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   VolunteerNotificationItem,
   VolunteerNotificationSummaryDto,
@@ -446,7 +446,7 @@ export const volunteerNotificationsService = {
       if (query.category) params.append("category", query.category);
 
       const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5277/api";
-      const res = await fetch(`${API_BASE_URL}/volunteer/notifications/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer/notifications/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }

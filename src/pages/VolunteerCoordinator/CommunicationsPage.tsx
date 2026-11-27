@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { communicationsService } from "../../services/communicationsService";
 
 import {
   Search,
@@ -129,6 +130,28 @@ export default function CommunicationsPage() {
 
   const [broadcasts, setBroadcasts] =
     useState<Broadcast[]>(initialBroadcasts);
+  const [audienceList, setAudienceList] = useState(audiences);
+
+  useEffect(() => {
+    communicationsService.getBroadcasts({ pageNumber: 1, pageSize: 50 }).then((res) => {
+      if (res?.data?.items?.length) {
+        setBroadcasts(res.data.items);
+      }
+    }).catch(() => {});
+    communicationsService.getAudiences().then((res) => {
+      if (res?.data?.length) {
+        setAudienceList(res.data.map((a) => ({ label: a.label, count: a.count })));
+      }
+    }).catch(() => {});
+    communicationsService.getDraft().then((draft) => {
+      if (draft && (draft.title || draft.message)) {
+        if (draft.title) setTitle(draft.title);
+        if (draft.message) setMessage(draft.message);
+        if (draft.audience) setAudience(draft.audience);
+        if (draft.channels?.length) setChannels(draft.channels as Channel[]);
+      }
+    }).catch(() => {});
+  }, []);
 
   // MODAL STATES
 
@@ -156,6 +179,7 @@ export default function CommunicationsPage() {
   // RECIPIENT COUNT
 
   const estimatedRecipients =
+    audienceList.find((item) => item.label === audience)?.count ??
     audiences.find((item) => item.label === audience)?.count ?? 0;
 
   // CHANNEL SELECTION
@@ -172,7 +196,7 @@ export default function CommunicationsPage() {
 
   // SAVE DRAFT
 
-  const handleSaveDraft = () => {
+  const handleSaveDraft = async () => {
     if (!title.trim() || !message.trim()) {
       notify("Please enter a message title and message.");
       return;
@@ -185,10 +209,14 @@ export default function CommunicationsPage() {
       channels,
     };
 
-    localStorage.setItem(
-      "carelink_communication_draft",
-      JSON.stringify(draft)
-    );
+    try {
+      await communicationsService.saveDraft(draft);
+    } catch {
+      localStorage.setItem(
+        "carelink_communication_draft",
+        JSON.stringify(draft)
+      );
+    }
 
     setIsDraftSaved(true);
 
@@ -197,7 +225,7 @@ export default function CommunicationsPage() {
 
   // SEND BROADCAST
 
-  const handleSendBroadcast = () => {
+  const handleSendBroadcast = async () => {
     if (!title.trim() || !message.trim()) {
       notify("Please complete the message details.");
       return;
@@ -210,9 +238,32 @@ export default function CommunicationsPage() {
 
     setIsSending(true);
 
-    // Demo simulation
+    try {
+      const created = await communicationsService.createBroadcast({
+        title,
+        audience,
+        message,
+        channels,
+      });
 
-    window.setTimeout(() => {
+      const newBroadcast: Broadcast = {
+        id: created.id || `BRD-${Date.now()}`,
+        title: created.title || title,
+        audience: created.audience || audience,
+        delivered: created.delivered ?? estimatedRecipients,
+        time: created.time || "Just now",
+        channel: created.channel || channels.join(", "),
+        status: created.status || "Delivered",
+        message: created.message || message,
+      };
+
+      setBroadcasts((previous) => [
+        newBroadcast,
+        ...previous.filter((b) => b.id !== newBroadcast.id),
+      ]);
+
+      await communicationsService.clearDraft();
+    } catch {
       const newBroadcast: Broadcast = {
         id: `BRD-${Date.now()}`,
         title,
@@ -228,22 +279,16 @@ export default function CommunicationsPage() {
         newBroadcast,
         ...previous,
       ]);
-
+      localStorage.removeItem("carelink_communication_draft");
+    } finally {
       setIsSending(false);
       setShowReview(false);
-
       setTitle("");
       setMessage("");
       setChannels(["In-app"]);
-
-      localStorage.removeItem(
-        "carelink_communication_draft"
-      );
-
       setIsDraftSaved(false);
-
       notify("Broadcast created successfully!");
-    }, 1000);
+    }
   };
 
   // CHANNEL BUTTON
@@ -261,7 +306,7 @@ export default function CommunicationsPage() {
       <button
         type="button"
         onClick={() => toggleChannel(channel)}
-        className={`h-[37px] px-3 rounded-lg border flex items-center gap-2 text-[10px] transition-all ${selected
+        className={`h-[37px] px-3 rounded-lg border flex items-center gap-2 text-sm transition-all ${selected
           ? "border-[#287fa9] bg-[#f1f8fc] text-[#17648e]"
           : "border-[#d5e3e9] bg-white text-[#718ba0] hover:border-[#287fa9]"
           }`}
@@ -296,7 +341,7 @@ export default function CommunicationsPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-8">
+        <div className="flex items-center gap-2 text-xs mb-8">
 
           <span className="text-[#8296aa]">
             Operations
@@ -322,7 +367,7 @@ export default function CommunicationsPage() {
 
           <div>
 
-            <h1 className="text-[27px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Communications
             </h1>
 
@@ -342,7 +387,7 @@ export default function CommunicationsPage() {
               document.getElementById("message-composer")
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[10px] font-semibold shrink-0"
+            className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-sm font-semibold shrink-0"
           >
             <Plus size={15} />
             New broadcast
@@ -365,11 +410,11 @@ export default function CommunicationsPage() {
 
             <div className="px-4 py-4 border-b border-[#d5e3e9]">
 
-              <h2 className="text-[13px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Compose operational message
               </h2>
 
-              <p className="text-[9px] text-[#8296aa] mt-1">
+              <p className="text-xs text-[#8296aa] mt-1">
                 Preview recipients before sending
               </p>
 
@@ -400,7 +445,7 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <label className="block text-[9px] font-semibold mb-2">
+                <label className="block text-sm font-semibold mb-2">
                   Audience
                 </label>
 
@@ -410,7 +455,7 @@ export default function CommunicationsPage() {
                     setAudience(e.target.value);
                     setIsDraftSaved(false);
                   }}
-                  className="w-full h-[43px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none focus:border-[#287fa9] bg-white"
+                  className="w-full h-[43px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9] bg-white"
                 >
 
                   {audiences.map((item) => (
@@ -432,7 +477,7 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <label className="block text-[9px] font-semibold mb-2">
+                <label className="block text-sm font-semibold mb-2">
                   Message title
                 </label>
 
@@ -444,7 +489,7 @@ export default function CommunicationsPage() {
                     setIsDraftSaved(false);
                   }}
                   placeholder="Enter message title"
-                  className="w-full h-[43px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none focus:border-[#287fa9]"
+                  className="w-full h-[43px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
 
               </div>
@@ -453,7 +498,7 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <label className="block text-[9px] font-semibold mb-2">
+                <label className="block text-sm font-semibold mb-2">
                   Message
                 </label>
 
@@ -466,10 +511,10 @@ export default function CommunicationsPage() {
                   }}
                   placeholder="Write your operational message..."
                   rows={5}
-                  className="w-full border border-[#d5e3e9] rounded-lg p-3 text-[10px] outline-none resize-y focus:border-[#287fa9] min-h-[105px]"
+                  className="w-full border border-[#d5e3e9] rounded-lg p-3 text-sm sm:text-[15px] outline-none resize-y focus:border-[#287fa9] min-h-[105px]"
                 />
 
-                <div className="text-right text-[9px] text-[#8296aa] mt-1">
+                <div className="text-right text-xs text-[#8296aa] mt-1">
                   {message.length} characters
                 </div>
 
@@ -479,7 +524,7 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <label className="block text-[9px] font-semibold mb-2">
+                <label className="block text-sm font-semibold mb-2">
                   Delivery channels
                 </label>
 
@@ -515,11 +560,11 @@ export default function CommunicationsPage() {
 
                 <div>
 
-                  <p className="text-[9px] font-semibold">
+                  <p className="text-xs font-semibold">
                     Multilingual delivery available
                   </p>
 
-                  <p className="text-[9px] text-[#527d96] mt-1">
+                  <p className="text-xs text-[#527d96] mt-1">
                     Recipients receive the message in their preferred supported language where available.
                   </p>
 
@@ -531,7 +576,7 @@ export default function CommunicationsPage() {
 
               <div className="pt-4 border-t border-[#d5e3e9] flex flex-col sm:flex-row items-center justify-between gap-3">
 
-                <div className="text-[9px]">
+                <div className="text-xs">
 
                   <span className="text-[#8296aa]">
                     Estimated recipients:
@@ -548,7 +593,7 @@ export default function CommunicationsPage() {
                   <button
                     type="button"
                     onClick={handleSaveDraft}
-                    className="h-[40px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-[10px] text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-2"
+                    className="h-[40px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-sm text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-2"
                   >
 
                     <Save size={13} />
@@ -559,7 +604,7 @@ export default function CommunicationsPage() {
 
                   <button
                     type="submit"
-                    className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2"
+                    className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg text-sm font-semibold flex items-center gap-2"
                   >
 
                     <Send size={13} />
@@ -584,7 +629,7 @@ export default function CommunicationsPage() {
 
             <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-[0_5px_15px_rgba(30,70,90,0.05)] p-4">
 
-              <h2 className="text-[13px] font-medium mb-3">
+              <h2 className="text-base sm:text-lg font-semibold mb-3">
                 Delivery health
               </h2>
 
@@ -598,13 +643,13 @@ export default function CommunicationsPage() {
 
                   <MessageSquare size={12} />
 
-                  <span className="text-[9px]">
+                  <span className="text-xs">
                     In-app
                   </span>
 
                 </div>
 
-                <span className="text-[9px] font-semibold">
+                <span className="text-xs font-semibold">
                   Operational
                 </span>
 
@@ -620,13 +665,13 @@ export default function CommunicationsPage() {
 
                   <Mail size={12} />
 
-                  <span className="text-[9px]">
+                  <span className="text-xs">
                     Email
                   </span>
 
                 </div>
 
-                <span className="text-[9px] font-semibold">
+                <span className="text-xs font-semibold">
                   Operational
                 </span>
 
@@ -642,13 +687,13 @@ export default function CommunicationsPage() {
 
                   <Smartphone size={12} />
 
-                  <span className="text-[9px]">
+                  <span className="text-xs">
                     SMS
                   </span>
 
                 </div>
 
-                <span className="text-[9px] font-semibold">
+                <span className="text-xs font-semibold">
                   Degraded
                 </span>
 
@@ -662,11 +707,11 @@ export default function CommunicationsPage() {
 
               <div className="px-4 py-4 border-b border-[#d5e3e9]">
 
-                <h2 className="text-[13px] font-medium">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Recent broadcasts
                 </h2>
 
-                <p className="text-[9px] text-[#8296aa] mt-1">
+                <p className="text-xs text-[#8296aa] mt-1">
                   Last 24 hours
                 </p>
 
@@ -692,11 +737,11 @@ export default function CommunicationsPage() {
 
                       <div className="min-w-0">
 
-                        <p className="text-[10px] font-semibold truncate">
+                        <p className="text-sm font-semibold truncate">
                           {broadcast.title}
                         </p>
 
-                        <p className="text-[8px] text-[#8296aa] mt-1">
+                        <p className="text-xs text-[#8296aa] mt-1">
                           {broadcast.delivered.toLocaleString()} delivered · {broadcast.time}
                         </p>
 
@@ -743,11 +788,11 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <h2 className="text-[17px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Review broadcast
                 </h2>
 
-                <p className="text-[10px] text-[#8296aa] mt-1">
+                <p className="text-[13px] text-[#8296aa] mt-1">
                   Confirm the message before sending.
                 </p>
 
@@ -770,7 +815,7 @@ export default function CommunicationsPage() {
 
                 <div>
 
-                  <p className="text-[9px] text-[#8296aa] mb-1">
+                  <p className="text-xs text-[#8296aa] mb-1">
                     MESSAGE TITLE
                   </p>
 
@@ -782,11 +827,11 @@ export default function CommunicationsPage() {
 
                 <div>
 
-                  <p className="text-[9px] text-[#8296aa] mb-1">
+                  <p className="text-xs text-[#8296aa] mb-1">
                     MESSAGE
                   </p>
 
-                  <p className="text-[11px] leading-5">
+                  <p className="text-sm leading-5">
                     {message}
                   </p>
 
@@ -807,11 +852,11 @@ export default function CommunicationsPage() {
 
                   <div>
 
-                    <p className="text-[9px] text-[#8296aa]">
+                    <p className="text-xs text-[#8296aa]">
                       Target audience
                     </p>
 
-                    <p className="text-[10px] font-semibold">
+                    <p className="text-sm font-semibold">
                       {audience}
                     </p>
 
@@ -829,7 +874,7 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <p className="text-[9px] text-[#8296aa] mb-2">
+                <p className="text-xs text-[#8296aa] mb-2">
                   Delivery channels
                 </p>
 
@@ -839,7 +884,7 @@ export default function CommunicationsPage() {
 
                     <span
                       key={channel}
-                      className="bg-[#e8f1f6] text-[#287fa9] px-3 py-2 rounded-lg text-[9px] font-semibold"
+                      className="bg-[#e8f1f6] text-[#287fa9] px-3 py-2 rounded-lg text-xs font-semibold"
                     >
                       {channel}
                     </span>
@@ -859,7 +904,7 @@ export default function CommunicationsPage() {
                   className="text-[#bd821d] shrink-0"
                 />
 
-                <p className="text-[9px] text-[#986617] leading-4">
+                <p className="text-xs text-[#986617] leading-4">
                   Please verify the audience and message content before sending this broadcast.
                 </p>
 
@@ -873,7 +918,7 @@ export default function CommunicationsPage() {
 
               <button
                 onClick={() => setShowReview(false)}
-                className="border border-[#d5e3e9] rounded-lg px-4 py-2.5 text-[10px]"
+                className="border border-[#d5e3e9] rounded-lg px-4 py-2.5 text-sm"
               >
                 Edit message
               </button>
@@ -881,7 +926,7 @@ export default function CommunicationsPage() {
               <button
                 disabled={isSending}
                 onClick={handleSendBroadcast}
-                className="bg-[#287fa9] hover:bg-[#17678e] disabled:opacity-50 text-white rounded-lg px-5 py-2.5 text-[10px] font-semibold flex items-center gap-2"
+                className="bg-[#287fa9] hover:bg-[#17678e] disabled:opacity-50 text-white rounded-lg px-5 py-2.5 text-sm font-semibold flex items-center gap-2"
               >
 
                 <Send size={13} />
@@ -910,11 +955,11 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Broadcast details
                 </h2>
 
-                <p className="text-[9px] text-[#8296aa] mt-1">
+                <p className="text-xs text-[#8296aa] mt-1">
                   {showBroadcastDetails.id}
                 </p>
 
@@ -932,7 +977,7 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <p className="text-[9px] text-[#8296aa]">
+                <p className="text-xs text-[#8296aa]">
                   Message title
                 </p>
 
@@ -944,11 +989,11 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <p className="text-[9px] text-[#8296aa]">
+                <p className="text-xs text-[#8296aa]">
                   Message
                 </p>
 
-                <p className="text-[11px] leading-5 mt-1">
+                <p className="text-sm leading-5 mt-1">
                   {showBroadcastDetails.message}
                 </p>
 
@@ -956,11 +1001,11 @@ export default function CommunicationsPage() {
 
               <div>
 
-                <p className="text-[9px] text-[#8296aa]">
+                <p className="text-xs text-[#8296aa]">
                   Audience
                 </p>
 
-                <p className="text-[11px] mt-1">
+                <p className="text-sm mt-1">
                   {showBroadcastDetails.audience}
                 </p>
 
@@ -970,7 +1015,7 @@ export default function CommunicationsPage() {
 
                 <div className="bg-[#f5f9fb] p-3 rounded-lg">
 
-                  <p className="text-[9px] text-[#8296aa]">
+                  <p className="text-xs text-[#8296aa]">
                     Delivered
                   </p>
 
@@ -982,11 +1027,11 @@ export default function CommunicationsPage() {
 
                 <div className="bg-[#f5f9fb] p-3 rounded-lg">
 
-                  <p className="text-[9px] text-[#8296aa]">
+                  <p className="text-xs text-[#8296aa]">
                     Status
                   </p>
 
-                  <p className="text-[11px] text-[#239879] font-semibold mt-2">
+                  <p className="text-sm text-[#239879] font-semibold mt-2">
                     {showBroadcastDetails.status}
                   </p>
 
@@ -994,12 +1039,12 @@ export default function CommunicationsPage() {
 
               </div>
 
-              <div className="flex items-center gap-2 text-[10px]">
+              <div className="flex items-center gap-2 text-sm">
                 <Radio size={15} className="text-[#287fa9]" />
                 {showBroadcastDetails.channel}
               </div>
 
-              <div className="flex items-center gap-2 text-[10px]">
+              <div className="flex items-center gap-2 text-sm">
                 <Clock size={15} className="text-[#287fa9]" />
                 {showBroadcastDetails.time}
               </div>
@@ -1010,7 +1055,7 @@ export default function CommunicationsPage() {
 
               <button
                 onClick={() => setShowBroadcastDetails(null)}
-                className="bg-[#287fa9] text-white px-5 py-2.5 rounded-lg text-xs"
+                className="bg-[#287fa9] text-white px-5 py-2.5 rounded-lg text-sm"
               >
                 Close
               </button>

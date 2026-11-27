@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   Broadcast,
   AudienceOption,
@@ -398,7 +398,7 @@ export const communicationsService = {
       if (query.audience) params.append("audience", query.audience);
 
       const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5277/api";
-      const res = await fetch(`${API_BASE_URL}/communications/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/communications/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }

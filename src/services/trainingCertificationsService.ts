@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   TrainingItem,
   CertificateItem,
@@ -292,7 +292,7 @@ export const trainingCertificationsService = {
       if (search) params.append("search", search);
       if (status && status !== "All") params.append("status", status);
 
-      const res = await fetch(`${API_BASE_URL}/volunteer/training/modules/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer/training/modules/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }
@@ -462,7 +462,7 @@ export const trainingCertificationsService = {
       if (search) params.append("search", search);
       if (status && status !== "All") params.append("status", status);
 
-      const res = await fetch(`${API_BASE_URL}/volunteer/training/certificates/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer/training/certificates/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }
