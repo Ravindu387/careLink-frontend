@@ -1,6 +1,7 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -157,6 +158,30 @@ export default function RoomBedManagementPage() {
   } | null>(null);
 
   const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    apiClient.get<any>("/rooms").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setRooms(
+          items.map((rm: any) => ({
+            id: rm.id || rm.roomCode || `RM-001`,
+            name: rm.name || "Room",
+            shelter: rm.shelter || rm.shelterName || "Riverton Central School",
+            floor: rm.floor || "Ground floor",
+            type: rm.type || "Family Room",
+            beds: Array.isArray(rm.beds) && rm.beds.length
+              ? rm.beds.map((b: any) => ({
+                  id: b.id || b.bedCode || "B-01",
+                  status: (b.status as BedStatus) || "Available",
+                  resident: b.resident || b.residentName,
+                }))
+              : [{ id: "B-01", status: "Available" as BedStatus }],
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
 
   const [newRoom, setNewRoom] = useState({
     name: "",
@@ -405,7 +430,7 @@ export default function RoomBedManagementPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="text-slate-400">Shelter Administration</span>
@@ -418,11 +443,11 @@ export default function RoomBedManagementPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
 
           <div>
-            <h1 className="text-[23px] md:text-[25px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Room & Bed Management
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-2">
+            <p className="text-[13px] text-slate-500 mt-2">
               Visually manage rooms, beds, reservations, and safe accommodation assignments.
             </p>
           </div>
@@ -431,14 +456,14 @@ export default function RoomBedManagementPage() {
 
             <button
               onClick={() => setRoomModal(true)}
-              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold hover:bg-slate-50"
+              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-sm font-semibold hover:bg-slate-50"
             >
               Add room
             </button>
 
             <button
               onClick={() => setBedModal(true)}
-              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-[#144665]"
+              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#144665]"
             >
               <Plus size={14} />
               Add beds
@@ -535,7 +560,7 @@ export default function RoomBedManagementPage() {
         ) : (
           <div className="bg-white border border-[#d5e3e9] rounded-xl py-16 text-center">
             <Building2 size={30} className="mx-auto text-slate-300" />
-            <h3 className="text-sm font-semibold mt-3">
+            <h3 className="text-base font-semibold mt-3">
               No rooms found
             </h3>
             <p className="text-xs text-slate-400 mt-1">
@@ -543,7 +568,7 @@ export default function RoomBedManagementPage() {
             </p>
             <button
               onClick={() => setRoomModal(true)}
-              className="mt-4 px-4 py-2 bg-[#1c638a] text-white rounded-lg text-xs"
+              className="mt-4 px-4 py-2 bg-[#1c638a] text-white rounded-lg text-sm"
             >
               Add room
             </button>
@@ -555,10 +580,10 @@ export default function RoomBedManagementPage() {
         <section className="mt-4 bg-white border border-[#d5e3e9] rounded-xl p-4">
 
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-semibold">
+            <h3 className="text-base font-semibold">
               Overall bed distribution
             </h3>
-            <span className="text-[9px] text-slate-400">
+            <span className="text-xs text-slate-400">
               {totalBeds} total beds
             </span>
           </div>
@@ -740,7 +765,7 @@ export default function RoomBedManagementPage() {
             <div className="grid grid-cols-2 gap-3">
 
               <div className="bg-[#f4f8fa] rounded-lg p-3">
-                <p className="text-[9px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   Total beds
                 </p>
                 <p className="text-xl font-bold">
@@ -749,7 +774,7 @@ export default function RoomBedManagementPage() {
               </div>
 
               <div className="bg-[#f4f8fa] rounded-lg p-3">
-                <p className="text-[9px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   Available beds
                 </p>
                 <p className="text-xl font-bold text-[#269a77]">
@@ -760,7 +785,7 @@ export default function RoomBedManagementPage() {
               </div>
             </div>
 
-            <h3 className="text-xs font-semibold pt-2">
+            <h3 className="text-base font-semibold pt-2">
               Room beds
             </h3>
 
@@ -770,8 +795,8 @@ export default function RoomBedManagementPage() {
                 className="flex items-center justify-between border border-slate-100 rounded-lg p-3"
               >
                 <div>
-                  <p className="text-xs font-semibold">{bed.id}</p>
-                  <p className="text-[9px] text-slate-400 mt-1">
+                  <p className="text-sm font-semibold">{bed.id}</p>
+                  <p className="text-xs text-slate-400 mt-1">
                     {bed.resident || "No resident assigned"}
                   </p>
                 </div>
@@ -785,7 +810,7 @@ export default function RoomBedManagementPage() {
                       e.target.value as BedStatus
                     )
                   }
-                  className="border border-slate-200 rounded-md px-2 py-1.5 text-[9px] outline-none"
+                  className="border border-slate-200 rounded-md px-2 py-1.5 text-sm sm:text-[15px] outline-none"
                 >
                   {bedStatuses.map((status) => (
                     <option key={status}>{status}</option>
@@ -796,7 +821,7 @@ export default function RoomBedManagementPage() {
 
             <button
               onClick={deleteRoom}
-              className="w-full mt-3 border border-red-200 text-red-600 rounded-lg py-2.5 text-xs font-semibold flex justify-center items-center gap-2 hover:bg-red-50"
+              className="w-full mt-3 border border-red-200 text-red-600 rounded-lg py-2.5 text-sm font-semibold flex justify-center items-center gap-2 hover:bg-red-50"
             >
               <Trash2 size={14} />
               Delete room
@@ -804,7 +829,7 @@ export default function RoomBedManagementPage() {
 
             <button
               onClick={() => setManageModal(false)}
-              className="w-full border border-slate-200 rounded-lg py-2.5 text-xs font-semibold hover:bg-slate-50"
+              className="w-full border border-slate-200 rounded-lg py-2.5 text-sm font-semibold hover:bg-slate-50"
             >
               Done
             </button>
@@ -832,7 +857,7 @@ export default function RoomBedManagementPage() {
                     status
                   )
                 }
-                className="w-full flex items-center justify-between border border-slate-200 rounded-lg p-3 text-xs hover:bg-slate-50"
+                className="w-full flex items-center justify-between border border-slate-200 rounded-lg p-3 text-sm hover:bg-slate-50"
               >
                 <span className="flex items-center gap-2">
                   <StatusDot status={status} />
@@ -852,7 +877,7 @@ export default function RoomBedManagementPage() {
 
           <CheckCircle2 size={17} className="shrink-0" />
 
-          <p className="text-xs">{successMessage}</p>
+          <p className="text-sm">{successMessage}</p>
 
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
@@ -886,14 +911,14 @@ function RoomCard({
       <div className="px-3.5 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
 
         <div className="min-w-0">
-          <h3 className="text-[10px] font-bold">{room.name}</h3>
+          <h3 className="text-base font-bold">{room.name}</h3>
 
-          <p className="text-[8px] text-slate-400 mt-1">
+          <p className="text-xs text-slate-400 mt-1">
             {room.type} · {room.floor}
           </p>
         </div>
 
-        <span className="px-2 py-1 rounded-md bg-[#e5f8f1] text-[#168d6c] text-[8px] font-semibold whitespace-nowrap">
+        <span className="px-2 py-1 rounded-md bg-[#e5f8f1] text-[#168d6c] text-xs font-semibold whitespace-nowrap">
           {available} available
         </span>
       </div>
@@ -913,11 +938,11 @@ function RoomCard({
             >
               <BedDouble size={17} strokeWidth={1.8} />
 
-              <span className="text-[8px] font-semibold">
+              <span className="text-xs font-semibold">
                 {bed.id}
               </span>
 
-              <span className="text-[7px]">
+              <span className="text-xs">
                 {bed.status}
               </span>
             </button>
@@ -930,13 +955,13 @@ function RoomCard({
 
       <div className="px-3.5 py-2.5 border-t border-slate-200 flex justify-between items-center">
 
-        <p className="text-[8px] text-slate-400">
+        <p className="text-xs text-slate-400">
           {room.beds.length} total beds
         </p>
 
         <button
           onClick={onManage}
-          className="text-[8px] text-[#28749b] hover:underline font-medium"
+          className="text-sm text-[#28749b] hover:underline font-medium"
         >
           Manage room
         </button>
@@ -974,11 +999,11 @@ function KpiCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <h3 className="text-[21px] font-bold leading-tight mt-0.5">
           {value}
         </h3>
-        <p className="text-[8px] text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-400 mt-0.5">
           {description}
         </p>
       </div>
@@ -1000,7 +1025,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full sm:min-w-[145px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full sm:min-w-[145px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -1043,7 +1068,7 @@ function LegendItem({ status }: { status: BedStatus }) {
   return (
     <div className="flex items-center gap-1.5">
       <StatusDot status={status} />
-      <span className="text-[8px] text-slate-500">{status}</span>
+      <span className="text-xs text-slate-500">{status}</span>
     </div>
   );
 }
@@ -1060,8 +1085,8 @@ function SummaryItem({
   return (
     <div className="flex items-center gap-2">
       <span className={`w-2 h-2 rounded-sm ${color}`} />
-      <span className="text-[9px] text-slate-500">{label}</span>
-      <span className="text-[10px] font-bold ml-auto">{value}</span>
+      <span className="text-xs text-slate-500">{label}</span>
+      <span className="text-sm font-bold ml-auto">{value}</span>
     </div>
   );
 }
@@ -1081,7 +1106,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1093,7 +1118,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );
@@ -1112,14 +1137,14 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -1150,7 +1175,7 @@ function Modal({
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[13px] text-slate-400 mt-1">
               {subtitle}
             </p>
           </div>
@@ -1183,14 +1208,14 @@ function ModalActions({
       <button
         type="button"
         onClick={onCancel}
-        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50"
+        className="flex-1 border border-slate-200 rounded-lg py-3 text-sm font-semibold hover:bg-slate-50"
       >
         Cancel
       </button>
 
       <button
         type="submit"
-        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#144665]"
       >
         {submitLabel}
       </button>

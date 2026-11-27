@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -117,6 +118,24 @@ export default function OccupancyManagementPage() {
   const [search, setSearch] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  useEffect(() => {
+    apiClient.get<any>("/occupancy/shelters").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setShelters(
+          items.map((s: any, idx: number) => ({
+            id: s.shelterCode || (typeof s.id === "string" && s.id.startsWith("SH-") ? s.id : `SH-00${idx + 1}`),
+            name: s.name || "Shelter",
+            district: s.district || "Central District",
+            capacity: Number(s.capacity ?? 400),
+            occupied: Number(s.occupied ?? s.currentOccupancy ?? 0),
+            reserved: Number(s.reserved ?? 0),
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   /* ================= CALCULATIONS ================= */
 
   const totalCapacity = shelters.reduce(
@@ -211,6 +230,13 @@ export default function OccupancyManagementPage() {
       return;
     }
 
+    apiClient.post("/occupancy/admissions", {
+      residentName: admissionForm.resident,
+      shelterId: admissionForm.shelterId,
+      headCount: people,
+      admissionDate: admissionForm.date,
+    }).catch(() => {});
+
     const newAdmission: Admission = {
       id: `ADM-${Date.now().toString().slice(-6)}`,
       resident: admissionForm.resident,
@@ -274,7 +300,7 @@ export default function OccupancyManagementPage() {
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
 
         {/* BREADCRUMB */}
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="text-slate-400">Shelter Administration</span>
@@ -286,11 +312,11 @@ export default function OccupancyManagementPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
 
           <div>
-            <h1 className="text-[23px] md:text-[25px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Occupancy Management
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-2">
+            <p className="text-[13px] text-slate-500 mt-2">
               Monitor capacity, reservations, admissions, and departures in real time.
             </p>
           </div>
@@ -305,7 +331,7 @@ export default function OccupancyManagementPage() {
                 });
                 setModal("threshold");
               }}
-              className="h-9 px-3 md:px-4 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-slate-50"
+              className="h-9 px-3 md:px-4 border border-[#aac4d2] bg-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-slate-50"
             >
               <Settings2 size={14} />
               Configure thresholds
@@ -313,7 +339,7 @@ export default function OccupancyManagementPage() {
 
             <button
               onClick={() => setModal("admission")}
-              className="h-9 px-3 md:px-4 bg-[#1c5d83] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-[#144665]"
+              className="h-9 px-3 md:px-4 bg-[#1c5d83] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#144665]"
             >
               <Plus size={14} />
               Record admission
@@ -334,11 +360,11 @@ export default function OccupancyManagementPage() {
             />
 
             <div className="flex-1">
-              <p className="text-[10px] font-bold text-[#96620d]">
+              <p className="text-sm font-bold text-[#96620d]">
                 Capacity warning
               </p>
 
-              <p className="text-[9px] text-[#96620d] mt-1">
+              <p className="text-xs text-[#96620d] mt-1">
                 {shelters
                   .filter((s) => getShelterStatus(s).label !== "Available")
                   .map((s) => `${s.name} is ${Math.round((s.occupied / s.capacity) * 100)}% occupied`)
@@ -348,7 +374,7 @@ export default function OccupancyManagementPage() {
 
             <button
               onClick={() => setModal("allocation")}
-              className="h-9 px-3 border border-[#d8c28f] bg-white rounded-lg text-[9px] font-semibold whitespace-nowrap hover:bg-[#fffdf7]"
+              className="h-9 px-3 border border-[#d8c28f] bg-white rounded-lg text-sm font-semibold whitespace-nowrap hover:bg-[#fffdf7]"
             >
               Review allocation plan
             </button>
@@ -409,16 +435,16 @@ export default function OccupancyManagementPage() {
 
             <div className="px-4 py-3.5 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <h2 className="text-xs font-semibold">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Shelter-wise occupancy
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Warning at {thresholds.warning}% · Critical at {thresholds.critical}%
                 </p>
               </div>
 
-              <span className="bg-[#eaf3f8] text-[#267ba6] px-2 py-1 rounded-md text-[8px] font-semibold">
+              <span className="bg-[#eaf3f8] text-[#267ba6] px-2 py-1 rounded-md text-xs font-semibold">
                 Live capacity
               </span>
             </div>
@@ -444,16 +470,16 @@ export default function OccupancyManagementPage() {
                     <div className="flex justify-between items-center gap-3 mb-2">
 
                       <div>
-                        <p className="text-[10px] font-semibold">
+                        <p className="text-sm font-semibold">
                           {shelter.name}
                         </p>
 
-                        <p className="text-[8px] text-slate-400 mt-1">
+                        <p className="text-xs text-slate-400 mt-1">
                           {shelter.district} · {available} beds available
                         </p>
                       </div>
 
-                      <span className={`px-2 py-1 rounded-md text-[8px] font-semibold whitespace-nowrap ${shelterStatus.badge}`}>
+                      <span className={`px-2 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${shelterStatus.badge}`}>
                         {shelterStatus.label} · {Math.round(rate)}%
                       </span>
                     </div>
@@ -483,11 +509,11 @@ export default function OccupancyManagementPage() {
           <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
 
             <div className="px-4 py-3.5 border-b border-slate-200">
-              <h2 className="text-xs font-semibold">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Capacity distribution
               </h2>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 All registered shelters
               </p>
             </div>
@@ -514,7 +540,7 @@ export default function OccupancyManagementPage() {
                       {occupancyRate.toFixed(1)}%
                     </p>
 
-                    <p className="text-[9px] text-slate-400 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       Occupied
                     </p>
                   </div>
@@ -551,15 +577,15 @@ export default function OccupancyManagementPage() {
         {admissions.length > 0 && (
           <section className="mt-3 bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
             <div className="px-4 py-3 border-b border-slate-200">
-              <h2 className="text-xs font-semibold">Recent admissions</h2>
-              <p className="text-[9px] text-slate-400 mt-1">
+              <h2 className="text-base sm:text-lg font-semibold">Recent admissions</h2>
+              <p className="text-xs text-slate-400 mt-1">
                 Admissions recorded during this session
               </p>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full min-w-[500px] text-left">
-                <thead className="bg-[#f5f9fa] text-[9px] text-slate-500">
+                <thead className="bg-[#f5f9fa] text-[13px] text-slate-500">
                   <tr>
                     <th className="px-4 py-3">Admission ID</th>
                     <th className="px-4 py-3">Resident</th>
@@ -570,7 +596,7 @@ export default function OccupancyManagementPage() {
                 </thead>
                 <tbody>
                   {admissions.map((admission) => (
-                    <tr key={admission.id} className="border-t border-slate-100 text-[10px]">
+                    <tr key={admission.id} className="border-t border-slate-100 text-sm">
                       <td className="px-4 py-3 font-semibold">{admission.id}</td>
                       <td className="px-4 py-3">{admission.resident}</td>
                       <td className="px-4 py-3">
@@ -598,13 +624,13 @@ export default function OccupancyManagementPage() {
             <div className="flex justify-between items-center mb-5">
 
               <div>
-                <h2 className="text-base font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   {modal === "admission" && "Record admission"}
                   {modal === "threshold" && "Configure thresholds"}
                   {modal === "allocation" && "Review allocation plan"}
                 </h2>
 
-                <p className="text-[10px] text-slate-400 mt-1">
+                <p className="text-[13px] text-slate-400 mt-1">
                   {modal === "admission"
                     ? "Register a new resident admission."
                     : modal === "threshold"
@@ -632,7 +658,7 @@ export default function OccupancyManagementPage() {
                 />
 
                 <div>
-                  <label className="text-xs font-medium block mb-1.5">
+                  <label className="text-sm font-medium block mb-1.5">
                     Select shelter
                   </label>
 
@@ -644,7 +670,7 @@ export default function OccupancyManagementPage() {
                         shelterId: e.target.value,
                       })
                     }
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
                   >
                     {shelters.map((shelter) => {
                       const available =
@@ -673,7 +699,7 @@ export default function OccupancyManagementPage() {
                 />
 
                 <div>
-                  <label className="text-xs font-medium block mb-1.5">
+                  <label className="text-sm font-medium block mb-1.5">
                     Admission date
                   </label>
 
@@ -687,13 +713,13 @@ export default function OccupancyManagementPage() {
                         date: e.target.value,
                       })
                     }
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#144665]"
                 >
                   Confirm admission
                 </button>
@@ -722,13 +748,13 @@ export default function OccupancyManagementPage() {
                   }
                 />
 
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[13px] text-slate-400">
                   Warning should be lower than critical. Values must be between 1 and 100.
                 </p>
 
                 <button
                   type="submit"
-                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-xs font-semibold"
+                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-sm font-semibold"
                 >
                   Save thresholds
                 </button>
@@ -749,19 +775,19 @@ export default function OccupancyManagementPage() {
                       className="border border-slate-200 rounded-lg p-3"
                     >
                       <div className="flex justify-between gap-2">
-                        <p className="text-xs font-semibold">{shelter.name}</p>
+                        <p className="text-sm font-semibold">{shelter.name}</p>
                         <span className="text-xs text-red-500 font-semibold">
                           {Math.round((shelter.occupied / shelter.capacity) * 100)}%
                         </span>
                       </div>
 
-                      <p className="text-[10px] text-slate-400 mt-1">
+                      <p className="text-[13px] text-slate-400 mt-1">
                         {shelter.capacity - shelter.occupied - shelter.reserved} spaces available
                       </p>
                     </div>
                   ))}
 
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[13px] text-slate-400">
                   Review the available spaces before reallocating residents.
                 </p>
               </div>
@@ -769,7 +795,7 @@ export default function OccupancyManagementPage() {
 
             <button
               onClick={() => setModal(null)}
-              className="w-full mt-4 border border-slate-200 rounded-lg py-2.5 text-xs font-semibold hover:bg-slate-50"
+              className="w-full mt-4 border border-slate-200 rounded-lg py-2.5 text-sm font-semibold hover:bg-slate-50"
             >
               Close
             </button>
@@ -784,7 +810,7 @@ export default function OccupancyManagementPage() {
 
           <CheckCircle2 size={17} className="shrink-0 mt-0.5" />
 
-          <p className="text-xs leading-5">{successMessage}</p>
+          <p className="text-sm leading-5">{successMessage}</p>
 
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
@@ -824,9 +850,9 @@ function KpiCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <h3 className="text-[21px] font-bold leading-tight mt-0.5">{value}</h3>
-        <p className="text-[8px] text-slate-400 mt-0.5">{description}</p>
+        <p className="text-xs text-slate-400 mt-0.5">{description}</p>
       </div>
     </div>
   );
@@ -848,10 +874,10 @@ function LegendItem({
           className="w-2 h-2 rounded-sm"
           style={{ backgroundColor: color }}
         />
-        <span className="text-[9px] text-slate-600">{label}</span>
+        <span className="text-xs text-slate-600">{label}</span>
       </div>
 
-      <span className="text-[9px] font-semibold">{value}</span>
+      <span className="text-xs font-semibold">{value}</span>
     </div>
   );
 }
@@ -871,7 +897,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -882,7 +908,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );
