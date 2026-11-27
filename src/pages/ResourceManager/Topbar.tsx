@@ -1,95 +1,163 @@
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   ShieldCheck,
   Bell,
-  ChevronRight,
+  ChevronDown,
+  Menu,
+  User,
+  Settings,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { TOPBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
 
-export default function Topbar() {
+interface TopbarProps {
+  onMenuClick?: () => void;
+}
+
+export default function Topbar({ onMenuClick }: TopbarProps) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const displayName = user?.fullName || "Daniel P.";
+  const displayEmail = user?.email || "resourcemanager@carelink.org";
+  const initials = getUserInitials(displayName, "DP");
+
   return (
-    <header className="sticky top-0 z-30 flex h-[74px] w-full items-center justify-between border-b border-slate-200 bg-white px-5 lg:px-7">
+    <header className={TOPBAR_THEME.header}>
+      {/* Left Side - Mobile Menu & Search Bar */}
+      <div className={TOPBAR_THEME.leftSection}>
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className={TOPBAR_THEME.mobileMenuBtn}
+          aria-label="Open navigation"
+        >
+          <Menu size={19} />
+        </button>
 
-      {/* Search Bar */}
-      <div className="flex w-full max-w-[488px] items-center gap-3 rounded-lg border border-slate-200 bg-[#f8fafb] px-3 py-3">
+        <div className={TOPBAR_THEME.searchContainer}>
+          <Search size={16} className="shrink-0 text-[#8296AA]" />
 
-        <Search
-          size={17}
-          className="shrink-0 text-slate-500"
-        />
+          <input
+            type="text"
+            placeholder="Search resources, requests, dispatches..."
+            className={TOPBAR_THEME.searchInput}
+          />
 
-        <input
-          type="text"
-          placeholder="Search resources, requests, dispatches..."
-          className="w-full bg-transparent text-[11px] text-[#173f5d] outline-none placeholder:text-slate-400"
-        />
-
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-slate-200 text-[10px] text-slate-500">
-          ⌘
+          <span className={TOPBAR_THEME.searchShortcut}>⌘ K</span>
         </div>
       </div>
 
       {/* Right Section */}
-      <div className="ml-4 flex shrink-0 items-center gap-2 lg:gap-3">
-
+      <div className={TOPBAR_THEME.rightSection}>
         {/* Primary Hub */}
-        <div className="hidden min-w-[155px] flex-col lg:flex">
-          <span className="text-[8px] font-medium text-slate-400">
-            PRIMARY HUB
-          </span>
-
-          <span className="mt-1 text-[10px] font-bold text-[#173f5d]">
-            Central Logistics Hub
-          </span>
+        <div className={TOPBAR_THEME.contextBlock}>
+          <div>
+            <p className={TOPBAR_THEME.contextLabel}>PRIMARY HUB</p>
+            <p className={TOPBAR_THEME.contextValue}>Central Logistics Hub</p>
+          </div>
         </div>
-
-        {/* Divider */}
-        <div className="mx-1 hidden h-11 border-l border-slate-200 lg:block" />
 
         {/* Security */}
         <button
+          type="button"
           aria-label="Security"
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-[#47677f] hover:bg-slate-50"
+          onClick={() => navigate("/resource-manager/audit-log")}
+          className={`hidden sm:flex ${TOPBAR_THEME.iconBtn}`}
         >
-          <ShieldCheck size={20} />
+          <ShieldCheck size={17} />
         </button>
 
         {/* Notifications */}
         <button
+          type="button"
           aria-label="Notifications"
-          className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-[#47677f] hover:bg-slate-50"
+          onClick={() => navigate("/resource-manager/alerts")}
+          className={TOPBAR_THEME.iconBtn}
         >
-          <Bell size={20} />
-
-          <span className="absolute -right-1 -top-1 flex h-[16px] w-[16px] items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white">
-            9
-          </span>
+          <Bell size={17} />
+          <span className={TOPBAR_THEME.notifBadge}>9</span>
         </button>
 
-        {/* User Avatar */}
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#287da6] text-xs font-bold text-white">
-          DP
+        {/* User Profile */}
+        <div className={TOPBAR_THEME.profileDivider}>
+          <button
+            type="button"
+            aria-label="Profile"
+            onClick={() => setProfileOpen((p) => !p)}
+            className={TOPBAR_THEME.profileTrigger}
+          >
+            <div className={TOPBAR_THEME.avatar}>{initials}</div>
+
+            <div className="hidden sm:block">
+              <p className={TOPBAR_THEME.userName}>{displayName}</p>
+              <p className={TOPBAR_THEME.userRole}>Resource Manager</p>
+            </div>
+
+            <ChevronDown
+              size={14}
+              className="hidden text-[#8296AA] sm:block"
+            />
+          </button>
+
+          {profileOpen && (
+            <div className={TOPBAR_THEME.dropdownMenu}>
+              <div className={TOPBAR_THEME.dropdownHeader}>
+                <p className="truncate text-sm font-bold text-[#153E5D]">
+                  {displayName}
+                </p>
+                <p className="truncate text-[13px] text-[#8296AA]">
+                  {displayEmail}
+                </p>
+              </div>
+
+              <div className="py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    navigate("/resource-manager/settings");
+                  }}
+                  className={TOPBAR_THEME.dropdownItem}
+                >
+                  <User size={15} />
+                  <span>My Profile</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    navigate("/resource-manager/settings");
+                  }}
+                  className={TOPBAR_THEME.dropdownItem}
+                >
+                  <Settings size={15} />
+                  <span>Logistics Settings</span>
+                </button>
+              </div>
+
+              <div className="my-1 border-t border-slate-100" />
+
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileOpen(false);
+                  logout();
+                  navigate("/login", { replace: true });
+                }}
+                className={TOPBAR_THEME.dropdownSignOut}
+              >
+                <LogOut size={15} />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          )}
         </div>
-
-        {/* User Details */}
-        <div className="hidden sm:block">
-          <p className="text-[10px] font-bold text-[#173f5d]">
-            Daniel P.
-          </p>
-
-          <p className="text-[9px] text-slate-400">
-            Resource Manager
-          </p>
-        </div>
-
-        {/* Profile Arrow */}
-        <button
-          aria-label="Profile"
-          className="ml-1 text-[#47677f] hover:text-[#287da6]"
-        >
-          <ChevronRight size={19} />
-        </button>
-
       </div>
     </header>
   );
