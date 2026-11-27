@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface ResourceSharingCommitment {
   id: string;
   resource: string;
@@ -209,7 +210,7 @@ class ResourceSharingService {
       if (filters?.status && filters.status !== "All statuses") params.append("status", filters.status);
 
       const url = params.toString() ? `${API_BASE_URL}?${params.toString()}` : API_BASE_URL;
-      const res = await fetch(url);
+      const res = await authFetch(url);
       if (!res.ok) {
         throw new Error(`Failed to fetch commitments: ${res.statusText}`);
       }
@@ -257,7 +258,7 @@ class ResourceSharingService {
 
   public async getMetrics(): Promise<ResourceSharingMetrics> {
     try {
-      const res = await fetch(`${API_BASE_URL}/metrics`);
+      const res = await authFetch(`${API_BASE_URL}/metrics`);
       if (!res.ok) {
         throw new Error(`Failed to fetch metrics: ${res.statusText}`);
       }
@@ -269,7 +270,7 @@ class ResourceSharingService {
 
   public async getById(id: string): Promise<ResourceSharingCommitment | null> {
     try {
-      const res = await fetch(`${API_BASE_URL}/${encodeURIComponent(id)}`);
+      const res = await authFetch(`${API_BASE_URL}/${encodeURIComponent(id)}`);
       if (!res.ok) {
         if (res.status === 404) return null;
         throw new Error(`Failed to fetch commitment ${id}`);
@@ -282,7 +283,7 @@ class ResourceSharingService {
 
   public async create(payload: CreateResourceSharingPayload): Promise<ResourceSharingCommitment> {
     try {
-      const res = await fetch(API_BASE_URL, {
+      const res = await authFetch(API_BASE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -315,7 +316,7 @@ class ResourceSharingService {
 
   public async update(id: string, payload: UpdateResourceSharingPayload): Promise<ResourceSharingCommitment> {
     try {
-      const res = await fetch(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -340,7 +341,7 @@ class ResourceSharingService {
 
   public async updateStatus(id: string, status: string): Promise<ResourceSharingCommitment> {
     try {
-      const res = await fetch(`${API_BASE_URL}/${encodeURIComponent(id)}/status`, {
+      const res = await authFetch(`${API_BASE_URL}/${encodeURIComponent(id)}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -365,7 +366,7 @@ class ResourceSharingService {
 
   public async delete(id: string): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
         method: "DELETE",
       });
       return res.ok;
@@ -381,7 +382,7 @@ class ResourceSharingService {
 
   public async reset(): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE_URL}/reset`, {
+      const res = await authFetch(`${API_BASE_URL}/reset`, {
         method: "POST",
       });
       return res.ok;

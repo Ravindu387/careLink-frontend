@@ -416,10 +416,10 @@ const Documents = () => {
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold text-[#153e5b]">Documents</h1>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">Documents</h1>
 
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
                 isLiveConnected
                   ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
                   : "border border-slate-200 bg-slate-100 text-slate-600"
@@ -436,7 +436,7 @@ const Documents = () => {
             </span>
 
             {metrics && (
-              <span className="rounded-full bg-[#e8f2f8] px-2.5 py-0.5 text-[10px] font-medium text-[#267ba4]">
+              <span className="rounded-full bg-[#e8f2f8] px-2.5 py-0.5 text-xs font-medium text-[#267ba4]">
                 {metrics.totalDocuments} Total Documents
               </span>
             )}
@@ -452,7 +452,7 @@ const Documents = () => {
           <button
             onClick={loadDocuments}
             disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
             title="Refresh documents list"
           >
             <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
@@ -461,7 +461,7 @@ const Documents = () => {
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
           >
             <Download size={15} />
             Export
@@ -469,7 +469,7 @@ const Documents = () => {
 
           <button
             onClick={() => setShowUploadModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Plus size={16} />
             Upload Document
@@ -542,7 +542,7 @@ const Documents = () => {
                 setActiveTab(tab);
                 setCurrentPage(1);
               }}
-              className={`relative whitespace-nowrap pb-4 text-xs transition ${
+              className={`relative whitespace-nowrap pb-4 text-sm transition ${
                 activeTab === tab
                   ? "font-semibold text-[#267ba4]"
                   : "text-slate-500 hover:text-[#267ba4]"
@@ -550,7 +550,7 @@ const Documents = () => {
             >
               {tab}
               <span
-                className={`ml-1.5 rounded-full px-2 py-0.5 text-[9px] font-medium ${
+                className={`ml-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
                   activeTab === tab
                     ? "bg-[#267ba4] text-white"
                     : "bg-[#e5eff4] text-[#153e5b]"
@@ -581,7 +581,7 @@ const Documents = () => {
               setCurrentPage(1);
             }}
             placeholder="Search documents by title, owner, type, visibility or file name..."
-            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
+            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
           />
         </div>
 
@@ -591,7 +591,7 @@ const Documents = () => {
             setTypeFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           {typeOptions.map((opt) => (
             <option key={opt}>{opt}</option>
@@ -604,7 +604,7 @@ const Documents = () => {
             setOwnerFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           {ownerOptions.map((opt) => (
             <option key={opt}>{opt}</option>
@@ -617,7 +617,7 @@ const Documents = () => {
             setVisibilityFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           {visibilityOptions.map((opt) => (
             <option key={opt}>{opt}</option>
@@ -630,7 +630,7 @@ const Documents = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All statuses</option>
           <option>Published</option>
@@ -642,7 +642,7 @@ const Documents = () => {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
         >
           <Filter size={15} />
           More filters
@@ -653,10 +653,10 @@ const Documents = () => {
       {showFilters && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d3e1e8] bg-white p-4">
           <div>
-            <p className="text-xs font-semibold text-[#153e5b]">
+            <p className="text-sm font-semibold text-[#153e5b]">
               Refine controlled documents
             </p>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Showing {filteredDocuments.length} matching files under active
               governance.
             </p>
@@ -664,7 +664,7 @@ const Documents = () => {
 
           <button
             onClick={resetFilters}
-            className="text-xs font-medium text-[#267ba4] hover:underline"
+            className="text-sm font-medium text-[#267ba4] hover:underline"
           >
             Clear all filters
           </button>
@@ -676,7 +676,7 @@ const Documents = () => {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1000px] text-left">
             <thead className="bg-[#f5f8fa]">
-              <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
+              <tr className="border-b border-[#d7e5eb] text-sm text-slate-500">
                 {[
                   "Document ID",
                   "Document",
@@ -700,7 +700,7 @@ const Documents = () => {
                 <tr
                   key={doc.id}
                   onClick={() => setSelectedDocument(doc)}
-                  className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
+                  className="cursor-pointer border-b border-[#e2ebef] text-sm text-slate-600 transition hover:bg-[#f5fafc]"
                 >
                   <td className="whitespace-nowrap px-3 py-4 font-semibold text-[#153e5b]">
                     {doc.id}
@@ -721,7 +721,7 @@ const Documents = () => {
                   </td>
 
                   <td className="whitespace-nowrap px-3 py-4">
-                    <span className="inline-flex items-center gap-1 rounded bg-[#edf3f6] px-2 py-0.5 text-[9px] text-slate-600">
+                    <span className="inline-flex items-center gap-1 rounded bg-[#edf3f6] px-2 py-0.5 text-xs text-slate-600">
                       <Globe size={11} className="text-[#267ba4]" />
                       {doc.visibility}
                     </span>
@@ -741,7 +741,7 @@ const Documents = () => {
                 <tr>
                   <td
                     colSpan={9}
-                    className="py-12 text-center text-xs text-slate-400"
+                    className="py-12 text-center text-sm text-slate-400"
                   >
                     No documents found matching the filter criteria.
                   </td>
@@ -753,7 +753,7 @@ const Documents = () => {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[13px] text-slate-400">
             Showing{" "}
             {filteredDocuments.length === 0
               ? 0
@@ -767,7 +767,7 @@ const Documents = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
@@ -776,7 +776,7 @@ const Documents = () => {
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
-                className={`h-8 w-8 rounded-lg border text-[10px] ${
+                className={`h-8 w-8 rounded-lg border text-sm ${
                   currentPage === number
                     ? "border-[#267ba4] bg-[#267ba4] text-white"
                     : "border-[#d3e1e8] text-slate-600 hover:bg-slate-50"
@@ -789,7 +789,7 @@ const Documents = () => {
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
@@ -846,9 +846,9 @@ function StatCard({
       </div>
 
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <p className="text-2xl font-bold text-[#153e5b]">{value}</p>
-        <p className="text-[9px] text-slate-400">{subtitle}</p>
+        <p className="text-xs text-slate-400">{subtitle}</p>
       </div>
     </div>
   );
@@ -866,7 +866,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`rounded-md px-2 py-1 text-[9px] font-medium ${
+      className={`rounded-md px-2 py-1 text-xs font-medium ${
         styles[status] || "bg-slate-100 text-slate-500"
       }`}
     >
@@ -879,8 +879,8 @@ function StatusBadge({ status }: { status: string }) {
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] text-slate-400">{label}</p>
-      <p className="mt-1 break-words text-xs font-medium text-[#153e5b]">
+      <p className="text-[13px] text-slate-400">{label}</p>
+      <p className="mt-1 break-words text-sm font-medium text-[#153e5b]">
         {value}
       </p>
     </div>
@@ -902,7 +902,7 @@ function DocumentDetailsModal({
       <div className="my-auto w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-[#267ba4]">{document.id}</p>
+            <p className="text-sm font-semibold text-[#267ba4]">{document.id}</p>
             <h2 className="mt-1 text-lg font-semibold text-[#153e5b]">
               Document Details
             </h2>
@@ -919,7 +919,7 @@ function DocumentDetailsModal({
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-[#153e5b]">
+            <h3 className="text-base font-semibold text-[#153e5b]">
               {document.name}
             </h3>
             <p className="mt-1 text-xs text-slate-500">
@@ -935,7 +935,7 @@ function DocumentDetailsModal({
           <Detail label="Version" value={document.version} />
           <Detail label="Visibility" value={document.visibility} />
           <div>
-            <p className="text-[10px] text-slate-400">Status</p>
+            <p className="text-[13px] text-slate-400">Status</p>
             <div className="mt-1">
               <StatusBadge status={document.status} />
             </div>
@@ -944,8 +944,8 @@ function DocumentDetailsModal({
 
         {document.fileName && (
           <div className="mt-5 rounded-lg bg-[#f5f8fa] p-3">
-            <p className="text-[10px] text-slate-400">Attached File</p>
-            <p className="mt-1 break-all text-xs font-medium text-[#153e5b]">
+            <p className="text-[13px] text-slate-400">Attached File</p>
+            <p className="mt-1 break-all text-sm font-medium text-[#153e5b]">
               {document.fileName}
             </p>
           </div>
@@ -953,14 +953,14 @@ function DocumentDetailsModal({
 
         {/* Workflow actions */}
         <div className="mt-6 border-t border-slate-100 pt-4">
-          <p className="mb-2 text-[10px] font-semibold text-slate-500">
+          <p className="mb-2 text-[13px] font-semibold text-slate-500">
             Document Actions
           </p>
           <div className="flex flex-wrap gap-2">
             {["Under Review", "Awaiting Signature"].includes(document.status) && (
               <button
                 onClick={() => onStatusChange(document.id, "Approved")}
-                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
               >
                 <Check size={13} />
                 Approve Document
@@ -970,7 +970,7 @@ function DocumentDetailsModal({
             {document.status === "Approved" && (
               <button
                 onClick={() => onStatusChange(document.id, "Published")}
-                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#1c668a]"
               >
                 <Share2 size={13} />
                 Publish to Network
@@ -980,7 +980,7 @@ function DocumentDetailsModal({
             {document.status !== "Archived" && (
               <button
                 onClick={() => onStatusChange(document.id, "Archived")}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-500 hover:bg-slate-50"
               >
                 Archive
               </button>
@@ -1002,7 +1002,7 @@ function DocumentDetailsModal({
           ) : (
             <button
               onClick={() => alert(`Opening ${document.name} in document viewer`)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
             >
               <Eye size={15} />
               View File
@@ -1011,7 +1011,7 @@ function DocumentDetailsModal({
 
           <button
             onClick={onClose}
-            className="flex-1 rounded-lg bg-[#267ba4] py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex-1 rounded-lg bg-[#267ba4] py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             Close
           </button>
@@ -1065,7 +1065,7 @@ function UploadDocumentModal({
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Upload Document
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Upload a document to your organisation workspace.
             </p>
           </div>
@@ -1077,7 +1077,7 @@ function UploadDocumentModal({
 
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Document Name *
             </label>
             <input
@@ -1085,18 +1085,18 @@ function UploadDocumentModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Flood Zone Assessment Report 2025"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Document Type *
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>Operational Plan</option>
               <option>Schedule</option>
@@ -1108,13 +1108,13 @@ function UploadDocumentModal({
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Document Owner *
             </label>
             <select
               value={owner}
               onChange={(e) => setOwner(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>Sara Khan</option>
               <option>Michael Torres</option>
@@ -1123,13 +1123,13 @@ function UploadDocumentModal({
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Visibility *
             </label>
             <select
               value={visibility}
               onChange={(e) => setVisibility(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>Internal</option>
               <option>Shared with NDA</option>
@@ -1140,7 +1140,7 @@ function UploadDocumentModal({
 
           {/* File Upload */}
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Select Document
             </label>
 
@@ -1148,20 +1148,20 @@ function UploadDocumentModal({
               {file ? (
                 <>
                   <FileCheck size={30} className="text-emerald-600" />
-                  <p className="mt-2 max-w-full break-all text-xs font-medium text-[#153e5b]">
+                  <p className="mt-2 max-w-full break-all text-sm font-medium text-[#153e5b]">
                     {file.name}
                   </p>
-                  <p className="mt-1 text-[10px] text-slate-400">
+                  <p className="mt-1 text-[13px] text-slate-400">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                 </>
               ) : (
                 <>
                   <Upload size={28} className="text-[#267ba4]" />
-                  <p className="mt-2 text-xs font-medium text-[#153e5b]">
+                  <p className="mt-2 text-sm font-medium text-[#153e5b]">
                     Click to select a file
                   </p>
-                  <p className="mt-1 text-[10px] text-slate-400">
+                  <p className="mt-1 text-[13px] text-slate-400">
                     PDF, DOC, DOCX, XLS, XLSX
                   </p>
                 </>
@@ -1181,14 +1181,14 @@ function UploadDocumentModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Upload size={14} />
             Upload Document

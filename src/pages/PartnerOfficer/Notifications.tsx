@@ -220,7 +220,7 @@ const Notifications = () => {
   };
 
   const togglePreference = (key: keyof NotificationPreferences) => {
-    setPreferences((prev) => ({
+    setPreferences((prev: NotificationPreferences) => ({
       ...prev,
       [key]: !prev[key],
     }));
@@ -252,7 +252,7 @@ const Notifications = () => {
               <span className="font-semibold text-[#153e5b]">Notifications</span>
             </p>
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                 isConnected
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -263,7 +263,7 @@ const Notifications = () => {
             </span>
           </div>
 
-          <h1 className="text-2xl font-semibold text-[#153e5b]">Notifications</h1>
+          <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">Notifications</h1>
 
           <p className="mt-1 text-sm text-slate-500">
             Review shared referrals, partner requests, operational exceptions, and reporting deadlines.
@@ -274,7 +274,7 @@ const Notifications = () => {
           <button
             onClick={() => loadData(false)}
             disabled={isSyncing}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
             title="Refresh notifications"
           >
             <RefreshCw size={14} className={isSyncing ? "animate-spin text-[#267ba4]" : ""} />
@@ -284,7 +284,7 @@ const Notifications = () => {
           <button
             onClick={markAllAsRead}
             disabled={unreadCount === 0}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
           >
             <CheckCheck size={15} />
             Mark all as read
@@ -292,7 +292,7 @@ const Notifications = () => {
 
           <button
             onClick={() => setShowPreferences(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Settings size={15} />
             Preferences
@@ -354,7 +354,7 @@ const Notifications = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search notifications..."
-            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
+            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
           />
         </div>
       </div>
@@ -367,7 +367,7 @@ const Notifications = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`relative flex items-center gap-1.5 whitespace-nowrap pb-4 text-xs ${
+              className={`relative flex items-center gap-1.5 whitespace-nowrap pb-4 text-sm ${
                 activeTab === tab
                   ? "font-semibold text-[#267ba4]"
                   : "text-slate-500 hover:text-[#267ba4]"
@@ -375,7 +375,7 @@ const Notifications = () => {
             >
               {tab}
               {typeof count === "number" && (
-                <span className="rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px] font-semibold text-[#153e5b]">
+                <span className="rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-xs font-semibold text-[#153e5b]">
                   {count}
                 </span>
               )}
@@ -405,7 +405,7 @@ const Notifications = () => {
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <Bell size={32} className="mb-3 text-slate-300" />
-            <h3 className="text-sm font-semibold text-[#153e5b]">
+            <h3 className="text-base font-semibold text-[#153e5b]">
               No notifications found
             </h3>
             <p className="mt-2 text-xs text-slate-400">
@@ -416,7 +416,7 @@ const Notifications = () => {
                 setActiveTab("All");
                 setSearch("");
               }}
-              className="mt-4 text-xs font-medium text-[#267ba4] hover:underline"
+              className="mt-4 text-sm font-medium text-[#267ba4] hover:underline"
             >
               Clear filters
             </button>
@@ -478,9 +478,9 @@ function SummaryCard({
       </div>
 
       <div>
-        <p className="text-[10px] text-slate-500">{title}</p>
+        <p className="text-[13px] text-slate-500">{title}</p>
         <p className="text-2xl font-bold text-[#153e5b]">{value}</p>
-        <p className="text-[9px] text-slate-400">{subtitle}</p>
+        <p className="text-xs text-slate-400">{subtitle}</p>
       </div>
     </div>
   );
@@ -546,22 +546,22 @@ function NotificationRow({
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="text-[11px] font-semibold text-[#153e5b]">
+          <h3 className="text-base font-semibold text-[#153e5b]">
             {notification.title}
           </h3>
 
           {isUrgent && (
-            <span className="rounded bg-[#fff0f0] px-1.5 py-0.5 text-[8px] font-semibold text-[#d94b4b]">
+            <span className="rounded bg-[#fff0f0] px-1.5 py-0.5 text-xs font-semibold text-[#d94b4b]">
               Urgent
             </span>
           )}
         </div>
 
-        <p className="mt-1 truncate text-[10px] text-slate-500">
+        <p className="mt-1 truncate text-[13px] text-slate-500">
           {notification.description}
         </p>
 
-        <p className="mt-1 text-[9px] text-slate-400">{notification.time}</p>
+        <p className="mt-1 text-xs text-slate-400">{notification.time}</p>
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
@@ -593,7 +593,7 @@ function NotificationDetailsModal({
       <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-[#267ba4]">
+            <p className="text-sm font-semibold text-[#267ba4]">
               Notification Details
             </p>
             <h2 className="mt-1 text-lg font-semibold text-[#153e5b]">
@@ -610,10 +610,10 @@ function NotificationDetailsModal({
           <NotificationIcon category={notification.category} />
 
           <div>
-            <p className="text-xs font-semibold text-[#153e5b]">
+            <p className="text-sm font-semibold text-[#153e5b]">
               {notification.category}
             </p>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               {notification.time}
             </p>
           </div>
@@ -624,8 +624,8 @@ function NotificationDetailsModal({
           <Detail label="Description" value={notification.description} />
 
           <div>
-            <p className="mb-2 text-[10px] text-slate-400">Details</p>
-            <p className="rounded-lg bg-[#f5f8fa] p-3 text-xs leading-6 text-slate-600">
+            <p className="mb-2 text-[13px] text-slate-400">Details</p>
+            <p className="rounded-lg bg-[#f5f8fa] p-3 text-sm leading-6 text-slate-600">
               {notification.details}
             </p>
           </div>
@@ -652,7 +652,7 @@ function NotificationDetailsModal({
 
           <button
             onClick={onClose}
-            className="ml-auto rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+            className="ml-auto rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
             Close
           </button>
@@ -731,7 +731,7 @@ function PreferencesModal({
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Notification Preferences
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Manage which notifications you want to receive.
             </p>
           </div>
@@ -744,14 +744,14 @@ function PreferencesModal({
         <div className="space-y-1">
           {options.map((option) => (
             <div
-              key={option.key}
+              key={String(option.key)}
               className="flex items-center justify-between gap-3 border-b border-slate-100 py-3"
             >
               <div>
-                <p className="text-xs font-medium text-[#153e5b]">
+                <p className="text-sm font-medium text-[#153e5b]">
                   {option.label}
                 </p>
-                <p className="mt-1 text-[10px] text-slate-400">
+                <p className="mt-1 text-[13px] text-slate-400">
                   {option.description}
                 </p>
               </div>
@@ -779,7 +779,7 @@ function PreferencesModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600"
+            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-600"
           >
             Cancel
           </button>
@@ -787,7 +787,7 @@ function PreferencesModal({
           <button
             onClick={onSave}
             disabled={isSaving}
-            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
           >
             {isSaving && <RefreshCw size={14} className="animate-spin" />}
             Save Preferences
@@ -807,8 +807,8 @@ function Detail({
 }) {
   return (
     <div>
-      <p className="text-[10px] text-slate-400">{label}</p>
-      <p className="mt-1 text-xs font-medium text-[#153e5b]">{value}</p>
+      <p className="text-[13px] text-slate-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-[#153e5b]">{value}</p>
     </div>
   );
 }

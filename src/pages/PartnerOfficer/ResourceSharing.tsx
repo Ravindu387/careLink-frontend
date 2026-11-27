@@ -344,7 +344,7 @@ const ResourceSharing = () => {
             </p>
 
             <span
-              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                 isLiveBackend
                   ? "bg-[#e5f6f0] text-[#299b7d]"
                   : "bg-[#fff4df] text-[#bd8229]"
@@ -359,7 +359,7 @@ const ResourceSharing = () => {
             </span>
           </div>
 
-          <h1 className="text-2xl font-semibold text-[#153e5b]">
+          <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">
             Resource Sharing
           </h1>
 
@@ -373,7 +373,7 @@ const ResourceSharing = () => {
             onClick={() => loadData(true)}
             disabled={isRefreshing}
             title="Refresh commitments from backend"
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2 text-sm font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
           >
             <RefreshCw size={13} className={isRefreshing ? "animate-spin" : ""} />
             Sync
@@ -381,7 +381,7 @@ const ResourceSharing = () => {
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
           >
             <Download size={15} />
             Export
@@ -389,7 +389,7 @@ const ResourceSharing = () => {
 
           <button
             onClick={() => setShowOfferModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Plus size={16} />
             Offer Resources
@@ -441,14 +441,14 @@ const ResourceSharing = () => {
               setActiveTab(tab);
               setCurrentPage(1);
             }}
-            className={`relative whitespace-nowrap pb-4 text-xs ${
+            className={`relative whitespace-nowrap pb-4 text-sm ${
               activeTab === tab
                 ? "font-semibold text-[#267ba4]"
                 : "text-slate-500 hover:text-[#267ba4]"
             }`}
           >
             {tab}
-            <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px] font-medium text-slate-600">
+            <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-xs font-medium text-slate-600">
               {getTabCount(tab)}
             </span>
 
@@ -474,7 +474,7 @@ const ResourceSharing = () => {
               setCurrentPage(1);
             }}
             placeholder="Search resource sharing by ID, item, source, destination, or partner..."
-            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
+            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
           />
         </div>
 
@@ -484,7 +484,7 @@ const ResourceSharing = () => {
             setTypeFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All resource types</option>
           <option>Food</option>
@@ -500,7 +500,7 @@ const ResourceSharing = () => {
             setLocationFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All locations</option>
           <option>North District</option>
@@ -515,7 +515,7 @@ const ResourceSharing = () => {
             setPartnerFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All partners</option>
           <option>Global Relief Network</option>
@@ -529,7 +529,7 @@ const ResourceSharing = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All statuses</option>
           <option>Pending Approval</option>
@@ -543,7 +543,7 @@ const ResourceSharing = () => {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
         >
           <Filter size={15} />
           More filters
@@ -554,17 +554,17 @@ const ResourceSharing = () => {
       {showFilters && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d3e1e8] bg-white p-4">
           <div>
-            <p className="text-xs font-semibold text-[#153e5b]">
+            <p className="text-sm font-semibold text-[#153e5b]">
               Additional filters active
             </p>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Narrow commitments by operational area, partner agency, resource category, and dispatch status.
             </p>
           </div>
 
           <button
             onClick={resetFilters}
-            className="text-xs font-medium text-[#267ba4] hover:underline"
+            className="text-sm font-medium text-[#267ba4] hover:underline"
           >
             Clear all filters
           </button>
@@ -576,7 +576,7 @@ const ResourceSharing = () => {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1050px] text-left">
             <thead className="bg-[#f5f8fa]">
-              <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
+              <tr className="border-b border-[#d7e5eb] text-sm text-slate-500">
                 {[
                   "Commitment",
                   "Resource",
@@ -598,7 +598,7 @@ const ResourceSharing = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-xs text-slate-400">
+                  <td colSpan={9} className="py-12 text-center text-sm text-slate-400">
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw size={15} className="animate-spin text-[#267ba4]" />
                       <span>Loading resource commitments...</span>
@@ -609,7 +609,7 @@ const ResourceSharing = () => {
                 <tr>
                   <td
                     colSpan={9}
-                    className="py-12 text-center text-xs text-slate-400"
+                    className="py-12 text-center text-sm text-slate-400"
                   >
                     No resource commitments found.
                   </td>
@@ -619,7 +619,7 @@ const ResourceSharing = () => {
                   <tr
                     key={item.id}
                     onClick={() => setSelectedResource(item)}
-                    className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
+                    className="cursor-pointer border-b border-[#e2ebef] text-sm text-slate-600 transition hover:bg-[#f5fafc]"
                   >
                     <td className="whitespace-nowrap px-3 py-4 font-semibold text-[#153e5b]">
                       {item.id}
@@ -668,7 +668,7 @@ const ResourceSharing = () => {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[13px] text-slate-400">
             Showing{" "}
             {filteredResources.length === 0
               ? 0
@@ -682,7 +682,7 @@ const ResourceSharing = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
@@ -691,7 +691,7 @@ const ResourceSharing = () => {
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
-                className={`h-8 w-8 rounded-lg border text-[10px] ${
+                className={`h-8 w-8 rounded-lg border text-sm ${
                   currentPage === number
                     ? "border-[#267ba4] bg-[#267ba4] text-white"
                     : "border-[#d3e1e8] text-slate-600 hover:bg-slate-50"
@@ -704,7 +704,7 @@ const ResourceSharing = () => {
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
@@ -764,9 +764,9 @@ function StatCard({
       </div>
 
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <p className="text-2xl font-bold text-[#153e5b]">{value}</p>
-        <p className="text-[9px] text-slate-400">{subtitle}</p>
+        <p className="text-xs text-slate-400">{subtitle}</p>
       </div>
     </div>
   );
@@ -786,7 +786,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`inline-block rounded-md px-2 py-1 text-[9px] font-medium ${
+      className={`inline-block rounded-md px-2 py-1 text-xs font-medium ${
         styles[status] || "bg-slate-100 text-slate-500"
       }`}
     >
@@ -805,8 +805,8 @@ function Detail({
 }) {
   return (
     <div>
-      <p className="text-[10px] text-slate-400">{label}</p>
-      <p className="mt-1 text-xs font-medium text-[#153e5b]">{value}</p>
+      <p className="text-[13px] text-slate-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-[#153e5b]">{value}</p>
     </div>
   );
 }
@@ -844,7 +844,7 @@ function ResourceDetailsModal({
           </button>
         </div>
 
-        <h3 className="mb-4 text-sm font-semibold text-[#153e5b]">
+        <h3 className="mb-4 text-base font-semibold text-[#153e5b]">
           {resource.resource}
         </h3>
 
@@ -870,14 +870,14 @@ function ResourceDetailsModal({
 
         {/* Quick Actions */}
         <div className="mt-6 border-t border-slate-100 pt-4">
-          <p className="mb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+          <p className="mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Quick Actions
           </p>
           <div className="flex flex-wrap gap-2">
             {resource.status === "Pending Approval" && (
               <button
                 onClick={() => onUpdateStatus(resource.id, "Approved")}
-                className="flex items-center gap-1.5 rounded-lg bg-[#299b7d] px-3 py-2 text-xs font-medium text-white hover:bg-[#208369]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#299b7d] px-3 py-2 text-sm font-medium text-white hover:bg-[#208369]"
               >
                 <Check size={13} />
                 Approve Offer
@@ -887,7 +887,7 @@ function ResourceDetailsModal({
             {resource.status === "Approved" && (
               <button
                 onClick={() => onUpdateStatus(resource.id, "In Transit")}
-                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-2 text-xs font-medium text-white hover:bg-[#1c668a]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-2 text-sm font-medium text-white hover:bg-[#1c668a]"
               >
                 <Truck size={13} />
                 Dispatch (In Transit)
@@ -897,7 +897,7 @@ function ResourceDetailsModal({
             {(resource.status === "In Transit" || resource.status === "Partial Delivery") && (
               <button
                 onClick={() => onUpdateStatus(resource.id, "Delivered")}
-                className="flex items-center gap-1.5 rounded-lg bg-[#299b7d] px-3 py-2 text-xs font-medium text-white hover:bg-[#208369]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#299b7d] px-3 py-2 text-sm font-medium text-white hover:bg-[#208369]"
               >
                 <Check size={13} />
                 Mark Delivered
@@ -907,7 +907,7 @@ function ResourceDetailsModal({
             {resource.status === "Delivered" && (
               <button
                 onClick={() => onUpdateStatus(resource.id, "Completed")}
-                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-2 text-xs font-medium text-white hover:bg-[#1c668a]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-2 text-sm font-medium text-white hover:bg-[#1c668a]"
               >
                 <Check size={13} />
                 Mark Completed
@@ -917,7 +917,7 @@ function ResourceDetailsModal({
             {resource.status !== "Archived" ? (
               <button
                 onClick={() => onUpdateStatus(resource.id, "Archived")}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
                 <Archive size={13} />
                 Archive
@@ -925,7 +925,7 @@ function ResourceDetailsModal({
             ) : (
               <button
                 onClick={() => onUpdateStatus(resource.id, "Pending Approval")}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
                 Restore to Pending
               </button>
@@ -933,7 +933,7 @@ function ResourceDetailsModal({
 
             <button
               onClick={() => onDelete(resource.id)}
-              className="ml-auto flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+              className="ml-auto flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
             >
               <Trash2 size={13} />
               Delete
@@ -943,7 +943,7 @@ function ResourceDetailsModal({
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-slate-100 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
+          className="mt-6 w-full rounded-lg bg-slate-100 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-200"
         >
           Close
         </button>
@@ -1005,7 +1005,7 @@ function OfferResourceModal({
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Offer Resources
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Submit a new humanitarian resource commitment to the coordination cluster.
             </p>
           </div>
@@ -1017,7 +1017,7 @@ function OfferResourceModal({
 
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Resource Name *
             </label>
             <input
@@ -1025,13 +1025,13 @@ function OfferResourceModal({
               value={resourceName}
               onChange={(e) => setResourceName(e.target.value)}
               placeholder="e.g. Family Food Packs, Clean Water Bottles"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Quantity (units) *
               </label>
               <input
@@ -1040,18 +1040,18 @@ function OfferResourceModal({
                 min="1"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Resource Type
               </label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>Food</option>
                 <option>Health</option>
@@ -1063,7 +1063,7 @@ function OfferResourceModal({
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Source Location *
             </label>
             <input
@@ -1071,12 +1071,12 @@ function OfferResourceModal({
               value={source}
               onChange={(e) => setSource(e.target.value)}
               placeholder="e.g. North District Logistics Hub"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Destination *
             </label>
             <input
@@ -1084,18 +1084,18 @@ function OfferResourceModal({
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
               placeholder="e.g. North Ward Shelters, Community Camp 2"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Partner Organisation
             </label>
             <select
               value={partner}
               onChange={(e) => setPartner(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>Global Relief Network</option>
               <option>CareLink Network</option>
@@ -1105,13 +1105,13 @@ function OfferResourceModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Operational Area
               </label>
               <select
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>North District</option>
                 <option>Eastbank</option>
@@ -1121,20 +1121,20 @@ function OfferResourceModal({
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Scheduled Date
               </label>
               <input
                 type="date"
                 value={scheduled}
                 onChange={(e) => setScheduled(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Description / Delivery Notes (Optional)
             </label>
             <textarea
@@ -1142,7 +1142,7 @@ function OfferResourceModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Packaging specifics, handling precautions, or driver contact..."
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
         </div>
@@ -1151,14 +1151,14 @@ function OfferResourceModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Send size={14} />
             Submit Offer

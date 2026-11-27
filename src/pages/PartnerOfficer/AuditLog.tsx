@@ -402,9 +402,9 @@ const AuditLog = () => {
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold text-[#153e5b]">Audit Log</h1>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">Audit Log</h1>
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
                 isLiveConnected
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-slate-100 text-slate-600 border border-slate-200"
@@ -418,7 +418,7 @@ const AuditLog = () => {
               {isLiveConnected ? "Live Connected" : "Local Ledger"}
             </span>
             {metrics && (
-              <span className="rounded-full bg-[#e8f2f8] px-2.5 py-0.5 text-[10px] font-medium text-[#267ba4]">
+              <span className="rounded-full bg-[#e8f2f8] px-2.5 py-0.5 text-xs font-medium text-[#267ba4]">
                 {metrics.totalEvents} Total Events
               </span>
             )}
@@ -434,7 +434,7 @@ const AuditLog = () => {
           <button
             onClick={handleVerifyIntegrity}
             disabled={isVerifying}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
             title="Verify cryptographic SHA-256 integrity"
           >
             <ShieldCheck size={14} className={isVerifying ? "animate-spin" : ""} />
@@ -444,7 +444,7 @@ const AuditLog = () => {
           <button
             onClick={loadData}
             disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
             title="Refresh audit records"
           >
             <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
@@ -453,14 +453,14 @@ const AuditLog = () => {
 
           <button
             onClick={() => setShowRetention(true)}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
           >
             Retention policy
           </button>
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Download size={15} />
             Export
@@ -482,18 +482,18 @@ const AuditLog = () => {
           <ShieldCheck size={19} className="shrink-0 text-[#52758a]" />
 
           <div>
-            <p className="text-[10px] font-semibold text-[#153e5b]">
+            <p className="text-sm font-semibold text-[#153e5b]">
               Read-only accountability records
             </p>
 
-            <p className="mt-1 text-[9px] text-slate-500">
+            <p className="mt-1 text-xs text-slate-500">
               Audit events cannot be edited or deleted from the Partner Officer
               workspace. Cryptographically sealed with SHA-256 signatures.
             </p>
           </div>
         </div>
 
-        <span className="hidden whitespace-nowrap text-[9px] text-slate-400 sm:block">
+        <span className="hidden whitespace-nowrap text-xs text-slate-400 sm:block">
           Retention: 7 years
         </span>
       </div>
@@ -509,7 +509,7 @@ const AuditLog = () => {
                 setActiveTab(tab);
                 setCurrentPage(1);
               }}
-              className={`rounded-lg px-3.5 py-1.5 text-xs font-medium transition ${
+              className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition ${
                 isActive
                   ? "bg-[#267ba4] text-white shadow-sm"
                   : "border border-[#d7e5eb] bg-white text-slate-600 hover:bg-slate-50"
@@ -536,7 +536,7 @@ const AuditLog = () => {
               setCurrentPage(1);
             }}
             placeholder="Search event, actor, record, or rationale..."
-            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
+            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
           />
         </div>
 
@@ -546,7 +546,7 @@ const AuditLog = () => {
             setActionFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           {actionTypes.map((type) => (
             <option key={type}>{type}</option>
@@ -559,7 +559,7 @@ const AuditLog = () => {
             setUserFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           {userOptions.map((user) => (
             <option key={user}>{user}</option>
@@ -572,7 +572,7 @@ const AuditLog = () => {
             setRecordFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All record types</option>
           <option>Referral</option>
@@ -587,7 +587,7 @@ const AuditLog = () => {
 
         <button
           onClick={() => setShowMoreFilters(!showMoreFilters)}
-          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
         >
           <Filter size={15} />
           More filters
@@ -598,13 +598,13 @@ const AuditLog = () => {
       {showMoreFilters && (
         <div className="mb-4 rounded-lg border border-[#d7e5eb] bg-white p-4">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-xs font-semibold text-[#153e5b]">
+            <h3 className="text-base font-semibold text-[#153e5b]">
               Advanced filters
             </h3>
 
             <button
               onClick={clearFilters}
-              className="flex items-center gap-1 text-[10px] font-medium text-[#267ba4]"
+              className="flex items-center gap-1 text-sm font-medium text-[#267ba4]"
             >
               <RotateCcw size={12} />
               Clear filters
@@ -613,7 +613,7 @@ const AuditLog = () => {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-[10px] text-slate-500">
+              <label className="mb-2 block text-sm text-slate-500">
                 From date
               </label>
 
@@ -624,12 +624,12 @@ const AuditLog = () => {
                   setDateFrom(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-[10px] text-slate-500">
+              <label className="mb-2 block text-sm text-slate-500">
                 To date
               </label>
 
@@ -641,7 +641,7 @@ const AuditLog = () => {
                   setDateTo(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
           </div>
@@ -653,7 +653,7 @@ const AuditLog = () => {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1050px] text-left">
             <thead className="bg-[#f5f8fa]">
-              <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
+              <tr className="border-b border-[#d7e5eb] text-sm text-slate-500">
                 {[
                   "Event ID",
                   "Action",
@@ -676,7 +676,7 @@ const AuditLog = () => {
                 <tr
                   key={event.id}
                   onClick={() => setSelectedEvent(event)}
-                  className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
+                  className="cursor-pointer border-b border-[#e2ebef] text-sm text-slate-600 transition hover:bg-[#f5fafc]"
                 >
                   <td className="whitespace-nowrap px-3 py-4 font-semibold text-[#153e5b]">
                     {event.id}
@@ -697,7 +697,7 @@ const AuditLog = () => {
                   <td className="whitespace-nowrap px-3 py-4">{event.change}</td>
 
                   <td className="whitespace-nowrap px-3 py-4">
-                    <span className="rounded-md bg-[#edf2f4] px-2 py-1 text-[9px] text-[#587386]">
+                    <span className="rounded-md bg-[#edf2f4] px-2 py-1 text-xs text-[#587386]">
                       {event.rationale}
                     </span>
                   </td>
@@ -712,7 +712,7 @@ const AuditLog = () => {
                 <tr>
                   <td
                     colSpan={8}
-                    className="py-12 text-center text-xs text-slate-400"
+                    className="py-12 text-center text-sm text-slate-400"
                   >
                     No audit records found.
                   </td>
@@ -724,7 +724,7 @@ const AuditLog = () => {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[13px] text-slate-400">
             Showing{" "}
             {filteredEvents.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}
             –{Math.min(currentPage * pageSize, filteredEvents.length)} of{" "}
@@ -735,7 +735,7 @@ const AuditLog = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
@@ -744,7 +744,7 @@ const AuditLog = () => {
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
-                className={`h-8 w-8 rounded-lg border text-[10px] ${
+                className={`h-8 w-8 rounded-lg border text-sm ${
                   currentPage === number
                     ? "border-[#267ba4] bg-[#267ba4] text-white"
                     : "border-[#d3e1e8] text-slate-600 hover:bg-slate-50"
@@ -757,7 +757,7 @@ const AuditLog = () => {
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
@@ -792,7 +792,7 @@ function RetentionModal({ onClose }: { onClose: () => void }) {
               Audit Retention Policy
             </h2>
 
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Organisation accountability and record retention.
             </p>
           </div>
@@ -808,11 +808,11 @@ function RetentionModal({ onClose }: { onClose: () => void }) {
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-[#153e5b]">
+            <p className="text-sm font-semibold text-[#153e5b]">
               7 Years Retention
             </p>
 
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Audit records are retained according to the configured organisation
               policy.
             </p>
@@ -847,7 +847,7 @@ function RetentionModal({ onClose }: { onClose: () => void }) {
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-[#267ba4] py-3 text-xs font-medium text-white hover:bg-[#1c668a]"
+          className="mt-6 w-full rounded-lg bg-[#267ba4] py-3 text-sm font-medium text-white hover:bg-[#1c668a]"
         >
           Close
         </button>
@@ -871,9 +871,9 @@ function PolicyItem({
       <div className="mt-0.5 text-[#267ba4]">{icon}</div>
 
       <div>
-        <p className="text-xs font-semibold text-[#153e5b]">{title}</p>
+        <p className="text-sm font-semibold text-[#153e5b]">{title}</p>
 
-        <p className="mt-1 text-[10px] leading-5 text-slate-500">{description}</p>
+        <p className="mt-1 text-sm leading-5 text-slate-500">{description}</p>
       </div>
     </div>
   );
@@ -892,7 +892,7 @@ function AuditDetailsModal({
       <div className="my-auto w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-[#267ba4]">{event.id}</p>
+            <p className="text-sm font-semibold text-[#267ba4]">{event.id}</p>
 
             <h2 className="mt-1 text-lg font-semibold text-[#153e5b]">
               Audit Event Details
@@ -910,9 +910,9 @@ function AuditDetailsModal({
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-[#153e5b]">{event.action}</p>
+            <p className="text-sm font-semibold text-[#153e5b]">{event.action}</p>
 
-            <p className="mt-1 text-[10px] text-slate-500">{event.timestamp}</p>
+            <p className="mt-1 text-[13px] text-slate-500">{event.timestamp}</p>
           </div>
         </div>
 
@@ -940,26 +940,26 @@ function AuditDetailsModal({
 
         <div className="mt-5 space-y-4">
           <div className="rounded-lg bg-[#f5f8fa] p-3">
-            <p className="text-[10px] text-slate-400">Change recorded</p>
+            <p className="text-[13px] text-slate-400">Change recorded</p>
 
-            <p className="mt-1 text-xs font-semibold text-[#153e5b]">
+            <p className="mt-1 text-sm font-semibold text-[#153e5b]">
               {event.change}
             </p>
           </div>
 
           <div className="rounded-lg bg-[#f5f8fa] p-3">
-            <p className="text-[10px] text-slate-400">Decision rationale</p>
+            <p className="text-[13px] text-slate-400">Decision rationale</p>
 
-            <p className="mt-1 text-xs text-[#153e5b]">{event.rationale}</p>
+            <p className="mt-1 text-sm text-[#153e5b]">{event.rationale}</p>
           </div>
 
           {event.checksum && (
             <div className="rounded-lg bg-[#f5f8fa] p-3">
-              <p className="flex items-center gap-1 text-[10px] text-slate-400">
+              <p className="flex items-center gap-1 text-[13px] text-slate-400">
                 <Hash size={12} />
                 Cryptographic Checksum (SHA-256)
               </p>
-              <p className="mt-1 font-mono text-[10px] text-[#267ba4] break-all">
+              <p className="mt-1 font-mono text-sm text-[#267ba4] break-all">
                 {event.checksum}
               </p>
             </div>
@@ -969,14 +969,14 @@ function AuditDetailsModal({
         <div className="mt-5 flex items-center gap-2 rounded-lg border border-[#d7e5eb] p-3">
           <ShieldCheck size={17} className="text-[#299b7d]" />
 
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[13px] text-slate-500">
             This is an immutable, read-only accountability record verified by CareLink Audit Ledger.
           </p>
         </div>
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-[#267ba4] py-3 text-xs font-medium text-white hover:bg-[#1c668a]"
+          className="mt-6 w-full rounded-lg bg-[#267ba4] py-3 text-sm font-medium text-white hover:bg-[#1c668a]"
         >
           Close
         </button>
@@ -997,12 +997,12 @@ function Detail({
 }) {
   return (
     <div>
-      <p className="flex items-center gap-1.5 text-[10px] text-slate-400">
+      <p className="flex items-center gap-1.5 text-[13px] text-slate-400">
         {icon}
         {label}
       </p>
 
-      <p className="mt-1 text-xs font-medium text-[#153e5b]">{value}</p>
+      <p className="mt-1 text-sm font-medium text-[#153e5b]">{value}</p>
     </div>
   );
 }
