@@ -449,8 +449,8 @@ export default function AllocationPage() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">
               Resource Management
             </p>
           </div>
@@ -458,23 +458,23 @@ export default function AllocationPage() {
 
         {/* Active Operation */}
         <div className="mx-4 mt-4 rounded-xl border border-white/10 bg-white/10 p-3">
-          <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-300">
             <span className="h-2 w-2 rounded-full bg-emerald-400" />
             Active Operation
           </div>
 
-          <p className="mt-2 text-xs font-bold">
+          <p className="mt-2 text-sm font-bold">
             Monsoon Floods 2025
           </p>
 
-          <p className="mt-1 text-[10px] text-sky-200">
+          <p className="mt-1 text-sm text-sky-200">
             Greater Riverton - Level 4
           </p>
         </div>
 
         {/* Navigation */}
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -491,7 +491,7 @@ export default function AllocationPage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   selected
                     ? "border-l-[3px] border-[#58b8a5] bg-[#287ba5] font-bold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -502,7 +502,7 @@ export default function AllocationPage() {
                 <span className="flex-1">{item.label}</span>
 
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs font-bold">
                     {item.count}
                   </span>
                 )}
@@ -518,8 +518,8 @@ export default function AllocationPage() {
           </div>
 
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">
               Resource Manager
             </p>
           </div>
@@ -560,7 +560,7 @@ export default function AllocationPage() {
                 setCurrentPage(1);
               }}
               placeholder="Search allocations, requests, resources..."
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
 
             {search ? (
@@ -568,7 +568,7 @@ export default function AllocationPage() {
                 <X size={15} className="text-slate-400" />
               </button>
             ) : (
-              <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+              <span className="hidden rounded border bg-white px-2 py-1 text-xs text-slate-400 sm:block">
                 ⌘ K
               </span>
             )}
@@ -577,7 +577,7 @@ export default function AllocationPage() {
           <div className="flex shrink-0 items-center gap-3 sm:gap-4">
 
             {/* BACKEND API STATUS BADGE */}
-            <div className="hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 text-[10px]">
+            <div className="hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 text-sm">
               {isBackendConnected ? (
                 <>
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -598,10 +598,10 @@ export default function AllocationPage() {
             </div>
 
             <div className="hidden border-r border-slate-200 pr-4 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">
+              <p className="text-xs uppercase text-slate-400">
                 Primary Hub
               </p>
-              <p className="text-[10px] font-bold text-slate-800">
+              <p className="text-sm font-bold text-slate-800">
                 Central Logistics Hub
               </p>
             </div>
@@ -623,7 +623,7 @@ export default function AllocationPage() {
               className="relative rounded-lg border p-2.5 text-slate-600"
             >
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -634,8 +634,8 @@ export default function AllocationPage() {
               </div>
 
               <div className="hidden sm:block">
-                <p className="text-[10px] font-bold">Daniel P.</p>
-                <p className="text-[9px] text-slate-400">
+                <p className="text-sm font-bold">Daniel P.</p>
+                <p className="text-xs text-slate-400">
                   Resource Manager
                 </p>
               </div>
@@ -649,7 +649,7 @@ export default function AllocationPage() {
           <section className="flex flex-wrap items-end justify-between gap-4">
 
             <div>
-              <p className="mb-2 flex items-center gap-1 text-[10px] text-slate-400">
+              <p className="mb-2 flex items-center gap-1 text-[13px] text-slate-400">
                 Resource Operations
                 <ChevronRight size={12} />
                 <span className="font-bold text-slate-700">
@@ -669,7 +669,7 @@ export default function AllocationPage() {
             <div className="flex gap-2">
               <button
                 onClick={handleExport}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
               >
                 <Download size={14} />
                 Export
@@ -677,7 +677,7 @@ export default function AllocationPage() {
 
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-1.5 rounded-lg bg-[#267da5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#17658b] transition shadow-sm"
+                className="flex items-center gap-1.5 rounded-lg bg-[#267da5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#17658b] transition shadow-sm"
               >
                 <Plus size={15} />
                 Create Allocation
@@ -731,7 +731,7 @@ export default function AllocationPage() {
                   </div>
 
                   <div>
-                    <p className="text-[10px] text-slate-400">
+                    <p className="text-[13px] text-slate-400">
                       {card.title}
                     </p>
 
@@ -739,7 +739,7 @@ export default function AllocationPage() {
                       {card.value}
                     </h3>
 
-                    <p className="text-[9px] text-slate-400">
+                    <p className="text-xs text-slate-400">
                       {card.note}
                     </p>
                   </div>
@@ -759,7 +759,7 @@ export default function AllocationPage() {
                     setActiveTab(tab);
                     setCurrentPage(1);
                   }}
-                  className={`relative flex items-center gap-1.5 pb-4 text-[11px] transition ${
+                  className={`relative flex items-center gap-1.5 pb-4 text-sm transition ${
                     activeTab === tab
                       ? "font-bold text-sky-700"
                       : "text-slate-500 hover:text-sky-700"
@@ -768,13 +768,13 @@ export default function AllocationPage() {
                   {tab}
 
                   {tab === "All" && (
-                    <span className="rounded-full bg-sky-100 px-1.5 py-0.5 text-[8px] font-bold text-sky-700">
+                    <span className="rounded-full bg-sky-100 px-1.5 py-0.5 text-xs font-bold text-sky-700">
                       {allocations.length}
                     </span>
                   )}
 
                   {tab === "Needs action" && (
-                    <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[8px] font-bold text-amber-700">
+                    <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-bold text-amber-700">
                       {awaitingCount}
                     </span>
                   )}
@@ -800,7 +800,7 @@ export default function AllocationPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search allocations..."
-                className="w-full text-xs outline-none"
+                className="w-full text-sm sm:text-[15px] outline-none"
               />
             </div>
 
@@ -810,7 +810,7 @@ export default function AllocationPage() {
                 setWarehouse(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>All warehouses</option>
               {["Central Hub", "West Depot", "Eastbank", "North Hub"].map((v) => (
@@ -824,7 +824,7 @@ export default function AllocationPage() {
                 setDestination(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>All destinations</option>
               {[...new Set(allocations.map((a) => a.destination))].map((v) => (
@@ -838,7 +838,7 @@ export default function AllocationPage() {
                 setStatus(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>All allocation states</option>
               {[
@@ -854,7 +854,7 @@ export default function AllocationPage() {
 
             <button
               onClick={resetFilters}
-              className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition"
             >
               <SlidersHorizontal size={14} />
               Reset filters
@@ -867,7 +867,7 @@ export default function AllocationPage() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1050px] text-left">
 
-                <thead className="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-wider">
+                <thead className="bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wider">
                   <tr>
                     {[
                       "Allocation",
@@ -895,7 +895,7 @@ export default function AllocationPage() {
                   {displayedAllocations.map((item) => (
                     <tr
                       key={item.id}
-                      className="text-xs transition hover:bg-slate-50/70"
+                      className="text-sm transition hover:bg-slate-50/70"
                     >
                       <td className="px-4 py-3.5 font-bold text-slate-800">
                         {item.id}
@@ -925,13 +925,13 @@ export default function AllocationPage() {
                         {item.approvedBy}
                       </td>
 
-                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 text-[11px]">
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 text-sm">
                         {item.approvedAt}
                       </td>
 
                       <td className="px-4 py-3.5">
                         <span
-                          className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[10px] font-semibold ${statusStyles[item.status]}`}
+                          className={`whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold ${statusStyles[item.status]}`}
                         >
                           {item.status}
                         </span>
@@ -942,7 +942,7 @@ export default function AllocationPage() {
                           <button
                             title="View allocation details"
                             onClick={() => setSelectedAllocation(item)}
-                            className="flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-[11px] font-medium text-sky-700 hover:bg-sky-50 transition"
+                            className="flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-sky-700 hover:bg-sky-50 transition"
                           >
                             <Eye size={13} />
                             Details
@@ -966,7 +966,7 @@ export default function AllocationPage() {
             {/* PAGINATION */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">
 
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[13px] text-slate-500">
                 Showing{" "}
                 {filteredAllocations.length === 0
                   ? 0
@@ -986,7 +986,7 @@ export default function AllocationPage() {
                   onClick={() =>
                     setCurrentPage((p) => Math.max(1, p - 1))
                   }
-                  className="rounded-lg border px-3 py-1.5 text-xs text-slate-600 disabled:opacity-40 hover:bg-slate-50"
+                  className="rounded-lg border px-3 py-1.5 text-sm text-slate-600 disabled:opacity-40 hover:bg-slate-50"
                 >
                   Previous
                 </button>
@@ -1013,7 +1013,7 @@ export default function AllocationPage() {
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
                   }
-                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-600 disabled:opacity-40 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 disabled:opacity-40 hover:bg-slate-50"
                 >
                   Next
                 </button>
@@ -1021,7 +1021,7 @@ export default function AllocationPage() {
             </div>
           </section>
 
-          <footer className="py-2 text-center text-[10px] text-slate-400">
+          <footer className="py-2 text-center text-[13px] text-slate-400">
             ReliefOS · Humanitarian Resource Management Platform · Connected to CareLink API
           </footer>
 
@@ -1056,7 +1056,7 @@ export default function AllocationPage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-sm font-semibold text-slate-700">
                 Request ID
               </label>
               <input
@@ -1069,12 +1069,12 @@ export default function AllocationPage() {
                   })
                 }
                 placeholder="Example: RR-2841"
-                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-sm font-semibold text-slate-700">
                 Resource Name
               </label>
               <input
@@ -1087,12 +1087,12 @@ export default function AllocationPage() {
                   })
                 }
                 placeholder="e.g. Trauma Medical Kit, Drinking Water"
-                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-sm font-semibold text-slate-700">
                 Quantity
               </label>
               <input
@@ -1105,13 +1105,13 @@ export default function AllocationPage() {
                   })
                 }
                 placeholder="Example: 500 units / 1,200 L"
-                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                <label className="mb-1 block text-sm font-semibold text-slate-700">
                   Source Warehouse
                 </label>
                 <select
@@ -1122,7 +1122,7 @@ export default function AllocationPage() {
                       source: e.target.value,
                     })
                   }
-                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs bg-white"
+                  className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] bg-white"
                 >
                   <option>Central Hub</option>
                   <option>West Depot</option>
@@ -1132,7 +1132,7 @@ export default function AllocationPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                <label className="mb-1 block text-sm font-semibold text-slate-700">
                   Destination Unit
                 </label>
                 <input
@@ -1145,7 +1145,7 @@ export default function AllocationPage() {
                     })
                   }
                   placeholder="e.g. Medical Team 3"
-                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </div>
             </div>
@@ -1154,14 +1154,14 @@ export default function AllocationPage() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="rounded-lg bg-sky-700 px-4 py-2 text-xs font-semibold text-white hover:bg-sky-800 transition"
+                className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-800 transition"
               >
                 Create Allocation
               </button>
@@ -1183,7 +1183,7 @@ export default function AllocationPage() {
                     {selectedAllocation.id}
                   </h3>
                   <span
-                    className={`rounded-md px-2 py-0.5 text-[10px] font-semibold ${statusStyles[selectedAllocation.status]}`}
+                    className={`rounded-md px-2 py-0.5 text-xs font-semibold ${statusStyles[selectedAllocation.status]}`}
                   >
                     {selectedAllocation.status}
                   </span>
@@ -1214,10 +1214,10 @@ export default function AllocationPage() {
                   key={label}
                   className="rounded-lg bg-slate-50 p-3"
                 >
-                  <p className="text-[10px] text-slate-400 uppercase tracking-wide">
+                  <p className="text-xs text-slate-400 uppercase tracking-wide">
                     {label}
                   </p>
-                  <p className="mt-1 text-xs font-semibold text-slate-700">
+                  <p className="mt-1 text-sm font-semibold text-slate-700">
                     {value}
                   </p>
                 </div>
@@ -1226,13 +1226,13 @@ export default function AllocationPage() {
 
             {/* STATUS TRANSITION BUTTONS */}
             <div className="border-t pt-3">
-              <p className="text-[11px] font-semibold text-slate-700 mb-2">Update Allocation Status</p>
+              <p className="text-sm font-semibold text-slate-700 mb-2">Update Allocation Status</p>
               <div className="flex flex-wrap gap-2">
                 {selectedAllocation.status !== "Allocated" && (
                   <button
                     disabled={actionInProgress === selectedAllocation.id}
                     onClick={() => handleStatusChange(selectedAllocation.id, "Allocated")}
-                    className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition"
+                    className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-sm font-semibold text-blue-700 hover:bg-blue-100 transition"
                   >
                     Set Allocated
                   </button>
@@ -1242,7 +1242,7 @@ export default function AllocationPage() {
                   <button
                     disabled={actionInProgress === selectedAllocation.id}
                     onClick={() => handleStatusChange(selectedAllocation.id, "Released")}
-                    className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+                    className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition"
                   >
                     Release Stock
                   </button>
@@ -1252,7 +1252,7 @@ export default function AllocationPage() {
                   <button
                     disabled={actionInProgress === selectedAllocation.id}
                     onClick={() => handleStatusChange(selectedAllocation.id, "Completed")}
-                    className="rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition"
+                    className="rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition"
                   >
                     Mark Completed
                   </button>
@@ -1262,7 +1262,7 @@ export default function AllocationPage() {
                   <button
                     disabled={actionInProgress === selectedAllocation.id}
                     onClick={() => handleStatusChange(selectedAllocation.id, "Partially Allocated")}
-                    className="rounded-lg border border-sky-300 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 hover:bg-sky-100 transition"
+                    className="rounded-lg border border-sky-300 bg-sky-50 px-3 py-1.5 text-sm font-semibold text-sky-700 hover:bg-sky-100 transition"
                   >
                     Partial Allocation
                   </button>
@@ -1274,7 +1274,7 @@ export default function AllocationPage() {
               <button
                 disabled={actionInProgress === selectedAllocation.id}
                 onClick={() => handleDeleteAllocation(selectedAllocation.id)}
-                className="flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition"
+                className="flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 transition"
               >
                 <Trash2 size={13} />
                 Cancel Allocation
@@ -1282,7 +1282,7 @@ export default function AllocationPage() {
 
               <button
                 onClick={() => setSelectedAllocation(null)}
-                className="rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-900 transition"
+                className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900 transition"
               >
                 Close
               </button>

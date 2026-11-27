@@ -279,7 +279,7 @@ export default function SettingsPage() {
     type?: string;
   }) => (
     <label className="block">
-      <span className="mb-2 block text-[11px] font-semibold text-[#173d5b]">
+      <span className="mb-2 block text-sm font-semibold text-[#173d5b]">
         {label}
       </span>
       <input
@@ -303,7 +303,7 @@ export default function SettingsPage() {
     onChange: (value: string) => void;
   }) => (
     <label className="block">
-      <span className="mb-2 block text-[11px] font-semibold text-[#173d5b]">
+      <span className="mb-2 block text-sm font-semibold text-[#173d5b]">
         {label}
       </span>
       <select
@@ -333,8 +333,8 @@ export default function SettingsPage() {
   }) => (
     <div className="flex items-center justify-between gap-4 border-b border-slate-100 py-4 last:border-0">
       <div>
-        <p className="text-xs font-semibold text-[#173d5b]">{title}</p>
-        <p className="mt-1 text-[10px] text-slate-400">{description}</p>
+        <p className="text-sm font-semibold text-[#173d5b]">{title}</p>
+        <p className="mt-1 text-[13px] text-slate-400">{description}</p>
       </div>
       <Toggle checked={checked} onChange={onChange} />
     </div>
@@ -355,23 +355,23 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">Resource Management</p>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">Resource Management</p>
           </div>
         </div>
 
         {/* OPERATION */}
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
-          <p className="mt-2 text-xs font-bold">Monsoon Floods 2025</p>
-          <p className="mt-1 text-[10px] text-sky-200">Greater Riverton · Level 4</p>
+          <p className="mt-2 text-sm font-bold">Monsoon Floods 2025</p>
+          <p className="mt-1 text-sm text-sky-200">Greater Riverton · Level 4</p>
         </div>
 
         {/* NAVIGATION */}
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -388,7 +388,7 @@ export default function SettingsPage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -398,7 +398,7 @@ export default function SettingsPage() {
                 <span className="flex-1">{item.label}</span>
 
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px]">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs">
                     {item.count}
                   </span>
                 )}
@@ -420,8 +420,8 @@ export default function SettingsPage() {
               : "DP"}
           </div>
           <div className="flex-1 truncate">
-            <p className="text-xs font-bold truncate">{profile.fullName || "Daniel Perera"}</p>
-            <p className="text-[10px] text-sky-200">Resource Manager</p>
+            <p className="text-sm font-bold truncate">{profile.fullName || "Daniel Perera"}</p>
+            <p className="text-sm text-sky-200">Resource Manager</p>
           </div>
           <ChevronRight size={18} />
         </div>
@@ -451,14 +451,14 @@ export default function SettingsPage() {
             <Search size={16} className="text-slate-400" />
             <input
               placeholder="Search resources, requests, dispatches..."
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
           </div>
 
           <div className="flex items-center gap-3">
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">Primary Hub</p>
-              <p className="text-[10px] font-bold">{profile.warehouse || "Central Logistics Hub"}</p>
+              <p className="text-xs uppercase text-slate-400">Primary Hub</p>
+              <p className="text-sm font-bold">{profile.warehouse || "Central Logistics Hub"}</p>
             </div>
 
             <button className="rounded-lg border p-2.5 hover:bg-slate-50" title="Security Status">
@@ -467,7 +467,7 @@ export default function SettingsPage() {
 
             <button className="relative rounded-lg border p-2.5 hover:bg-slate-50" title="Alerts">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -484,8 +484,8 @@ export default function SettingsPage() {
             </div>
 
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">{profile.fullName || "Daniel P."}</p>
-              <p className="text-[9px] text-slate-400">Resource Manager</p>
+              <p className="text-sm font-bold">{profile.fullName || "Daniel P."}</p>
+              <p className="text-xs text-slate-400">Resource Manager</p>
             </div>
 
             <ChevronRight size={17} className="hidden sm:block text-slate-400" />
@@ -495,7 +495,7 @@ export default function SettingsPage() {
         {/* PAGE CONTENT */}
         <div className="space-y-6 p-4 sm:p-6 lg:p-7">
           {/* BREADCRUMB & BACKEND BADGE */}
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] text-slate-400">
             <div>
               Resource Operations
               <ChevronRight size={12} className="mx-1 inline" />
@@ -504,19 +504,19 @@ export default function SettingsPage() {
 
             <div className="flex items-center gap-2">
               {isBackendConnected === true && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-medium text-emerald-700 border border-emerald-200">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 border border-emerald-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   API Connected
                 </span>
               )}
               {isBackendConnected === false && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-medium text-amber-700 border border-amber-200">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 border border-amber-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                   Offline Mode
                 </span>
               )}
               {lastUpdated && (
-                <span className="text-[10px] text-slate-400 hidden sm:inline">
+                <span className="text-[13px] text-slate-400 hidden sm:inline">
                   Last saved: {new Date(lastUpdated).toLocaleTimeString()}
                 </span>
               )}
@@ -557,7 +557,7 @@ export default function SettingsPage() {
                 type="button"
                 onClick={handleReset}
                 disabled={isSaving || isLoading}
-                className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
                 title="Reset all settings to default values"
               >
                 <RotateCcw size={14} />
@@ -568,7 +568,7 @@ export default function SettingsPage() {
                 type="button"
                 onClick={handleSave}
                 disabled={isSaving || isLoading}
-                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#1d668e] disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1d668e] disabled:opacity-50"
               >
                 {isSaving ? (
                   <Loader2 size={15} className="animate-spin" />
@@ -603,7 +603,7 @@ export default function SettingsPage() {
                       key={tab.name}
                       type="button"
                       onClick={() => setActiveTab(tab.name)}
-                      className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-4 text-left text-[11px] transition last:mb-0 ${
+                      className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-4 text-left text-sm transition last:mb-0 ${
                         active
                           ? "bg-[#e6f0f6] font-semibold text-[#287ba5]"
                           : "text-slate-500 hover:bg-slate-50"
@@ -622,8 +622,8 @@ export default function SettingsPage() {
                 {/* PROFILE */}
                 {activeTab === "Profile" && (
                   <div>
-                    <h3 className="text-sm font-semibold">Profile</h3>
-                    <p className="mt-1 text-[10px] text-slate-400">
+                    <h3 className="text-base font-semibold">Profile</h3>
+                    <p className="mt-1 text-[13px] text-slate-400">
                       Configure profile for your Resource Manager workspace.
                     </p>
 
@@ -667,8 +667,8 @@ export default function SettingsPage() {
                 {/* INVENTORY RULES */}
                 {activeTab === "Inventory Rules" && (
                   <div>
-                    <h3 className="text-sm font-semibold">Inventory Rules</h3>
-                    <p className="mt-1 text-[10px] text-slate-400">
+                    <h3 className="text-base font-semibold">Inventory Rules</h3>
+                    <p className="mt-1 text-[13px] text-slate-400">
                       Configure stock thresholds and inventory management rules.
                     </p>
 
@@ -737,8 +737,8 @@ export default function SettingsPage() {
                 {/* DISPATCH PREFERENCES */}
                 {activeTab === "Dispatch Preferences" && (
                   <div>
-                    <h3 className="text-sm font-semibold">Dispatch Preferences</h3>
-                    <p className="mt-1 text-[10px] text-slate-400">
+                    <h3 className="text-base font-semibold">Dispatch Preferences</h3>
+                    <p className="mt-1 text-[13px] text-slate-400">
                       Configure dispatch, delivery, tracking, and approval preferences.
                     </p>
 
@@ -811,8 +811,8 @@ export default function SettingsPage() {
                 {/* NOTIFICATIONS */}
                 {activeTab === "Notifications" && (
                   <div>
-                    <h3 className="text-sm font-semibold">Notifications</h3>
-                    <p className="mt-1 text-[10px] text-slate-400">
+                    <h3 className="text-base font-semibold">Notifications</h3>
+                    <p className="mt-1 text-[13px] text-slate-400">
                       Manage alerts and communication preferences.
                     </p>
 
@@ -877,8 +877,8 @@ export default function SettingsPage() {
                 {/* SECURITY */}
                 {activeTab === "Security" && (
                   <div>
-                    <h3 className="text-sm font-semibold">Security</h3>
-                    <p className="mt-1 text-[10px] text-slate-400">
+                    <h3 className="text-base font-semibold">Security</h3>
+                    <p className="mt-1 text-[13px] text-slate-400">
                       Manage account access and workspace security.
                     </p>
 
@@ -887,8 +887,8 @@ export default function SettingsPage() {
                     <div className="mb-5 flex items-center gap-3 rounded-lg bg-[#eaf3f7] p-4">
                       <ShieldCheck size={25} className="text-sky-700" />
                       <div>
-                        <p className="text-xs font-semibold">Account security</p>
-                        <p className="mt-1 text-[10px] text-slate-500">
+                        <p className="text-sm font-semibold">Account security</p>
+                        <p className="mt-1 text-[13px] text-slate-500">
                           Protect your Resource Manager account.
                         </p>
                       </div>
@@ -937,7 +937,7 @@ export default function SettingsPage() {
           )}
 
           {/* FOOTER */}
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] text-slate-400">
             <p className="flex items-center gap-2">
               <ShieldCheck size={13} />
               ReliefOS Resource Management System

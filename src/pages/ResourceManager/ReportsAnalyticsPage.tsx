@@ -119,7 +119,7 @@ const fallbackCategories: CategoryDistribution[] = [
 ];
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-600 outline-none focus:border-sky-500";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none focus:border-sky-500";
 
 export default function ReportsAnalyticsPage() {
   const navigate = useNavigate();
@@ -371,23 +371,23 @@ export default function ReportsAnalyticsPage() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">Resource Management</p>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">Resource Management</p>
           </div>
         </div>
 
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
 
-          <p className="mt-2 text-xs font-bold">Monsoon Floods 2025</p>
+          <p className="mt-2 text-sm font-bold">Monsoon Floods 2025</p>
 
-          <p className="mt-1 text-[10px] text-sky-200">Greater Riverton · Level 4</p>
+          <p className="mt-1 text-sm text-sky-200">Greater Riverton · Level 4</p>
         </div>
 
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -404,7 +404,7 @@ export default function ReportsAnalyticsPage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -414,7 +414,7 @@ export default function ReportsAnalyticsPage() {
                 <span className="flex-1">{item.label}</span>
 
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px]">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs">
                     {item.count}
                   </span>
                 )}
@@ -429,8 +429,8 @@ export default function ReportsAnalyticsPage() {
           </div>
 
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">Resource Manager</p>
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">Resource Manager</p>
           </div>
 
           <ChevronRight size={18} />
@@ -464,17 +464,17 @@ export default function ReportsAnalyticsPage() {
               placeholder="Search resources, requests, dispatches, reports..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
 
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+            <span className="hidden rounded border bg-white px-2 py-1 text-xs text-slate-400 sm:block">
               ⌘ K
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Backend Connection Badge */}
-            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600">
+            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
               {isBackendConnected === true ? (
                 <>
                   <Wifi size={13} className="text-emerald-500" />
@@ -503,8 +503,8 @@ export default function ReportsAnalyticsPage() {
             </button>
 
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">Primary Hub</p>
-              <p className="text-[10px] font-bold">Central Logistics Hub</p>
+              <p className="text-xs uppercase text-slate-400">Primary Hub</p>
+              <p className="text-sm font-bold">Central Logistics Hub</p>
             </div>
 
             <button className="hidden rounded-lg border p-2.5 sm:block" aria-label="Security">
@@ -513,7 +513,7 @@ export default function ReportsAnalyticsPage() {
 
             <button className="relative rounded-lg border p-2.5" aria-label="Notifications">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -523,8 +523,8 @@ export default function ReportsAnalyticsPage() {
             </div>
 
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">Resource Manager</p>
+              <p className="text-sm font-bold">Daniel P.</p>
+              <p className="text-xs text-slate-400">Resource Manager</p>
             </div>
 
             <ChevronRight size={17} className="hidden sm:block" />
@@ -534,7 +534,7 @@ export default function ReportsAnalyticsPage() {
         {/* PAGE CONTENT */}
         <div className="space-y-5 p-4 sm:p-6 lg:p-7">
           {/* BREADCRUMB */}
-          <div className="text-[10px] text-slate-400">
+          <div className="text-[13px] text-slate-400">
             Resource Operations <ChevronRight size={12} className="mx-1 inline" />
             <span className="font-semibold text-[#163d5c]">Reports & Analytics</span>
           </div>
@@ -551,14 +551,14 @@ export default function ReportsAnalyticsPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setShowSchedule(true)}
-                className="rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
+                className="rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
               >
                 Schedule Reports
               </button>
 
               <button
                 onClick={exportCSV}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
               >
                 <Download size={14} /> Export CSV
               </button>
@@ -568,7 +568,7 @@ export default function ReportsAnalyticsPage() {
           {/* FILTER PANEL */}
           <section className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-              <label className="text-[10px] font-semibold text-slate-500">
+              <label className="text-sm font-semibold text-slate-500">
                 Reporting period
                 <select
                   value={period}
@@ -582,7 +582,7 @@ export default function ReportsAnalyticsPage() {
                 </select>
               </label>
 
-              <label className="text-[10px] font-semibold text-slate-500">
+              <label className="text-sm font-semibold text-slate-500">
                 Operation
                 <select
                   value={operation}
@@ -595,7 +595,7 @@ export default function ReportsAnalyticsPage() {
                 </select>
               </label>
 
-              <label className="text-[10px] font-semibold text-slate-500">
+              <label className="text-sm font-semibold text-slate-500">
                 Warehouse
                 <select
                   value={warehouse}
@@ -613,7 +613,7 @@ export default function ReportsAnalyticsPage() {
               <div className="flex items-end">
                 <button
                   onClick={handleApplyFilters}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
                 >
                   <Filter size={14} /> Apply filters
                 </button>
@@ -638,9 +638,9 @@ export default function ReportsAnalyticsPage() {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">{card.title}</p>
+                    <p className="text-[13px] text-slate-400">{card.title}</p>
                     <h3 className="text-2xl font-bold text-slate-800">{card.value}</h3>
-                    <p className="text-[10px] text-slate-400">{card.note}</p>
+                    <p className="text-[13px] text-slate-400">{card.note}</p>
                   </div>
                 </div>
               );
@@ -653,15 +653,15 @@ export default function ReportsAnalyticsPage() {
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 p-4">
                 <div>
-                  <h3 className="text-xs font-bold text-slate-800">
+                  <h3 className="text-base font-bold text-slate-800">
                     Fulfilment performance ({appliedPeriod})
                   </h3>
-                  <p className="mt-0.5 text-[10px] text-slate-400">
+                  <p className="mt-0.5 text-[13px] text-slate-400">
                     Requests received and fulfilled across active timeline
                   </p>
                 </div>
 
-                <div className="flex gap-3 text-[10px] text-slate-600 font-medium">
+                <div className="flex gap-3 text-sm text-slate-600 font-medium">
                   <span className="flex items-center gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-xs bg-[#287ba5]" />
                     Received
@@ -708,7 +708,7 @@ export default function ReportsAnalyticsPage() {
                         </div>
 
                         <p
-                          className="absolute bottom-2 text-[10px] font-medium text-slate-500"
+                          className="absolute bottom-2 text-[13px] font-medium text-slate-500"
                           style={{
                             left: `${(100 / weeks.length) * (idx + 0.5)}%`,
                             transform: "translateX(-50%)",
@@ -726,8 +726,8 @@ export default function ReportsAnalyticsPage() {
             {/* INVENTORY CATEGORY CHART */}
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="border-b border-slate-200 p-4">
-                <h3 className="text-xs font-bold text-slate-800">Inventory by category</h3>
-                <p className="mt-0.5 text-[10px] text-slate-400">
+                <h3 className="text-base font-bold text-slate-800">Inventory by category</h3>
+                <p className="mt-0.5 text-[13px] text-slate-400">
                   Current stock availability and fulfillment coverage
                 </p>
               </div>
@@ -735,7 +735,7 @@ export default function ReportsAnalyticsPage() {
               <div className="space-y-4 p-5">
                 {categories.map((category) => (
                   <div key={category.name}>
-                    <div className="mb-1.5 flex items-center justify-between gap-3 text-[11px]">
+                    <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
                       <span className="font-semibold text-slate-700">
                         {category.name}
                       </span>
@@ -761,15 +761,15 @@ export default function ReportsAnalyticsPage() {
           <section className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-bold text-slate-800">Report library</h3>
-                <p className="mt-0.5 text-[11px] text-slate-400">
+                <h3 className="text-base font-bold text-slate-800">Report library</h3>
+                <p className="mt-0.5 text-[13px] text-slate-400">
                   Generated operational audits, fulfillment summaries, and compliance reports.
                 </p>
               </div>
 
               <button
                 onClick={() => setShowGenerateModal(true)}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
               >
                 <Plus size={14} /> Generate report
               </button>
@@ -783,7 +783,7 @@ export default function ReportsAnalyticsPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search reports by title, category, format..."
-                  className="w-full py-2.5 text-xs outline-none"
+                  className="w-full py-2.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
 
@@ -806,7 +806,7 @@ export default function ReportsAnalyticsPage() {
                     setSearch("");
                     setReportFilter("All reports");
                   }}
-                  className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-200"
+                  className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200"
                 >
                   Reset
                 </button>
@@ -817,7 +817,7 @@ export default function ReportsAnalyticsPage() {
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-left">
-                  <thead className="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-wider">
+                  <thead className="bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-3.5">Report name</th>
                       <th className="px-4 py-3.5">Category</th>
@@ -832,7 +832,7 @@ export default function ReportsAnalyticsPage() {
                     {filteredReports.map((report) => (
                       <tr
                         key={report.id}
-                        className="border-t border-slate-100 text-xs hover:bg-slate-50/80 transition"
+                        className="border-t border-slate-100 text-sm hover:bg-slate-50/80 transition"
                       >
                         <td className="px-4 py-3.5 font-semibold text-slate-800">
                           <div className="flex items-center gap-2">
@@ -854,7 +854,7 @@ export default function ReportsAnalyticsPage() {
                         </td>
 
                         <td className="px-4 py-3.5">
-                          <span className="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
+                          <span className="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-700">
                             {report.format}
                           </span>
                         </td>
@@ -863,7 +863,7 @@ export default function ReportsAnalyticsPage() {
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => setShowReport(report)}
-                              className="text-xs font-semibold text-sky-700 hover:underline"
+                              className="text-sm font-semibold text-sky-700 hover:underline"
                             >
                               View
                             </button>
@@ -889,7 +889,7 @@ export default function ReportsAnalyticsPage() {
                 )}
               </div>
 
-              <div className="border-t border-slate-100 px-4 py-3 text-[11px] text-slate-400">
+              <div className="border-t border-slate-100 px-4 py-3 text-[13px] text-slate-400">
                 Showing {filteredReports.length} reports in archive
               </div>
             </div>
@@ -914,7 +914,7 @@ export default function ReportsAnalyticsPage() {
             <div className="flex items-center justify-between border-b pb-3">
               <div>
                 <h3 className="text-lg font-bold text-slate-800">Schedule Reports</h3>
-                <p className="mt-0.5 text-[11px] text-slate-400">
+                <p className="mt-0.5 text-[13px] text-slate-400">
                   Set up automated email delivery for operational audits
                 </p>
               </div>
@@ -997,14 +997,14 @@ export default function ReportsAnalyticsPage() {
               <button
                 type="button"
                 onClick={() => setShowSchedule(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="rounded-lg bg-[#287ba5] px-4 py-2 text-xs font-bold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-4 py-2 text-sm font-bold text-white hover:bg-[#1c668d]"
               >
                 Save Schedule
               </button>
@@ -1023,7 +1023,7 @@ export default function ReportsAnalyticsPage() {
             <div className="flex items-center justify-between border-b pb-3">
               <div>
                 <h3 className="text-lg font-bold text-slate-800">Generate Report</h3>
-                <p className="mt-0.5 text-[11px] text-slate-400">
+                <p className="mt-0.5 text-[13px] text-slate-400">
                   Compile and export operational data for {appliedPeriod}
                 </p>
               </div>
@@ -1091,14 +1091,14 @@ export default function ReportsAnalyticsPage() {
               <button
                 type="button"
                 onClick={() => setShowGenerateModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="rounded-lg bg-[#287ba5] px-4 py-2 text-xs font-bold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-4 py-2 text-sm font-bold text-white hover:bg-[#1c668d]"
               >
                 Compile Report
               </button>
@@ -1129,7 +1129,7 @@ export default function ReportsAnalyticsPage() {
               <FileText size={24} className="text-sky-700 shrink-0" />
               <div>
                 <p className="text-sm font-bold text-slate-800">{showReport.name}</p>
-                <p className="text-[11px] text-slate-500">{showReport.category} Analytics</p>
+                <p className="text-[13px] text-slate-500">{showReport.category} Analytics</p>
               </div>
             </div>
 
@@ -1145,7 +1145,7 @@ export default function ReportsAnalyticsPage() {
                   key={label}
                   className="flex items-center justify-between rounded-lg bg-slate-50 p-2.5"
                 >
-                  <span className="text-[11px] text-slate-500">{label}</span>
+                  <span className="text-[13px] text-slate-500">{label}</span>
                   <span className="font-semibold text-slate-800">{value}</span>
                 </div>
               ))}
@@ -1171,14 +1171,14 @@ export default function ReportsAnalyticsPage() {
                   link.click();
                   URL.revokeObjectURL(url);
                 }}
-                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-[#287ba5] py-2.5 text-xs font-bold text-white hover:bg-[#1c668d] transition"
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-[#287ba5] py-2.5 text-sm font-bold text-white hover:bg-[#1c668d] transition"
               >
                 <Download size={14} /> Download {showReport.format}
               </button>
 
               <button
                 onClick={() => setShowReport(null)}
-                className="rounded-lg bg-slate-100 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+                className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition"
               >
                 Close
               </button>

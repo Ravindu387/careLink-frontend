@@ -181,7 +181,7 @@ const navigation = [
 ];
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-600 outline-none focus:border-sky-500";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none focus:border-sky-500";
 
 const actionTypeStyles: Record<string, string> = {
   Approval: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -391,7 +391,9 @@ export default function AuditLogPage() {
 
     try {
       const created = await auditLogService.createAuditLog(payload);
-      setRecords((prev) => [created, ...prev]);
+      if (created) {
+        setRecords((prev) => [created, ...prev]);
+      }
       setIsBackendConnected(true);
     } catch (err) {
       console.warn("Backend error, adding audit event locally:", err);
@@ -434,23 +436,23 @@ export default function AuditLogPage() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">Resource Management</p>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">Resource Management</p>
           </div>
         </div>
 
         {/* ACTIVE OPERATION */}
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
-          <p className="mt-2 text-xs font-bold">Monsoon Floods 2025</p>
-          <p className="mt-1 text-[10px] text-sky-200">Greater Riverton · Level 4</p>
+          <p className="mt-2 text-sm font-bold">Monsoon Floods 2025</p>
+          <p className="mt-1 text-sm text-sky-200">Greater Riverton · Level 4</p>
         </div>
 
         {/* NAVIGATION */}
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -467,7 +469,7 @@ export default function AuditLogPage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -477,7 +479,7 @@ export default function AuditLogPage() {
                 <span className="flex-1">{item.label}</span>
 
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px]">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs">
                     {item.count}
                   </span>
                 )}
@@ -493,8 +495,8 @@ export default function AuditLogPage() {
           </div>
 
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">Resource Manager</p>
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">Resource Manager</p>
           </div>
 
           <ChevronRight size={18} />
@@ -530,21 +532,21 @@ export default function AuditLogPage() {
                 setCurrentPage(1);
               }}
               placeholder="Search event, actor, record, or rationale..."
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
             {search && (
               <button onClick={() => setSearch("")} aria-label="Clear search">
                 <X size={14} className="text-slate-400 hover:text-slate-600" />
               </button>
             )}
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+            <span className="hidden rounded border bg-white px-2 py-1 text-xs text-slate-400 sm:block">
               ⌘ K
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Backend Connection Indicator */}
-            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600">
+            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
               {isBackendConnected === true ? (
                 <>
                   <Wifi size={13} className="text-emerald-500" />
@@ -573,8 +575,8 @@ export default function AuditLogPage() {
             </button>
 
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">Primary Hub</p>
-              <p className="text-[10px] font-bold">Central Logistics Hub</p>
+              <p className="text-xs uppercase text-slate-400">Primary Hub</p>
+              <p className="text-sm font-bold">Central Logistics Hub</p>
             </div>
 
             <button className="hidden rounded-lg border p-2.5 sm:block" aria-label="Security status">
@@ -583,7 +585,7 @@ export default function AuditLogPage() {
 
             <button className="relative rounded-lg border p-2.5" aria-label="Notifications">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -593,8 +595,8 @@ export default function AuditLogPage() {
             </div>
 
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">Resource Manager</p>
+              <p className="text-sm font-bold">Daniel P.</p>
+              <p className="text-xs text-slate-400">Resource Manager</p>
             </div>
           </div>
         </header>
@@ -602,7 +604,7 @@ export default function AuditLogPage() {
         {/* PAGE CONTENT */}
         <div className="space-y-5 p-4 sm:p-6 lg:p-7">
           {/* BREADCRUMB */}
-          <div className="text-[10px] text-slate-400">
+          <div className="text-[13px] text-slate-400">
             Resource Operations
             <ChevronRight size={12} className="mx-1 inline" />
             <span className="font-semibold text-[#163d5c]">Audit Log</span>
@@ -620,7 +622,7 @@ export default function AuditLogPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
               >
                 <Plus size={14} className="text-[#287ba5]" />
                 Record Log Entry
@@ -628,14 +630,14 @@ export default function AuditLogPage() {
 
               <button
                 onClick={() => setShowRetention(true)}
-                className="rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
+                className="rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
               >
                 Retention Policy
               </button>
 
               <button
                 onClick={handleExport}
-                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
               >
                 <Download size={14} />
                 Export CSV
@@ -647,18 +649,18 @@ export default function AuditLogPage() {
           <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between text-slate-400">
-                <span className="text-[11px] font-medium">Total Events</span>
+                <span className="text-sm font-medium">Total Events</span>
                 <Layers size={16} className="text-sky-600" />
               </div>
               <p className="mt-2 text-2xl font-bold text-slate-800">
                 {summary ? summary.totalLogs : records.length}
               </p>
-              <p className="mt-1 text-[10px] text-slate-400">All registered audits</p>
+              <p className="mt-1 text-[13px] text-slate-400">All registered audits</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between text-slate-400">
-                <span className="text-[11px] font-medium">Approvals</span>
+                <span className="text-sm font-medium">Approvals</span>
                 <CheckCircle2 size={16} className="text-emerald-600" />
               </div>
               <p className="mt-2 text-2xl font-bold text-emerald-700">
@@ -666,12 +668,12 @@ export default function AuditLogPage() {
                   ? summary.approvalsCount
                   : records.filter((r) => r.actionType === "Approval").length}
               </p>
-              <p className="mt-1 text-[10px] text-slate-400">Requests & transfers</p>
+              <p className="mt-1 text-[13px] text-slate-400">Requests & transfers</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between text-slate-400">
-                <span className="text-[11px] font-medium">Dispatches</span>
+                <span className="text-sm font-medium">Dispatches</span>
                 <Truck size={16} className="text-blue-600" />
               </div>
               <p className="mt-2 text-2xl font-bold text-blue-700">
@@ -679,12 +681,12 @@ export default function AuditLogPage() {
                   ? summary.dispatchesCount
                   : records.filter((r) => r.actionType === "Dispatch").length}
               </p>
-              <p className="mt-1 text-[10px] text-slate-400">Transit & delivery events</p>
+              <p className="mt-1 text-[13px] text-slate-400">Transit & delivery events</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between text-slate-400">
-                <span className="text-[11px] font-medium">Today's Activity</span>
+                <span className="text-sm font-medium">Today's Activity</span>
                 <Activity size={16} className="text-teal-600" />
               </div>
               <p className="mt-2 text-2xl font-bold text-teal-700">
@@ -692,7 +694,7 @@ export default function AuditLogPage() {
                   ? summary.todayCount
                   : records.filter((r) => r.date === "2025-06-22").length}
               </p>
-              <p className="mt-1 text-[10px] text-slate-400">Events in last 24h</p>
+              <p className="mt-1 text-[13px] text-slate-400">Events in last 24h</p>
             </div>
           </section>
 
@@ -701,16 +703,16 @@ export default function AuditLogPage() {
             <div className="flex items-center gap-3">
               <ShieldCheck size={22} className="shrink-0 text-slate-700" />
               <div>
-                <p className="text-xs font-bold text-slate-800">
+                <p className="text-sm font-bold text-slate-800">
                   Read-only accountability records
                 </p>
-                <p className="mt-0.5 text-[11px] text-slate-500">
+                <p className="mt-0.5 text-[13px] text-slate-500">
                   Audit events cannot be edited or removed. Cryptographically preserved for full compliance.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-500">
+            <div className="flex items-center gap-2 text-[13px] font-semibold text-slate-500">
               <LockKeyhole size={13} className="text-slate-400" />
               Retention: 7 Years
             </div>
@@ -728,7 +730,7 @@ export default function AuditLogPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search event, actor, record, or rationale..."
-                className="w-full py-2.5 text-xs outline-none"
+                className="w-full py-2.5 text-sm sm:text-[15px] outline-none"
               />
               {search && (
                 <button onClick={() => setSearch("")} aria-label="Clear filter search">
@@ -810,7 +812,7 @@ export default function AuditLogPage() {
 
             <button
               onClick={() => setShowMoreFilters(true)}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
             >
               <Filter size={14} />
               More filters
@@ -823,7 +825,7 @@ export default function AuditLogPage() {
               dateFilter !== "All dates") && (
               <button
                 onClick={resetFilters}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-200 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 transition"
               >
                 <RotateCcw size={13} />
                 Reset
@@ -835,7 +837,7 @@ export default function AuditLogPage() {
           <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[950px] text-left">
-                <thead className="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-wider">
+                <thead className="bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wider">
                   <tr>
                     <th className="px-4 py-3.5 font-semibold">Event ID</th>
                     <th className="px-4 py-3.5 font-semibold">Action</th>
@@ -857,7 +859,7 @@ export default function AuditLogPage() {
                     return (
                       <tr
                         key={record.id}
-                        className="border-t border-slate-100 text-xs hover:bg-slate-50/80 transition"
+                        className="border-t border-slate-100 text-sm hover:bg-slate-50/80 transition"
                       >
                         <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-800">
                           {record.id}
@@ -866,7 +868,7 @@ export default function AuditLogPage() {
                         <td className="whitespace-nowrap px-4 py-3.5">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${badgeClass}`}
+                              className={`rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
                             >
                               {record.actionType}
                             </span>
@@ -884,7 +886,7 @@ export default function AuditLogPage() {
                           {record.timestamp}
                         </td>
 
-                        <td className="whitespace-nowrap px-4 py-3.5 font-mono text-[11px] font-semibold text-[#287ba5]">
+                        <td className="whitespace-nowrap px-4 py-3.5 font-mono text-sm font-semibold text-[#287ba5]">
                           {record.record}
                         </td>
 
@@ -893,7 +895,7 @@ export default function AuditLogPage() {
                         </td>
 
                         <td className="px-4 py-3.5">
-                          <span className="inline-block max-w-[220px] truncate rounded bg-slate-100 px-2 py-1 text-[11px] text-slate-600">
+                          <span className="inline-block max-w-[220px] truncate rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">
                             {record.rationale}
                           </span>
                         </td>
@@ -924,7 +926,7 @@ export default function AuditLogPage() {
                   </p>
                   <button
                     onClick={resetFilters}
-                    className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 hover:bg-sky-100 transition"
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-3 py-1.5 text-sm font-semibold text-sky-700 hover:bg-sky-100 transition"
                   >
                     <RotateCcw size={13} />
                     Reset filters
@@ -935,7 +937,7 @@ export default function AuditLogPage() {
 
             {/* PAGINATION */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 text-xs">
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[13px] text-slate-500">
                 Showing{" "}
                 <span className="font-semibold text-slate-700">
                   {filteredRecords.length === 0
@@ -957,7 +959,7 @@ export default function AuditLogPage() {
                 <button
                   disabled={safePage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent"
                 >
                   Previous
                 </button>
@@ -979,7 +981,7 @@ export default function AuditLogPage() {
                 <button
                   disabled={safePage === totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent"
                 >
                   Next
                 </button>
@@ -988,7 +990,7 @@ export default function AuditLogPage() {
           </section>
 
           {/* FOOTER AUDIT NOTICE */}
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] text-slate-400">
             <p className="flex items-center gap-1.5">
               <LockKeyhole size={13} className="text-slate-400" />
               All audit records are immutable, cryptographically verifiable, and tamper-evident.
@@ -1028,7 +1030,7 @@ export default function AuditLogPage() {
                 <p className="text-sm font-bold text-slate-800">
                   {selectedRecord.action}
                 </p>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[13px] text-slate-500">
                   Immutable accountability record
                 </p>
               </div>
@@ -1036,50 +1038,50 @@ export default function AuditLogPage() {
 
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Event ID</p>
+                <p className="text-[13px] text-slate-400">Event ID</p>
                 <p className="font-bold text-slate-800 mt-0.5">{selectedRecord.id}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Actor</p>
+                <p className="text-[13px] text-slate-400">Actor</p>
                 <p className="font-bold text-slate-800 mt-0.5">{selectedRecord.actor}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Timestamp</p>
+                <p className="text-[13px] text-slate-400">Timestamp</p>
                 <p className="font-semibold text-slate-700 mt-0.5">{selectedRecord.timestamp}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Record ID</p>
+                <p className="text-[13px] text-slate-400">Record ID</p>
                 <p className="font-semibold text-[#287ba5] mt-0.5">{selectedRecord.record}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Action Type</p>
+                <p className="text-[13px] text-slate-400">Action Type</p>
                 <p className="font-semibold text-slate-700 mt-0.5">{selectedRecord.actionType}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Record Type</p>
+                <p className="text-[13px] text-slate-400">Record Type</p>
                 <p className="font-semibold text-slate-700 mt-0.5">{selectedRecord.recordType}</p>
               </div>
             </div>
 
             <div className="mt-2 space-y-2 text-xs">
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Change Detail</p>
+                <p className="text-[13px] text-slate-400">Change Detail</p>
                 <p className="font-medium text-slate-800 mt-0.5">{selectedRecord.change}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Rationale / Justification</p>
+                <p className="text-[13px] text-slate-400">Rationale / Justification</p>
                 <p className="font-medium text-slate-800 mt-0.5">{selectedRecord.rationale}</p>
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/50 p-3 text-[11px] text-slate-500">
+            <div className="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/50 p-3 text-[13px] text-slate-500">
               <LockKeyhole size={14} className="text-slate-400" />
               <span>This record is verified and cannot be edited or deleted.</span>
             </div>
 
             <button
               onClick={() => setSelectedRecord(null)}
-              className="mt-4 w-full rounded-lg bg-[#287ba5] py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] transition"
+              className="mt-4 w-full rounded-lg bg-[#287ba5] py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] transition"
             >
               Close
             </button>
@@ -1224,14 +1226,14 @@ export default function AuditLogPage() {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="rounded-lg bg-[#287ba5] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50"
+                  className="rounded-lg bg-[#287ba5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50"
                 >
                   {isSubmitting ? "Recording..." : "Save Audit Record"}
                 </button>
@@ -1263,7 +1265,7 @@ export default function AuditLogPage() {
                 <p className="text-sm font-bold text-slate-800">
                   Audit Data Protection Standard
                 </p>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[13px] text-slate-500">
                   Read-only accountability and compliance guarantee
                 </p>
               </div>
@@ -1289,7 +1291,7 @@ export default function AuditLogPage() {
 
             <button
               onClick={() => setShowRetention(false)}
-              className="mt-5 w-full rounded-lg bg-[#287ba5] py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] transition"
+              className="mt-5 w-full rounded-lg bg-[#287ba5] py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] transition"
             >
               Close
             </button>
@@ -1390,7 +1392,7 @@ export default function AuditLogPage() {
                   resetFilters();
                   setShowMoreFilters(false);
                 }}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 <RotateCcw size={13} />
                 Reset
@@ -1401,7 +1403,7 @@ export default function AuditLogPage() {
                   setCurrentPage(1);
                   setShowMoreFilters(false);
                 }}
-                className="rounded-lg bg-[#287ba5] px-5 py-2 text-xs font-semibold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1c668d]"
               >
                 Apply Filters
               </button>

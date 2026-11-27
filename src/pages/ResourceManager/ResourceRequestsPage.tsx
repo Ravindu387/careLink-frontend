@@ -63,7 +63,7 @@ const statusStyles: Record<string, string> = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-600 outline-none focus:border-sky-500";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none focus:border-sky-500";
 
 export default function ResourceRequestsPage() {
   const navigate = useNavigate();
@@ -356,29 +356,29 @@ export default function ResourceRequestsPage() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">
               Resource Management
             </p>
           </div>
         </div>
 
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
 
-          <p className="mt-2 text-xs font-bold">
+          <p className="mt-2 text-sm font-bold">
             Monsoon Floods 2025
           </p>
 
-          <p className="mt-1 text-[10px] text-sky-200">
+          <p className="mt-1 text-sm text-sky-200">
             Greater Riverton · Level 4
           </p>
         </div>
 
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -393,7 +393,7 @@ export default function ResourceRequestsPage() {
                   setSidebarOpen(false);
                   navigate(item.path);
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -403,7 +403,7 @@ export default function ResourceRequestsPage() {
                 <span className="flex-1">{item.label}</span>
 
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px]">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs">
                     {item.count}
                   </span>
                 )}
@@ -418,8 +418,8 @@ export default function ResourceRequestsPage() {
           </div>
 
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">
               Resource Manager
             </p>
           </div>
@@ -460,10 +460,10 @@ export default function ResourceRequestsPage() {
                 setCurrentPage(1);
               }}
               placeholder="Search resource requests, units, items..."
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
 
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+            <span className="hidden rounded border bg-white px-2 py-1 text-xs text-slate-400 sm:block">
               ⌘ K
             </span>
           </div>
@@ -472,13 +472,13 @@ export default function ResourceRequestsPage() {
             {/* Connection Badge */}
             <div className="flex items-center gap-2">
               {isBackendConnected === true && (
-                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
+                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   API Connected
                 </span>
               )}
               {isBackendConnected === false && (
-                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-700 border border-amber-200">
+                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 border border-amber-200">
                   <WifiOff size={11} />
                   Offline Mode
                 </span>
@@ -488,17 +488,17 @@ export default function ResourceRequestsPage() {
                 onClick={loadRequests}
                 disabled={isLoading}
                 title="Refresh resource requests"
-                className="flex items-center gap-1 rounded-lg border border-slate-200 p-2 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                className="flex items-center gap-1 rounded-lg border border-slate-200 p-2 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
               >
                 <RefreshCw size={14} className={isLoading ? "animate-spin text-sky-600" : ""} />
               </button>
             </div>
 
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">
+              <p className="text-xs uppercase text-slate-400">
                 Primary Hub
               </p>
-              <p className="text-[10px] font-bold">
+              <p className="text-sm font-bold">
                 Central Logistics Hub
               </p>
             </div>
@@ -509,7 +509,7 @@ export default function ResourceRequestsPage() {
 
             <button className="relative rounded-lg border p-2.5">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -519,8 +519,8 @@ export default function ResourceRequestsPage() {
             </div>
 
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-sm font-bold">Daniel P.</p>
+              <p className="text-xs text-slate-400">
                 Resource Manager
               </p>
             </div>
@@ -556,7 +556,7 @@ export default function ResourceRequestsPage() {
         <div className="space-y-5 p-4 sm:p-6 lg:p-7">
 
           {/* BREADCRUMB */}
-          <div className="text-[10px] text-slate-400">
+          <div className="text-[13px] text-slate-400">
             Resource Operations
             <ChevronRight size={12} className="mx-1 inline" />
             <span className="font-semibold text-[#163d5c]">
@@ -579,7 +579,7 @@ export default function ResourceRequestsPage() {
               <div className="relative">
                 <button
                   onClick={() => setShowExportMenu(!showExportMenu)}
-                  className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition"
+                  className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition"
                 >
                   <Download size={14} />
                   Export
@@ -589,14 +589,14 @@ export default function ResourceRequestsPage() {
                   <div className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl z-30">
                     <button
                       onClick={() => handleExport("csv")}
-                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 text-left font-medium"
+                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 text-left font-medium"
                     >
                       <FileSpreadsheet size={15} className="text-emerald-600" />
                       Export as CSV
                     </button>
                     <button
                       onClick={() => handleExport("pdf")}
-                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 text-left font-medium border-t border-slate-100"
+                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 text-left font-medium border-t border-slate-100"
                     >
                       <FileText size={15} className="text-rose-600" />
                       Export as PDF Document
@@ -607,7 +607,7 @@ export default function ResourceRequestsPage() {
 
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
               >
                 <Plus size={15} />
                 Create Request
@@ -658,9 +658,9 @@ export default function ResourceRequestsPage() {
                     <Icon size={20} />
                   </div>
                   <div>
-                    <p className="text-[10px] text-slate-400 font-medium">{card.title}</p>
+                    <p className="text-[13px] text-slate-400 font-medium">{card.title}</p>
                     <h3 className="text-2xl font-bold text-slate-800">{card.value}</h3>
-                    <p className="text-[9px] text-slate-400">{card.note}</p>
+                    <p className="text-xs text-slate-400">{card.note}</p>
                   </div>
                 </div>
               );
@@ -673,10 +673,10 @@ export default function ResourceRequestsPage() {
               <ShieldCheck size={20} />
             </div>
             <div>
-              <p className="text-xs font-bold text-sky-900">
+              <p className="text-sm font-bold text-sky-900">
                 Controlled allocation workflow
               </p>
-              <p className="mt-0.5 text-[11px] text-slate-600">
+              <p className="mt-0.5 text-sm text-slate-600">
                 Approvals reserve stock but do not release it. Dispatch release requires separate authorisation and stock verification.
               </p>
             </div>
@@ -692,7 +692,7 @@ export default function ResourceRequestsPage() {
                     setActiveTab(tab);
                     setCurrentPage(1);
                   }}
-                  className={`relative flex items-center gap-1.5 pb-3.5 text-xs transition ${
+                  className={`relative flex items-center gap-1.5 pb-3.5 text-sm transition ${
                     activeTab === tab
                       ? "font-bold text-[#287ba5]"
                       : "text-slate-500 hover:text-[#287ba5]"
@@ -701,13 +701,13 @@ export default function ResourceRequestsPage() {
                   {tab}
 
                   {tab === "All" && (
-                    <span className="rounded-full bg-sky-100 px-1.5 py-0.2 text-[9px] font-bold text-sky-800">
+                    <span className="rounded-full bg-sky-100 px-1.5 py-0.2 text-xs font-bold text-sky-800">
                       {requests.length}
                     </span>
                   )}
 
                   {tab === "Needs action" && (
-                    <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[9px] font-bold text-amber-800">
+                    <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-xs font-bold text-amber-800">
                       {approvalCount + partialCount}
                     </span>
                   )}
@@ -732,7 +732,7 @@ export default function ResourceRequestsPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search requests..."
-                className="w-full text-xs outline-none"
+                className="w-full text-sm sm:text-[15px] outline-none"
               />
             </div>
 
@@ -742,7 +742,7 @@ export default function ResourceRequestsPage() {
                 setPriority(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none"
             >
               <option>All priorities</option>
               <option>Critical</option>
@@ -756,7 +756,7 @@ export default function ResourceRequestsPage() {
                 setCategory(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none"
             >
               <option>All categories</option>
               {["Food & Water", "Medical", "Shelter", "WASH", "Transport & Fuel"].map((v) => (
@@ -770,7 +770,7 @@ export default function ResourceRequestsPage() {
                 setRequester(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none"
             >
               <option>All requesters</option>
               {requesterOptions.map((v) => (
@@ -784,7 +784,7 @@ export default function ResourceRequestsPage() {
                 setStatus(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none"
             >
               <option>All statuses</option>
               {["Awaiting Approval", "Partially Available", "Allocated", "Processing", "Fulfilled"].map((v) => (
@@ -795,7 +795,7 @@ export default function ResourceRequestsPage() {
             <button
               onClick={resetFilters}
               title="Reset all filters"
-              className="flex items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+              className="flex items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
             >
               <RotateCcw size={13} />
               Reset
@@ -808,7 +808,7 @@ export default function ResourceRequestsPage() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[850px] text-left">
 
-                <thead className="bg-slate-50 text-[10px] text-slate-500 font-semibold">
+                <thead className="bg-slate-50 text-[13px] text-slate-500 font-semibold">
                   <tr>
                     <th className="px-4 py-3.5">Request</th>
                     <th className="px-4 py-3.5">Requesting Unit</th>
@@ -826,7 +826,7 @@ export default function ResourceRequestsPage() {
                   {displayedRequests.map((request) => (
                     <tr
                       key={request.id}
-                      className="border-t border-slate-100 text-[11px] transition hover:bg-slate-50"
+                      className="border-t border-slate-100 text-sm transition hover:bg-slate-50"
                     >
                       <td className="px-4 py-3.5 font-bold text-slate-800">
                         {request.id}
@@ -845,7 +845,7 @@ export default function ResourceRequestsPage() {
                       </td>
 
                       <td className="px-4 py-3.5">
-                        <span className={`rounded-md px-2 py-0.5 text-[9px] font-semibold ${priorityStyles[request.priority] || "bg-slate-100 text-slate-700"}`}>
+                        <span className={`rounded-md px-2 py-0.5 text-xs font-semibold ${priorityStyles[request.priority] || "bg-slate-100 text-slate-700"}`}>
                           {request.priority}
                         </span>
                       </td>
@@ -859,7 +859,7 @@ export default function ResourceRequestsPage() {
                       </td>
 
                       <td className="px-4 py-3.5">
-                        <span className={`whitespace-nowrap rounded-md px-2 py-0.5 text-[9px] font-semibold ${statusStyles[request.status] || "bg-slate-100 text-slate-700"}`}>
+                        <span className={`whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-semibold ${statusStyles[request.status] || "bg-slate-100 text-slate-700"}`}>
                           {request.status}
                         </span>
                       </td>
@@ -899,7 +899,7 @@ export default function ResourceRequestsPage() {
 
             {/* PAGINATION */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">
-              <p className="text-[10px] text-slate-400">
+              <p className="text-[13px] text-slate-400">
                 Showing {filteredRequests.length === 0 ? 0 : (safePage - 1) * pageSize + 1}
                 –{Math.min(safePage * pageSize, filteredRequests.length)}
                 {" "}of {filteredRequests.length}
@@ -909,7 +909,7 @@ export default function ResourceRequestsPage() {
                 <button
                   disabled={safePage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-[10px] text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
                 >
                   Previous
                 </button>
@@ -918,7 +918,7 @@ export default function ResourceRequestsPage() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`h-7 min-w-7 rounded-lg border px-2 text-[10px] font-semibold transition ${
+                    className={`h-7 min-w-7 rounded-lg border px-2 text-xs font-semibold transition ${
                       safePage === page
                         ? "border-[#287ba5] bg-[#287ba5] text-white"
                         : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -931,7 +931,7 @@ export default function ResourceRequestsPage() {
                 <button
                   disabled={safePage === totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-[10px] text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
                 >
                   Next
                 </button>
@@ -939,7 +939,7 @@ export default function ResourceRequestsPage() {
             </div>
           </section>
 
-          <footer className="py-2 text-center text-[10px] text-slate-400 border-t border-slate-200/60">
+          <footer className="py-2 text-center text-[13px] text-slate-400 border-t border-slate-200/60">
             CareLink Resource Management Platform · Operational Demand Command
           </footer>
         </div>
@@ -969,7 +969,7 @@ export default function ResourceRequestsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700">Requesting Unit</label>
+              <label className="block text-sm font-semibold text-slate-700">Requesting Unit</label>
               <input
                 required
                 value={newRequest.unit}
@@ -980,7 +980,7 @@ export default function ResourceRequestsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700">Resource Name</label>
+              <label className="block text-sm font-semibold text-slate-700">Resource Name</label>
               <input
                 required
                 value={newRequest.resource}
@@ -992,7 +992,7 @@ export default function ResourceRequestsPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700">Category</label>
+                <label className="block text-sm font-semibold text-slate-700">Category</label>
                 <select
                   value={newRequest.category}
                   onChange={(e) => setNewRequest({ ...newRequest, category: e.target.value })}
@@ -1005,7 +1005,7 @@ export default function ResourceRequestsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">Quantity</label>
+                <label className="block text-sm font-semibold text-slate-700">Quantity</label>
                 <input
                   required
                   placeholder="e.g. 2,400 units, 1,200 L"
@@ -1018,7 +1018,7 @@ export default function ResourceRequestsPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700">Priority</label>
+                <label className="block text-sm font-semibold text-slate-700">Priority</label>
                 <select
                   value={newRequest.priority}
                   onChange={(e) => setNewRequest({ ...newRequest, priority: e.target.value as RequestPriority })}
@@ -1031,7 +1031,7 @@ export default function ResourceRequestsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">Suggested Source</label>
+                <label className="block text-sm font-semibold text-slate-700">Suggested Source</label>
                 <select
                   value={newRequest.source || "Central Hub"}
                   onChange={(e) => setNewRequest({ ...newRequest, source: e.target.value })}
@@ -1049,7 +1049,7 @@ export default function ResourceRequestsPage() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -1057,7 +1057,7 @@ export default function ResourceRequestsPage() {
               <button
                 type="submit"
                 disabled={actionInProgress === "create"}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50 shadow-sm"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50 shadow-sm"
               >
                 {actionInProgress === "create" ? (
                   <>
@@ -1093,7 +1093,7 @@ export default function ResourceRequestsPage() {
             <div className="mb-4 rounded-xl bg-sky-50 p-4 border border-sky-100">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-sky-800">{selectedRequest.id}</span>
-                <span className={`rounded-md px-2 py-0.5 text-[9px] font-semibold ${statusStyles[selectedRequest.status]}`}>
+                <span className={`rounded-md px-2 py-0.5 text-xs font-semibold ${statusStyles[selectedRequest.status]}`}>
                   {selectedRequest.status}
                 </span>
               </div>
@@ -1118,7 +1118,7 @@ export default function ResourceRequestsPage() {
 
             {/* STATUS TRANSITION CONTROLS */}
             <div className="mt-5 border-t border-slate-100 pt-4">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                 Workflow Actions
               </p>
 
@@ -1128,14 +1128,14 @@ export default function ResourceRequestsPage() {
                     <button
                       onClick={() => handleStatusUpdate(selectedRequest.id, "Allocated")}
                       disabled={actionInProgress?.startsWith("status-")}
-                      className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 transition"
+                      className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition"
                     >
                       Authorize & Allocate
                     </button>
                     <button
                       onClick={() => handleStatusUpdate(selectedRequest.id, "Partially Available")}
                       disabled={actionInProgress?.startsWith("status-")}
-                      className="rounded-lg border border-slate-200 px-3 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                      className="rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                     >
                       Partial Sourcing
                     </button>
@@ -1146,7 +1146,7 @@ export default function ResourceRequestsPage() {
                   <button
                     onClick={() => handleStatusUpdate(selectedRequest.id, "Allocated")}
                     disabled={actionInProgress?.startsWith("status-")}
-                    className="flex-1 rounded-lg bg-[#287ba5] py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] transition"
+                    className="flex-1 rounded-lg bg-[#287ba5] py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] transition"
                   >
                     Allocate Remaining
                   </button>
@@ -1156,7 +1156,7 @@ export default function ResourceRequestsPage() {
                   <button
                     onClick={() => handleStatusUpdate(selectedRequest.id, "Processing")}
                     disabled={actionInProgress?.startsWith("status-")}
-                    className="flex-1 rounded-lg bg-blue-600 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 transition"
+                    className="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition"
                   >
                     Start Processing
                   </button>
@@ -1166,7 +1166,7 @@ export default function ResourceRequestsPage() {
                   <button
                     onClick={() => handleStatusUpdate(selectedRequest.id, "Fulfilled")}
                     disabled={actionInProgress?.startsWith("status-")}
-                    className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 transition"
+                    className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition"
                   >
                     Mark Fulfilled
                   </button>
@@ -1177,7 +1177,7 @@ export default function ResourceRequestsPage() {
                     setSelectedRequest(null);
                     navigate("/resource-manager/allocations");
                   }}
-                  className="rounded-lg border border-slate-200 px-3 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                 >
                   Allocations Page
                 </button>
@@ -1187,7 +1187,7 @@ export default function ResourceRequestsPage() {
             <div className="mt-4 flex justify-end">
               <button
                 onClick={() => setSelectedRequest(null)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Close
               </button>
