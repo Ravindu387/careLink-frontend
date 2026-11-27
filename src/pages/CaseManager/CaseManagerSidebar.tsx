@@ -1,5 +1,6 @@
-import { NavLink } from "react-router-dom";
-
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   BriefcaseBusiness,
   LayoutDashboard,
@@ -13,8 +14,19 @@ import {
   Bell,
   ChartNoAxesCombined,
   Settings,
+  LogOut,
+  ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  X,
 } from "lucide-react";
+import { SIDEBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
+import { CareLinkLogo } from "../../components/common/CareLinkLogo";
+
+interface CaseManagerSidebarProps {
+  open?: boolean;
+  onClose?: () => void;
+}
 
 const navigation = [
   {
@@ -81,162 +93,197 @@ const navigation = [
   },
 ];
 
-export default function CaseManagerSidebar() {
+export default function CaseManagerSidebar({
+  open = false,
+  onClose,
+}: CaseManagerSidebarProps) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+  const [sectionOpen, setSectionOpen] = useState(true);
+
+  const displayName = user?.fullName || "Amina Mensah";
+  const initials = getUserInitials(displayName, "AM");
+
+  const handleSignOut = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[295px] flex-col bg-[#153e5d] text-white">
+    <>
+      {open && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          onClick={onClose}
+          className={SIDEBAR_THEME.overlay}
+        />
+      )}
 
-      {/* BRAND */}
+      <aside
+        className={`${SIDEBAR_THEME.asideBase} ${
+          collapsed ? SIDEBAR_THEME.widthCollapsed : SIDEBAR_THEME.widthExpanded
+        } lg:static lg:h-screen lg:shrink-0 lg:translate-x-0 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* BRAND HEADER */}
+        <div className={SIDEBAR_THEME.header}>
+          <NavLink
+            to="/case-manager/dashboard"
+            onClick={onClose}
+            className="flex min-w-0 items-center gap-3 transition hover:opacity-90"
+          >
+            <CareLinkLogo size={collapsed ? "compact" : "sidebar"} />
 
-      <div className="px-[22px] pt-[22px]">
+            {!collapsed && (
+              <div className="min-w-0">
+                <h1 className={SIDEBAR_THEME.brandTitle}>CareLink</h1>
+                <p className={SIDEBAR_THEME.brandSubtitle}>Connecting Help. Saving Lives.</p>
+              </div>
+            )}
+          </NavLink>
 
-        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            className={SIDEBAR_THEME.collapseBtn}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          </button>
 
-          <div className="flex h-[44px] w-[44px] items-center justify-center rounded-xl bg-[#65bba5] text-[#153e5d]">
-            <BriefcaseBusiness size={22} />
-          </div>
-
-          <div>
-            <h1 className="text-[19px] font-bold">
-              ReliefOS
-            </h1>
-
-            <p className="text-[11px] text-[#b8d1df]">
-              Case Management
-            </p>
-          </div>
-
+          <button
+            type="button"
+            onClick={onClose}
+            className={SIDEBAR_THEME.mobileCloseBtn}
+            aria-label="Close sidebar"
+          >
+            <X size={18} />
+          </button>
         </div>
 
-        <div className="mt-5 border-b border-white/10" />
+        {/* ACTIVE RESPONSE */}
+        {!collapsed && (
+          <div className={SIDEBAR_THEME.statusCardWrapper}>
+            <div className={SIDEBAR_THEME.statusCard}>
+              <div className={SIDEBAR_THEME.statusIndicatorRow}>
+                <div className="flex items-center gap-2">
+                  <span className={SIDEBAR_THEME.statusDot} />
+                  <span className={SIDEBAR_THEME.statusLabel}>
+                    ACTIVE RESPONSE
+                  </span>
+                </div>
+              </div>
 
-      </div>
-
-      {/* ACTIVE RESPONSE */}
-
-      <div className="px-[14px] pt-[15px]">
-
-        <div className="rounded-xl border border-white/10 bg-white/[0.07] px-3 py-3.5">
-
-          <div className="mb-2 flex items-center gap-2">
-
-            <span className="h-[7px] w-[7px] rounded-full bg-[#65c8a7]" />
-
-            <span className="text-[9px] font-bold tracking-[0.8px] text-[#79d5b8]">
-              ACTIVE RESPONSE
-            </span>
-
+              <h3 className={SIDEBAR_THEME.statusTitle}>Monsoon Floods 2025</h3>
+              <p className={SIDEBAR_THEME.statusSubtitle}>
+                Greater Riverton · Level 4
+              </p>
+            </div>
           </div>
+        )}
 
-          <h3 className="text-[13px] font-bold">
-            Monsoon Floods 2025
-          </h3>
+        {/* NAVIGATION */}
+        <nav className={SIDEBAR_THEME.navScroll}>
+          {!collapsed && (
+            <button
+              type="button"
+              onClick={() => setSectionOpen((prev) => !prev)}
+              className={SIDEBAR_THEME.sectionHeadingBtn}
+            >
+              <span>CASE OPERATIONS</span>
+              <ChevronDown
+                size={12}
+                className={`transition-transform ${
+                  sectionOpen ? "rotate-0" : "-rotate-90"
+                }`}
+              />
+            </button>
+          )}
 
-          <p className="mt-1 text-[10px] text-[#b7cbd9]">
-            Greater Riverton · Level 4
-          </p>
+          {(sectionOpen || collapsed) && (
+            <div className={SIDEBAR_THEME.menuList}>
+              {navigation.map((item) => {
+                const Icon = item.icon;
 
-        </div>
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    end={item.path === "/case-manager/dashboard"}
+                    onClick={onClose}
+                    title={collapsed ? item.name : undefined}
+                    className={({ isActive }) =>
+                      `${SIDEBAR_THEME.menuItemBase} ${
+                        isActive
+                          ? SIDEBAR_THEME.menuItemActive
+                          : SIDEBAR_THEME.menuItemInactive
+                      } ${collapsed ? "justify-center px-0" : ""}`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <div className="flex min-w-0 items-center gap-3">
+                          <Icon
+                            size={17}
+                            strokeWidth={1.8}
+                            className={
+                              isActive
+                                ? SIDEBAR_THEME.iconActive
+                                : SIDEBAR_THEME.iconInactive
+                            }
+                          />
 
-      </div>
+                          {!collapsed && (
+                            <span className="truncate">{item.name}</span>
+                          )}
+                        </div>
 
-      {/* NAVIGATION */}
-
-      <nav className="mt-6 flex-1 overflow-y-auto px-[12px] pb-4">
-
-        <p className="mb-3 px-3 text-[9px] font-bold tracking-[1px] text-[#78a5c2]">
-          CASE OPERATIONS
-        </p>
-
-        <div className="space-y-[3px]">
-
-          {navigation.map((item) => {
-
-            const Icon = item.icon;
-
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  `group relative flex h-[46px] items-center justify-between rounded-lg px-3 transition-all ${
-                    isActive
-                      ? "bg-[#287fa9] text-white shadow-sm before:absolute before:left-0 before:top-2 before:h-[30px] before:w-[4px] before:rounded-r-full before:bg-[#65c5aa]"
-                      : "text-[#d0e0ea] hover:bg-white/10 hover:text-white"
-                  }`
-                }
-              >
-
-                {({ isActive }) => (
-                  <>
-
-                    <div className="flex items-center gap-3">
-
-                      <Icon
-                        size={19}
-                        strokeWidth={1.8}
-                        className={
-                          isActive
-                            ? "text-white"
-                            : "text-[#b8d0df]"
-                        }
-                      />
-
-                      <span className="text-[12px] font-medium">
-                        {item.name}
-                      </span>
-
-                    </div>
-
-                    {item.badge && (
-                      <span className="flex h-[19px] min-w-[19px] items-center justify-center rounded-full bg-[#e94c59] px-1 text-[9px] font-bold text-white">
-                        {item.badge}
-                      </span>
+                        {!collapsed && item.badge && (
+                          <span className={SIDEBAR_THEME.badge}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </>
                     )}
-
-                  </>
-                )}
-
-              </NavLink>
-            );
-
-          })}
-
-        </div>
-
-      </nav>
-
-      {/* BOTTOM PROFILE */}
-
-      <div className="border-t border-white/10 px-[20px] py-4">
-
-        <button className="flex w-full items-center justify-between gap-3 text-left">
-
-          <div className="flex items-center gap-3">
-
-            <div className="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-[#287fa9] text-[12px] font-bold">
-              AM
+                  </NavLink>
+                );
+              })}
             </div>
+          )}
+        </nav>
 
-            <div>
+        {/* BOTTOM PROFILE */}
+        <div className={SIDEBAR_THEME.footer}>
+          <div
+            className={`${SIDEBAR_THEME.profileRow} ${
+              collapsed ? "justify-center" : ""
+            }`}
+          >
+            <div className={SIDEBAR_THEME.avatar}>{initials}</div>
 
-              <p className="text-[11px] font-bold">
-                Amina Mensah
-              </p>
-
-              <p className="mt-0.5 text-[9px] text-[#a9c5d5]">
-                Incident Case Manager
-              </p>
-
-            </div>
-
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className={SIDEBAR_THEME.userName}>{displayName}</p>
+                <p className={SIDEBAR_THEME.userRole}>Case Manager</p>
+              </div>
+            )}
           </div>
 
-          <ChevronRight size={16} />
-
-        </button>
-
-      </div>
-
-    </aside>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            title="Sign out"
+            className={SIDEBAR_THEME.signOutBtn}
+          >
+            <LogOut size={14} />
+            {!collapsed && <span>Sign out</span>}
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }
