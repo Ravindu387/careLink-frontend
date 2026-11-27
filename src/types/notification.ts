@@ -3,7 +3,13 @@ export type NotificationType =
   | "message"
   | "delivery"
   | "shelter"
-  | "medical";
+  | "medical"
+  | "Emergency"
+  | "Assistance"
+  | "Volunteer"
+  | "Resource"
+  | "System"
+  | string;
 
 export interface CitizenNotification {
   id: string | number;
@@ -40,11 +46,8 @@ export interface NotificationFilterParams {
   category?: string;
   unreadOnly?: boolean;
   search?: string;
-  | "Emergency"
-  | "Assistance"
-  | "Volunteer"
-  | "Resource"
-  | "System";
+}
+
 
 export type NotificationPriority = "Critical" | "High" | "Normal" | "Low";
 

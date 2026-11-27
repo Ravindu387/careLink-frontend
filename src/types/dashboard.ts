@@ -82,6 +82,8 @@ export interface CreateResourceRequestPayload {
   priority: string;
   category: string;
   source: string;
+}
+
 export interface DashboardSummary {
   openRequestsCount: number;
   openRequestsTodayDelta: number;

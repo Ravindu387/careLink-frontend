@@ -10,6 +10,9 @@ export interface AuditRecord {
   recordType: string;
   date: string;
   createdAt?: string;
+  type?: string;
+  environment?: string;
+  ipAddress?: string;
 }
 
 export interface CreateAuditLogPayload {
