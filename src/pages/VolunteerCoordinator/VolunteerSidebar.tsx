@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Users,
   LayoutDashboard,
@@ -11,12 +12,16 @@ import {
   MessageSquare,
   Bell,
   Settings,
-  ChevronRight,
+  LogOut,
   X,
-  Globe,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
 } from "lucide-react";
-
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { SIDEBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
+import { CareLinkLogo } from "../../components/common/CareLinkLogo";
 
 type Props = {
   open: boolean;
@@ -28,61 +33,61 @@ const navigation = [
     title: "COORDINATION WORKSPACE",
     items: [
       {
-        name: "Dashboard",
-        path: "/volunteer/dashboard",
+        name: "Volunteer Dashboard",
+        path: "/volunteer-coordinator/dashboard",
         icon: LayoutDashboard,
       },
       {
         name: "Volunteer Directory",
-        path: "/volunteer/directory",
+        path: "/volunteer-coordinator/directory",
         icon: Users,
       },
       {
         name: "Pending Verification",
-        path: "/volunteer/verification",
+        path: "/volunteer-coordinator/verification",
         icon: ShieldCheck,
         badge: "18",
       },
       {
         name: "Skills & Availability",
-        path: "/volunteer/skills",
+        path: "/volunteer-coordinator/skills",
         icon: SlidersHorizontal,
       },
       {
-        name: "Tasks",
-        path: "/volunteer/tasks",
+        name: "Tasks & Deployments",
+        path: "/volunteer-coordinator/tasks",
         icon: ListTodo,
         badge: "12",
       },
       {
-        name: "Assignments",
-        path: "/volunteer/assignments",
+        name: "Volunteer Assignments",
+        path: "/volunteer-coordinator/assignments",
         icon: CheckCheck,
       },
       {
         name: "AI Matching",
-        path: "/volunteer/ai-matching",
+        path: "/volunteer-coordinator/ai-matching",
         icon: Sparkles,
         badge: "3",
       },
       {
-        name: "Activity Tracking",
-        path: "/volunteer/activity",
+        name: "Activity & Attendance",
+        path: "/volunteer-coordinator/activity",
         icon: ChartNoAxesCombined,
       },
       {
         name: "Training & Certifications",
-        path: "/volunteer/training",
+        path: "/volunteer-coordinator/training",
         icon: Award,
       },
       {
         name: "Communications",
-        path: "/volunteer/communications",
+        path: "/volunteer-coordinator/communications",
         icon: MessageSquare,
       },
       {
         name: "Reports & Analytics",
-        path: "/volunteer/reports",
+        path: "/volunteer-coordinator/reports",
         icon: ChartNoAxesCombined,
       },
     ],
@@ -92,185 +97,216 @@ const navigation = [
     items: [
       {
         name: "Notifications",
-        path: "/volunteer/notifications",
+        path: "/volunteer-coordinator/notifications",
         icon: Bell,
         badge: "5",
       },
       {
         name: "Settings",
-        path: "/volunteer/settings",
+        path: "/volunteer-coordinator/settings",
         icon: Settings,
       },
     ],
   },
 ];
 
-export default function VolunteerSidebar({
-  open,
-  onClose,
-}: Props) {
+export default function VolunteerSidebar({ open, onClose }: Props) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
+    "COORDINATION WORKSPACE": true,
+    ACCOUNT: true,
+  });
+
+  const displayName = user?.fullName || "Nadia Okafor";
+  const initials = getUserInitials(displayName, "NO");
+
+  const toggleGroup = (title: string) => {
+    setExpandedGroups((prev) => ({ ...prev, [title]: !(prev[title] ?? true) }));
+  };
+
   return (
     <>
-      {/* MOBILE OVERLAY */}
       {open && (
         <button
           onClick={onClose}
           aria-label="Close sidebar"
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          className={SIDEBAR_THEME.overlay}
         />
       )}
 
-      {/* SIDEBAR */}
       <aside
-        className={`
-          fixed left-0 top-0 z-50 flex h-screen w-[230px]
-          flex-col bg-[#153F60] text-white
-          transition-transform duration-300
-          lg:sticky lg:top-0 lg:translate-x-0
-          ${
-            open
-              ? "translate-x-0"
-              : "-translate-x-full"
-          }
-        `}
+        className={`${SIDEBAR_THEME.asideBase} ${
+          collapsed ? SIDEBAR_THEME.widthCollapsed : SIDEBAR_THEME.widthExpanded
+        } h-screen lg:sticky lg:top-0 lg:shrink-0 lg:translate-x-0 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        {/* LOGO */}
-        <div className="flex h-[72px] shrink-0 items-center border-b border-white/10 px-4">
+        {/* BRAND HEADER */}
+        <div className={SIDEBAR_THEME.header}>
           <NavLink
-            to="/volunteer/dashboard"
+            to="/volunteer-coordinator/dashboard"
             onClick={onClose}
-            className="flex items-center gap-2.5"
+            className="flex min-w-0 items-center gap-3 transition hover:opacity-90"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#65BDA7] text-[#153F60]">
-              <Users size={21} />
-            </div>
+            <CareLinkLogo size={collapsed ? "compact" : "sidebar"} />
 
-            <div>
-              <h2 className="text-sm font-bold">
-                ReliefOS
-              </h2>
-
-              <p className="mt-0.5 text-[9px] text-slate-300">
-                Volunteer Coordination
-              </p>
-            </div>
+            {!collapsed && (
+              <div className="min-w-0">
+                <h2 className={SIDEBAR_THEME.brandTitle}>CareLink</h2>
+                <p className={SIDEBAR_THEME.brandSubtitle}>
+                  Connecting Help. Saving Lives.
+                </p>
+              </div>
+            )}
           </NavLink>
 
           <button
-            onClick={onClose}
-            className="ml-auto lg:hidden"
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            className={SIDEBAR_THEME.collapseBtn}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <X size={19} />
+            {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          </button>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className={SIDEBAR_THEME.mobileCloseBtn}
+            aria-label="Close sidebar"
+          >
+            <X size={18} />
           </button>
         </div>
 
         {/* ACTIVE RESPONSE */}
-        <div className="px-3 pt-3">
-          <div className="rounded-lg border border-white/10 bg-white/[0.07] p-3">
-            <div className="mb-2 flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#65C9A9]" />
+        {!collapsed && (
+          <div className={SIDEBAR_THEME.statusCardWrapper}>
+            <div className={SIDEBAR_THEME.statusCard}>
+              <div className={SIDEBAR_THEME.statusIndicatorRow}>
+                <div className="flex items-center gap-2">
+                  <span className={SIDEBAR_THEME.statusDot} />
+                  <p className={SIDEBAR_THEME.statusLabel}>ACTIVE RESPONSE</p>
+                </div>
+              </div>
 
-              <p className="text-[8px] font-bold tracking-wider text-[#65C9A9]">
-                ACTIVE RESPONSE
+              <p className={SIDEBAR_THEME.statusTitle}>Monsoon Floods 2025</p>
+              <p className={SIDEBAR_THEME.statusSubtitle}>
+                Greater Riverton · Level 4
               </p>
             </div>
-
-            <p className="text-[10px] font-bold">
-              Monsoon Floods 2025
-            </p>
-
-            <p className="mt-1 text-[8px] text-slate-300">
-              Greater Riverton · Level 4
-            </p>
           </div>
-        </div>
+        )}
 
         {/* NAVIGATION */}
-        <div className="flex-1 overflow-y-auto px-2 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {navigation.map((group) => (
-            <div key={group.title} className="mb-4">
-              <h3 className="mb-2 px-3 text-[8px] font-bold tracking-[0.15em] text-[#83A9C1]">
-                {group.title}
-              </h3>
+        <nav className={SIDEBAR_THEME.navScroll}>
+          {navigation.map((group) => {
+            const isGroupExpanded = expandedGroups[group.title] ?? true;
 
-              <div className="space-y-1">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
+            return (
+              <div key={group.title} className="mb-4 last:mb-0">
+                {!collapsed && (
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(group.title)}
+                    className={SIDEBAR_THEME.sectionHeadingBtn}
+                  >
+                    <span>{group.title}</span>
+                    <ChevronDown
+                      size={12}
+                      className={`transition-transform ${
+                        isGroupExpanded ? "rotate-0" : "-rotate-90"
+                      }`}
+                    />
+                  </button>
+                )}
 
-                  return (
-                    <NavLink
-                      key={item.path}
-                      to={item.path}
-                      onClick={onClose}
-                      className={({ isActive }) =>
-                        `
-                        relative flex min-h-[35px] items-center gap-2.5
-                        rounded-md px-2.5 py-2
-                        text-[10px] font-medium
-                        transition-all duration-200
-                        ${
-                          isActive
-                            ? "bg-[#2785B2] text-white shadow-sm"
-                            : "text-slate-200 hover:bg-white/10 hover:text-white"
-                        }
-                        `
-                      }
-                    >
-                      {({ isActive }) => (
-                        <>
-                          {isActive && (
-                            <span className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r-full bg-[#65C9A9]" />
+                {(isGroupExpanded || collapsed) && (
+                  <div className={SIDEBAR_THEME.menuList}>
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+
+                      return (
+                        <NavLink
+                          key={item.path}
+                          to={item.path}
+                          end={item.path === "/volunteer-coordinator/dashboard"}
+                          onClick={onClose}
+                          title={collapsed ? item.name : undefined}
+                          className={({ isActive }) =>
+                            `${SIDEBAR_THEME.menuItemBase} ${
+                              isActive
+                                ? SIDEBAR_THEME.menuItemActive
+                                : SIDEBAR_THEME.menuItemInactive
+                            } ${collapsed ? "justify-center px-0" : ""}`
+                          }
+                        >
+                          {({ isActive }) => (
+                            <>
+                              <div className="flex min-w-0 items-center gap-3">
+                                <Icon
+                                  size={17}
+                                  strokeWidth={1.8}
+                                  className={
+                                    isActive
+                                      ? SIDEBAR_THEME.iconActive
+                                      : SIDEBAR_THEME.iconInactive
+                                  }
+                                />
+                                {!collapsed && (
+                                  <span className="truncate">{item.name}</span>
+                                )}
+                              </div>
+
+                              {!collapsed && item.badge && (
+                                <span className={SIDEBAR_THEME.badge}>
+                                  {item.badge}
+                                </span>
+                              )}
+                            </>
                           )}
-
-                          <Icon size={14} />
-
-                          <span className="flex-1">
-                            {item.name}
-                          </span>
-
-                          {item.badge && (
-                            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[8px] font-bold text-white">
-                              {item.badge}
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </NavLink>
-                  );
-                })}
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
-        </div>
+            );
+          })}
+        </nav>
 
-        {/* USER PROFILE */}
-        <div className="shrink-0 border-t border-white/10 p-3">
-          <NavLink
-            to="/"
-            onClick={onClose}
-            className="mb-4 flex items-center gap-2 px-1 text-[10px] font-semibold text-slate-200 hover:text-white"
+        {/* USER PROFILE & SIGN OUT */}
+        <div className={SIDEBAR_THEME.footer}>
+          <div
+            className={`${SIDEBAR_THEME.profileRow} ${
+              collapsed ? "justify-center" : ""
+            }`}
           >
-            <Globe size={14} />
-            Citizen portal
-          </NavLink>
+            <div className={SIDEBAR_THEME.avatar}>{initials}</div>
 
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2785B2] text-[9px] font-bold">
-              NC
-            </div>
-
-            <div className="flex-1">
-              <p className="text-[9px] font-bold">
-                Nadia Okafor
-              </p>
-
-              <p className="mt-0.5 text-[8px] text-slate-300">
-                Volunteer Coordinator
-              </p>
-            </div>
-
-            <ChevronRight size={13} />
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className={SIDEBAR_THEME.userName}>{displayName}</p>
+                <p className={SIDEBAR_THEME.userRole}>Volunteer Coordinator</p>
+              </div>
+            )}
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              navigate("/login", { replace: true });
+            }}
+            title="Sign out"
+            className={SIDEBAR_THEME.signOutBtn}
+          >
+            <LogOut size={14} />
+            {!collapsed && <span>Sign out</span>}
+          </button>
         </div>
       </aside>
     </>
