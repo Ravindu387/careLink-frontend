@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -100,6 +101,26 @@ export default function DonationRecords() {
   const [showBulkMenu, setShowBulkMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    apiClient.get<any>("/donations").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setDonations(
+          items.map((d: any) => ({
+            id: d.id || d.reference || "DON-88400",
+            donor: d.donor || d.donorName || "Donor",
+            type: d.type === "Material" ? "Material" : "Monetary",
+            amount: typeof d.amount === "number" ? `$${d.amount.toLocaleString()}` : String(d.amount || "$0"),
+            campaign: d.campaign || "Flood Response 2025",
+            received: d.received || d.date || "Today",
+            verification: (d.verification as Donation["verification"]) || "Verified",
+            allocation: (d.allocation as Donation["allocation"]) || "Unallocated",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
 
   const [newDonation, setNewDonation] = useState({
     donor: "",
@@ -220,6 +241,14 @@ export default function DonationRecords() {
       notify("Please complete all required fields.");
       return;
     }
+
+    apiClient.post("/donations", {
+      donor: newDonation.donor,
+      type: newDonation.type,
+      amount: newDonation.amount,
+      campaign: newDonation.campaign,
+      received: newDonation.received,
+    }).catch(() => {});
 
     const donation: Donation = {
       id: `DON-${Math.floor(10000 + Math.random() * 89999)}`,
@@ -373,7 +402,7 @@ export default function DonationRecords() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[8px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={10} />
           <span className="text-slate-500">
@@ -388,11 +417,11 @@ export default function DonationRecords() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
 
           <div>
-            <h1 className="text-[21px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Donation Records
             </h1>
 
-            <p className="text-[9px] text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Verify monetary and material contributions and track
               transparent allocation status.
             </p>
@@ -402,7 +431,7 @@ export default function DonationRecords() {
 
             <button
               onClick={handleExport}
-              className="h-[31px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[9px] text-[#23749e] flex items-center gap-2 hover:bg-slate-50"
+              className="h-[31px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-sm text-[#23749e] flex items-center gap-2 hover:bg-slate-50"
             >
               <Download size={12} />
               Export
@@ -410,7 +439,7 @@ export default function DonationRecords() {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="h-[31px] px-3 bg-[#23749e] text-white rounded-lg text-[9px] font-semibold flex items-center gap-2 hover:bg-[#175c80]"
+              className="h-[31px] px-3 bg-[#23749e] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#175c80]"
             >
               <Plus size={13} />
               Record donation
@@ -434,7 +463,7 @@ export default function DonationRecords() {
             <button
               key={tab}
               onClick={() => changeTab(tab)}
-              className={`h-[35px] whitespace-nowrap text-[8px] flex items-center gap-1.5 border-b-2 transition ${
+              className={`h-[35px] whitespace-nowrap text-sm flex items-center gap-1.5 border-b-2 transition ${
                 activeTab === tab
                   ? "border-[#23749e] text-[#23749e] font-semibold"
                   : "border-transparent text-slate-500 hover:text-[#23749e]"
@@ -442,7 +471,7 @@ export default function DonationRecords() {
             >
               {tab}
 
-              <span className="bg-[#e7eff3] text-slate-500 rounded-full px-1.5 py-0.5 text-[7px]">
+              <span className="bg-[#e7eff3] text-slate-500 rounded-full px-1.5 py-0.5 text-xs">
                 {tabCounts[tab].toLocaleString()}
               </span>
             </button>
@@ -466,7 +495,7 @@ export default function DonationRecords() {
                 setCurrentPage(1);
               }}
               placeholder="Search donation reference or donor..."
-              className="w-full h-[31px] bg-white border border-[#d5e3e9] rounded-lg pl-8 pr-3 text-[8px] outline-none focus:border-[#39ae90]"
+              className="w-full h-[31px] bg-white border border-[#d5e3e9] rounded-lg pl-8 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
             />
           </div>
 
@@ -528,7 +557,7 @@ export default function DonationRecords() {
 
             <button
               onClick={() => setShowMoreFilters(!showMoreFilters)}
-              className="h-[31px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[8px] flex items-center justify-center gap-1.5 hover:bg-slate-50 whitespace-nowrap"
+              className="h-[31px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-sm flex items-center justify-center gap-1.5 hover:bg-slate-50 whitespace-nowrap"
             >
               <Filter size={11} />
               More filters
@@ -542,10 +571,10 @@ export default function DonationRecords() {
           <div className="bg-white border border-[#d5e3e9] rounded-lg p-3 mb-3 flex flex-wrap gap-4 items-end">
 
             <div>
-              <label className="block text-[8px] text-slate-500 mb-1">
+              <label className="block text-sm text-slate-500 mb-1">
                 Campaign
               </label>
-              <select className="border border-[#d5e3e9] rounded-md p-2 text-[9px]">
+              <select className="border border-[#d5e3e9] rounded-md p-2 text-sm sm:text-[15px]">
                 <option>All campaigns</option>
                 <option>Flood Response 2025</option>
                 <option>Emergency Shelter Fund</option>
@@ -555,12 +584,12 @@ export default function DonationRecords() {
             </div>
 
             <div>
-              <label className="block text-[8px] text-slate-500 mb-1">
+              <label className="block text-sm text-slate-500 mb-1">
                 Received date
               </label>
               <input
                 type="date"
-                className="border border-[#d5e3e9] rounded-md p-2 text-[9px]"
+                className="border border-[#d5e3e9] rounded-md p-2 text-sm sm:text-[15px]"
               />
             </div>
 
@@ -569,7 +598,7 @@ export default function DonationRecords() {
                 setShowMoreFilters(false);
                 notify("Additional filters applied.");
               }}
-              className="bg-[#23749e] text-white rounded-md px-4 py-2 text-[9px]"
+              className="bg-[#23749e] text-white rounded-md px-4 py-2 text-sm"
             >
               Apply filters
             </button>
@@ -585,11 +614,11 @@ export default function DonationRecords() {
           <div className="min-h-[51px] px-3 flex items-center justify-between border-b border-[#d7e4e9]">
 
             <div>
-              <h2 className="text-[10px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Donation Records
               </h2>
 
-              <p className="text-[8px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 {filteredDonations.length} demonstration records
               </p>
             </div>
@@ -598,7 +627,7 @@ export default function DonationRecords() {
 
               <button
                 onClick={() => setShowBulkMenu(!showBulkMenu)}
-                className="h-[30px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[8px] hover:bg-slate-50"
+                className="h-[30px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-sm hover:bg-slate-50"
               >
                 Bulk actions
               </button>
@@ -608,14 +637,14 @@ export default function DonationRecords() {
 
                   <button
                     onClick={() => handleBulkAction("Verify")}
-                    className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50 rounded"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 rounded"
                   >
                     Verify selected
                   </button>
 
                   <button
                     onClick={() => handleBulkAction("Allocate")}
-                    className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50 rounded"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 rounded"
                   >
                     Allocate selected
                   </button>
@@ -631,7 +660,7 @@ export default function DonationRecords() {
             <table className="w-full min-w-[900px] text-left">
 
               <thead>
-                <tr className="h-[25px] bg-[#f5f8f9] border-b border-[#d5e3e9] text-[7px] text-slate-500">
+                <tr className="h-[25px] bg-[#f5f8f9] border-b border-[#d5e3e9] text-sm text-slate-500">
 
                   <th className="px-2.5 font-medium">
                     <input
@@ -679,27 +708,27 @@ export default function DonationRecords() {
                       />
                     </td>
 
-                    <td className="px-2 text-[7px] font-semibold whitespace-nowrap">
+                    <td className="px-2 text-sm font-semibold whitespace-nowrap">
                       {donation.id}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       {donation.donor}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       {donation.type}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       {donation.amount}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       {donation.campaign}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       {donation.received}
                     </td>
 
@@ -738,7 +767,7 @@ export default function DonationRecords() {
                               notify(`Viewing ${donation.id}`);
                               setActiveMenu(null);
                             }}
-                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50"
                           >
                             View details
                           </button>
@@ -751,7 +780,7 @@ export default function DonationRecords() {
                               setActiveMenu(null);
                               notify("Donation verified.");
                             }}
-                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50"
                           >
                             Mark as verified
                           </button>
@@ -764,7 +793,7 @@ export default function DonationRecords() {
                               setActiveMenu(null);
                               notify("Donation allocated.");
                             }}
-                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50"
                           >
                             Allocate donation
                           </button>
@@ -777,7 +806,7 @@ export default function DonationRecords() {
                               setActiveMenu(null);
                               notify("Donation placed on hold.");
                             }}
-                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50"
                           >
                             Place on hold
                           </button>
@@ -796,7 +825,7 @@ export default function DonationRecords() {
                   size={23}
                   className="mx-auto text-slate-300 mb-2"
                 />
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[13px] text-slate-500">
                   No donation records found.
                 </p>
                 <button
@@ -807,7 +836,7 @@ export default function DonationRecords() {
                     setVerificationFilter("All verification states");
                     setAllocationFilter("All statuses");
                   }}
-                  className="text-[9px] text-[#23749e] mt-2"
+                  className="text-sm text-[#23749e] mt-2"
                 >
                   Clear filters
                 </button>
@@ -819,7 +848,7 @@ export default function DonationRecords() {
 
           <div className="min-h-[43px] px-3 flex flex-wrap items-center justify-between gap-2">
 
-            <p className="text-[8px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing{" "}
               {filteredDonations.length === 0
                 ? 0
@@ -846,7 +875,7 @@ export default function DonationRecords() {
                 onClick={() =>
                   setCurrentPage((page) => Math.max(1, page - 1))
                 }
-                className="h-[25px] px-3 border border-[#d5e3e9] rounded-md text-[8px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-[25px] px-3 border border-[#d5e3e9] rounded-md text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Previous
               </button>
@@ -858,7 +887,7 @@ export default function DonationRecords() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-[24px] h-[25px] rounded-md border text-[8px] ${
+                  className={`w-[24px] h-[25px] rounded-md border text-sm ${
                     currentPage === page
                       ? "bg-[#23749e] border-[#23749e] text-white"
                       : "bg-white border-[#d5e3e9] hover:bg-slate-50"
@@ -875,7 +904,7 @@ export default function DonationRecords() {
                     Math.min(totalPages, page + 1)
                   )
                 }
-                className="h-[25px] px-3 border border-[#b5cbd8] rounded-md text-[8px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-[25px] px-3 border border-[#b5cbd8] rounded-md text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Next
               </button>
@@ -896,11 +925,11 @@ export default function DonationRecords() {
 
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Record donation
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Register a new monetary or material contribution.
                 </p>
               </div>
@@ -1004,14 +1033,14 @@ export default function DonationRecords() {
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px]"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold hover:bg-[#175c80]"
+                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-sm font-semibold hover:bg-[#175c80]"
               >
                 Save donation
               </button>
@@ -1023,7 +1052,7 @@ export default function DonationRecords() {
       {/* TOAST MESSAGE */}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-[10px] flex items-center gap-3">
+        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-sm flex items-center gap-3">
           {toast}
           <button onClick={() => setToast("")}>
             <X size={13} />
@@ -1052,7 +1081,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none w-full lg:w-[110px] h-[31px] bg-white border border-[#d5e3e9] rounded-lg pl-2 pr-6 text-[8px] outline-none focus:border-[#39ae90] cursor-pointer"
+        className="appearance-none w-full lg:w-[110px] h-[31px] bg-white border border-[#d5e3e9] rounded-lg pl-2 pr-6 text-sm sm:text-[15px] outline-none focus:border-[#39ae90] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -1084,7 +1113,7 @@ function VerificationBadge({
 
   return (
     <span
-      className={`px-2 py-1 rounded text-[7px] font-semibold ${styles[status]}`}
+      className={`px-2 py-1 rounded text-xs font-semibold ${styles[status]}`}
     >
       {status}
     </span>
@@ -1109,7 +1138,7 @@ function AllocationBadge({
 
   return (
     <span
-      className={`px-2 py-1 rounded text-[7px] font-semibold whitespace-nowrap ${styles[status]}`}
+      className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${styles[status]}`}
     >
       {status}
     </span>
@@ -1129,7 +1158,7 @@ function FormField({
 }) {
   return (
     <label className="block">
-      <span className="block text-[9px] font-medium mb-1.5">
+      <span className="block text-xs font-medium mb-1.5">
         {label}
       </span>
       {children}

@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -144,8 +145,28 @@ export default function FundingOfficerDashboard() {
     useState<string | null>(null);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [donationList, setDonationList] = useState<Donation[]>(donations);
 
-  const filteredDonations = donations.filter((donation) =>
+  useEffect(() => {
+    apiClient.get<any>("/funding-dashboard").then((res) => {
+      if (Array.isArray(res?.recentDonations) && res.recentDonations.length) {
+        setDonationList(
+          res.recentDonations.map((d: any) => ({
+            reference: d.reference || d.id || "DON-88400",
+            donor: d.donor || d.donorName || "Donor",
+            type: d.type || "Monetary",
+            amount: typeof d.amount === "number" ? `$${d.amount.toLocaleString()}` : String(d.amount || "$0"),
+            campaign: d.campaign || "Flood Response 2025",
+            received: d.received || "Today",
+            verification: d.verification === "Pending" ? "Pending" : "Verified",
+            allocation: d.allocation || "Allocated",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
+  const filteredDonations = donationList.filter((donation) =>
     [
       donation.reference,
       donation.donor,
@@ -174,7 +195,7 @@ export default function FundingOfficerDashboard() {
       "Allocation",
     ];
 
-    const rows = donations.map((d) => [
+    const rows = donationList.map((d) => [
       d.reference,
       d.donor,
       d.type,
@@ -221,7 +242,7 @@ export default function FundingOfficerDashboard() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={11} />
           <span className="text-slate-500">
@@ -238,11 +259,11 @@ export default function FundingOfficerDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
 
           <div>
-            <h1 className="text-[21px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Funding & Donation Dashboard
             </h1>
 
-            <p className="text-[10px] text-slate-500 mt-1.5">
+            <p className="text-[13px] text-slate-500 mt-1.5">
               Monitor verified contributions, allocations,
               expenditure, campaigns, and transparency risks.
             </p>
@@ -252,7 +273,7 @@ export default function FundingOfficerDashboard() {
 
             <button
               onClick={handleExport}
-              className="h-[34px] px-3 border border-[#a9c5d5] bg-white rounded-lg text-[10px] text-[#1c638a] flex items-center gap-2 hover:bg-slate-50"
+              className="h-[34px] px-3 border border-[#a9c5d5] bg-white rounded-lg text-sm text-[#1c638a] flex items-center gap-2 hover:bg-slate-50"
             >
               <Download size={13} />
               Export summary
@@ -260,7 +281,7 @@ export default function FundingOfficerDashboard() {
 
            <button
       onClick={() => navigate("/funding-officer/donations")}
-      className="h-[34px] px-3 bg-[#23749e] hover:bg-[#175c80] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2"
+      className="h-[34px] px-3 bg-[#23749e] hover:bg-[#175c80] text-white rounded-lg text-sm font-semibold flex items-center gap-2"
     >
       <Plus size={14} />
       Record donation
@@ -279,18 +300,18 @@ export default function FundingOfficerDashboard() {
             />
 
             <div>
-              <p className="text-[9px] font-semibold">
+              <p className="text-xs font-semibold">
                 Demonstration financial data
               </p>
 
-              <p className="text-[8px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 All amounts and records shown are illustrative
                 and are not real payment transactions.
               </p>
             </div>
           </div>
 
-          <span className="text-[7px] text-slate-400 whitespace-nowrap">
+          <span className="text-xs text-slate-400 whitespace-nowrap">
             Updated just now
           </span>
         </div>
@@ -378,16 +399,16 @@ export default function FundingOfficerDashboard() {
 
             <div className="h-[49px] px-3 flex items-center justify-between border-b border-[#d7e4e9]">
               <div>
-                <h2 className="text-[11px] font-medium">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Funds received and allocated
                 </h2>
 
-                <p className="text-[8px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Last seven days · USD
                 </p>
               </div>
 
-              <span className="bg-[#e5f6f1] text-[#159b79] rounded px-2 py-1 text-[8px] font-semibold">
+              <span className="bg-[#e5f6f1] text-[#159b79] rounded px-2 py-1 text-xs font-semibold">
                 +$218K received
               </span>
             </div>
@@ -437,7 +458,7 @@ export default function FundingOfficerDashboard() {
                         />
                       </div>
 
-                      <span className="absolute text-[7px] text-slate-400 translate-y-4">
+                      <span className="absolute text-xs text-slate-400 translate-y-4">
                         {item.day}
                       </span>
                     </div>
@@ -460,11 +481,11 @@ export default function FundingOfficerDashboard() {
 
             <div className="h-[49px] px-3 flex items-center justify-between border-b border-[#d7e4e9]">
               <div>
-                <h2 className="text-[11px] font-medium">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Campaign performance
                 </h2>
 
-                <p className="text-[8px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Active emergency appeals
                 </p>
               </div>
@@ -473,7 +494,7 @@ export default function FundingOfficerDashboard() {
                 onClick={() =>
                   showMessage("Opening campaign overview...")
                 }
-                className="text-[8px] text-[#23749e] flex items-center gap-1"
+                className="text-sm text-[#23749e] flex items-center gap-1"
               >
                 View campaigns
                 <ChevronRight size={12} />
@@ -521,11 +542,11 @@ export default function FundingOfficerDashboard() {
             <div className="h-[49px] px-3 flex items-center justify-between border-b border-[#d7e4e9]">
 
               <div>
-                <h2 className="text-[11px] font-medium">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Recent donation records
                 </h2>
 
-                <p className="text-[8px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Latest verified and pending contributions
                 </p>
               </div>
@@ -534,7 +555,7 @@ export default function FundingOfficerDashboard() {
                 onClick={() =>
                   showMessage("Opening all donation records...")
                 }
-                className="text-[8px] text-[#23749e] flex items-center gap-1"
+                className="text-sm text-[#23749e] flex items-center gap-1"
               >
                 View all
                 <ChevronRight size={12} />
@@ -548,7 +569,7 @@ export default function FundingOfficerDashboard() {
               <table className="w-full text-left min-w-[700px]">
 
                 <thead>
-                  <tr className="bg-[#f5f8f9] text-[7px] text-slate-500 border-b border-[#d7e4e9]">
+                  <tr className="bg-[#f5f8f9] text-sm text-slate-500 border-b border-[#d7e4e9]">
                     <th className="px-2.5 py-3 font-medium">Reference</th>
                     <th className="px-2 py-3 font-medium">Donor</th>
                     <th className="px-2 py-3 font-medium">Type</th>
@@ -567,27 +588,27 @@ export default function FundingOfficerDashboard() {
                       key={donation.reference}
                       className="border-b border-[#e6edf0] hover:bg-[#f8fbfc] transition"
                     >
-                      <td className="px-2.5 py-3 text-[8px] font-semibold whitespace-nowrap">
+                      <td className="px-2.5 py-3 text-sm font-semibold whitespace-nowrap">
                         {donation.reference}
                       </td>
 
-                      <td className="px-2 py-3 text-[8px] whitespace-nowrap">
+                      <td className="px-2 py-3 text-sm whitespace-nowrap">
                         {donation.donor}
                       </td>
 
-                      <td className="px-2 py-3 text-[8px]">
+                      <td className="px-2 py-3 text-sm">
                         {donation.type}
                       </td>
 
-                      <td className="px-2 py-3 text-[8px] whitespace-nowrap">
+                      <td className="px-2 py-3 text-sm whitespace-nowrap">
                         {donation.amount}
                       </td>
 
-                      <td className="px-2 py-3 text-[8px] whitespace-nowrap">
+                      <td className="px-2 py-3 text-sm whitespace-nowrap">
                         {donation.campaign}
                       </td>
 
-                      <td className="px-2 py-3 text-[8px]">
+                      <td className="px-2 py-3 text-sm">
                         {donation.received}
                       </td>
 
@@ -633,13 +654,13 @@ export default function FundingOfficerDashboard() {
 
             {selectedDonation && (
               <div className="p-3 bg-[#f0f7fa] border-t border-[#d7e4e9] flex justify-between items-center">
-                <p className="text-[9px]">
+                <p className="text-xs">
                   Selected: <strong>{selectedDonation}</strong>
                 </p>
 
                 <button
                   onClick={() => setSelectedDonation(null)}
-                  className="text-[#23749e] text-[9px]"
+                  className="text-[#23749e] text-sm"
                 >
                   Close
                 </button>
@@ -655,16 +676,16 @@ export default function FundingOfficerDashboard() {
             <div className="h-[49px] px-3 flex items-center justify-between border-b border-[#d7e4e9]">
 
               <div>
-                <h2 className="text-[11px] font-medium">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Attention required
                 </h2>
 
-                <p className="text-[8px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Funding risks and pending actions
                 </p>
               </div>
 
-              <span className="bg-[#fdebed] text-[#d92d40] rounded px-2 py-1 text-[7px] font-semibold">
+              <span className="bg-[#fdebed] text-[#d92d40] rounded px-2 py-1 text-xs font-semibold">
                 5 flags
               </span>
             </div>
@@ -680,11 +701,11 @@ export default function FundingOfficerDashboard() {
                 <AlertIcon type={alert.type} />
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-[8px] font-semibold">
+                  <p className="text-xs font-semibold">
                     {alert.title}
                   </p>
 
-                  <p className="text-[7px] text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-400 mt-0.5">
                     {alert.description}
                   </p>
                 </div>
@@ -704,7 +725,7 @@ export default function FundingOfficerDashboard() {
 
         <section className="mb-5">
 
-          <h2 className="text-[10px] font-medium mb-2">
+          <h2 className="text-base sm:text-lg font-semibold mb-2">
             Quick actions
           </h2>
 
@@ -725,7 +746,7 @@ export default function FundingOfficerDashboard() {
                     <Icon size={15} />
                   </span>
 
-                  <span className="flex-1 text-left text-[8px] font-semibold">
+                  <span className="flex-1 text-left text-xs font-semibold">
                     {action.label}
                   </span>
 
@@ -741,7 +762,7 @@ export default function FundingOfficerDashboard() {
 
         {/* FOOTER */}
 
-        <footer className="border-t border-[#d7e4e9] pt-4 flex flex-col sm:flex-row justify-between gap-2 text-[8px] text-slate-400">
+        <footer className="border-t border-[#d7e4e9] pt-4 flex flex-col sm:flex-row justify-between gap-2 text-xs text-slate-400">
           <p>CareLink · Funding & Donations Management</p>
           <p>Demonstration environment · USD</p>
         </footer>
@@ -750,7 +771,7 @@ export default function FundingOfficerDashboard() {
       {/* TOAST MESSAGE */}
 
       {message && (
-        <div className="fixed bottom-5 right-5 z-50 bg-[#123e60] text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 text-[10px]">
+        <div className="fixed bottom-5 right-5 z-50 bg-[#123e60] text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 text-sm">
           <Check size={15} className="text-[#60d5ad]" />
           {message}
 
@@ -794,7 +815,7 @@ function StatCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[8px] text-slate-500">
+        <p className="text-xs text-slate-500">
           {label}
         </p>
 
@@ -802,7 +823,7 @@ function StatCard({
           {value}
         </p>
 
-        <p className="text-[7px] text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-400 mt-0.5">
           {note}
         </p>
       </div>
@@ -827,11 +848,11 @@ function CampaignRow({
     <div className="min-h-[44px] px-3 py-2 border-b border-[#d7e4e9] flex items-center gap-3">
 
       <div className="w-[40%] min-w-0">
-        <p className="text-[8px] font-semibold truncate">
+        <p className="text-xs font-semibold truncate">
           {name}
         </p>
 
-        <p className="text-[7px] text-slate-400 mt-1">
+        <p className="text-xs text-slate-400 mt-1">
           {amount}
         </p>
       </div>
@@ -843,7 +864,7 @@ function CampaignRow({
         />
       </div>
 
-      <span className="text-[8px] font-semibold w-[32px] text-right">
+      <span className="text-xs font-semibold w-[32px] text-right">
         {percentage}%
       </span>
     </div>
@@ -868,7 +889,7 @@ function StatusBadge({
   };
 
   return (
-    <span className={`inline-block whitespace-nowrap rounded px-2 py-1 text-[7px] font-semibold ${styles[status]}`}>
+    <span className={`inline-block whitespace-nowrap rounded px-2 py-1 text-xs font-semibold ${styles[status]}`}>
       {status}
     </span>
   );
@@ -891,7 +912,7 @@ function Legend({
         className="w-[6px] h-[6px] rounded-sm"
         style={{ backgroundColor: color }}
       />
-      <span className="text-[7px] text-slate-500">
+      <span className="text-xs text-slate-500">
         {label}
       </span>
     </div>
