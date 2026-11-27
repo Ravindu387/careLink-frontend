@@ -320,7 +320,7 @@ const PriorityQueue: React.FC = () => {
             <button
               onClick={() => loadData(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
               title="Refresh queue"
             >
               <RefreshCw size={13} className={isRefreshing ? "animate-spin text-[#287da8]" : ""} />
@@ -363,7 +363,7 @@ const PriorityQueue: React.FC = () => {
             />
             <div>
               <p
-                className={`text-xs font-bold ${
+                className={`text-sm font-bold ${
                   (stats?.overdueCount ?? 0) > 0 ? "text-red-900" : "text-emerald-900"
                 }`}
               >
@@ -372,7 +372,7 @@ const PriorityQueue: React.FC = () => {
                   : "All critical cases are currently within target SLA review windows"}
               </p>
               <p
-                className={`mt-1 text-xs ${
+                className={`mt-1 text-sm ${
                   (stats?.overdueCount ?? 0) > 0 ? "text-red-800" : "text-emerald-800"
                 }`}
               >
@@ -383,7 +383,7 @@ const PriorityQueue: React.FC = () => {
 
           <button
             onClick={() => setShowPolicy(true)}
-            className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-xs font-semibold text-[#287da8] shadow-sm transition hover:bg-sky-50"
+            className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-sm font-semibold text-[#287da8] shadow-sm transition hover:bg-sky-50"
           >
             View SLA policy
           </button>
@@ -398,7 +398,7 @@ const PriorityQueue: React.FC = () => {
                 setActiveTab(tab.id);
                 setCurrentPage(1);
               }}
-              className={`relative flex items-center gap-2 py-4 text-xs transition ${
+              className={`relative flex items-center gap-2 py-4 text-sm transition ${
                 activeTab === tab.id
                   ? "font-semibold text-[#287da8]"
                   : "text-slate-500 hover:text-sky-700"
@@ -406,7 +406,7 @@ const PriorityQueue: React.FC = () => {
             >
               {tab.label}
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                   activeTab === tab.id
                     ? "bg-sky-100 text-[#287da8]"
                     : "bg-slate-200 text-slate-600"
@@ -434,7 +434,7 @@ const PriorityQueue: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
             {searchTerm && (
               <button onClick={() => setSearchTerm("")}>
@@ -450,7 +450,7 @@ const PriorityQueue: React.FC = () => {
               setEventFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All crisis events</option>
             <option>Flood Response</option>
@@ -464,7 +464,7 @@ const PriorityQueue: React.FC = () => {
               setPriorityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All priorities</option>
             <option>Critical</option>
@@ -480,7 +480,7 @@ const PriorityQueue: React.FC = () => {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All categories</option>
             <option>Emergency shelter</option>
@@ -498,7 +498,7 @@ const PriorityQueue: React.FC = () => {
               setStatusFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All statuses</option>
             <option>Under Review</option>
@@ -515,7 +515,7 @@ const PriorityQueue: React.FC = () => {
               setDateFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>Date range</option>
             <option>Last 1 hour</option>
@@ -526,7 +526,7 @@ const PriorityQueue: React.FC = () => {
           {/* More Filters Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2.5 rounded-lg border px-4 py-3 text-xs font-semibold shadow-sm transition ${
+            className={`flex items-center gap-2.5 rounded-lg border px-4 py-3 text-sm font-semibold shadow-sm transition ${
               showFilters
                 ? "border-[#287da8] bg-sky-50 text-[#287da8]"
                 : "border-[#b9d0df] bg-white text-[#287da8] hover:bg-sky-50"
@@ -549,7 +549,7 @@ const PriorityQueue: React.FC = () => {
 
             <button
               onClick={resetFilters}
-              className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-100"
             >
               Clear all filters
             </button>
@@ -561,7 +561,7 @@ const PriorityQueue: React.FC = () => {
           {/* Table Header */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#d5e2eb] px-5 py-4">
             <div>
-              <h2 className="text-base font-medium text-[#173e5b]">Prioritised Assistance Queue</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-[#173e5b]">Prioritised Assistance Queue</h2>
               <p className="mt-1 text-xs text-slate-400">
                 {isLoading ? "Loading queue..." : `Showing ${cases.length} of ${totalCount} priority case(s)`}
               </p>
@@ -575,7 +575,7 @@ const PriorityQueue: React.FC = () => {
                   showToast("Please select at least one case using the checkboxes.");
                 }
               }}
-              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-xs font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
+              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-sm font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
             >
               Claim selected {selectedCases.length > 0 && `(${selectedCases.length})`}
             </button>
@@ -585,7 +585,7 @@ const PriorityQueue: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1100px] text-left">
               <thead className="bg-[#f7f9fa]">
-                <tr className="border-b border-[#d5e2eb] text-[11px] font-semibold text-slate-500">
+                <tr className="border-b border-[#d5e2eb] text-sm font-semibold text-slate-500">
                   <th className="px-4 py-4">
                     <input
                       type="checkbox"
@@ -644,26 +644,26 @@ const PriorityQueue: React.FC = () => {
                         />
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] font-bold text-[#173e5b]">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm font-bold text-[#173e5b]">
                         {item.id}
                       </td>
 
                       <td className="px-3 py-5">
-                        <p className="whitespace-nowrap text-[11px] font-semibold text-[#173e5b]">
+                        <p className="whitespace-nowrap text-sm font-semibold text-[#173e5b]">
                           {item.category}
                         </p>
-                        <p className="mt-1 whitespace-nowrap text-[10px] text-slate-500">
+                        <p className="mt-1 whitespace-nowrap text-[13px] text-slate-500">
                           {item.applicant}
                         </p>
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         {item.location}
                       </td>
 
                       <td className="px-3 py-5">
                         <span
-                          className={`rounded-md px-2.5 py-1 text-[10px] font-semibold ${priorityStyle(
+                          className={`rounded-md px-2.5 py-1 text-xs font-semibold ${priorityStyle(
                             item.priority
                           )}`}
                         >
@@ -672,17 +672,17 @@ const PriorityQueue: React.FC = () => {
                       </td>
 
                       <td className="px-3 py-5">
-                        <p className="text-[11px] font-semibold text-slate-700">{item.aiPriority}</p>
-                        <p className="mt-1 text-[10px] text-slate-400">{item.confidence}</p>
+                        <p className="text-sm font-semibold text-slate-700">{item.aiPriority}</p>
+                        <p className="mt-1 text-[13px] text-slate-400">{item.confidence}</p>
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         {item.verification}
                       </td>
 
-                      <td className="px-3 py-5 text-[11px] text-slate-600">
+                      <td className="px-3 py-5 text-sm text-slate-600">
                         <span
-                          className={`rounded px-1.5 py-0.5 text-[10px] ${
+                          className={`rounded px-1.5 py-0.5 text-xs ${
                             item.assigned === "Unassigned"
                               ? "bg-amber-50 font-medium text-amber-700"
                               : "bg-slate-100 font-medium text-slate-700"
@@ -692,10 +692,10 @@ const PriorityQueue: React.FC = () => {
                         </span>
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         <span className="font-semibold text-slate-700">{item.age}</span>
                         {item.priority === "Critical" && item.minutes > 30 && (
-                          <span className="ml-1.5 rounded bg-red-100 px-1.5 py-0.5 text-[9px] font-bold text-red-700">
+                          <span className="ml-1.5 rounded bg-red-100 px-1.5 py-0.5 text-xs font-bold text-red-700">
                             SLA RISK
                           </span>
                         )}
@@ -703,7 +703,7 @@ const PriorityQueue: React.FC = () => {
 
                       <td className="px-3 py-5">
                         <span
-                          className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[10px] font-semibold ${statusStyle(
+                          className={`whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold ${statusStyle(
                             item.status
                           )}`}
                         >
@@ -744,7 +744,7 @@ const PriorityQueue: React.FC = () => {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3.5 py-2 text-xs text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3.5 py-2 text-sm text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ChevronLeft size={14} />
                 Previous
@@ -754,7 +754,7 @@ const PriorityQueue: React.FC = () => {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`h-8 w-8 rounded-lg border text-xs transition ${
+                  className={`h-8 w-8 rounded-lg border text-sm transition ${
                     currentPage === page
                       ? "border-[#287da8] bg-[#287da8] font-semibold text-white"
                       : "border-[#d5e2eb] bg-white text-slate-600 hover:bg-sky-50"
@@ -767,7 +767,7 @@ const PriorityQueue: React.FC = () => {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3.5 py-2 text-xs font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3.5 py-2 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
                 <ChevronRight size={14} />
@@ -829,11 +829,11 @@ const PriorityQueue: React.FC = () => {
             <div className="mt-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Update Priority</label>
+                  <label className="text-sm font-semibold text-slate-700">Update Priority</label>
                   <select
                     value={editPriority}
                     onChange={(e) => setEditPriority(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   >
                     <option>Critical</option>
                     <option>High</option>
@@ -843,11 +843,11 @@ const PriorityQueue: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Update Status</label>
+                  <label className="text-sm font-semibold text-slate-700">Update Status</label>
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   >
                     <option>Under Review</option>
                     <option>Assigned</option>
@@ -859,13 +859,13 @@ const PriorityQueue: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Coordinator Notes</label>
+                <label className="text-sm font-semibold text-slate-700">Coordinator Notes</label>
                 <textarea
                   rows={2}
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
                   placeholder="Record priority reassessment reason, relief deployment instructions..."
-                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-xs outline-none focus:border-sky-500"
+                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </div>
             </div>
@@ -876,7 +876,7 @@ const PriorityQueue: React.FC = () => {
                   type="button"
                   disabled={isSubmittingEdit}
                   onClick={handleClaimSingle}
-                  className="flex items-center gap-1.5 rounded-lg border border-sky-300 bg-sky-50 px-4 py-2 text-xs font-semibold text-[#287da8] hover:bg-sky-100 disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-lg border border-sky-300 bg-sky-50 px-4 py-2 text-sm font-semibold text-[#287da8] hover:bg-sky-100 disabled:opacity-50"
                 >
                   <UserCheck size={14} />
                   Claim Case
@@ -887,7 +887,7 @@ const PriorityQueue: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedCase(null)}
-                  className="rounded-lg border border-[#b9d0df] px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-[#b9d0df] px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Close
                 </button>
@@ -896,7 +896,7 @@ const PriorityQueue: React.FC = () => {
                   type="button"
                   disabled={isSubmittingEdit}
                   onClick={handleUpdateCase}
-                  className="flex items-center gap-1.5 rounded-lg bg-[#287da8] px-5 py-2 text-xs font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-lg bg-[#287da8] px-5 py-2 text-sm font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
                 >
                   <Check size={14} />
                   {isSubmittingEdit ? "Saving..." : "Save Changes"}
@@ -925,13 +925,13 @@ const PriorityQueue: React.FC = () => {
             </p>
 
             <div className="mt-4">
-              <label className="text-xs font-semibold text-slate-700">Assign To</label>
+              <label className="text-sm font-semibold text-slate-700">Assign To</label>
               <input
                 type="text"
                 value={bulkAssignTo}
                 onChange={(e) => setBulkAssignTo(e.target.value)}
                 placeholder="You, Field Team A, Coordinator West..."
-                className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
@@ -939,7 +939,7 @@ const PriorityQueue: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowBulkModal(false)}
-                className="rounded-lg border border-[#b9d0df] px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-[#b9d0df] px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -947,7 +947,7 @@ const PriorityQueue: React.FC = () => {
                 type="button"
                 disabled={isSubmittingBulk}
                 onClick={handleBulkClaim}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287da8] px-5 py-2 text-xs font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287da8] px-5 py-2 text-sm font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
               >
                 <UserCheck size={14} />
                 {isSubmittingBulk ? "Claiming..." : `Confirm Claim (${selectedCases.length})`}
@@ -1005,7 +1005,7 @@ const PriorityQueue: React.FC = () => {
 
             <button
               onClick={() => setShowPolicy(false)}
-              className="mt-6 w-full rounded-lg bg-[#287da8] py-2.5 text-xs font-semibold text-white hover:bg-[#17678f]"
+              className="mt-6 w-full rounded-lg bg-[#287da8] py-2.5 text-sm font-semibold text-white hover:bg-[#17678f]"
             >
               Close policy
             </button>

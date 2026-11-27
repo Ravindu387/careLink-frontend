@@ -247,7 +247,7 @@ const PotentialDuplicates: React.FC = () => {
             <button
               onClick={() => loadData(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
               title="Refresh duplicate matches"
             >
               <RefreshCw size={13} className={isRefreshing ? "animate-spin text-[#287da8]" : ""} />
@@ -271,7 +271,7 @@ const PotentialDuplicates: React.FC = () => {
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-xs font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-sm font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
             >
               <Download size={16} />
               {isExporting ? "Exporting..." : "Export"}
@@ -279,7 +279,7 @@ const PotentialDuplicates: React.FC = () => {
 
             <button
               onClick={() => setShowPolicy(true)}
-              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-xs font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
+              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-sm font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
             >
               <ShieldCheck size={16} />
               Detection policy
@@ -313,8 +313,8 @@ const PotentialDuplicates: React.FC = () => {
         <div className="mb-5 flex items-center gap-3 rounded-xl border border-[#d9c8fa] border-l-[4px] border-l-[#7654c8] bg-[#f4efff] px-4 py-4 shadow-sm">
           <Copy size={22} className="shrink-0 text-[#7654c8]" />
           <div>
-            <p className="text-xs font-bold text-[#6040a8]">Human review is required</p>
-            <p className="mt-1 text-xs text-[#7654c8]">
+            <p className="text-sm font-bold text-[#6040a8]">Human review is required</p>
+            <p className="mt-1 text-sm text-[#7654c8]">
               Similarity detection flags possible matches only. Cases remain separate until an authorised reviewer decides otherwise.
             </p>
           </div>
@@ -333,7 +333,7 @@ const PotentialDuplicates: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
             {searchTerm && (
               <button onClick={() => setSearchTerm("")}>
@@ -349,7 +349,7 @@ const PotentialDuplicates: React.FC = () => {
               setSimilarityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All similarity levels</option>
             <option>High</option>
@@ -364,7 +364,7 @@ const PotentialDuplicates: React.FC = () => {
               setReviewFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All review states</option>
             <option>Awaiting Review</option>
@@ -380,7 +380,7 @@ const PotentialDuplicates: React.FC = () => {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All categories</option>
             <option>Emergency shelter</option>
@@ -396,7 +396,7 @@ const PotentialDuplicates: React.FC = () => {
               setDateFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>Date detected</option>
             <option>Today</option>
@@ -406,7 +406,7 @@ const PotentialDuplicates: React.FC = () => {
           {/* More Filters Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2.5 rounded-lg border px-4 py-3 text-xs font-semibold shadow-sm transition ${
+            className={`flex items-center gap-2.5 rounded-lg border px-4 py-3 text-sm font-semibold shadow-sm transition ${
               showFilters
                 ? "border-[#287da8] bg-sky-50 text-[#287da8]"
                 : "border-[#b9d0df] bg-white text-[#287da8] hover:bg-sky-50"
@@ -429,7 +429,7 @@ const PotentialDuplicates: React.FC = () => {
 
             <button
               onClick={resetFilters}
-              className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-100"
             >
               Clear all filters
             </button>
@@ -440,7 +440,7 @@ const PotentialDuplicates: React.FC = () => {
         <div className="overflow-hidden rounded-xl border border-[#d5e2eb] bg-white shadow-[0_8px_25px_rgba(30,64,90,0.06)]">
           {/* Table Header */}
           <div className="hidden border-b border-[#d5e2eb] bg-[#f7f9fa] lg:block">
-            <div className="grid grid-cols-[1fr_1.2fr_1.7fr_4fr_0.8fr_1.2fr_1.8fr_35px] items-center text-[10px] font-semibold text-slate-500">
+            <div className="grid grid-cols-[1fr_1.2fr_1.7fr_4fr_0.8fr_1.2fr_1.8fr_35px] items-center text-[13px] font-semibold text-slate-500">
               {["Match ID", "Primary Case", "Possible Duplicate", "Similarity Factors", "Score", "Confidence", "Status", ""].map(
                 (heading, index) => (
                   <div key={index} className="px-3 py-4">
@@ -467,39 +467,39 @@ const PotentialDuplicates: React.FC = () => {
                 >
                   {/* Match ID */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">Match ID</span>
-                    <p className="text-[11px] font-bold text-[#173e5b]">{item.id}</p>
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">Match ID</span>
+                    <p className="text-sm font-bold text-[#173e5b]">{item.id}</p>
                   </div>
 
                   {/* Primary Case */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">Primary Case</span>
-                    <p className="text-[11px] font-semibold text-[#173e5b]">{item.primaryCase}</p>
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">Primary Case</span>
+                    <p className="text-sm font-semibold text-[#173e5b]">{item.primaryCase}</p>
                   </div>
 
                   {/* Possible Duplicate */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">Possible Duplicate</span>
-                    <p className="text-[11px] text-slate-600">{item.duplicateCase}</p>
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">Possible Duplicate</span>
+                    <p className="text-sm text-slate-600">{item.duplicateCase}</p>
                   </div>
 
                   {/* Similarity Factors */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">Similarity Factors</span>
-                    <p className="text-[11px] leading-5 text-slate-600">{item.factors}</p>
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">Similarity Factors</span>
+                    <p className="text-sm leading-5 text-slate-600">{item.factors}</p>
                   </div>
 
                   {/* Score */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">Score</span>
-                    <p className="text-xs font-bold text-[#7654c8]">{item.score}%</p>
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">Score</span>
+                    <p className="text-sm font-bold text-[#7654c8]">{item.score}%</p>
                   </div>
 
                   {/* Confidence */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">Confidence</span>
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">Confidence</span>
                     <span
-                      className={`inline-block rounded-md px-2.5 py-1 text-[10px] font-semibold ${confidenceStyle(
+                      className={`inline-block rounded-md px-2.5 py-1 text-xs font-semibold ${confidenceStyle(
                         item.confidence
                       )}`}
                     >
@@ -509,9 +509,9 @@ const PotentialDuplicates: React.FC = () => {
 
                   {/* Status */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">Status</span>
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">Status</span>
                     <span
-                      className={`inline-block whitespace-nowrap rounded-md px-2.5 py-1 text-[10px] font-semibold ${statusStyle(
+                      className={`inline-block whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold ${statusStyle(
                         item.status
                       )}`}
                     >
@@ -545,7 +545,7 @@ const PotentialDuplicates: React.FC = () => {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3.5 py-2 text-xs text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3.5 py-2 text-sm text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ChevronLeft size={14} />
                 Previous
@@ -555,7 +555,7 @@ const PotentialDuplicates: React.FC = () => {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`h-8 w-8 rounded-lg border text-xs transition ${
+                  className={`h-8 w-8 rounded-lg border text-sm transition ${
                     currentPage === page
                       ? "border-[#287da8] bg-[#287da8] font-semibold text-white"
                       : "border-[#d5e2eb] bg-white text-slate-600 hover:bg-sky-50"
@@ -568,7 +568,7 @@ const PotentialDuplicates: React.FC = () => {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3.5 py-2 text-xs font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3.5 py-2 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
                 <ChevronRight size={14} />
@@ -600,9 +600,9 @@ const PotentialDuplicates: React.FC = () => {
 
             {/* Similarity Score Card */}
             <div className="mb-5 rounded-xl bg-purple-50 p-4 text-center">
-              <p className="text-xs font-medium text-purple-700">AI Similarity Score</p>
+              <p className="text-sm font-medium text-purple-700">AI Similarity Score</p>
               <h3 className="mt-1 text-3xl font-bold text-purple-700">{selectedDuplicate.score}%</h3>
-              <p className="mt-1 text-xs text-purple-600">
+              <p className="mt-1 text-sm text-purple-600">
                 {selectedDuplicate.confidence} Confidence · Category: {selectedDuplicate.category}
               </p>
             </div>
@@ -610,14 +610,14 @@ const PotentialDuplicates: React.FC = () => {
             {/* Case Comparison Cards */}
             <div className="mb-5 grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-3.5">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Primary Case
                 </p>
                 <p className="mt-1 text-sm font-bold text-[#173e5b]">{selectedDuplicate.primaryCase}</p>
               </div>
 
               <div className="rounded-xl border border-purple-200 bg-purple-50/30 p-3.5">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-purple-500">
+                <p className="text-xs font-semibold uppercase tracking-wider text-purple-500">
                   Possible Duplicate
                 </p>
                 <p className="mt-1 text-sm font-bold text-purple-800">
@@ -648,31 +648,31 @@ const PotentialDuplicates: React.FC = () => {
               </div>
               <div className="pt-1">
                 <span className="text-slate-400">Description / Comparison Context:</span>
-                <p className="mt-1 text-xs text-slate-700">{selectedDuplicate.description}</p>
+                <p className="mt-1 text-sm text-slate-700">{selectedDuplicate.description}</p>
               </div>
             </div>
 
             {/* Review Notes Input */}
             <div className="mt-4">
-              <label className="text-xs font-semibold text-slate-700">Reviewer Notes (Optional)</label>
+              <label className="text-sm font-semibold text-slate-700">Reviewer Notes (Optional)</label>
               <textarea
                 rows={2}
                 value={reviewNotes}
                 onChange={(e) => setReviewNotes(e.target.value)}
                 placeholder="Add explanation for confirming, deferring, or dismissing this duplicate..."
-                className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-xs outline-none focus:border-sky-500"
+                className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
             {/* Review Actions */}
             <div className="mt-5 space-y-2.5">
-              <p className="text-xs font-semibold text-slate-700">Review decision</p>
+              <p className="text-sm font-semibold text-slate-700">Review decision</p>
 
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   disabled={isSubmittingDecision}
                   onClick={() => handleUpdateStatus("Confirmed")}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
                 >
                   <CheckCircle2 size={15} />
                   Confirm Duplicate
@@ -681,7 +681,7 @@ const PotentialDuplicates: React.FC = () => {
                 <button
                   disabled={isSubmittingDecision}
                   onClick={handleMergeCases}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-[#287da8] py-2.5 text-xs font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-[#287da8] py-2.5 text-sm font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
                 >
                   <GitMerge size={15} />
                   Confirm & Merge Cases
@@ -692,7 +692,7 @@ const PotentialDuplicates: React.FC = () => {
                 <button
                   disabled={isSubmittingDecision}
                   onClick={() => handleUpdateStatus("Not Duplicate")}
-                  className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                 >
                   <ShieldCheck size={15} />
                   Mark as Not Duplicate
@@ -701,7 +701,7 @@ const PotentialDuplicates: React.FC = () => {
                 <button
                   disabled={isSubmittingDecision}
                   onClick={() => handleUpdateStatus("Deferred")}
-                  className="flex items-center justify-center gap-2 rounded-lg border border-orange-200 bg-orange-50 py-2.5 text-xs font-semibold text-orange-700 hover:bg-orange-100 disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-orange-200 bg-orange-50 py-2.5 text-sm font-semibold text-orange-700 hover:bg-orange-100 disabled:opacity-50"
                 >
                   <Clock size={15} />
                   Defer Review
@@ -733,24 +733,24 @@ const PotentialDuplicates: React.FC = () => {
 
             <div className="space-y-4 text-xs">
               <div className="rounded-xl bg-purple-50 p-3.5">
-                <p className="text-xs font-semibold text-purple-800">Similarity Scoring Algorithm</p>
+                <p className="text-sm font-semibold text-purple-800">Similarity Scoring Algorithm</p>
                 <p className="mt-1 leading-5 text-purple-700">
                   The system analyzes incoming humanitarian cases against open records using phonetic contact matching, geolocation proximity, household size ratios, and natural language descriptions.
                 </p>
               </div>
 
               <div className="rounded-xl bg-red-50 p-3.5">
-                <p className="text-xs font-semibold text-red-800">High Similarity (85% – 100%)</p>
+                <p className="text-sm font-semibold text-red-800">High Similarity (85% – 100%)</p>
                 <p className="mt-1 text-red-700">Requires priority human review before relief dispatch.</p>
               </div>
 
               <div className="rounded-xl bg-orange-50 p-3.5">
-                <p className="text-xs font-semibold text-orange-800">Medium Similarity (70% – 84%)</p>
+                <p className="text-sm font-semibold text-orange-800">Medium Similarity (70% – 84%)</p>
                 <p className="mt-1 text-orange-700">Requires additional field corroboration or phone verification.</p>
               </div>
 
               <div className="rounded-xl bg-sky-50 p-3.5">
-                <p className="text-xs font-semibold text-sky-800">Low Similarity (Below 70%)</p>
+                <p className="text-sm font-semibold text-sky-800">Low Similarity (Below 70%)</p>
                 <p className="mt-1 text-sky-700">Can proceed under normal standard operating procedures.</p>
               </div>
 
@@ -761,7 +761,7 @@ const PotentialDuplicates: React.FC = () => {
 
             <button
               onClick={() => setShowPolicy(false)}
-              className="mt-6 w-full rounded-lg bg-[#287da8] py-2.5 text-xs font-semibold text-white hover:bg-[#17678f]"
+              className="mt-6 w-full rounded-lg bg-[#287da8] py-2.5 text-sm font-semibold text-white hover:bg-[#17678f]"
             >
               Close policy
             </button>

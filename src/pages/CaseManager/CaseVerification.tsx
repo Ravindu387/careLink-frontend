@@ -266,7 +266,7 @@ const CaseVerification: React.FC = () => {
               onClick={() => loadData(true)}
               disabled={isRefreshing}
               title="Refresh verification data"
-              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-3 text-xs font-medium text-[#287da8] transition hover:bg-sky-50 disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-3 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 disabled:opacity-50 cursor-pointer"
             >
               <RefreshCw size={15} className={isRefreshing ? "animate-spin" : ""} />
               <span className="hidden sm:inline">Refresh</span>
@@ -275,7 +275,7 @@ const CaseVerification: React.FC = () => {
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-xs font-medium text-[#287da8] transition hover:bg-sky-50 disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 disabled:opacity-50 cursor-pointer"
             >
               <Download size={15} />
               {isExporting ? "Exporting..." : "Export CSV"}
@@ -283,7 +283,7 @@ const CaseVerification: React.FC = () => {
 
             <button
               onClick={() => setShowPolicy(true)}
-              className="rounded-lg bg-[#287da8] px-5 py-3 text-xs font-semibold text-white transition hover:bg-[#17678f] cursor-pointer"
+              className="rounded-lg bg-[#287da8] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#17678f] cursor-pointer"
             >
               Verification policy
             </button>
@@ -313,7 +313,7 @@ const CaseVerification: React.FC = () => {
                     : "Demonstration Verification Mode"}
                 </span>
                 <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold ${
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold ${
                     isLiveBackend
                       ? "bg-emerald-200 text-emerald-800"
                       : "bg-sky-200 text-sky-800"
@@ -322,7 +322,7 @@ const CaseVerification: React.FC = () => {
                   {isLiveBackend ? "LIVE" : "DEMO"}
                 </span>
               </div>
-              <p className="mt-0.5 text-[10px] text-slate-500">
+              <p className="mt-0.5 text-[13px] text-slate-500">
                 {isLiveBackend
                   ? "Real-time decision processing and verification audit sync enabled."
                   : "Serving simulated evidence cases for the Greater Riverton flood operations."}
@@ -330,7 +330,7 @@ const CaseVerification: React.FC = () => {
             </div>
           </div>
 
-          <span className="hidden text-[10px] text-slate-400 sm:block">
+          <span className="hidden text-[13px] text-slate-400 sm:block">
             {analyticsData?.lastUpdated
               ? `Updated ${new Date(analyticsData.lastUpdated).toLocaleTimeString()}`
               : "Updated just now"}
@@ -345,13 +345,13 @@ const CaseVerification: React.FC = () => {
               <p className="text-sm font-bold text-amber-900">
                 {analyticsData?.statistics.awaitingReview ?? 14} cases awaiting evidence review
               </p>
-              <p className="mt-1 text-xs text-amber-800">
+              <p className="mt-1 text-sm text-amber-800">
                 Critical requests should be verified or escalated within 30 minutes.
               </p>
             </div>
           </div>
 
-          <span className="rounded-md bg-[#fff2d9] px-4 py-2 text-[10px] font-semibold text-amber-800">
+          <span className="rounded-md bg-[#fff2d9] px-4 py-2 text-sm font-semibold text-amber-800">
             Oldest: {analyticsData?.statistics.oldestPendingAge ?? "42 min"}
           </span>
         </div>
@@ -383,7 +383,7 @@ const CaseVerification: React.FC = () => {
                   <h2 className="mt-1 text-2xl font-bold text-[#173e5b]">
                     {isLoading && !analyticsData ? "..." : item.value}
                   </h2>
-                  <p className="mt-1 text-[10px] text-slate-500">{item.description}</p>
+                  <p className="mt-1 text-[13px] text-slate-500">{item.description}</p>
                 </div>
               </div>
             );
@@ -403,7 +403,7 @@ const CaseVerification: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
           </div>
 
@@ -414,7 +414,7 @@ const CaseVerification: React.FC = () => {
               setEvidenceFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none"
           >
             <option value="All evidence states">All evidence states</option>
             <option value="Evidence pending">Evidence pending</option>
@@ -430,7 +430,7 @@ const CaseVerification: React.FC = () => {
               setPriorityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none"
           >
             <option value="All priorities">All priorities</option>
             <option value="Critical">Critical</option>
@@ -446,7 +446,7 @@ const CaseVerification: React.FC = () => {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none"
           >
             <option value="All categories">All categories</option>
             <option value="Emergency shelter">Emergency shelter</option>
@@ -462,7 +462,7 @@ const CaseVerification: React.FC = () => {
               setAgeFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none"
           >
             <option value="Submission age">Submission age</option>
             <option value="Last 1 hour">Last 1 hour</option>
@@ -472,7 +472,7 @@ const CaseVerification: React.FC = () => {
           {/* More Filters Button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-xs font-semibold text-[#287da8] hover:bg-sky-50 cursor-pointer"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-sm font-semibold text-[#287da8] hover:bg-sky-50 cursor-pointer"
           >
             <Filter size={15} />
             Filters
@@ -491,7 +491,7 @@ const CaseVerification: React.FC = () => {
 
             <button
               onClick={resetFilters}
-              className="text-xs font-semibold text-sky-700 hover:underline cursor-pointer"
+              className="text-sm font-semibold text-sky-700 hover:underline cursor-pointer"
             >
               Reset all filters
             </button>
@@ -502,7 +502,7 @@ const CaseVerification: React.FC = () => {
         <div className="overflow-hidden rounded-xl border border-[#d5e2eb] bg-white shadow-[0_8px_25px_rgba(30,64,90,0.06)]">
           {/* Table Header */}
           <div className="hidden border-b border-[#d5e2eb] bg-[#f7f9fa] lg:block">
-            <div className="grid grid-cols-[1fr_2fr_1.8fr_1fr_1.2fr_1.7fr_1.2fr_0.8fr_1.1fr_30px] items-center text-[10px] font-semibold text-slate-500">
+            <div className="grid grid-cols-[1fr_2fr_1.8fr_1fr_1.2fr_1.7fr_1.2fr_0.8fr_1.1fr_30px] items-center text-[13px] font-semibold text-slate-500">
               {[
                 "Case",
                 "Category & Applicant",
@@ -536,38 +536,38 @@ const CaseVerification: React.FC = () => {
                 >
                   {/* Case ID */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">
                       Case
                     </span>
-                    <p className="text-[11px] font-bold text-[#173e5b]">{item.id}</p>
+                    <p className="text-sm font-bold text-[#173e5b]">{item.id}</p>
                   </div>
 
                   {/* Category */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">
                       Category & Applicant
                     </span>
-                    <p className="text-[11px] font-semibold text-[#173e5b]">
+                    <p className="text-sm font-semibold text-[#173e5b]">
                       {item.category}
                     </p>
-                    <p className="mt-1 text-[10px] text-slate-500">{item.applicant}</p>
+                    <p className="mt-1 text-[13px] text-slate-500">{item.applicant}</p>
                   </div>
 
                   {/* Location */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">
                       Location
                     </span>
-                    <p className="text-[11px] text-slate-600">{item.location}</p>
+                    <p className="text-sm text-slate-600">{item.location}</p>
                   </div>
 
                   {/* Reported */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">
                       Reported
                     </span>
                     <span
-                      className={`inline-block rounded-md px-2.5 py-1.5 text-[10px] font-semibold ${priorityStyle(
+                      className={`inline-block rounded-md px-2.5 py-1.5 text-sm font-semibold ${priorityStyle(
                         item.priority
                       )}`}
                     >
@@ -577,55 +577,55 @@ const CaseVerification: React.FC = () => {
 
                   {/* AI Priority */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">
                       AI Priority
                     </span>
-                    <p className="text-[11px] font-semibold text-slate-700">
+                    <p className="text-sm font-semibold text-slate-700">
                       {item.aiPriority}
                     </p>
-                    <p className="mt-1 text-[10px] text-slate-400">{item.confidence}</p>
+                    <p className="mt-1 text-[13px] text-slate-400">{item.confidence}</p>
                   </div>
 
                   {/* Verification */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">
                       Verification
                     </span>
-                    <span className="text-[11px] font-medium text-slate-700">
+                    <span className="text-sm font-medium text-slate-700">
                       {item.verification}
                     </span>
                   </div>
 
                   {/* Assigned */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">
                       Assigned
                     </span>
                     {item.assigned === "You" ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-700">
+                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-sky-700">
                         <UserCheck size={12} />
                         You
                       </span>
                     ) : (
-                      <span className="text-[11px] text-slate-500">{item.assigned}</span>
+                      <span className="text-[13px] text-slate-500">{item.assigned}</span>
                     )}
                   </div>
 
                   {/* Age */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">
                       Age
                     </span>
-                    <p className="text-[11px] text-slate-600">{item.age}</p>
+                    <p className="text-sm text-slate-600">{item.age}</p>
                   </div>
 
                   {/* Status */}
                   <div className="px-3">
-                    <span className="mb-1 block text-[9px] text-slate-400 lg:hidden">
+                    <span className="mb-1 block text-xs text-slate-400 lg:hidden">
                       Status
                     </span>
                     <span
-                      className={`inline-block whitespace-nowrap rounded-md px-2 py-1.5 text-[10px] font-semibold ${statusStyle(
+                      className={`inline-block whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-semibold ${statusStyle(
                         item.status
                       )}`}
                     >
@@ -664,7 +664,7 @@ const CaseVerification: React.FC = () => {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-4 py-2 text-xs text-slate-500 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
               >
                 <ChevronLeft size={14} />
                 Previous
@@ -674,7 +674,7 @@ const CaseVerification: React.FC = () => {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`h-8 w-8 rounded-lg border text-xs transition cursor-pointer ${
+                  className={`h-8 w-8 rounded-lg border text-sm transition cursor-pointer ${
                     currentPage === page
                       ? "border-[#287da8] bg-[#287da8] text-white"
                       : "border-[#d5e2eb] bg-white text-slate-600 hover:bg-sky-50"
@@ -687,7 +687,7 @@ const CaseVerification: React.FC = () => {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-4 py-2 text-xs font-medium text-[#287da8] hover:bg-sky-50 disabled:opacity-40 cursor-pointer"
+                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-4 py-2 text-sm font-medium text-[#287da8] hover:bg-sky-50 disabled:opacity-40 cursor-pointer"
               >
                 Next
                 <ChevronRight size={14} />
@@ -707,7 +707,7 @@ const CaseVerification: React.FC = () => {
                   <ShieldCheck size={22} />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[#173e5b]">
+                  <h2 className="text-lg sm:text-xl font-bold text-[#173e5b]">
                     Case Verification & Decision
                   </h2>
                   <p className="text-xs text-slate-400">
@@ -755,14 +755,14 @@ const CaseVerification: React.FC = () => {
             {/* Evidence & Documents */}
             {selectedCase.documents && selectedCase.documents.length > 0 && (
               <div className="mt-3">
-                <label className="block text-[11px] font-semibold text-slate-600">
+                <label className="block text-sm font-semibold text-slate-600">
                   Attached Evidence Documents ({selectedCase.documents.length})
                 </label>
                 <div className="mt-1 flex flex-wrap gap-2">
                   {selectedCase.documents.map((doc, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1.5 rounded-md bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-700"
+                      className="inline-flex items-center gap-1.5 rounded-md bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700"
                     >
                       <FileText size={12} />
                       {doc}
@@ -774,7 +774,7 @@ const CaseVerification: React.FC = () => {
 
             {/* Decision Rationale Input */}
             <div className="mt-4">
-              <label className="block text-[11px] font-semibold text-slate-600">
+              <label className="block text-sm font-semibold text-slate-600">
                 Decision Notes & Rationale
               </label>
               <textarea
@@ -782,7 +782,7 @@ const CaseVerification: React.FC = () => {
                 placeholder="Record decision reason, verification call details, or info request notes..."
                 value={decisionRationale}
                 onChange={(e) => setDecisionRationale(e.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white p-2.5 text-xs text-slate-700 focus:border-sky-500 focus:outline-none"
+                className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white p-2.5 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:outline-none"
               />
             </div>
 
@@ -791,7 +791,7 @@ const CaseVerification: React.FC = () => {
               <button
                 disabled={isSubmittingDecision}
                 onClick={() => handleRecordDecision("Verify")}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60 cursor-pointer"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60 cursor-pointer"
               >
                 <Check size={14} />
                 Verify Case
@@ -800,7 +800,7 @@ const CaseVerification: React.FC = () => {
               <button
                 disabled={isSubmittingDecision}
                 onClick={() => handleRecordDecision("RequestInfo")}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-sky-700 py-2.5 text-xs font-semibold text-white transition hover:bg-sky-800 disabled:opacity-60 cursor-pointer"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-sky-700 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:opacity-60 cursor-pointer"
               >
                 <MessageSquare size={13} />
                 Request Info
@@ -809,7 +809,7 @@ const CaseVerification: React.FC = () => {
               <button
                 disabled={isSubmittingDecision}
                 onClick={() => handleRecordDecision("Reject")}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-rose-600 py-2.5 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-60 cursor-pointer"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-rose-600 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-60 cursor-pointer"
               >
                 <X size={14} />
                 Reject
@@ -836,28 +836,28 @@ const CaseVerification: React.FC = () => {
             <div className="space-y-4 text-sm text-slate-600">
               <div>
                 <h3 className="font-semibold text-slate-800">1. Evidence Review</h3>
-                <p className="mt-1 text-xs leading-6">
+                <p className="mt-1 text-sm leading-6">
                   Review submitted documents, photographs and supporting evidence before approving a case.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-slate-800">2. Contact Verification</h3>
-                <p className="mt-1 text-xs leading-6">
+                <p className="mt-1 text-sm leading-6">
                   Confirm applicant contact information and validate the reported location.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-slate-800">3. Priority Review</h3>
-                <p className="mt-1 text-xs leading-6">
+                <p className="mt-1 text-sm leading-6">
                   Critical requests should be reviewed or escalated within 30 minutes.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-slate-800">4. Decision Recording</h3>
-                <p className="mt-1 text-xs leading-6">
+                <p className="mt-1 text-sm leading-6">
                   Record verification decisions with clear reasons and supporting information.
                 </p>
               </div>
