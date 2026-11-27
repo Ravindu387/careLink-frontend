@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   SecurityEvent,
   SecurityEventStats,
@@ -132,7 +132,7 @@ export const securityEventService = {
     }
 
     const queryString = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${API_BASE_URL}/security-events/export-csv${queryString}`, {
+    const response = await authFetch(`${API_BASE_URL}/security-events/export-csv${queryString}`, {
       method: "GET",
       headers,
     });

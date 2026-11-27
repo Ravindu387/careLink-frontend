@@ -1,3 +1,16 @@
+import { request, authFetch } from "./api";
+import type {
+  AuditRecord,
+  AuditLogSummary,
+  CreateAuditLogPayload,
+  AuditLogQueryParams,
+  AuditLogStats,
+  AuditLogQuery,
+  CreateAuditLogRequest,
+  ExportAuditLogRequest,
+} from "../types/auditLog";
+import type { PaginatedList } from "../types/securityEvent";
+
 export interface AuditEvent {
   id: string;
   action: string;
@@ -38,7 +51,7 @@ export interface AuditLogMetrics {
   allRecordsVerified: boolean;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5277";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5277/api";
 
 export const auditLogService = {
   async getAll(filters?: AuditLogFilters): Promise<AuditEvent[]> {
@@ -69,15 +82,16 @@ export const auditLogService = {
     }
 
     const query = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${API_BASE}/api/audit-log${query}`);
+    const response = await authFetch(`${API_BASE_URL}/audit-logs${query}`);
     if (!response.ok) {
       throw new Error(`Failed to load audit log: ${response.status} ${response.statusText}`);
     }
-    return response.json();
+    const json = await response.json();
+    return Array.isArray(json) ? json : json.items || [];
   },
 
   async getMetrics(): Promise<AuditLogMetrics> {
-    const response = await fetch(`${API_BASE}/api/audit-log/metrics`);
+    const response = await authFetch(`${API_BASE_URL}/audit-logs/metrics`);
     if (!response.ok) {
       throw new Error(`Failed to load audit metrics: ${response.status}`);
     }
@@ -85,7 +99,7 @@ export const auditLogService = {
   },
 
   async getById(id: string): Promise<AuditEvent> {
-    const response = await fetch(`${API_BASE}/api/audit-log/${encodeURIComponent(id)}`);
+    const response = await authFetch(`${API_BASE_URL}/audit-logs/${encodeURIComponent(id)}`);
     if (!response.ok) {
       throw new Error(`Failed to load audit record ${id}: ${response.status}`);
     }
@@ -93,7 +107,7 @@ export const auditLogService = {
   },
 
   async verifyIntegrity(): Promise<{ verified: boolean; status: string; recordsChecked: number }> {
-    const response = await fetch(`${API_BASE}/api/audit-log/verify`, {
+    const response = await authFetch(`${API_BASE_URL}/audit-logs/verify`, {
       method: "POST",
     });
 
@@ -104,7 +118,7 @@ export const auditLogService = {
   },
 
   async reset(): Promise<{ message: string; metrics: AuditLogMetrics }> {
-    const response = await fetch(`${API_BASE}/api/audit-log/reset`, {
+    const response = await authFetch(`${API_BASE_URL}/audit-logs/reset`, {
       method: "POST",
     });
 
@@ -112,81 +126,70 @@ export const auditLogService = {
       throw new Error(`Failed to reset audit log: ${response.status}`);
     }
     return response.json();
-import { request } from "./api";
-import type {
-  AuditRecord,
-  AuditLogSummary,
-  CreateAuditLogPayload,
-  AuditLogQueryParams,
-} from "../types/auditLog";
-  AuditLogStats,
-  AuditLogQuery,
-  CreateAuditLogRequest,
-  ExportAuditLogRequest,
-} from "../types/auditLog";
-import type { PaginatedList } from "../types/securityEvent";
+  },
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5277/api";
-
-export const auditLogService = {
-  async getAuditLogs(params?: AuditLogQueryParams): Promise<AuditRecord[]> {
-    const query = new URLSearchParams();
-    if (params?.search) query.append("search", params.search);
-    if (params?.actionType && params.actionType !== "All action types") {
-      query.append("actionType", params.actionType);
-    }
-    if (params?.actor && params.actor !== "All users") {
-      query.append("actor", params.actor);
-    }
-    if (params?.recordType && params.recordType !== "All record types") {
-      query.append("recordType", params.recordType);
-    }
-    if (params?.dateFilter && params.dateFilter !== "All dates") {
-      query.append("dateFilter", params.dateFilter);
-    }
-    if (params?.startDate) query.append("startDate", params.startDate);
-    if (params?.endDate) query.append("endDate", params.endDate);
-
-    const queryString = query.toString() ? `?${query.toString()}` : "";
-    const response = await request<AuditRecord[]>(`/auditlogs${queryString}`, {
-  async getAuditLogs(query?: AuditLogQuery): Promise<PaginatedList<AuditRecord>> {
+  async getAuditLogs(
+    paramsOrQuery?: AuditLogQueryParams | AuditLogQuery
+  ): Promise<PaginatedList<AuditRecord> & AuditRecord[]> {
     const params = new URLSearchParams();
-    if (query?.search) params.append("search", query.search);
-    if (query?.action && query.action !== "All action types") {
-      params.append("action", query.action);
+    if (paramsOrQuery?.search) params.append("search", paramsOrQuery.search);
+    const action = (paramsOrQuery as any)?.action || (paramsOrQuery as any)?.actionType;
+    if (action && action !== "All action types" && action !== "All") {
+      params.append("action", action);
     }
-    if (query?.actor && query.actor !== "All users") {
-      params.append("actor", query.actor);
+    if (paramsOrQuery?.actor && paramsOrQuery.actor !== "All users") {
+      params.append("actor", paramsOrQuery.actor);
     }
-    if (query?.type && query.type !== "All record types") {
-      params.append("type", query.type);
+    const recType = (paramsOrQuery as any)?.type || (paramsOrQuery as any)?.recordType;
+    if (recType && recType !== "All record types") {
+      params.append("type", recType);
     }
-    if (query?.dateFilter && query.dateFilter !== "All time") {
-      params.append("dateFilter", query.dateFilter);
+    if (paramsOrQuery?.dateFilter && paramsOrQuery.dateFilter !== "All time" && paramsOrQuery.dateFilter !== "All dates") {
+      params.append("dateFilter", paramsOrQuery.dateFilter);
     }
-    if (query?.pageNumber) {
-      params.append("pageNumber", query.pageNumber.toString());
+    if ((paramsOrQuery as any)?.startDate) params.append("startDate", (paramsOrQuery as any).startDate);
+    if ((paramsOrQuery as any)?.endDate) params.append("endDate", (paramsOrQuery as any).endDate);
+    if ((paramsOrQuery as any)?.pageNumber) {
+      params.append("pageNumber", (paramsOrQuery as any).pageNumber.toString());
     }
-    if (query?.pageSize) {
-      params.append("pageSize", query.pageSize.toString());
+    if ((paramsOrQuery as any)?.pageSize) {
+      params.append("pageSize", (paramsOrQuery as any).pageSize.toString());
     }
 
     const queryString = params.toString() ? `?${params.toString()}` : "";
-    const response = await request<PaginatedList<AuditRecord>>(`/audit-logs${queryString}`, {
+    const response = await request<any>(`/audit-logs${queryString}`, {
       method: "GET",
     });
 
-    return (
-      response.data || {
-        items: [],
-        totalCount: 0,
-        pageNumber: 1,
-        pageSize: query?.pageSize || 10,
-        totalPages: 1,
-        hasPreviousPage: false,
-        hasNextPage: false,
-      }
-    );
+    const rawData = response.data;
+    let list: any[] = [];
+    let totalCount = 0;
+    let pageNumber = (paramsOrQuery as any)?.pageNumber || 1;
+    let pageSize = (paramsOrQuery as any)?.pageSize || 10;
+    let totalPages = 1;
+
+    if (Array.isArray(rawData)) {
+      list = [...rawData];
+      totalCount = rawData.length;
+    } else if (rawData?.items && Array.isArray(rawData.items)) {
+      list = [...rawData.items];
+      totalCount = rawData.totalCount ?? rawData.items.length;
+      pageNumber = rawData.pageNumber ?? pageNumber;
+      pageSize = rawData.pageSize ?? pageSize;
+      totalPages = rawData.totalPages ?? Math.max(1, Math.ceil(totalCount / pageSize));
+    }
+
+    // Attach pagination properties directly to the array so both array-based callers and PaginatedList callers work seamlessly
+    const result = list as any;
+    result.items = list;
+    result.totalCount = totalCount;
+    result.pageNumber = pageNumber;
+    result.pageSize = pageSize;
+    result.totalPages = totalPages;
+    result.hasPreviousPage = pageNumber > 1;
+    result.hasNextPage = pageNumber < totalPages;
+
+    return result;
   },
 
   async getStats(): Promise<AuditLogStats | null> {
@@ -203,15 +206,6 @@ export const auditLogService = {
     return response.data || [];
   },
 
-  async getAuditLogById(id: string): Promise<AuditRecord> {
-    const response = await request<AuditRecord>(`/auditlogs/${id}`, {
-      method: "GET",
-    });
-    return response.data;
-  },
-
-  async getAuditLogSummary(): Promise<AuditLogSummary | null> {
-    const response = await request<AuditLogSummary>("/auditlogs/summary", {
   async getRecordTypes(): Promise<string[]> {
     const response = await request<string[]>("/audit-logs/record-types", {
       method: "GET",
@@ -233,12 +227,21 @@ export const auditLogService = {
     return response.data || null;
   },
 
-  async createAuditLog(payload: CreateAuditLogPayload): Promise<AuditRecord> {
-    const response = await request<AuditRecord>("/auditlogs", {
+  async getAuditLogSummary(): Promise<AuditLogSummary | null> {
+    const response = await request<AuditLogSummary>("/audit-logs/summary", {
+      method: "GET",
+    });
+    return response.data || null;
+  },
+
+  async createAuditLog(
+    payload: CreateAuditLogPayload | CreateAuditLogRequest
+  ): Promise<AuditRecord | null> {
+    const response = await request<AuditRecord>("/audit-logs", {
       method: "POST",
       body: JSON.stringify(payload),
     });
-    return response.data;
+    return response.data || null;
   },
 
   getExportUrl(params?: AuditLogQueryParams): string {
@@ -257,13 +260,7 @@ export const auditLogService = {
       query.append("dateFilter", params.dateFilter);
     }
     const queryString = query.toString() ? `?${query.toString()}` : "";
-    return `${API_BASE_URL}/auditlogs/export${queryString}`;
-  async createAuditLog(data: CreateAuditLogRequest): Promise<AuditRecord | null> {
-    const response = await request<AuditRecord>("/audit-logs", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-    return response.data || null;
+    return `${API_BASE_URL}/audit-logs/export${queryString}`;
   },
 
   async exportAuditLog(data: ExportAuditLogRequest): Promise<{ eventId: string | null }> {
@@ -275,7 +272,7 @@ export const auditLogService = {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_BASE_URL}/audit-logs/export`, {
+    const response = await authFetch(`${API_BASE_URL}/audit-logs/export`, {
       method: "POST",
       headers,
       body: JSON.stringify(data),
