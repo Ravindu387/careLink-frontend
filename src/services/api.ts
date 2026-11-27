@@ -5,6 +5,34 @@ const API_BASE_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   "http://localhost:5277/api";
 
+const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, "");
+
+export function authFetch(
+  input: string | URL,
+  init: RequestInit = {}
+): Promise<Response> {
+  let url = typeof input === "string" ? input : input.toString();
+  if (url.startsWith("/api/") || url === "/api") {
+    url = `${BACKEND_ORIGIN}${url}`;
+  } else if (typeof window !== "undefined" && url.startsWith(window.location.origin + "/api")) {
+    url = `${BACKEND_ORIGIN}${url.slice(window.location.origin.length)}`;
+  }
+
+  const headers: Record<string, string> = {
+    ...(init.headers as Record<string, string>),
+  };
+
+  const token = typeof localStorage !== "undefined" ? localStorage.getItem("carelink_token") : null;
+  if (token && !headers["Authorization"] && !headers["authorization"]) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return fetch(url, {
+    ...init,
+    headers,
+  });
+}
+
 export async function request<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -38,10 +66,10 @@ export async function request<T>(
     }
 
     if (!response.ok || !data?.success) {
-      if (response.status === 401) {
+      if (response.status === 401 && !endpoint.includes("/auth/login")) {
         throw new Error("Your session has expired. Please sign in again.");
       }
-      if (response.status === 403) {
+      if (response.status === 403 && !data?.message) {
         throw new Error("Access denied. Your account does not have permission to perform this action.");
       }
 
