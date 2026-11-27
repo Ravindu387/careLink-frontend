@@ -1,4 +1,3 @@
-
 import { useMemo, useState, useEffect, useCallback } from "react";
 import {
   Check,
@@ -10,102 +9,23 @@ import {
   MoreHorizontal,
   X,
   Building2,
-  ShieldCheck,
   FileText,
   Download,
-  RefreshCw,
-  AlertCircle,
   Loader2,
+  MapPin,
+  UserCheck,
+  Globe,
+  Mail,
+  Phone,
 } from "lucide-react";
 import { verificationService } from "../../services/verificationService";
+import { organizationService } from "../../services/organizationService";
 import type {
+  VerificationDocumentItem,
   VerificationRequestItem,
   VerificationStats,
   VerificationStatus,
 } from "../../types/verification";
-
-const initialRequests: VerificationRequestItem[] = [
-  {
-    id: "VER-2048",
-    applicant: "Global Relief Network",
-    type: "Partner Organisation",
-    evidence: "Registration · Tax · Safeguarding",
-    priority: "High",
-    submitted: "2 hours ago",
-    status: "Pending Review",
-    documents: ["Registration", "Tax", "Safeguarding"],
-  },
-  {
-    id: "VER-2044",
-    applicant: "Sara Khan",
-    type: "Partner Officer",
-    evidence: "Identity · Employment Letter",
-    priority: "High",
-    submitted: "5 hours ago",
-    status: "Pending Review",
-    documents: ["Identity", "Employment Letter"],
-  },
-  {
-    id: "VER-2039",
-    applicant: "Riverton Medical Collective",
-    type: "Medical Partner",
-    evidence: "Registration · Medical Licence",
-    priority: "Standard",
-    submitted: "Yesterday",
-    status: "Additional Info",
-    documents: ["Registration", "Medical Licence"],
-  },
-  {
-    id: "VER-2031",
-    applicant: "Abdul Rahman",
-    type: "Resource Manager",
-    evidence: "Identity · Appointment Letter",
-    priority: "Standard",
-    submitted: "Yesterday",
-    status: "Pending Review",
-    documents: ["Identity", "Appointment Letter"],
-  },
-  {
-    id: "VER-2027",
-    applicant: "Community Response Alliance",
-    type: "Partner Organisation",
-    evidence: "Registration · Tax",
-    priority: "High",
-    submitted: "2 days ago",
-    status: "Pending Review",
-    documents: ["Registration", "Tax"],
-  },
-  {
-    id: "VER-2022",
-    applicant: "Daniel Perera",
-    type: "Resource Manager",
-    evidence: "Identity · Employment Letter",
-    priority: "Standard",
-    submitted: "3 days ago",
-    status: "Approved",
-    documents: ["Identity", "Employment Letter"],
-  },
-  {
-    id: "VER-2018",
-    applicant: "Emergency Logistics Unit",
-    type: "Partner Organisation",
-    evidence: "Registration · Tax · Safeguarding",
-    priority: "High",
-    submitted: "4 days ago",
-    status: "Pending Review",
-    documents: ["Registration", "Tax", "Safeguarding"],
-  },
-  {
-    id: "VER-2012",
-    applicant: "Nadia Okafor",
-    type: "Partner Officer",
-    evidence: "Identity · Appointment Letter",
-    priority: "Standard",
-    submitted: "5 days ago",
-    status: "Rejected",
-    documents: ["Identity", "Appointment Letter"],
-  },
-];
 
 const statusStyles: Record<VerificationStatus, string> = {
   "Pending Review": "bg-orange-50 text-orange-700",
@@ -117,7 +37,9 @@ const statusStyles: Record<VerificationStatus, string> = {
 function StatusBadge({ status }: { status: VerificationStatus }) {
   return (
     <span
-      className={`inline-block whitespace-nowrap rounded-md px-2.5 py-1.5 text-[9px] font-semibold ${statusStyles[status] || "bg-slate-100 text-slate-700"}`}
+      className={`inline-block whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-semibold ${
+        statusStyles[status] || "bg-slate-100 text-slate-700"
+      }`}
     >
       {status}
     </span>
@@ -146,13 +68,9 @@ function StatCard({
       </div>
 
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
-        <h3 className="mt-0.5 text-2xl font-bold text-[#123B5C]">
-          {value}
-        </h3>
-        <p className="mt-0.5 text-[9px] text-slate-400">
-          {description}
-        </p>
+        <p className="text-xs text-slate-500">{title}</p>
+        <h3 className="mt-0.5 text-2xl font-bold text-[#123B5C]">{value}</h3>
+        <p className="mt-0.5 text-xs text-slate-400">{description}</p>
       </div>
     </div>
   );
@@ -161,7 +79,6 @@ function StatCard({
 export default function VerificationQueue() {
   const [requests, setRequests] = useState<VerificationRequestItem[]>([]);
   const [stats, setStats] = useState<VerificationStats | null>(null);
-  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -181,22 +98,22 @@ export default function VerificationQueue() {
   const [actionMessage, setActionMessage] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 4;
+  const pageSize = 6;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [paged, statData, typeList] = await Promise.all([
-        verificationService.getRequests(),
+      const [paged, statData] = await Promise.all([
+        verificationService.getRequests({ pageSize: 50 }),
         verificationService.getStats(),
-        verificationService.getTypes(),
       ]);
       setRequests(paged?.items || []);
       setStats(statData);
-      setAvailableTypes(typeList);
     } catch (err: any) {
-      setError(err.message || "Failed to load verification applications from server.");
+      setError(
+        err.message || "Failed to load verification applications from server."
+      );
     } finally {
       setLoading(false);
     }
@@ -208,22 +125,23 @@ export default function VerificationQueue() {
 
   const filteredRequests = useMemo(() => {
     return requests.filter((request) => {
-      const searchMatch =
-        `${request.id} ${request.applicant} ${request.type} ${request.evidence}`
-          .toLowerCase()
-          .includes(search.toLowerCase());
+      const searchMatch = `${request.id} ${request.applicant} ${
+        request.organizationName || ""
+      } ${request.representativeFullName || ""} ${request.type} ${
+        request.evidence
+      }`
+        .toLowerCase()
+        .includes(search.toLowerCase());
 
       const typeMatch =
-        typeFilter === "All request types" ||
-        request.type === typeFilter;
+        typeFilter === "All request types" || request.type === typeFilter;
 
       const priorityMatch =
         priorityFilter === "All priorities" ||
         request.priority === priorityFilter;
 
       const statusMatch =
-        statusFilter === "All states" ||
-        request.status === statusFilter;
+        statusFilter === "All states" || request.status === statusFilter;
 
       return searchMatch && typeMatch && priorityMatch && statusMatch;
     });
@@ -239,27 +157,47 @@ export default function VerificationQueue() {
     currentPage * pageSize
   );
 
-  const pendingCount = stats?.totalPending ?? requests.filter(
-    (r) => r.status === "Pending Review"
-  ).length;
+  const pendingCount =
+    stats?.totalPending ??
+    requests.filter((r) => r.status === "Pending Review").length;
 
-  const highPriorityCount = stats?.highPriority ?? requests.filter(
-    (r) => r.priority === "High" && r.status === "Pending Review"
-  ).length;
+  const highPriorityCount =
+    stats?.highPriority ??
+    requests.filter(
+      (r) => r.priority === "High" && r.status === "Pending Review"
+    ).length;
 
-  const approvedCount = stats?.approvedToday ?? requests.filter(
-    (r) => r.status === "Approved"
-  ).length;
+  const approvedCount =
+    stats?.approvedToday ??
+    requests.filter((r) => r.status === "Approved").length;
 
-  const additionalInfoCount = stats?.additionalInfo ?? requests.filter(
-    (r) => r.status === "Additional Info"
-  ).length;
+  const additionalInfoCount =
+    stats?.additionalInfo ??
+    requests.filter((r) => r.status === "Additional Info").length;
 
   const openReview = (request: VerificationRequestItem) => {
     setSelectedRequest(request);
-    setRationale("");
+    setRationale(request.decisionRationale || request.decisionNote || "");
     setActionMessage("");
     setActiveMenu(null);
+  };
+
+  const handleDownloadDocument = async (doc: VerificationDocumentItem) => {
+    const orgId = doc.organizationId || selectedRequest?.organizationId;
+    const docId = doc.documentId || doc.id;
+    if (!orgId || !docId) {
+      setActionMessage("Document binary is only available for uploaded files.");
+      return;
+    }
+    try {
+      await organizationService.downloadDocument(
+        orgId,
+        docId,
+        doc.originalFileName || doc.name
+      );
+    } catch (err: any) {
+      setActionMessage(err.message || "Could not download document.");
+    }
   };
 
   const updateRequest = async (
@@ -269,14 +207,19 @@ export default function VerificationQueue() {
     if (!selectedRequest) return;
 
     if (!rationale.trim()) {
-      setActionMessage("Please provide a decision rationale before continuing.");
+      setActionMessage(
+        "Please provide a decision rationale or comments before continuing."
+      );
       return;
     }
 
     setIsSubmitting(true);
     setActionMessage("");
 
-    const decisionMap: Record<VerificationStatus, "Approve" | "Reject" | "RequestInfo"> = {
+    const decisionMap: Record<
+      VerificationStatus,
+      "Approve" | "Reject" | "RequestInfo"
+    > = {
       Approved: "Approve",
       Rejected: "Reject",
       "Additional Info": "RequestInfo",
@@ -284,10 +227,15 @@ export default function VerificationQueue() {
     };
 
     try {
-      const updated = await verificationService.recordDecision(selectedRequest.id, {
-        decision: decisionMap[status] || "Approve",
-        decisionNote: rationale.trim(),
-      });
+      const updated = await verificationService.recordDecision(
+        selectedRequest.id,
+        {
+          decision: decisionMap[status] || "Approve",
+          status,
+          decisionNote: rationale.trim(),
+          rationale: rationale.trim(),
+        }
+      );
 
       setRequests((previous) =>
         previous.map((request) =>
@@ -297,10 +245,11 @@ export default function VerificationQueue() {
 
       setSelectedRequest(updated);
       setActionMessage(message);
-      setRationale("");
       verificationService.getStats().then(setStats).catch(() => {});
     } catch (err: any) {
-      setActionMessage(err.message || "Failed to persist verification decision.");
+      setActionMessage(
+        err.message || "Failed to persist verification decision."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -346,65 +295,61 @@ export default function VerificationQueue() {
 
   return (
     <div className="min-h-screen bg-[#EFF6F7]">
-
       {/* BREADCRUMB */}
-      <div className="flex h-10 items-center gap-2 border-b border-[#64C9AD] bg-white px-6 text-[9px] text-slate-500">
+      <div className="flex h-10 items-center gap-2 border-b border-[#64C9AD] bg-white px-6 text-xs text-slate-500">
         <span>Administration</span>
         <ChevronRight size={12} />
-        <span className="font-semibold text-[#123B5C]">
-          Verification Queue
-        </span>
+        <span className="font-semibold text-[#123B5C]">Verification Queue</span>
       </div>
 
       <main className="mx-auto max-w-[1800px] space-y-4 px-4 py-6 md:px-6 lg:px-8">
-
         {/* PAGE HEADING */}
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-2xl font-medium tracking-tight text-[#123B5C] md:text-[28px]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-[#123B5C]">
               Verification Queue
             </h1>
             <p className="mt-2 text-xs text-slate-500">
-              Review identity, organisation, and privileged role requests before enabling access.
+              Review Partner Organisation registrations, humanitarian
+              capabilities, authorised representatives, and uploaded
+              verification certificates before enabling access.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={exportCSV}
-              className="flex items-center gap-2 rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+              className="flex items-center gap-2 rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-sm font-semibold text-[#2785B2] hover:bg-sky-50"
             >
               <Download size={14} />
               Export
             </button>
-            <button
-              onClick={() =>
-                alert(
-                  "Verification policy: Review all submitted evidence and provide an auditable decision rationale."
-                )
-              }
-              className="rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
-            >
-              Verification policy
-            </button>
           </div>
         </div>
+
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+            {error}
+          </div>
+        )}
 
         {/* SLA ALERT */}
         <div className="flex flex-col gap-3 rounded-lg border border-[#F4D18A] border-l-2 border-l-orange-400 bg-[#FFF9EC] px-4 py-3 sm:flex-row sm:items-center">
           <Check className="shrink-0 text-[#9A6400]" size={19} />
 
           <div className="flex-1">
-            <p className="text-[11px] font-bold text-[#8C5800]">
-              {pendingCount || 14} privileged requests awaiting review
+            <p className="text-sm font-bold text-[#8C5800]">
+              {pendingCount} Partner Organisation &amp; privileged requests
+              awaiting review
             </p>
-            <p className="mt-1 text-[9px] text-[#9A6400]">
-              Oldest unresolved request was submitted 2 days ago.
+            <p className="mt-1 text-xs text-[#9A6400]">
+              {stats?.oldestPendingText ||
+                "All pending requests are within fresh review window."}
             </p>
           </div>
 
-          <div className="rounded-md bg-[#FFF3D8] px-3 py-2 text-[9px] font-semibold text-[#A36B12] sm:min-w-[45%]">
-            SLA: 24 hours
+          <div className="rounded-md bg-[#FFF3D8] px-3 py-2 text-xs font-semibold text-[#A36B12] sm:min-w-[30%]">
+            SLA: {stats?.slaTarget || "24 hours"}
           </div>
         </div>
 
@@ -412,31 +357,31 @@ export default function VerificationQueue() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             title="Total pending"
-            value="64"
-            description="All request types"
+            value={String(pendingCount)}
+            description="Awaiting review"
             icon={Clock}
             color="bg-orange-50 text-orange-600"
           />
 
           <StatCard
             title="High priority"
-            value={String(highPriorityCount || 14)}
-            description="Privileged access"
+            value={String(highPriorityCount)}
+            description="Partner Organisations"
             icon={AlertTriangle}
             color="bg-red-50 text-red-600"
           />
 
           <StatCard
-            title="Approved today"
-            value={String(approvedCount || 28)}
-            description="Median 4h 12m"
+            title="Approved"
+            value={String(approvedCount)}
+            description="Verified & active"
             icon={Check}
             color="bg-emerald-50 text-emerald-600"
           />
 
           <StatCard
             title="Additional info"
-            value={String(additionalInfoCount || 9)}
+            value={String(additionalInfoCount)}
             description="Awaiting applicant"
             icon={Users}
             color="bg-sky-50 text-sky-600"
@@ -453,8 +398,8 @@ export default function VerificationQueue() {
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Search request, applicant, or organisation..."
-              className="w-full bg-transparent text-[10px] outline-none placeholder:text-slate-400"
+              placeholder="Search request ID, organisation, or representative..."
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
           </div>
 
@@ -465,7 +410,7 @@ export default function VerificationQueue() {
                 setTypeFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All request types</option>
               <option>Partner Organisation</option>
@@ -480,7 +425,7 @@ export default function VerificationQueue() {
                 setPriorityFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All priorities</option>
               <option>High</option>
@@ -493,7 +438,7 @@ export default function VerificationQueue() {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All states</option>
               <option>Pending Review</option>
@@ -508,7 +453,7 @@ export default function VerificationQueue() {
                 setDateFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>Date submitted</option>
               <option>Today</option>
@@ -518,7 +463,7 @@ export default function VerificationQueue() {
 
           <button
             onClick={() => setShowMoreFilters(!showMoreFilters)}
-            className="h-11 rounded-lg border border-[#B9D1DD] bg-white px-4 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+            className="h-11 rounded-lg border border-[#B9D1DD] bg-white px-4 text-sm font-semibold text-[#2785B2] hover:bg-sky-50"
           >
             More filters
           </button>
@@ -526,8 +471,9 @@ export default function VerificationQueue() {
 
         {showMoreFilters && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#D7E5EA] bg-white p-4">
-            <p className="text-[10px] text-slate-500">
-              Filter requests by their priority, type, status and submission date.
+            <p className="text-[13px] text-slate-500">
+              Filter requests by their priority, type, status and submission
+              date.
             </p>
             <button
               onClick={() => {
@@ -538,7 +484,7 @@ export default function VerificationQueue() {
                 setDateFilter("Date submitted");
                 setCurrentPage(1);
               }}
-              className="text-[10px] font-semibold text-[#2785B2]"
+              className="text-sm font-semibold text-[#2785B2]"
             >
               Clear all filters
             </button>
@@ -550,85 +496,115 @@ export default function VerificationQueue() {
           <div className="overflow-x-auto rounded-t-xl">
             <table className="w-full min-w-[1050px] text-left">
               <thead>
-                <tr className="border-b border-[#D7E5EA] bg-[#F6F9FA] text-[9px] font-semibold text-slate-500">
+                <tr className="border-b border-[#D7E5EA] bg-[#F6F9FA] text-[13px] font-semibold text-slate-500">
                   <th className="px-4 py-4">Request ID</th>
-                  <th className="px-4 py-4">Applicant</th>
-                  <th className="px-4 py-4">Request Type</th>
-                  <th className="px-4 py-4">Evidence</th>
-                  <th className="px-4 py-4">Priority</th>
+                  <th className="px-4 py-4">Organisation / Applicant</th>
+                  <th className="px-4 py-4">Classification</th>
+                  <th className="px-4 py-4">Authorised Representative</th>
+                  <th className="px-4 py-4">Uploaded Documents</th>
                   <th className="px-4 py-4">Submitted</th>
-                  <th className="px-4 py-4">Status</th>
+                  <th className="px-4 py-4">Approval Status</th>
                   <th className="px-4 py-4"></th>
                 </tr>
               </thead>
 
               <tbody>
-                {visibleRequests.map((request) => (
-                  <tr
-                    key={request.id}
-                    onClick={() => openReview(request)}
-                    className="cursor-pointer border-b border-[#E5EDF1] text-[10px] text-slate-600 transition hover:bg-[#F5FAFC]"
-                  >
-                    <td className="px-4 py-5 font-bold text-[#123B5C]">
-                      {request.id}
-                    </td>
-                    <td className="px-4 py-5 font-medium text-[#315C7B]">
-                      {request.applicant}
-                    </td>
-                    <td className="px-4 py-5">{request.type}</td>
-                    <td className="px-4 py-5">{request.evidence}</td>
-                    <td className="px-4 py-5">
-                      <span
-                        className={
-                          request.priority === "High"
-                            ? "font-semibold text-orange-600"
-                            : "text-slate-500"
-                        }
-                      >
-                        {request.priority}
-                      </span>
-                    </td>
-                    <td className="px-4 py-5">{request.submitted}</td>
-                    <td className="px-4 py-5">
-                      <StatusBadge status={request.status} />
-                    </td>
-
-                    <td
-                      className="relative px-4 py-5"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button
-                        onClick={() =>
-                          setActiveMenu(
-                            activeMenu === request.id ? null : request.id
-                          )
-                        }
-                        className="rounded-md p-1 text-slate-500 hover:bg-slate-100"
-                        aria-label="Request actions"
-                      >
-                        <MoreHorizontal size={18} />
-                      </button>
-
-                      {activeMenu === request.id && (
-                        <div className="absolute right-8 top-10 z-30 w-40 rounded-lg border border-slate-200 bg-white p-1 shadow-xl">
-                          <button
-                            onClick={() => openReview(request)}
-                            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-[10px] hover:bg-slate-50"
-                          >
-                            <FileText size={13} />
-                            Review request
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-
-                {visibleRequests.length === 0 && (
+                {loading ? (
                   <tr>
                     <td
                       colSpan={8}
-                      className="px-4 py-12 text-center text-xs text-slate-400"
+                      className="px-4 py-12 text-center text-sm text-slate-400"
+                    >
+                      <Loader2
+                        size={18}
+                        className="mx-auto mb-2 animate-spin text-[#2785B2]"
+                      />
+                      Loading verification queue...
+                    </td>
+                  </tr>
+                ) : (
+                  visibleRequests.map((request) => (
+                    <tr
+                      key={request.id}
+                      onClick={() => openReview(request)}
+                      className="cursor-pointer border-b border-[#E5EDF1] text-sm text-slate-600 transition hover:bg-[#F5FAFC]"
+                    >
+                      <td className="px-4 py-5 font-bold text-[#123B5C]">
+                        {request.id}
+                      </td>
+                      <td className="px-4 py-5">
+                        <p className="font-semibold text-[#123B5C]">
+                          {request.organizationName || request.applicant}
+                        </p>
+                        {request.registrationNumber && (
+                          <p className="mt-0.5 text-xs text-slate-400">
+                            Reg No: {request.registrationNumber}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-5">
+                        <p>{request.organizationType || request.type}</p>
+                        {(request.district || request.province) && (
+                          <p className="mt-0.5 text-xs text-slate-400">
+                            {[request.district, request.province]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-5">
+                        <p className="font-medium text-[#123B5C]">
+                          {request.representativeFullName || request.applicant}
+                        </p>
+                        {request.representativeEmail && (
+                          <p className="mt-0.5 text-xs text-slate-400">
+                            {request.representativeEmail}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-5">{request.evidence}</td>
+                      <td className="px-4 py-5">{request.submitted}</td>
+                      <td className="px-4 py-5">
+                        <StatusBadge status={request.status} />
+                      </td>
+
+                      <td
+                        className="relative px-4 py-5"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={() =>
+                            setActiveMenu(
+                              activeMenu === request.id ? null : request.id
+                            )
+                          }
+                          className="rounded-md p-1 text-slate-500 hover:bg-slate-100"
+                          aria-label="Request actions"
+                        >
+                          <MoreHorizontal size={18} />
+                        </button>
+
+                        {activeMenu === request.id && (
+                          <div className="absolute right-8 top-10 z-30 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-xl">
+                            <button
+                              onClick={() => openReview(request)}
+                              className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-slate-50"
+                            >
+                              <FileText size={13} />
+                              Review organisation
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+
+                {!loading && visibleRequests.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={8}
+                      className="px-4 py-12 text-center text-sm text-slate-400"
                     >
                       No verification requests found.
                     </td>
@@ -640,21 +616,20 @@ export default function VerificationQueue() {
 
           {/* PAGINATION */}
           <div className="flex flex-col items-center justify-between gap-3 px-4 py-4 sm:flex-row">
-            <p className="text-[9px] text-slate-500">
+            <p className="text-xs text-slate-500">
               Showing{" "}
               {filteredRequests.length === 0
                 ? 0
                 : (currentPage - 1) * pageSize + 1}
-              –
-              {Math.min(currentPage * pageSize, filteredRequests.length)}
-              {" "}of {filteredRequests.length}
+              –{Math.min(currentPage * pageSize, filteredRequests.length)} of{" "}
+              {filteredRequests.length}
             </p>
 
             <div className="flex items-center gap-2">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="rounded-lg border border-[#D7E5EA] px-4 py-2 text-[10px] text-[#2785B2] disabled:opacity-40"
+                className="rounded-lg border border-[#D7E5EA] px-4 py-2 text-sm text-[#2785B2] disabled:opacity-40"
               >
                 Previous
               </button>
@@ -664,7 +639,7 @@ export default function VerificationQueue() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`rounded-lg border px-3 py-2 text-[10px] ${
+                    className={`rounded-lg border px-3 py-2 text-sm ${
                       currentPage === page
                         ? "border-[#2785B2] bg-[#2785B2] text-white"
                         : "border-[#D7E5EA] text-[#123B5C] hover:bg-sky-50"
@@ -680,7 +655,7 @@ export default function VerificationQueue() {
                 onClick={() =>
                   setCurrentPage((p) => Math.min(totalPages, p + 1))
                 }
-                className="rounded-lg border border-[#B9D1DD] px-4 py-2 text-[10px] text-[#2785B2] disabled:opacity-40"
+                className="rounded-lg border border-[#B9D1DD] px-4 py-2 text-sm text-[#2785B2] disabled:opacity-40"
               >
                 Next
               </button>
@@ -688,25 +663,29 @@ export default function VerificationQueue() {
           </div>
         </section>
 
-        <footer className="py-3 text-[9px] text-slate-400">
+        <footer className="py-3 text-xs text-slate-400">
           © 2026 Humanitarian Aid Platform · CareLink
         </footer>
       </main>
 
-      {/* REVIEW MODAL */}
+      {/* COMPREHENSIVE PARTNER ORGANISATION REVIEW MODAL */}
       {selectedRequest && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-900/50 p-4 backdrop-blur-[2px]">
-          <div className="my-auto w-full max-w-[750px] overflow-hidden rounded-xl bg-white shadow-2xl">
-
+          <div className="my-auto w-full max-w-[880px] overflow-hidden rounded-xl bg-white shadow-2xl">
             {/* MODAL HEADER */}
             <div className="flex items-center justify-between border-b border-[#D7E5EA] px-6 py-5">
               <div>
-                <p className="text-[9px] font-bold tracking-widest text-[#42B99A]">
-                  SECURE ADMINISTRATIVE ACTION
+                <p className="text-xs font-bold tracking-widest text-[#42B99A]">
+                  PARTNER ORGANISATION VERIFICATION REVIEW
                 </p>
-                <h2 className="mt-2 text-lg font-medium text-[#123B5C]">
-                  Review {selectedRequest.id}
-                </h2>
+                <div className="mt-1.5 flex items-center gap-3">
+                  <h2 className="text-lg font-semibold text-[#123B5C]">
+                    {selectedRequest.organizationName ||
+                      selectedRequest.applicant}{" "}
+                    ({selectedRequest.id})
+                  </h2>
+                  <StatusBadge status={selectedRequest.status} />
+                </div>
               </div>
 
               <button
@@ -719,93 +698,362 @@ export default function VerificationQueue() {
             </div>
 
             <div className="max-h-[75vh] space-y-5 overflow-y-auto p-6">
-
-              {/* APPLICANT DETAILS */}
-              <div className="flex items-center gap-3 rounded-xl bg-[#F4F8F9] p-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#E6F1F6] text-[#2785B2]">
-                  <Building2 size={21} />
+              {/* 1. ORGANISATION BASIC INFORMATION */}
+              <div className="rounded-xl border border-[#D7E5EA] bg-[#F8FBFC] p-4">
+                <div className="mb-3 flex items-center gap-2 text-xs font-bold text-[#123B5C]">
+                  <Building2 size={16} className="text-[#2785B2]" />
+                  <span>Organisation Basic Information</span>
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-xs font-bold text-[#123B5C]">
-                    {selectedRequest.applicant}
-                  </h3>
-                  <p className="mt-1 text-[9px] text-slate-500">
-                    {selectedRequest.type} · submitted{" "}
-                    {selectedRequest.submitted}
-                  </p>
+                <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Organisation Name
+                    </p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {selectedRequest.organizationName ||
+                        selectedRequest.applicant}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Organisation Type
+                    </p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {selectedRequest.organizationType || selectedRequest.type}
+                      {selectedRequest.otherOrganizationType
+                        ? ` (${selectedRequest.otherOrganizationType})`
+                        : ""}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Registration Number
+                    </p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {selectedRequest.registrationNumber || "Not provided"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Official Email
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1 text-[#123B5C]">
+                      <Mail size={12} className="text-slate-400" />
+                      {selectedRequest.applicantEmail || "Not provided"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Official Contact Number
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1 text-[#123B5C]">
+                      <Phone size={12} className="text-slate-400" />
+                      {selectedRequest.applicantPhone || "Not provided"}
+                      {selectedRequest.secondaryContactPhone
+                        ? ` / ${selectedRequest.secondaryContactPhone}`
+                        : ""}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Registration Country &amp; Year
+                    </p>
+                    <p className="mt-0.5 text-[#123B5C]">
+                      {selectedRequest.registrationCountry || "Sri Lanka"}
+                      {selectedRequest.yearEstablished
+                        ? ` · Est. ${selectedRequest.yearEstablished}`
+                        : ""}
+                    </p>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Address, District &amp; Province
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1 text-[#123B5C]">
+                      <MapPin size={12} className="shrink-0 text-slate-400" />
+                      {[
+                        selectedRequest.address,
+                        selectedRequest.district,
+                        selectedRequest.province,
+                      ]
+                        .filter(Boolean)
+                        .join(", ") || "Not provided"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Registration Date
+                    </p>
+                    <p className="mt-0.5 text-[#123B5C]">
+                      {selectedRequest.submittedAt
+                        ? new Date(selectedRequest.submittedAt).toLocaleString()
+                        : selectedRequest.submitted}
+                    </p>
+                  </div>
                 </div>
 
-                <span
-                  className={`rounded-lg px-3 py-2 text-[9px] font-bold ${
-                    selectedRequest.priority === "High"
-                      ? "bg-red-50 text-red-600"
-                      : "bg-orange-50 text-orange-700"
-                  }`}
-                >
-                  {selectedRequest.priority} priority
-                </span>
+                {selectedRequest.description && (
+                  <div className="mt-3 border-t border-slate-200/70 pt-2.5 text-xs">
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Operational Scope / Description
+                    </p>
+                    <p className="mt-0.5 text-slate-700">
+                      {selectedRequest.description}
+                    </p>
+                  </div>
+                )}
               </div>
 
-              {/* SUBMITTED EVIDENCE */}
+              {/* 2. HUMANITARIAN OPERATIONAL INFORMATION */}
+              <div className="rounded-xl border border-[#D7E5EA] bg-white p-4">
+                <div className="mb-3 flex items-center gap-2 text-xs font-bold text-[#123B5C]">
+                  <Globe size={16} className="text-[#2785B2]" />
+                  <span>Humanitarian Operational Capabilities</span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2">
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Main Areas of Operation
+                    </p>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {(selectedRequest.areasOfOperation &&
+                      selectedRequest.areasOfOperation.length > 0
+                        ? selectedRequest.areasOfOperation
+                        : [selectedRequest.district || "Regional"]
+                      ).map((area) => (
+                        <span
+                          key={area}
+                          className="rounded-full bg-[#EFF6F7] px-2.5 py-0.5 text-xs font-semibold text-[#123B5C]"
+                        >
+                          {area}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Humanitarian Services / Areas of Assistance
+                    </p>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {(selectedRequest.areasOfAssistance &&
+                      selectedRequest.areasOfAssistance.length > 0
+                        ? selectedRequest.areasOfAssistance
+                        : ["General Humanitarian Relief"]
+                      ).map((srv) => (
+                        <span
+                          key={srv}
+                          className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800"
+                        >
+                          {srv}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Operational Capacity
+                    </p>
+                    <p className="mt-0.5 text-slate-700">
+                      {selectedRequest.operationalCapacity ||
+                        "Standard humanitarian partner capacity"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Emergency Response Availability
+                    </p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {selectedRequest.emergencyResponseAvailability ||
+                        "Available for emergency response"}
+                    </p>
+                    {selectedRequest.additionalResources && (
+                      <p className="mt-1 text-[13px] text-slate-500">
+                        Resources: {selectedRequest.additionalResources}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. AUTHORISED REPRESENTATIVE */}
+              <div className="rounded-xl border border-[#D7E5EA] bg-white p-4">
+                <div className="mb-3 flex items-center gap-2 text-xs font-bold text-[#123B5C]">
+                  <UserCheck size={16} className="text-[#2785B2]" />
+                  <span>Authorised Representative</span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Representative Name &amp; Role
+                    </p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {selectedRequest.representativeFullName ||
+                        selectedRequest.applicant}
+                    </p>
+                    <p className="text-[13px] text-slate-500">
+                      {selectedRequest.representativeDesignation ||
+                        "Authorised Representative"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Representative Contact
+                    </p>
+                    <p className="mt-0.5 text-[#123B5C]">
+                      {selectedRequest.representativeEmail ||
+                        selectedRequest.applicantEmail}
+                    </p>
+                    <p className="text-[13px] text-slate-500">
+                      {selectedRequest.representativePhone ||
+                        selectedRequest.applicantPhone}
+                      {selectedRequest.representativeAlternativePhone
+                        ? ` / ${selectedRequest.representativeAlternativePhone}`
+                        : ""}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-slate-400">
+                      Account Login Username
+                    </p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {selectedRequest.loginEmail ||
+                        selectedRequest.representativeEmail ||
+                        selectedRequest.applicantEmail}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. UPLOADED VERIFICATION DOCUMENTS */}
               <div>
-                <h3 className="mb-3 text-xs font-semibold text-[#123B5C]">
-                  Submitted evidence
+                <h3 className="mb-2.5 text-base font-bold text-[#123B5C]">
+                  Uploaded Verification Documents (
+                  {selectedRequest.documents.length})
                 </h3>
 
                 <div className="space-y-2">
-                  {selectedRequest.documents.map((document) => (
-                    <div
-                      key={document}
-                      className="flex items-center gap-3 rounded-lg border border-[#D7E5EA] p-3"
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-50 text-[#2785B2]">
-                        <ShieldCheck size={19} />
-                      </div>
+                  {selectedRequest.documents.map((docItem, index) => {
+                    const docObj: VerificationDocumentItem =
+                      typeof docItem === "string"
+                        ? {
+                            id: `doc-${index}`,
+                            name: docItem,
+                            originalFileName: docItem,
+                            type: "PDF",
+                            size: "Uploaded",
+                          }
+                        : docItem;
 
-                      <div className="flex-1">
-                        <p className="text-[10px] font-semibold text-[#123B5C]">
-                          {document}
-                        </p>
-                        <p className="mt-1 text-[9px] text-slate-400">
-                          Uploaded · document appears complete
-                        </p>
-                      </div>
+                    return (
+                      <div
+                        key={docObj.id || index}
+                        className="flex items-center justify-between gap-3 rounded-lg border border-[#D7E5EA] bg-white p-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-50 text-[#2785B2]">
+                            <FileText size={17} />
+                          </div>
 
-                      <span className="rounded-lg bg-[#E6F7F1] px-3 py-2 text-[9px] font-semibold text-[#16866A]">
-                        Ready
-                      </span>
-                    </div>
-                  ))}
+                          <div>
+                            <p className="text-sm font-semibold text-[#123B5C]">
+                              {docObj.name}
+                            </p>
+                            <p className="mt-0.5 text-[13px] text-slate-500">
+                              File:{" "}
+                              <span className="font-medium text-slate-700">
+                                {docObj.originalFileName || docObj.name}
+                              </span>{" "}
+                              · {docObj.type} · {docObj.size}
+                            </p>
+                          </div>
+                        </div>
+
+                        {docObj.canDownload && (
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadDocument(docObj)}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#2785B2] bg-white px-3 py-1.5 text-sm font-semibold text-[#2785B2] hover:bg-sky-50"
+                          >
+                            <Download size={12} />
+                            Download / View
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+
+              {/* ADDITIONAL INFORMATION REQUEST / RESPONSE HISTORY */}
+              {(selectedRequest.additionalInfoRequest ||
+                selectedRequest.additionalInfoResponse) && (
+                <div className="space-y-2 rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-xs">
+                  {selectedRequest.additionalInfoRequest && (
+                    <div>
+                      <p className="text-xs font-bold uppercase text-amber-900">
+                        Additional Information Requested by Admin:
+                      </p>
+                      <p className="mt-0.5 text-amber-800">
+                        {selectedRequest.additionalInfoRequest}
+                      </p>
+                    </div>
+                  )}
+                  {selectedRequest.additionalInfoResponse && (
+                    <div className="border-t border-amber-200 pt-2">
+                      <p className="text-xs font-bold uppercase text-emerald-900">
+                        Organisation Representative Response:
+                      </p>
+                      <p className="mt-0.5 text-emerald-800">
+                        {selectedRequest.additionalInfoResponse}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* DECISION RATIONALE */}
               <div>
                 <label
                   htmlFor="decision-rationale"
-                  className="mb-2 block text-xs font-semibold text-[#123B5C]"
+                  className="mb-2 block text-sm font-semibold text-[#123B5C]"
                 >
-                  Decision rationale <span className="text-red-600">*</span>
+                  Administrator Decision Rationale / Comments{" "}
+                  <span className="text-red-600">*</span>
                 </label>
 
                 <textarea
                   id="decision-rationale"
-                  rows={4}
+                  rows={3}
                   value={rationale}
                   onChange={(e) => {
                     setRationale(e.target.value);
                     setActionMessage("");
                   }}
-                  placeholder="Record the basis for this verification decision..."
-                  className="w-full resize-y rounded-lg border border-[#D7E5EA] p-3 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#2785B2] focus:ring-2 focus:ring-sky-100"
+                  placeholder="Record the verification rationale, rejection reason, or additional information requested..."
+                  className="w-full resize-y rounded-lg border border-[#D7E5EA] p-3 text-sm sm:text-[15px] text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#2785B2] focus:ring-2 focus:ring-sky-100"
                 />
               </div>
 
               {actionMessage && (
                 <div
-                  className={`rounded-lg p-3 text-[10px] ${
-                    actionMessage.startsWith("Please")
+                  className={`rounded-lg p-3 text-sm font-medium ${
+                    actionMessage.startsWith("Please") ||
+                    actionMessage.startsWith("Failed")
                       ? "bg-red-50 text-red-600"
                       : "bg-emerald-50 text-emerald-700"
                   }`}
@@ -817,49 +1065,44 @@ export default function VerificationQueue() {
 
             {/* MODAL ACTIONS */}
             <div className="flex flex-col-reverse justify-end gap-2 border-t border-[#D7E5EA] p-5 sm:flex-row">
-
               <button
                 onClick={() =>
-                  updateRequest("Rejected", "Request rejected in this demo.")
+                  updateRequest(
+                    "Rejected",
+                    "Partner Organisation registration rejected and notification dispatched."
+                  )
                 }
-                disabled={
-                  selectedRequest.status === "Approved" ||
-                  selectedRequest.status === "Rejected"
-                }
-                className="rounded-lg bg-red-600 px-5 py-3 text-[10px] font-semibold text-white hover:bg-red-700 disabled:opacity-40"
+                disabled={isSubmitting}
+                className="rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-40"
               >
-                Reject
+                Reject Organisation
               </button>
 
               <button
                 onClick={() =>
                   updateRequest(
                     "Additional Info",
-                    "Additional information requested in this demo."
+                    "Additional verification information requested from the representative."
                   )
                 }
-                disabled={
-                  selectedRequest.status === "Approved" ||
-                  selectedRequest.status === "Rejected"
-                }
-                className="rounded-lg border border-[#B9D1DD] bg-white px-5 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50 disabled:opacity-40"
+                disabled={isSubmitting}
+                className="rounded-lg border border-[#B9D1DD] bg-white px-5 py-3 text-sm font-semibold text-[#2785B2] hover:bg-sky-50 disabled:opacity-40"
               >
-                Request information
+                Request Additional Information
               </button>
 
               <button
                 onClick={() =>
-                  updateRequest("Approved", "Request approved and verified in this demo.")
+                  updateRequest(
+                    "Approved",
+                    "Partner Organisation approved, account activated, and permissions granted."
+                  )
                 }
-                disabled={
-                  selectedRequest.status === "Approved" ||
-                  selectedRequest.status === "Rejected"
-                }
-                className="rounded-lg bg-[#2785B2] px-5 py-3 text-[10px] font-semibold text-white shadow-sm hover:bg-[#1D6F98] disabled:opacity-40"
+                disabled={isSubmitting}
+                className="rounded-lg bg-[#2785B2] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#1D6F98] disabled:opacity-40"
               >
-                Approve &amp; verify
+                Approve Organisation
               </button>
-
             </div>
           </div>
         </div>
