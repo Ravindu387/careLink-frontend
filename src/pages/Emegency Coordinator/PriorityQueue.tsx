@@ -24,7 +24,7 @@ import {
 } from "../../services/priorityQueueService";
 
 const selectStyle =
-  "w-full min-w-0 rounded-lg border border-[#d4e0e8] bg-white px-2.5 py-2.5 text-[10px] text-slate-700 outline-none focus:border-sky-500";
+  "w-full min-w-0 rounded-lg border border-[#d4e0e8] bg-white px-2.5 py-2.5 text-[13px] text-slate-700 outline-none focus:border-sky-500";
 
 export default function PriorityQueue() {
   const [requests, setRequests] = useState<PriorityQueueItem[]>([]);
@@ -350,10 +350,10 @@ export default function PriorityQueue() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-medium text-[#153f5e]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
               Priority Queue
             </h1>
-            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-[10px] font-semibold text-red-700">
+            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">
               Live Triage
             </span>
           </div>
@@ -366,7 +366,7 @@ export default function PriorityQueue() {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b8d0df] bg-white px-3.5 py-2.5 text-[10px] font-medium text-[#175477] hover:bg-sky-50 transition"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b8d0df] bg-white px-3.5 py-2.5 text-sm font-medium text-[#175477] hover:bg-sky-50 transition"
             title="Refresh priority queue from backend"
           >
             <RefreshCw
@@ -378,7 +378,7 @@ export default function PriorityQueue() {
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b8d0df] bg-white px-4 py-2.5 text-[10px] font-medium text-[#175477] hover:bg-sky-50 transition"
+            className="flex items-center gap-2 rounded-lg border border-[#b8d0df] bg-white px-4 py-2.5 text-sm font-medium text-[#175477] hover:bg-sky-50 transition"
           >
             <Download size={14} />
             Export
@@ -386,7 +386,7 @@ export default function PriorityQueue() {
 
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-[10px] font-semibold text-white hover:bg-[#1c668d] transition shadow-sm"
+            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] transition shadow-sm"
           >
             <Plus size={14} />
             Create request
@@ -415,10 +415,10 @@ export default function PriorityQueue() {
         <div className="flex items-center gap-3">
           <AlertTriangle size={19} className="shrink-0 text-red-700" />
           <div>
-            <p className="text-[10px] font-semibold text-red-800">
+            <p className="text-sm font-semibold text-red-800">
               {metrics ? metrics.criticalOrOverdueRequiringAttentionCount : 12} critical or overdue cases require attention
             </p>
-            <p className="mt-0.5 text-[9px] text-red-600">
+            <p className="mt-0.5 text-xs text-red-600">
               Human review is required before priority or escalation decisions.
             </p>
           </div>
@@ -426,7 +426,7 @@ export default function PriorityQueue() {
 
         <button
           onClick={() => setShowPolicy(true)}
-          className="shrink-0 rounded-lg border border-[#b8d0df] bg-white px-3 py-2 text-[9px] font-medium text-[#175477] hover:bg-sky-50 transition"
+          className="shrink-0 rounded-lg border border-[#b8d0df] bg-white px-3 py-2 text-sm font-medium text-[#175477] hover:bg-sky-50 transition"
         >
           Review SLA policy
         </button>
@@ -441,7 +441,7 @@ export default function PriorityQueue() {
               setActiveTab(tab.name);
               setPage(1);
             }}
-            className={`flex items-center gap-1.5 border-b-2 pb-3 text-[10px] whitespace-nowrap transition ${
+            className={`flex items-center gap-1.5 border-b-2 pb-3 text-sm whitespace-nowrap transition ${
               activeTab === tab.name
                 ? "border-[#287da5] font-semibold text-[#287da5]"
                 : "border-transparent text-slate-500 hover:text-sky-800"
@@ -449,7 +449,7 @@ export default function PriorityQueue() {
           >
             {tab.name}
             <span
-              className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                 activeTab === tab.name
                   ? "bg-sky-100 text-[#287da5]"
                   : "bg-slate-200 text-slate-600"
@@ -472,7 +472,7 @@ export default function PriorityQueue() {
               setPage(1);
             }}
             placeholder="Search request ID, category, or location..."
-            className="w-full min-w-0 bg-transparent text-[10px] outline-none placeholder:text-slate-400"
+            className="w-full min-w-0 bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
           />
           {search && (
             <button onClick={() => setSearch("")} className="text-slate-400 hover:text-slate-600">
@@ -545,7 +545,7 @@ export default function PriorityQueue() {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-[10px] font-medium transition ${
+          className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition ${
             showFilters
               ? "border-sky-700 bg-sky-50 text-sky-800"
               : "border-sky-600 bg-white text-sky-800 hover:bg-sky-50"
@@ -560,7 +560,7 @@ export default function PriorityQueue() {
       {showFilters && (
         <div className="mb-3 grid grid-cols-1 gap-3 rounded-lg border border-[#d4e0e8] bg-white p-3 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-[9px] font-medium text-slate-500">
+            <label className="mb-1.5 block text-sm font-medium text-slate-500">
               Assigned organisation / team
             </label>
             <select
@@ -583,7 +583,7 @@ export default function PriorityQueue() {
           <div className="flex items-end">
             <button
               onClick={clearFilters}
-              className="rounded-lg bg-slate-100 px-4 py-2.5 text-[10px] font-medium text-slate-600 hover:bg-slate-200 transition"
+              className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-200 transition"
             >
               Clear all filters
             </button>
@@ -611,7 +611,7 @@ export default function PriorityQueue() {
                 ].map((heading, i) => (
                   <th
                     key={i}
-                    className="whitespace-nowrap px-3 py-3 text-[9px] font-semibold text-slate-500"
+                    className="whitespace-nowrap px-3 py-3 text-[13px] font-semibold text-slate-500"
                   >
                     {heading}
                   </th>
@@ -622,7 +622,7 @@ export default function PriorityQueue() {
             <tbody>
               {loading && requests.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-12 text-center text-xs text-slate-500">
+                  <td colSpan={10} className="py-12 text-center text-sm text-slate-500">
                     <div className="flex items-center justify-center gap-2">
                       <Loader2 size={16} className="animate-spin text-sky-600" />
                       <span>Loading priority requests...</span>
@@ -636,25 +636,25 @@ export default function PriorityQueue() {
                     onClick={() => setSelected(item)}
                     className="cursor-pointer border-b border-slate-100 transition hover:bg-[#f0f6f8]"
                   >
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] font-semibold text-[#153f5e]">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm font-semibold text-[#153f5e]">
                       {item.id}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-700">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-700">
                       {item.category}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-600">
                       {item.location}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-500">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-500">
                       {item.reported}
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
                       <span
-                        className={`rounded-md px-2 py-1 text-[8px] font-semibold ${
+                        className={`rounded-md px-2 py-1 text-xs font-semibold ${
                           item.priority.startsWith("Critical")
                             ? "bg-red-100 text-red-700"
                             : item.priority.startsWith("High")
@@ -666,9 +666,9 @@ export default function PriorityQueue() {
                       </span>
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px]">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm">
                       {item.verification === "Verified" ? (
-                        <span className="rounded-md bg-emerald-100 px-2 py-1 text-[8px] font-semibold text-emerald-700">
+                        <span className="rounded-md bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">
                           Verified
                         </span>
                       ) : (
@@ -678,19 +678,19 @@ export default function PriorityQueue() {
                       )}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-600">
                       {item.assigned}
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
-                      <span className="rounded-md bg-sky-100 px-2 py-1 text-[8px] font-semibold text-sky-700">
+                      <span className="rounded-md bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-700">
                         {item.age}
                       </span>
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
                       <span
-                        className={`rounded-md px-2 py-1 text-[8px] font-semibold ${
+                        className={`rounded-md px-2 py-1 text-xs font-semibold ${
                           item.status === "Escalated"
                             ? "bg-red-100 text-red-700"
                             : item.status === "Completed"
@@ -719,7 +719,7 @@ export default function PriorityQueue() {
         )}
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">
-          <p className="text-[9px] text-slate-500">
+          <p className="text-xs text-slate-500">
             Showing {filtered.length === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)} of {filtered.length === 0 ? 0 : (metrics ? metrics.totalCount : 1284)} requests
           </p>
 
@@ -727,7 +727,7 @@ export default function PriorityQueue() {
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-[9px] text-slate-500 hover:bg-slate-50 disabled:opacity-40 transition"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-500 hover:bg-slate-50 disabled:opacity-40 transition"
             >
               Previous
             </button>
@@ -736,7 +736,7 @@ export default function PriorityQueue() {
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`h-7 w-7 rounded-md border text-[9px] transition ${
+                className={`h-7 w-7 rounded-md border text-sm transition ${
                   page === p
                     ? "border-[#287da5] bg-[#287da5] text-white font-medium"
                     : "border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -749,7 +749,7 @@ export default function PriorityQueue() {
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-[9px] text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition"
             >
               Next
             </button>
@@ -766,10 +766,10 @@ export default function PriorityQueue() {
           >
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold text-[#153f5e]">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#153f5e]">
                   Create Priority Request
                 </h2>
-                <p className="mt-0.5 text-[10px] text-slate-400">
+                <p className="mt-0.5 text-[13px] text-slate-400">
                   Triage high-urgency humanitarian demand.
                 </p>
               </div>
@@ -783,7 +783,7 @@ export default function PriorityQueue() {
             </div>
 
             <div className="space-y-3">
-              <label className="block text-[10px] text-slate-600">
+              <label className="block text-sm text-slate-600">
                 Category
                 <select
                   value={form.category}
@@ -798,7 +798,7 @@ export default function PriorityQueue() {
                 </select>
               </label>
 
-              <label className="block text-[10px] text-slate-600">
+              <label className="block text-sm text-slate-600">
                 Location *
                 <input
                   required
@@ -809,7 +809,7 @@ export default function PriorityQueue() {
                 />
               </label>
 
-              <label className="block text-[10px] text-slate-600">
+              <label className="block text-sm text-slate-600">
                 Crisis Event
                 <select
                   value={form.crisisEvent}
@@ -822,7 +822,7 @@ export default function PriorityQueue() {
                 </select>
               </label>
 
-              <label className="block text-[10px] text-slate-600">
+              <label className="block text-sm text-slate-600">
                 Priority Level
                 <select
                   value={form.priority}
@@ -844,7 +844,7 @@ export default function PriorityQueue() {
                 </select>
               </label>
 
-              <label className="block text-[10px] text-slate-600">
+              <label className="block text-sm text-slate-600">
                 Assign Team
                 <select
                   value={form.assigned}
@@ -860,7 +860,7 @@ export default function PriorityQueue() {
                 </select>
               </label>
 
-              <label className="block text-[10px] text-slate-600">
+              <label className="block text-sm text-slate-600">
                 Operational Description (Optional)
                 <textarea
                   value={form.description}
@@ -876,14 +876,14 @@ export default function PriorityQueue() {
               <button
                 type="button"
                 onClick={() => setShowCreate(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-[10px] text-slate-600 hover:bg-slate-50 transition"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-lg bg-[#287da5] px-4 py-2 text-[10px] font-semibold text-white hover:bg-[#206788] disabled:opacity-50 transition flex items-center gap-1.5"
+                className="rounded-lg bg-[#287da5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#206788] disabled:opacity-50 transition flex items-center gap-1.5"
               >
                 {submitting && <Loader2 size={13} className="animate-spin" />}
                 <span>Create request</span>
@@ -899,7 +899,7 @@ export default function PriorityQueue() {
           <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <p className="text-[9px] font-semibold text-sky-600">
+                <p className="text-xs font-semibold text-sky-600">
                   PRIORITY REQUEST DETAILS
                 </p>
                 <h2 className="mt-1 text-lg font-semibold text-[#153f5e]">
@@ -917,16 +917,16 @@ export default function PriorityQueue() {
                   {selected.priority}
                 </span>
                 {selected.overdue && (
-                  <span className="rounded bg-red-200 px-1.5 py-0.5 text-[8px] font-bold text-red-800">
+                  <span className="rounded bg-red-200 px-1.5 py-0.5 text-xs font-bold text-red-800">
                     OVERDUE
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-[10px] text-slate-600">
+              <p className="mt-1 text-sm text-slate-600">
                 {selected.category} · {selected.location}
               </p>
               {selected.description && (
-                <p className="mt-1 text-[10px] text-slate-700 italic">
+                <p className="mt-1 text-sm text-slate-700 italic">
                   "{selected.description}"
                 </p>
               )}
@@ -940,7 +940,7 @@ export default function PriorityQueue() {
               ["Status", selected.status],
               ["Crisis Event", selected.crisisEvent],
             ].map(([label, value]) => (
-              <div key={label} className="flex justify-between border-b border-slate-100 py-2.5 text-[10px]">
+              <div key={label} className="flex justify-between border-b border-slate-100 py-2.5 text-sm">
                 <span className="text-slate-500">{label}</span>
                 <span className="font-medium text-slate-800">{value}</span>
               </div>
@@ -948,14 +948,14 @@ export default function PriorityQueue() {
 
             {/* Quick Triage Actions */}
             <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
-              <label className="block text-[9px] font-medium text-slate-500">
+              <label className="block text-sm font-medium text-slate-500">
                 Assign / Dispatch Team
               </label>
               <div className="flex gap-2">
                 <select
                   value={assignTeamName}
                   onChange={(e) => setAssignTeamName(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[10px] text-slate-700 outline-none"
+                  className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm sm:text-[15px] text-slate-700 outline-none"
                 >
                   <option>Medical Team 3</option>
                   <option>Medical Team 2</option>
@@ -968,7 +968,7 @@ export default function PriorityQueue() {
                 <button
                   disabled={actionLoading}
                   onClick={() => handleAssignTeam(selected.id, assignTeamName)}
-                  className="rounded-lg bg-[#287da5] px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-[#206788] disabled:opacity-50 transition shrink-0 flex items-center gap-1"
+                  className="rounded-lg bg-[#287da5] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#206788] disabled:opacity-50 transition shrink-0 flex items-center gap-1"
                 >
                   <UserCheck size={12} />
                   <span>Assign</span>
@@ -980,7 +980,7 @@ export default function PriorityQueue() {
                   <button
                     disabled={actionLoading}
                     onClick={() => handleUpdateStatus(selected.id, "Escalated")}
-                    className="flex-1 rounded-lg border border-red-300 bg-white py-2 text-[10px] font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 transition flex items-center justify-center gap-1"
+                    className="flex-1 rounded-lg border border-red-300 bg-white py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 transition flex items-center justify-center gap-1"
                   >
                     <ShieldAlert size={12} />
                     <span>Escalate Case</span>
@@ -991,7 +991,7 @@ export default function PriorityQueue() {
                   <button
                     disabled={actionLoading}
                     onClick={() => handleUpdateStatus(selected.id, "In Progress")}
-                    className="flex-1 rounded-lg border border-sky-300 bg-white py-2 text-[10px] font-semibold text-sky-700 hover:bg-sky-50 disabled:opacity-50 transition"
+                    className="flex-1 rounded-lg border border-sky-300 bg-white py-2 text-sm font-semibold text-sky-700 hover:bg-sky-50 disabled:opacity-50 transition"
                   >
                     Mark In Progress
                   </button>
@@ -1001,7 +1001,7 @@ export default function PriorityQueue() {
                   <button
                     disabled={actionLoading}
                     onClick={() => handleUpdateStatus(selected.id, "Completed")}
-                    className="flex-1 rounded-lg bg-emerald-600 py-2 text-[10px] font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition"
+                    className="flex-1 rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition"
                   >
                     Resolve Case
                   </button>
@@ -1011,7 +1011,7 @@ export default function PriorityQueue() {
 
             <button
               onClick={() => setSelected(null)}
-              className="mt-4 w-full rounded-lg bg-[#153f5e] py-2 text-[10px] font-semibold text-white hover:bg-[#205879] transition"
+              className="mt-4 w-full rounded-lg bg-[#153f5e] py-2 text-sm font-semibold text-white hover:bg-[#205879] transition"
             >
               Close Details
             </button>
@@ -1025,10 +1025,10 @@ export default function PriorityQueue() {
           <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold text-[#153f5e]">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#153f5e]">
                   Operational SLA Policy
                 </h2>
-                <p className="mt-0.5 text-[10px] text-slate-400">
+                <p className="mt-0.5 text-[13px] text-slate-400">
                   Target response time horizons by priority classification.
                 </p>
               </div>
@@ -1050,16 +1050,16 @@ export default function PriorityQueue() {
                 >
                   <div className="flex items-center justify-between">
                     <span
-                      className={`rounded-md px-2 py-1 text-[9px] font-semibold ${policy.color}`}
+                      className={`rounded-md px-2 py-1 text-xs font-semibold ${policy.color}`}
                     >
                       {policy.level}
                     </span>
-                    <span className="text-[10px] font-medium text-slate-700">
+                    <span className="text-sm font-medium text-slate-700">
                       {policy.time}
                     </span>
                   </div>
                   {policy.description && (
-                    <p className="mt-1.5 text-[9px] text-slate-500">
+                    <p className="mt-1.5 text-xs text-slate-500">
                       {policy.description}
                     </p>
                   )}
@@ -1067,13 +1067,13 @@ export default function PriorityQueue() {
               ))}
             </div>
 
-            <p className="mt-4 text-[9px] text-slate-400">
+            <p className="mt-4 text-xs text-slate-400">
               Active CareLink operational SLA framework. Human review overrides AI confidence scores when evidence is pending.
             </p>
 
             <button
               onClick={() => setShowPolicy(false)}
-              className="mt-4 w-full rounded-lg bg-[#153f5e] py-2.5 text-[10px] font-semibold text-white hover:bg-[#205879] transition"
+              className="mt-4 w-full rounded-lg bg-[#153f5e] py-2.5 text-sm font-semibold text-white hover:bg-[#205879] transition"
             >
               Close
             </button>

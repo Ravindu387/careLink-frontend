@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { aiRecommendationService } from "../../services/aiRecommendationService";
 import {
   Search,
@@ -43,9 +43,11 @@ const reviewStyle: Record<string, string> = {
 };
 
 export default function AIRecommendations() {
-  const [recommendations, setRecommendations] = useState<Recommendation[]>(
-    initialRecommendations
-  );
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [metrics, setMetrics] = useState<RecommendationMetrics | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLiveConnected, setIsLiveConnected] = useState(true);
 
   useEffect(() => {
     let isCancelled = false;
@@ -131,6 +133,42 @@ export default function AIRecommendations() {
   const handleManualRefresh = () => {
     setLoading(true);
     loadData();
+  };
+
+  const handleResetData = async () => {
+    try {
+      setLoading(true);
+      await recommendationService.resetData();
+      await loadData();
+      showToastMessage("Data reset to defaults successfully.");
+    } catch (err: unknown) {
+      showToastMessage(err instanceof Error ? err.message : "Failed to reset data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateRecommendation = async () => {
+    try {
+      setGenerating(true);
+      const newRec = await recommendationService.generateRecommendation({
+        category: genCategory,
+        location: genLocation,
+        description: genDescription,
+        affectedPeopleCount: genAffectedCount,
+        hasVulnerableMembers: genHasVulnerable,
+        isLifeThreatening: genIsLifeThreatening,
+        priorityHint: genPriorityHint,
+      });
+      setRecommendations((prev) => [newRec, ...prev]);
+      setShowGenerateModal(false);
+      showToastMessage("Recommendation generated successfully.");
+      await loadData();
+    } catch (err: unknown) {
+      showToastMessage(err instanceof Error ? err.message : "Failed to generate recommendation");
+    } finally {
+      setGenerating(false);
+    }
   };
 
   useEffect(() => {
@@ -267,16 +305,16 @@ export default function AIRecommendations() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-medium text-[#153f5e]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
               AI Recommendations
             </h1>
             {isLiveConnected ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold text-emerald-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Backend Live
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
                 <Activity size={10} />
                 Connecting...
               </span>
@@ -291,7 +329,7 @@ export default function AIRecommendations() {
           <button
             onClick={handleManualRefresh}
             disabled={loading}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-[10px] font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
             title="Refresh data from server"
           >
             <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
@@ -300,7 +338,7 @@ export default function AIRecommendations() {
 
           <button
             onClick={handleResetData}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
             title="Reset to default seed data"
           >
             <RotateCcw size={12} />
@@ -309,13 +347,13 @@ export default function AIRecommendations() {
 
           <button
             onClick={() => setShowGenerateModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-[#153f5e] px-3.5 py-2 text-[10px] font-semibold text-white shadow-sm transition hover:bg-[#205879]"
+            className="flex items-center gap-1.5 rounded-lg bg-[#153f5e] px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#205879]"
           >
             <Plus size={13} />
             Run AI Analysis
           </button>
 
-          <span className="rounded-md bg-purple-100 px-3 py-2 text-[9px] font-semibold text-purple-700">
+          <span className="rounded-md bg-purple-100 px-3 py-2 text-xs font-semibold text-purple-700">
             {awaitingCount} awaiting human review
           </span>
         </div>
@@ -325,10 +363,10 @@ export default function AIRecommendations() {
       <div className="mb-4 flex items-start gap-3 rounded-lg border border-purple-200 border-l-[3px] border-l-purple-600 bg-purple-50 p-3">
         <Sparkles size={18} className="mt-0.5 shrink-0 text-purple-600" />
         <div>
-          <p className="text-[10px] font-semibold text-purple-900">
+          <p className="text-sm font-semibold text-purple-900">
             AI recommendations are never automatically approved
           </p>
-          <p className="mt-1 text-[9px] text-purple-700">
+          <p className="mt-1 text-xs text-purple-700">
             Critical humanitarian decisions remain under authorised human control and are fully audited.
           </p>
         </div>
@@ -339,11 +377,11 @@ export default function AIRecommendations() {
         <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
           <div className="flex items-center gap-2">
             <AlertTriangle size={16} />
-            <span className="text-[10px] font-medium">{error}</span>
+            <span className="text-sm font-medium">{error}</span>
           </div>
           <button
             onClick={loadData}
-            className="rounded bg-red-600 px-2.5 py-1 text-[9px] font-semibold text-white hover:bg-red-700"
+            className="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
           >
             Retry Connection
           </button>
@@ -358,11 +396,11 @@ export default function AIRecommendations() {
               <Sparkles size={19} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-500">Awaiting review</p>
+              <p className="text-xs text-slate-500">Awaiting review</p>
               <h2 className="text-2xl font-semibold text-[#153f5e]">
                 {metrics ? metrics.awaitingReview : awaitingCount}
               </h2>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 {recommendations.filter((r) => r.reviewState === "Awaiting Review" && r.priority === "Critical").length} critical cases
               </p>
             </div>
@@ -375,11 +413,11 @@ export default function AIRecommendations() {
               <AlertTriangle size={19} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-500">High urgency</p>
+              <p className="text-xs text-slate-500">High urgency</p>
               <h2 className="text-2xl font-semibold text-[#153f5e]">
                 {metrics ? metrics.highUrgency : recommendations.filter((r) => r.priority === "Critical" || r.priority === "High").length}
               </h2>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 Across active queues
               </p>
             </div>
@@ -392,11 +430,11 @@ export default function AIRecommendations() {
               <Check size={19} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-500">Acceptance rate</p>
+              <p className="text-xs text-slate-500">Acceptance rate</p>
               <h2 className="text-2xl font-semibold text-[#153f5e]">
                 {metrics ? `${metrics.acceptanceRate.toFixed(1)}%` : "91.6%"}
               </h2>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 {metrics ? metrics.totalReviewed.toLocaleString() : "1,498"} reviewed
               </p>
             </div>
@@ -409,11 +447,11 @@ export default function AIRecommendations() {
               <ShieldCheck size={19} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-500">Override rate</p>
+              <p className="text-xs text-slate-500">Override rate</p>
               <h2 className="text-2xl font-semibold text-[#153f5e]">
                 {metrics ? `${metrics.overrideRate.toFixed(1)}%` : "8.4%"}
               </h2>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 Audited with rationale
               </p>
             </div>
@@ -429,14 +467,14 @@ export default function AIRecommendations() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search recommendation or request..."
-            className="w-full min-w-0 bg-transparent text-[10px] outline-none placeholder:text-slate-400"
+            className="w-full min-w-0 bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
           />
         </div>
 
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[10px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All recommendation types</option>
           <option>Emergency shelter</option>
@@ -450,7 +488,7 @@ export default function AIRecommendations() {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[10px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All priorities</option>
           <option>Critical</option>
@@ -462,7 +500,7 @@ export default function AIRecommendations() {
         <select
           value={confidence}
           onChange={(e) => setConfidence(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[10px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>Confidence range</option>
           <option>90% and above</option>
@@ -473,7 +511,7 @@ export default function AIRecommendations() {
         <select
           value={review}
           onChange={(e) => setReview(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[10px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>Review state</option>
           <option>Awaiting Review</option>
@@ -485,7 +523,7 @@ export default function AIRecommendations() {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 rounded-lg border border-sky-600 bg-white px-3 py-2.5 text-[10px] font-medium text-sky-700 hover:bg-sky-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-sky-600 bg-white px-3 py-2.5 text-sm font-medium text-sky-700 hover:bg-sky-50"
         >
           <Filter size={13} />
           More filters
@@ -495,12 +533,12 @@ export default function AIRecommendations() {
 
       {showFilters && (
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d5e2e9] bg-white p-3">
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[13px] text-slate-500">
             Filtering across {recommendations.length} total recommendations stored on the backend.
           </p>
           <button
             onClick={resetFilters}
-            className="text-[10px] font-semibold text-sky-700 hover:underline"
+            className="text-sm font-semibold text-sky-700 hover:underline"
           >
             Clear all filters
           </button>
@@ -526,7 +564,7 @@ export default function AIRecommendations() {
                 ].map((heading, i) => (
                   <th
                     key={i}
-                    className="whitespace-nowrap px-3 py-3 text-[9px] font-semibold text-slate-500"
+                    className="whitespace-nowrap px-3 py-3 text-[13px] font-semibold text-slate-500"
                   >
                     {heading}
                   </th>
@@ -549,40 +587,40 @@ export default function AIRecommendations() {
                     onClick={() => openReview(item)}
                     className="cursor-pointer border-b border-slate-100 transition hover:bg-[#f0f6f8]"
                   >
-                    <td className="whitespace-nowrap px-3 py-4 text-[9px] font-semibold text-[#153f5e]">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm font-semibold text-[#153f5e]">
                       {item.id}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600">
                       {item.request}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600">
                       {item.category}
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-4">
-                      <span className={`rounded-md px-2 py-1 text-[8px] font-semibold ${priorityStyle[item.priority] || "bg-slate-100 text-slate-600"}`}>
+                      <span className={`rounded-md px-2 py-1 text-xs font-semibold ${priorityStyle[item.priority] || "bg-slate-100 text-slate-600"}`}>
                         {item.priority}
                       </span>
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-[9px] font-medium text-slate-700">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-slate-700">
                       {item.confidence}%
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600">
                       {item.action}
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-4">
-                      <span className="rounded-md bg-sky-100 px-2 py-1 text-[8px] font-semibold text-sky-700">
+                      <span className="rounded-md bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-700">
                         {item.timestamp}
                       </span>
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-4">
-                      <span className={`rounded-md px-2 py-1 text-[8px] font-semibold ${reviewStyle[item.reviewState] || "bg-slate-100 text-slate-600"}`}>
+                      <span className={`rounded-md px-2 py-1 text-xs font-semibold ${reviewStyle[item.reviewState] || "bg-slate-100 text-slate-600"}`}>
                         {item.reviewState}
                       </span>
                     </td>
@@ -607,11 +645,11 @@ export default function AIRecommendations() {
         )}
 
         <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3">
-          <p className="text-[9px] text-slate-500">
+          <p className="text-xs text-slate-500">
             Showing {filtered.length} of {recommendations.length} recommendations
           </p>
           {loading && (
-            <span className="inline-flex items-center gap-1.5 text-[9px] text-slate-400">
+            <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
               <Loader2 size={11} className="animate-spin" /> Syncing...
             </span>
           )}
@@ -624,7 +662,7 @@ export default function AIRecommendations() {
           <div className="my-auto w-full max-w-2xl rounded-xl bg-white p-5 shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <p className="text-[9px] font-semibold text-purple-600">
+                <p className="text-xs font-semibold text-purple-600">
                   AI RECOMMENDATION REVIEW
                 </p>
                 <h2 className="mt-1 text-lg font-semibold text-[#153f5e]">
@@ -641,33 +679,33 @@ export default function AIRecommendations() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-lg border border-slate-200 p-4">
-                <p className="mb-3 text-[10px] font-semibold text-slate-700">
+                <p className="mb-3 text-sm font-semibold text-slate-700">
                   Recommendation details
                 </p>
 
-                <p className="text-[10px] text-slate-500">Associated request</p>
+                <p className="text-[13px] text-slate-500">Associated request</p>
                 <p className="mt-1 text-sm font-semibold text-[#153f5e]">
                   {selected.request}
                 </p>
 
-                <p className="mt-3 text-[10px] text-slate-500">Category</p>
-                <p className="mt-1 text-xs text-slate-700 font-medium">
+                <p className="mt-3 text-[13px] text-slate-500">Category</p>
+                <p className="mt-1 text-sm text-slate-700 font-medium">
                   {selected.category}
                 </p>
 
-                <p className="mt-3 text-[10px] text-slate-500">Suggested action</p>
-                <p className="mt-1 text-xs text-slate-700 font-medium">
+                <p className="mt-3 text-[13px] text-slate-500">Suggested action</p>
+                <p className="mt-1 text-sm text-slate-700 font-medium">
                   {selected.action}
                 </p>
 
-                <p className="mt-3 text-[10px] text-slate-500">Timestamp</p>
-                <p className="mt-1 text-xs text-slate-700">
+                <p className="mt-3 text-[13px] text-slate-500">Timestamp</p>
+                <p className="mt-1 text-sm text-slate-700">
                   {selected.timestamp}
                 </p>
               </div>
 
               <div className="rounded-lg border border-slate-200 p-4">
-                <p className="text-[10px] font-semibold text-slate-700">
+                <p className="text-sm font-semibold text-slate-700">
                   AI recommended priority
                 </p>
 
@@ -675,38 +713,38 @@ export default function AIRecommendations() {
                   <p className="text-3xl font-bold text-red-600">
                     {selected.confidence}%
                   </p>
-                  <p className="mt-1 text-[9px] text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500">
                     Confidence score
                   </p>
                 </div>
 
                 <div className="mt-3 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500">Priority</span>
-                  <span className={`rounded-md px-2 py-1 text-[9px] font-semibold ${priorityStyle[selected.priority] || "bg-slate-100 text-slate-600"}`}>
+                  <span className="text-[13px] text-slate-500">Priority</span>
+                  <span className={`rounded-md px-2 py-1 text-xs font-semibold ${priorityStyle[selected.priority] || "bg-slate-100 text-slate-600"}`}>
                     {selected.priority}
                   </span>
                 </div>
 
-                <p className="mt-3 text-[10px] text-slate-500">
+                <p className="mt-3 text-[13px] text-slate-500">
                   Alternative considered
                 </p>
-                <p className="mt-1 text-[10px] text-slate-700">
+                <p className="mt-1 text-sm text-slate-700">
                   {selected.alternative}
                 </p>
               </div>
             </div>
 
             <div className="mt-4 rounded-lg bg-slate-50 p-4 border border-slate-200">
-              <p className="text-[10px] font-semibold text-slate-700">
+              <p className="text-sm font-semibold text-slate-700">
                 Supporting explanation
               </p>
-              <p className="mt-2 text-[10px] leading-5 text-slate-600">
+              <p className="mt-2 text-sm leading-5 text-slate-600">
                 {selected.explanation}
               </p>
             </div>
 
             {selected.reviewedAt && (
-              <div className="mt-3 rounded-lg bg-blue-50/60 border border-blue-100 p-3 text-[10px] text-blue-900">
+              <div className="mt-3 rounded-lg bg-blue-50/60 border border-blue-100 p-3 text-sm text-blue-900">
                 <span className="font-semibold">Current review status: </span>
                 {selected.reviewState} by {selected.reviewedBy || "Emergency Coordinator"} (
                 {new Date(selected.reviewedAt).toLocaleString()})
@@ -714,7 +752,7 @@ export default function AIRecommendations() {
             )}
 
             <div className="mt-4">
-              <p className="mb-2 text-[10px] font-semibold text-slate-700">
+              <p className="mb-2 text-sm font-semibold text-slate-700">
                 Record human decision
               </p>
 
@@ -730,7 +768,7 @@ export default function AIRecommendations() {
                     <button
                       key={option.value}
                       onClick={() => setDecision(option.value)}
-                      className={`flex items-center justify-center gap-1.5 rounded-lg border p-2.5 text-[9px] font-medium transition ${
+                      className={`flex items-center justify-center gap-1.5 rounded-lg border p-2.5 text-sm font-medium transition ${
                         decision === option.value
                           ? "border-[#287da5] bg-sky-50 text-[#175477] font-semibold shadow-xs"
                           : "border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -748,14 +786,14 @@ export default function AIRecommendations() {
                 onChange={(e) => setRationale(e.target.value)}
                 placeholder="Enter mandatory auditable rationale for this decision..."
                 rows={3}
-                className="mt-3 w-full resize-none rounded-lg border border-[#d5e2e9] p-3 text-[10px] outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                className="mt-3 w-full resize-none rounded-lg border border-[#d5e2e9] p-3 text-sm sm:text-[15px] outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
               />
             </div>
 
             <div className="mt-4 flex flex-wrap justify-end gap-2">
               <button
                 onClick={() => setSelected(null)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-[10px] text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -763,7 +801,7 @@ export default function AIRecommendations() {
               <button
                 onClick={saveDecision}
                 disabled={savingDecision}
-                className="flex items-center gap-1.5 rounded-lg bg-[#153f5e] px-4 py-2 text-[10px] font-semibold text-white hover:bg-[#205879] disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-[#153f5e] px-4 py-2 text-sm font-semibold text-white hover:bg-[#205879] disabled:opacity-50"
               >
                 {savingDecision && <Loader2 size={12} className="animate-spin" />}
                 Save human decision
@@ -783,10 +821,10 @@ export default function AIRecommendations() {
                   <Sparkles size={18} />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-[#153f5e]">
+                  <h2 className="text-lg sm:text-xl font-semibold text-[#153f5e]">
                     Run AI Recommendation Analysis
                   </h2>
-                  <p className="text-[10px] text-slate-500">
+                  <p className="text-[13px] text-slate-500">
                     Input incident details to generate an explainable AI action plan
                   </p>
                 </div>
@@ -801,13 +839,13 @@ export default function AIRecommendations() {
 
             <div className="space-y-3">
               <div>
-                <label className="block text-[10px] font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-1">
                   Assistance Category *
                 </label>
                 <select
                   value={genCategory}
                   onChange={(e) => setGenCategory(e.target.value)}
-                  className="w-full rounded-lg border border-[#d5e2e9] bg-white p-2.5 text-[10px] text-slate-700 outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-[#d5e2e9] bg-white p-2.5 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-sky-500"
                 >
                   <option>Emergency shelter</option>
                   <option>Medical supplies</option>
@@ -819,7 +857,7 @@ export default function AIRecommendations() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-1">
                   Location / Sector
                 </label>
                 <input
@@ -827,13 +865,13 @@ export default function AIRecommendations() {
                   value={genLocation}
                   onChange={(e) => setGenLocation(e.target.value)}
                   placeholder="e.g. Riverside, North Ward Sector 2"
-                  className="w-full rounded-lg border border-[#d5e2e9] p-2.5 text-[10px] text-slate-700 outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-[#d5e2e9] p-2.5 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-sky-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
                     Estimated Affected People
                   </label>
                   <input
@@ -842,18 +880,18 @@ export default function AIRecommendations() {
                     max="1000"
                     value={genAffectedCount}
                     onChange={(e) => setGenAffectedCount(parseInt(e.target.value) || 1)}
-                    className="w-full rounded-lg border border-[#d5e2e9] p-2.5 text-[10px] text-slate-700 outline-none focus:border-sky-500"
+                    className="w-full rounded-lg border border-[#d5e2e9] p-2.5 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-sky-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
                     Priority Hint (Optional)
                   </label>
                   <select
                     value={genPriorityHint}
                     onChange={(e) => setGenPriorityHint(e.target.value)}
-                    className="w-full rounded-lg border border-[#d5e2e9] bg-white p-2.5 text-[10px] text-slate-700 outline-none focus:border-sky-500"
+                    className="w-full rounded-lg border border-[#d5e2e9] bg-white p-2.5 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-sky-500"
                   >
                     <option value="">AI Auto-Detect</option>
                     <option value="Critical">Force Critical</option>
@@ -865,7 +903,7 @@ export default function AIRecommendations() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-1">
                   Incident Description & Conditions
                 </label>
                 <textarea
@@ -873,7 +911,7 @@ export default function AIRecommendations() {
                   onChange={(e) => setGenDescription(e.target.value)}
                   placeholder="Describe situational hazards, road access, special medical needs, or flood depths..."
                   rows={3}
-                  className="w-full resize-none rounded-lg border border-[#d5e2e9] p-2.5 text-[10px] text-slate-700 outline-none focus:border-sky-500"
+                  className="w-full resize-none rounded-lg border border-[#d5e2e9] p-2.5 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-sky-500"
                 />
               </div>
 
@@ -885,7 +923,7 @@ export default function AIRecommendations() {
                     onChange={(e) => setGenIsLifeThreatening(e.target.checked)}
                     className="h-3.5 w-3.5 rounded border-slate-300 text-red-600 focus:ring-red-500"
                   />
-                  <span className="text-[10px] font-medium text-red-700">
+                  <span className="text-sm font-medium text-red-700">
                     Immediate life threat or active danger to survival
                   </span>
                 </label>
@@ -897,7 +935,7 @@ export default function AIRecommendations() {
                     onChange={(e) => setGenHasVulnerable(e.target.checked)}
                     className="h-3.5 w-3.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                   />
-                  <span className="text-[10px] font-medium text-slate-700">
+                  <span className="text-sm font-medium text-slate-700">
                     Includes vulnerable individuals (elderly, infants, persons with disabilities)
                   </span>
                 </label>
@@ -907,7 +945,7 @@ export default function AIRecommendations() {
             <div className="mt-5 flex justify-end gap-2">
               <button
                 onClick={() => setShowGenerateModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-[10px] text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -915,7 +953,7 @@ export default function AIRecommendations() {
               <button
                 onClick={handleGenerateRecommendation}
                 disabled={generating}
-                className="flex items-center gap-1.5 rounded-lg bg-purple-700 px-4 py-2 text-[10px] font-semibold text-white hover:bg-purple-800 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-purple-700 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-800 disabled:opacity-50"
               >
                 {generating ? (
                   <>

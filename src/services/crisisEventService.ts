@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface CrisisEvent {
   id: string;
   name: string;
@@ -85,7 +86,7 @@ export const crisisEventService = {
     }
 
     const query = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${API_BASE}/api/crisisevents${query}`);
+    const response = await authFetch(`${API_BASE}/api/crisisevents${query}`);
     if (!response.ok) {
       throw new Error(`Failed to load crisis events: ${response.status} ${response.statusText}`);
     }
@@ -93,7 +94,7 @@ export const crisisEventService = {
   },
 
   async getMetrics(): Promise<CrisisEventMetrics> {
-    const response = await fetch(`${API_BASE}/api/crisisevents/metrics`);
+    const response = await authFetch(`${API_BASE}/api/crisisevents/metrics`);
     if (!response.ok) {
       throw new Error(`Failed to load crisis metrics: ${response.status}`);
     }
@@ -101,7 +102,7 @@ export const crisisEventService = {
   },
 
   async getById(id: string): Promise<CrisisEvent> {
-    const response = await fetch(`${API_BASE}/api/crisisevents/${encodeURIComponent(id)}`);
+    const response = await authFetch(`${API_BASE}/api/crisisevents/${encodeURIComponent(id)}`);
     if (!response.ok) {
       throw new Error(`Failed to load crisis event ${id}: ${response.status}`);
     }
@@ -109,7 +110,7 @@ export const crisisEventService = {
   },
 
   async create(payload: CreateCrisisEventPayload): Promise<CrisisEvent> {
-    const response = await fetch(`${API_BASE}/api/crisisevents`, {
+    const response = await authFetch(`${API_BASE}/api/crisisevents`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -125,7 +126,7 @@ export const crisisEventService = {
   },
 
   async update(id: string, payload: UpdateCrisisEventPayload): Promise<CrisisEvent> {
-    const response = await fetch(`${API_BASE}/api/crisisevents/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${API_BASE}/api/crisisevents/${encodeURIComponent(id)}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -141,7 +142,7 @@ export const crisisEventService = {
   },
 
   async updateStatus(id: string, status: string): Promise<CrisisEvent> {
-    const response = await fetch(`${API_BASE}/api/crisisevents/${encodeURIComponent(id)}/status`, {
+    const response = await authFetch(`${API_BASE}/api/crisisevents/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -157,7 +158,7 @@ export const crisisEventService = {
   },
 
   async delete(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/api/crisisevents/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${API_BASE}/api/crisisevents/${encodeURIComponent(id)}`, {
       method: "DELETE",
     });
 
@@ -167,7 +168,7 @@ export const crisisEventService = {
   },
 
   async reset(): Promise<{ message: string; metrics: CrisisEventMetrics }> {
-    const response = await fetch(`${API_BASE}/api/crisisevents/reset`, {
+    const response = await authFetch(`${API_BASE}/api/crisisevents/reset`, {
       method: "POST",
     });
 
