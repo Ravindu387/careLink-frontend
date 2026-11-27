@@ -102,7 +102,7 @@ const StatCard: React.FC<StatCardProps> = ({
         <div className="min-w-0">
           <p className="text-[12px] font-medium text-slate-500">{title}</p>
           <h2 className="mt-1 text-[26px] font-bold text-slate-800">{value}</h2>
-          <p className="mt-1 text-[10px] text-slate-400">{description}</p>
+          <p className="mt-1 text-[13px] text-slate-400">{description}</p>
         </div>
       </div>
     </div>
@@ -264,7 +264,7 @@ const CaseManagementDashboard: React.FC = () => {
             <form onSubmit={handleCreateCaseSubmit} className="mt-5 space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600">
+                  <label className="block text-sm font-semibold text-slate-600">
                     Assistance Category *
                   </label>
                   <select
@@ -272,7 +272,7 @@ const CaseManagementDashboard: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, category: e.target.value })
                     }
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
                   >
                     <option value="Emergency shelter">Emergency shelter</option>
                     <option value="Medical supplies">Medical supplies</option>
@@ -284,7 +284,7 @@ const CaseManagementDashboard: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600">
+                  <label className="block text-sm font-semibold text-slate-600">
                     Urgency Priority *
                   </label>
                   <select
@@ -292,7 +292,7 @@ const CaseManagementDashboard: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, priority: e.target.value })
                     }
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
                   >
                     <option value="Critical">Critical</option>
                     <option value="High">High</option>
@@ -304,7 +304,7 @@ const CaseManagementDashboard: React.FC = () => {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-semibold text-slate-600">
+                  <label className="block text-sm font-semibold text-slate-600">
                     Applicant / Head of Household *
                   </label>
                   <input
@@ -315,12 +315,12 @@ const CaseManagementDashboard: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, applicantName: e.target.value })
                     }
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600">
+                  <label className="block text-sm font-semibold text-slate-600">
                     People Count *
                   </label>
                   <input
@@ -334,13 +334,13 @@ const CaseManagementDashboard: React.FC = () => {
                         peopleCount: parseInt(e.target.value) || 1,
                       })
                     }
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600">
+                <label className="block text-sm font-semibold text-slate-600">
                   Location / Sector *
                 </label>
                 <input
@@ -351,12 +351,12 @@ const CaseManagementDashboard: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, location: e.target.value })
                   }
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600">
+                <label className="block text-sm font-semibold text-slate-600">
                   Incident Description & Immediate Needs
                 </label>
                 <textarea
@@ -366,7 +366,7 @@ const CaseManagementDashboard: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-hidden"
                 />
               </div>
 
@@ -374,14 +374,14 @@ const CaseManagementDashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-[12px] font-medium text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingCase}
-                  className="flex items-center gap-2 rounded-lg bg-sky-700 px-5 py-2 text-[12px] font-semibold text-white shadow-sm hover:bg-sky-800 disabled:opacity-60"
+                  className="flex items-center gap-2 rounded-lg bg-sky-700 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-800 disabled:opacity-60"
                 >
                   {isSubmittingCase ? (
                     <>
@@ -418,7 +418,7 @@ const CaseManagementDashboard: React.FC = () => {
         {/* PAGE HEADING */}
         <div className="mb-7 flex flex-wrap items-center justify-between gap-5">
           <div>
-            <h1 className="text-[34px] font-normal tracking-tight text-slate-800 md:text-[36px]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-slate-800">
               Case Management Dashboard
             </h1>
             <p className="mt-2 text-[14px] text-slate-500">
@@ -432,7 +432,7 @@ const CaseManagementDashboard: React.FC = () => {
               onClick={() => fetchDashboardData(true)}
               disabled={isRefreshing}
               title="Refresh dashboard metrics"
-              className="flex h-[45px] items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-[12px] font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+              className="flex h-[45px] items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
             >
               <RefreshCw
                 size={16}
@@ -444,7 +444,7 @@ const CaseManagementDashboard: React.FC = () => {
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="flex h-[45px] items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 text-[12px] font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-60"
+              className="flex h-[45px] items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-60"
             >
               <Download size={17} />
               {isExporting ? "Exporting..." : "Export summary"}
@@ -452,7 +452,7 @@ const CaseManagementDashboard: React.FC = () => {
 
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex h-[45px] items-center gap-2 rounded-lg bg-sky-700 px-5 text-[12px] font-semibold text-white shadow-sm transition hover:bg-sky-800"
+              className="flex h-[45px] items-center gap-2 rounded-lg bg-sky-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-800"
             >
               <Plus size={17} />
               Create case
@@ -487,7 +487,7 @@ const CaseManagementDashboard: React.FC = () => {
                     : "Demonstration operations data"}
                 </p>
                 <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold ${
                     isLiveBackend
                       ? "bg-emerald-200 text-emerald-800"
                       : "bg-sky-200 text-sky-800"
@@ -498,7 +498,7 @@ const CaseManagementDashboard: React.FC = () => {
               </div>
 
               <p
-                className={`mt-1 text-[11px] ${
+                className={`mt-1 text-sm ${
                   isLiveBackend ? "text-emerald-700" : "text-sky-700"
                 }`}
               >
@@ -510,7 +510,7 @@ const CaseManagementDashboard: React.FC = () => {
           </div>
 
           <span
-            className={`hidden text-[10px] sm:block ${
+            className={`hidden text-sm sm:block ${
               isLiveBackend ? "text-emerald-600" : "text-sky-600"
             }`}
           >
@@ -540,13 +540,13 @@ const CaseManagementDashboard: React.FC = () => {
           <div className="rounded-xl border border-slate-200 bg-white shadow-sm lg:col-span-3">
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5">
               <div>
-                <h2 className="text-[16px] font-semibold">Case status overview</h2>
-                <p className="mt-1 text-[11px] text-slate-400">
+                <h2 className="text-lg sm:text-xl font-semibold">Case status overview</h2>
+                <p className="mt-1 text-[13px] text-slate-400">
                   Open cases by workflow stage
                 </p>
               </div>
 
-              <span className="rounded-lg bg-sky-50 px-3 py-2 text-[10px] font-semibold text-sky-700">
+              <span className="rounded-lg bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-700">
                 {dashboardData?.totalOpenCases.toLocaleString() || "1,284"} open
               </span>
             </div>
@@ -554,7 +554,7 @@ const CaseManagementDashboard: React.FC = () => {
             <div className="space-y-5 p-6">
               {dashboardData?.statusOverview.map((item) => (
                 <div key={item.name} className="flex items-center gap-4">
-                  <span className="w-[90px] shrink-0 text-[11px] font-medium text-slate-600">
+                  <span className="w-[90px] shrink-0 text-sm font-medium text-slate-600">
                     {item.name}
                   </span>
 
@@ -567,7 +567,7 @@ const CaseManagementDashboard: React.FC = () => {
                     />
                   </div>
 
-                  <span className="w-9 text-right text-[11px] font-semibold text-slate-700">
+                  <span className="w-9 text-right text-sm font-semibold text-slate-700">
                     {item.value}
                   </span>
                 </div>
@@ -579,13 +579,13 @@ const CaseManagementDashboard: React.FC = () => {
           <div className="rounded-xl border border-slate-200 bg-white shadow-sm lg:col-span-2">
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5">
               <div>
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Cases received vs resolved
                 </h2>
-                <p className="mt-1 text-[11px] text-slate-400">Last seven days</p>
+                <p className="mt-1 text-[13px] text-slate-400">Last seven days</p>
               </div>
 
-              <span className="rounded-lg bg-emerald-50 px-3 py-2 text-[10px] font-semibold text-emerald-700">
+              <span className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700">
                 Resolution {dashboardData?.resolutionRate || "+84.7%"}
               </span>
             </div>
@@ -657,17 +657,17 @@ const CaseManagementDashboard: React.FC = () => {
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm lg:col-span-3">
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5">
               <div>
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Priority cases requiring action
                 </h2>
-                <p className="mt-1 text-[11px] text-slate-400">
+                <p className="mt-1 text-[13px] text-slate-400">
                   Sorted by urgency and SLA risk
                 </p>
               </div>
 
               <button
                 onClick={() => navigate("/case-manager/priority-queue")}
-                className="flex items-center gap-1 text-[11px] font-medium text-sky-700 hover:text-sky-900"
+                className="flex items-center gap-1 text-sm font-medium text-sky-700 hover:text-sky-900"
               >
                 View priority queue
                 <ChevronRight size={15} />
@@ -677,7 +677,7 @@ const CaseManagementDashboard: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[850px] text-left">
                 <thead className="bg-slate-50">
-                  <tr className="text-[11px] font-semibold text-slate-500">
+                  <tr className="text-sm font-semibold text-slate-500">
                     <th className="px-4 py-4">Case</th>
                     <th className="px-4 py-4">Category & Applicant</th>
                     <th className="px-4 py-4">Location</th>
@@ -697,26 +697,26 @@ const CaseManagementDashboard: React.FC = () => {
                       key={item.id}
                       className="border-t border-slate-100 transition hover:bg-slate-50"
                     >
-                      <td className="whitespace-nowrap px-4 py-5 text-[11px] font-semibold text-sky-700">
+                      <td className="whitespace-nowrap px-4 py-5 text-sm font-semibold text-sky-700">
                         {item.id}
                       </td>
 
                       <td className="px-4 py-5">
-                        <p className="whitespace-nowrap text-[11px] font-semibold">
+                        <p className="whitespace-nowrap text-sm font-semibold">
                           {item.category}
                         </p>
-                        <p className="mt-1 whitespace-nowrap text-[10px] text-slate-400">
+                        <p className="mt-1 whitespace-nowrap text-[13px] text-slate-400">
                           {item.applicant}
                         </p>
                       </td>
 
-                      <td className="whitespace-nowrap px-4 py-5 text-[11px] text-slate-500">
+                      <td className="whitespace-nowrap px-4 py-5 text-sm text-slate-500">
                         {item.location}
                       </td>
 
                       <td className="px-4 py-5">
                         <span
-                          className={`rounded-md px-2 py-1.5 text-[10px] font-semibold ${
+                          className={`rounded-md px-2 py-1.5 text-sm font-semibold ${
                             item.priority === "Critical"
                               ? "bg-red-100 text-red-600"
                               : "bg-orange-100 text-orange-600"
@@ -727,19 +727,19 @@ const CaseManagementDashboard: React.FC = () => {
                       </td>
 
                       <td className="px-4 py-5">
-                        <p className="text-[11px] font-semibold">
+                        <p className="text-sm font-semibold">
                           {item.aiPriority}
                         </p>
-                        <p className="mt-1 text-[10px] text-slate-400">
+                        <p className="mt-1 text-[13px] text-slate-400">
                           {item.confidence}
                         </p>
                       </td>
 
-                      <td className="whitespace-nowrap px-4 py-5 text-[11px] text-slate-500">
+                      <td className="whitespace-nowrap px-4 py-5 text-sm text-slate-500">
                         {item.verification}
                       </td>
 
-                      <td className="whitespace-nowrap px-4 py-5 text-[11px]">
+                      <td className="whitespace-nowrap px-4 py-5 text-sm">
                         {item.assigned === "You" ? (
                           <span className="inline-flex items-center gap-1 font-semibold text-sky-700">
                             <UserCheck size={12} />
@@ -750,7 +750,7 @@ const CaseManagementDashboard: React.FC = () => {
                         )}
                       </td>
 
-                      <td className="whitespace-nowrap px-4 py-5 text-[11px] text-slate-500">
+                      <td className="whitespace-nowrap px-4 py-5 text-sm text-slate-500">
                         <span className="flex items-center gap-1">
                           <Clock size={11} className="text-slate-400" />
                           {item.age}
@@ -759,7 +759,7 @@ const CaseManagementDashboard: React.FC = () => {
 
                       <td className="px-4 py-5">
                         <span
-                          className={`whitespace-nowrap rounded-md px-2 py-1.5 text-[10px] font-semibold ${
+                          className={`whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-semibold ${
                             item.status === "Under Review"
                               ? "bg-orange-100 text-orange-700"
                               : item.status === "Assigned"
@@ -775,7 +775,7 @@ const CaseManagementDashboard: React.FC = () => {
                         {item.assigned === "Unassigned" ? (
                           <button
                             onClick={() => handleClaimCase(item.id)}
-                            className="rounded-md bg-sky-50 px-2.5 py-1 text-[10px] font-semibold text-sky-700 hover:bg-sky-100"
+                            className="rounded-md bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 hover:bg-sky-100"
                           >
                             Claim
                           </button>
@@ -800,13 +800,13 @@ const CaseManagementDashboard: React.FC = () => {
           <div className="rounded-xl border border-slate-200 bg-white shadow-sm lg:col-span-2">
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5">
               <div>
-                <h2 className="text-[16px] font-semibold">Recent case activity</h2>
-                <p className="mt-1 text-[11px] text-slate-400">
+                <h2 className="text-lg sm:text-xl font-semibold">Recent case activity</h2>
+                <p className="mt-1 text-[13px] text-slate-400">
                   Across assigned operations
                 </p>
               </div>
 
-              <span className="rounded-lg bg-emerald-50 px-3 py-2 text-[10px] font-semibold text-emerald-700">
+              <span className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700">
                 Live
               </span>
             </div>
@@ -828,12 +828,12 @@ const CaseManagementDashboard: React.FC = () => {
                       <p className="text-[12px] font-semibold text-slate-700">
                         {activity.title}
                       </p>
-                      <p className="mt-1 truncate text-[10px] text-slate-400">
+                      <p className="mt-1 truncate text-[13px] text-slate-400">
                         {activity.description}
                       </p>
                     </div>
 
-                    <span className="whitespace-nowrap text-[10px] text-slate-400">
+                    <span className="whitespace-nowrap text-[13px] text-slate-400">
                       {activity.time} ago
                     </span>
                   </div>
@@ -845,7 +845,7 @@ const CaseManagementDashboard: React.FC = () => {
 
         {/* QUICK ACTIONS */}
         <section className="mb-8">
-          <h2 className="mb-4 text-[16px] font-semibold text-slate-700">
+          <h2 className="mb-4 text-lg sm:text-xl font-semibold text-slate-700">
             Quick actions
           </h2>
 
@@ -895,7 +895,7 @@ const CaseManagementDashboard: React.FC = () => {
                       <Icon size={19} />
                     </div>
 
-                    <span className="text-[11px] font-semibold text-slate-600">
+                    <span className="text-sm font-semibold text-slate-600">
                       {action.title}
                     </span>
                   </div>
