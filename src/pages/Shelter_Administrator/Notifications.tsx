@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -251,6 +252,26 @@ export default function NotificationsPage() {
   const [showSearch, setShowSearch] = useState(false);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    apiClient.get<any>("/notifications").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setNotifications(
+          items.map((n: any, idx: number) => ({
+            id: Number(n.id) || idx + 1,
+            title: n.title || "Notification",
+            description: n.description || n.message || "",
+            type: (n.type as NotificationType) || "System",
+            time: n.time || "Recently",
+            icon: n.icon || "resident",
+            unread: n.unread !== undefined ? Boolean(n.unread) : !n.isRead,
+            details: n.details || n.description || "",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   const [preferences, setPreferences] = useState({
     inApp: true,
     email: true,
@@ -362,24 +383,24 @@ export default function NotificationsPage() {
 
           <input
             placeholder="Search residents, shelters, requests..."
-            className="w-full h-[32px] bg-[#f5f9fa] border border-slate-200 rounded-lg pl-8 pr-3 text-[10px] outline-none focus:border-[#45b99b]"
+            className="w-full h-[32px] bg-[#f5f9fa] border border-slate-200 rounded-lg pl-8 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
           />
         </div>
 
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
 
           <div className="hidden lg:block text-right mr-2">
-            <p className="text-[7px] text-slate-400 uppercase">
+            <p className="text-xs text-slate-400 uppercase">
               Operational Area
             </p>
-            <p className="text-[10px] font-semibold mt-0.5">
+            <p className="text-sm font-semibold mt-0.5">
               Greater Riverton
             </p>
           </div>
 
           <div className="hidden sm:block w-px h-7 bg-slate-200" />
 
-          <button className="h-8 px-2 border border-slate-200 rounded-md flex items-center gap-1 text-[10px]">
+          <button className="h-8 px-2 border border-slate-200 rounded-md flex items-center gap-1 text-xs">
             <Globe size={13} />
             EN
           </button>
@@ -391,21 +412,21 @@ export default function NotificationsPage() {
           <button className="relative h-8 w-8 border border-slate-200 rounded-md flex items-center justify-center">
             <Bell size={14} />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-3 h-3 px-0.5 bg-rose-500 text-white rounded-full text-[7px] flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 min-w-3 h-3 px-0.5 bg-rose-500 text-white rounded-full text-xs flex items-center justify-center">
                 {unreadCount}
               </span>
             )}
           </button>
 
           <div className="hidden sm:flex items-center gap-2 ml-1">
-            <div className="w-7 h-7 bg-[#1c638a] rounded-full text-white flex items-center justify-center text-[9px] font-bold">
+            <div className="w-7 h-7 bg-[#1c638a] rounded-full text-white flex items-center justify-center text-xs font-bold">
               SA
             </div>
             <div>
-              <p className="text-[9px] font-semibold">
+              <p className="text-xs font-semibold">
                 Sanjana A.
               </p>
-              <p className="text-[7px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 Administrator
               </p>
             </div>
@@ -421,7 +442,7 @@ export default function NotificationsPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[8px] mb-6">
+        <div className="flex items-center gap-2 text-xs mb-6">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={10} className="text-slate-400" />
           <span className="text-slate-400">
@@ -436,10 +457,10 @@ export default function NotificationsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
 
           <div>
-            <h1 className="text-[21px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Notifications
             </h1>
-            <p className="text-[9px] text-slate-500 mt-1.5">
+            <p className="text-xs text-slate-500 mt-1.5">
               Review operational alerts, assignments, and system updates.
             </p>
           </div>
@@ -447,7 +468,7 @@ export default function NotificationsPage() {
           <div className="flex gap-2">
             <button
               onClick={markAllAsRead}
-              className="h-[31px] px-3 bg-white border border-[#aac4d2] rounded-md text-[9px] font-semibold hover:bg-slate-50"
+              className="h-[31px] px-3 bg-white border border-[#aac4d2] rounded-md text-sm font-semibold hover:bg-slate-50"
             >
               <CheckCheck size={12} className="inline mr-1" />
               Mark all as read
@@ -455,7 +476,7 @@ export default function NotificationsPage() {
 
             <button
               onClick={() => setShowPreferences(true)}
-              className="h-[31px] px-3 bg-[#1c638a] text-white rounded-md text-[9px] font-semibold hover:bg-[#144665]"
+              className="h-[31px] px-3 bg-[#1c638a] text-white rounded-md text-sm font-semibold hover:bg-[#144665]"
             >
               Preferences
             </button>
@@ -470,7 +491,7 @@ export default function NotificationsPage() {
             <button
               key={tab}
               onClick={() => changeTab(tab)}
-              className={`relative py-3 text-[8px] whitespace-nowrap transition ${
+              className={`relative py-3 text-sm whitespace-nowrap transition ${
                 activeTab === tab
                   ? "text-[#1c638a] font-bold"
                   : "text-slate-500 hover:text-[#1c638a]"
@@ -479,7 +500,7 @@ export default function NotificationsPage() {
               {tab}
 
               {["All", "Unread", "Critical"].includes(tab) && (
-                <span className="ml-1 bg-[#e6eff4] text-slate-500 rounded-full px-1.5 py-0.5 text-[7px]">
+                <span className="ml-1 bg-[#e6eff4] text-slate-500 rounded-full px-1.5 py-0.5 text-xs">
                   {getTabCount(tab)}
                 </span>
               )}
@@ -506,7 +527,7 @@ export default function NotificationsPage() {
               setCurrentPage(1);
             }}
             placeholder="Search notifications..."
-            className="w-full h-9 bg-white border border-[#d5e3e9] rounded-lg pl-9 pr-3 text-[9px] outline-none focus:border-[#45b99b]"
+            className="w-full h-9 bg-white border border-[#d5e3e9] rounded-lg pl-9 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
           />
         </div>
 
@@ -534,10 +555,10 @@ export default function NotificationsPage() {
                   size={30}
                   className="mx-auto text-slate-300"
                 />
-                <p className="text-xs font-semibold mt-3">
+                <p className="text-sm font-semibold mt-3">
                   No notifications found
                 </p>
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Try selecting another category or search term.
                 </p>
               </div>
@@ -547,7 +568,7 @@ export default function NotificationsPage() {
 
             <div className="px-3 py-2 border-t border-slate-200 flex items-center justify-between">
 
-              <span className="text-[8px] text-slate-400">
+              <span className="text-xs text-slate-400">
                 Showing {filtered.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}
                 {"–"}
                 {Math.min(currentPage * pageSize, filtered.length)}
@@ -562,7 +583,7 @@ export default function NotificationsPage() {
                   onClick={() =>
                     setCurrentPage((p) => Math.max(1, p - 1))
                   }
-                  className="h-7 px-3 border border-slate-200 rounded-md text-[8px] disabled:opacity-40"
+                  className="h-7 px-3 border border-slate-200 rounded-md text-sm disabled:opacity-40"
                 >
                   Previous
                 </button>
@@ -574,7 +595,7 @@ export default function NotificationsPage() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`w-7 h-7 rounded-md border text-[8px] ${
+                    className={`w-7 h-7 rounded-md border text-sm ${
                       currentPage === page
                         ? "bg-[#1c638a] text-white border-[#1c638a]"
                         : "border-slate-200 hover:bg-slate-50"
@@ -589,7 +610,7 @@ export default function NotificationsPage() {
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
                   }
-                  className="h-7 px-3 border border-slate-200 rounded-md text-[8px] disabled:opacity-40"
+                  className="h-7 px-3 border border-slate-200 rounded-md text-sm disabled:opacity-40"
                 >
                   Next
                 </button>
@@ -601,7 +622,7 @@ export default function NotificationsPage() {
 
           <aside className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm p-3 h-fit">
 
-            <h2 className="text-[10px] font-semibold mb-4">
+            <h2 className="text-base sm:text-lg font-semibold mb-4">
               Notification summary
             </h2>
 
@@ -630,7 +651,7 @@ export default function NotificationsPage() {
 
             <div className="border-t border-[#123e60] mt-3 pt-3">
 
-              <h2 className="text-[10px] font-semibold mb-3">
+              <h2 className="text-base sm:text-lg font-semibold mb-3">
                 Delivery status
               </h2>
 
@@ -673,7 +694,7 @@ export default function NotificationsPage() {
             <div className="mt-8">
               <NotificationIcon item={selected} />
 
-              <span className="inline-block mt-4 text-[8px] font-semibold text-[#287da7] bg-[#eaf3f8] rounded px-2 py-1">
+              <span className="inline-block mt-4 text-xs font-semibold text-[#287da7] bg-[#eaf3f8] rounded px-2 py-1">
                 {selected.type}
               </span>
 
@@ -681,25 +702,25 @@ export default function NotificationsPage() {
                 {selected.title}
               </h3>
 
-              <p className="text-[9px] text-slate-400 mt-2">
+              <p className="text-xs text-slate-400 mt-2">
                 {selected.time} · Notification ID #{selected.id}
               </p>
             </div>
 
             <div className="bg-[#f5f9fa] rounded-lg p-4 mt-7">
-              <p className="text-[10px] font-semibold mb-2">
+              <p className="text-sm font-semibold mb-2">
                 Description
               </p>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 {selected.description}
               </p>
             </div>
 
             <div className="mt-6">
-              <p className="text-xs font-semibold mb-2">
+              <p className="text-sm font-semibold mb-2">
                 Additional information
               </p>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 {selected.details}
               </p>
             </div>
@@ -707,7 +728,7 @@ export default function NotificationsPage() {
             <div className="mt-7 border-t border-slate-200 pt-5">
               <button
                 onClick={() => setSelected(null)}
-                className="w-full h-10 bg-[#1c638a] text-white rounded-lg text-xs font-semibold"
+                className="w-full h-10 bg-[#1c638a] text-white rounded-lg text-sm font-semibold"
               >
                 Close notification
               </button>
@@ -725,10 +746,10 @@ export default function NotificationsPage() {
 
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-base font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Notification preferences
                 </h2>
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Manage how you receive notifications.
                 </p>
               </div>
@@ -738,7 +759,7 @@ export default function NotificationsPage() {
               </button>
             </div>
 
-            <h3 className="text-xs font-semibold mb-3">
+            <h3 className="text-base font-semibold mb-3">
               Delivery channels
             </h3>
 
@@ -771,7 +792,7 @@ export default function NotificationsPage() {
 
             <div className="border-t border-slate-200 my-5" />
 
-            <h3 className="text-xs font-semibold mb-3">
+            <h3 className="text-base font-semibold mb-3">
               Notification categories
             </h3>
 
@@ -799,14 +820,14 @@ export default function NotificationsPage() {
             <div className="flex gap-2 mt-6">
               <button
                 onClick={() => setShowPreferences(false)}
-                className="flex-1 h-10 border border-slate-200 rounded-lg text-xs font-semibold"
+                className="flex-1 h-10 border border-slate-200 rounded-lg text-sm font-semibold"
               >
                 Cancel
               </button>
 
               <button
                 onClick={savePreferences}
-                className="flex-1 h-10 bg-[#1c638a] text-white rounded-lg text-xs font-semibold"
+                className="flex-1 h-10 bg-[#1c638a] text-white rounded-lg text-sm font-semibold"
               >
                 Save preferences
               </button>
@@ -820,7 +841,7 @@ export default function NotificationsPage() {
       {message && (
         <div className="fixed bottom-5 right-5 z-[70] bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3">
           <CheckCircle2 size={16} />
-          <p className="text-xs">{message}</p>
+          <p className="text-sm">{message}</p>
           <button onClick={() => setMessage("")}>
             <X size={14} />
           </button>
@@ -850,15 +871,15 @@ function NotificationRow({
 
       <div className="flex-1 min-w-0">
 
-        <p className="text-[8px] font-bold text-[#123e60] truncate">
+        <p className="text-xs font-bold text-[#123e60] truncate">
           {item.title}
         </p>
 
-        <p className="text-[8px] text-slate-500 mt-1.5">
+        <p className="text-xs text-slate-500 mt-1.5">
           {item.description}
         </p>
 
-        <p className="text-[7px] text-slate-400 mt-2">
+        <p className="text-xs text-slate-400 mt-2">
           {item.time}
         </p>
       </div>
@@ -936,12 +957,12 @@ function SummaryRow({
 }) {
   return (
     <div className="flex items-center justify-between py-2">
-      <span className="text-[8px] text-slate-500">
+      <span className="text-xs text-slate-500">
         {label}
       </span>
 
       <span
-        className={`text-[10px] font-bold ${
+        className={`text-sm font-bold ${
           color === "red" ? "text-[#e34b59]" : ""
         }`}
       >
@@ -976,7 +997,7 @@ function DeliveryRow({
       )}
 
       <span
-        className={`text-[8px] ${
+        className={`text-xs ${
           type === "warning"
             ? "text-[#123e60]"
             : "text-slate-600"
@@ -1008,7 +1029,7 @@ function PreferenceRow({
         {icon && (
           <span className="text-[#287da7]">{icon}</span>
         )}
-        <span className="text-[10px] text-slate-600">
+        <span className="text-sm text-slate-600">
           {label}
         </span>
       </div>

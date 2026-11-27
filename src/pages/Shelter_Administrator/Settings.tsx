@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { apiClient } from "../../services/api";
 
 import {
   Search,
@@ -77,6 +78,13 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    apiClient.get<any>("/settings").then((res) => {
+      if (res?.profile) setProfile((prev) => ({ ...prev, ...res.profile }));
+      if (res?.shelter) setShelter((prev) => ({ ...prev, ...res.shelter }));
+    }).catch(() => {});
+  }, []);
+
   const [profile, setProfile] = useState<ProfileData>({
     fullName: "Sanjana Amarasinghe",
     email: "sanjana@carelink.org",
@@ -151,6 +159,12 @@ export default function SettingsPage() {
       return;
     }
 
+    apiClient.put("/settings", {
+      profile,
+      shelter,
+      notifications,
+    }).catch(() => {});
+
     setSaved(true);
   };
 
@@ -194,7 +208,7 @@ export default function SettingsPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[10px] mb-9">
+        <div className="flex items-center gap-2 text-sm mb-9">
           <span className="text-slate-500">CareLink</span>
 
           <ChevronRight
@@ -221,7 +235,7 @@ export default function SettingsPage() {
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
 
           <div>
-            <h1 className="text-[25px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Settings
             </h1>
 
@@ -233,7 +247,7 @@ export default function SettingsPage() {
 
           <button
             onClick={handleSave}
-            className="h-10 px-5 bg-[#1c638a] hover:bg-[#164d6d] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 shadow-sm"
+            className="h-10 px-5 bg-[#1c638a] hover:bg-[#164d6d] text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 shadow-sm"
           >
             {saved ? (
               <Check size={15} />
@@ -275,7 +289,7 @@ export default function SettingsPage() {
                     <span className="flex items-center gap-3">
                       <Icon size={19} />
 
-                      <span className="text-[11px]">
+                      <span className="text-sm">
                         {item.label}
                       </span>
                     </span>
@@ -375,17 +389,17 @@ function ProfileSettings({
             </div>
 
             <div>
-              <p className="text-xs font-semibold">
+              <p className="text-sm font-semibold">
                 Profile photo
               </p>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 JPG or PNG · maximum 2 MB
               </p>
             </div>
           </div>
 
-          <label className="h-10 px-4 border border-[#aac4d2] rounded-lg flex items-center gap-2 text-xs font-semibold text-[#1c638a] hover:bg-slate-50 cursor-pointer">
+          <label className="h-10 px-4 border border-[#aac4d2] rounded-lg flex items-center gap-2 text-sm font-semibold text-[#1c638a] hover:bg-slate-50 cursor-pointer">
             <Upload size={15} />
             Upload photo
 
@@ -514,11 +528,11 @@ function ShelterSettings({
         />
 
         <div>
-          <p className="text-xs font-semibold">
+          <p className="text-sm font-semibold">
             Shelter configuration
           </p>
 
-          <p className="text-[10px] text-slate-500 mt-1">
+          <p className="text-[13px] text-slate-500 mt-1">
             Changes to shelter capacity should be verified
             by an authorised administrator.
           </p>
@@ -575,14 +589,14 @@ function SecuritySettings({
 
       <div className="border-t border-slate-200 mt-5 pt-5">
 
-        <h3 className="text-xs font-semibold mb-4">
+        <h3 className="text-base font-semibold mb-4">
           Change password
         </h3>
 
         {passwordFields.map((field) => (
           <div key={field.key} className="mb-4">
 
-            <label className="block text-[10px] font-semibold mb-2">
+            <label className="block text-sm font-semibold mb-2">
               {field.label}
             </label>
 
@@ -598,7 +612,7 @@ function SecuritySettings({
                     [field.key]: e.target.value,
                   }))
                 }
-                className="w-full h-10 border border-[#d7e4e9] rounded-lg px-3 pr-10 text-xs outline-none focus:border-[#35b48e]"
+                className="w-full h-10 border border-[#d7e4e9] rounded-lg px-3 pr-10 text-sm sm:text-[15px] outline-none focus:border-[#35b48e]"
                 placeholder={field.label}
               />
 
@@ -621,7 +635,7 @@ function SecuritySettings({
 
         <div className="border-t border-slate-200 mt-6 pt-5">
 
-          <h3 className="text-xs font-semibold mb-3">
+          <h3 className="text-base font-semibold mb-3">
             Account protection
           </h3>
 
@@ -713,7 +727,7 @@ function NotificationSettings({
 
         {/* DELIVERY CHANNELS */}
 
-        <h3 className="text-xs font-semibold mb-3">
+        <h3 className="text-base font-semibold mb-3">
           Delivery channels
         </h3>
 
@@ -745,7 +759,7 @@ function NotificationSettings({
 
         <div className="border-t border-slate-200 mt-5 pt-5">
 
-          <h3 className="text-xs font-semibold mb-3">
+          <h3 className="text-base font-semibold mb-3">
             Notification categories
           </h3>
 
@@ -778,11 +792,11 @@ function SectionHeading({
 }) {
   return (
     <div>
-      <h2 className="text-[15px] font-medium">
+      <h2 className="text-lg sm:text-xl font-semibold">
         {title}
       </h2>
 
-      <p className="text-[10px] text-slate-500 mt-4">
+      <p className="text-[13px] text-slate-500 mt-4">
         {description}
       </p>
     </div>
@@ -808,7 +822,7 @@ function FormField({
 }) {
   return (
     <div>
-      <label className="block text-[10px] font-semibold mb-2">
+      <label className="block text-sm font-semibold mb-2">
         {label}
       </label>
 
@@ -817,7 +831,7 @@ function FormField({
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full h-[43px] border border-[#d7e4e9] rounded-lg px-3 text-[10px] outline-none focus:border-[#35b48e] disabled:bg-slate-50 disabled:text-slate-500"
+        className="w-full h-[43px] border border-[#d7e4e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#35b48e] disabled:bg-slate-50 disabled:text-slate-500"
       />
     </div>
   );
@@ -852,12 +866,12 @@ function ToggleRow({
         )}
 
         <div>
-          <p className="text-[11px] font-medium">
+          <p className="text-sm font-medium">
             {label}
           </p>
 
           {description && (
-            <p className="text-[9px] text-slate-400 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               {description}
             </p>
           )}

@@ -1,6 +1,7 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -156,6 +157,28 @@ export default function MaintenanceIncidentsPage() {
     useState<MaintenanceRequest | null>(null);
 
   const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    apiClient.get<any>("/maintenance-requests").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setRequests(
+          items.map((r: any) => ({
+            id: r.id || r.requestCode || "MR-300",
+            issue: r.issue || r.title || "Maintenance issue",
+            category: r.category || "Plumbing",
+            shelter: r.shelter || r.shelterName || "Riverton Central",
+            room: r.room || "General",
+            reported: r.reported || "Today",
+            priority: (r.priority as Priority) || "Medium",
+            technician: r.technician || "Unassigned",
+            status: (r.status as RequestStatus) || "Pending",
+            description: r.description || "",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
@@ -325,7 +348,7 @@ export default function MaintenanceIncidentsPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="text-slate-400">
@@ -342,18 +365,18 @@ export default function MaintenanceIncidentsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
 
           <div>
-            <h1 className="text-[23px] md:text-[25px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Maintenance & Incidents
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-2">
+            <p className="text-[13px] text-slate-500 mt-2">
               Track facility faults, repairs, technicians, and resolution progress.
             </p>
           </div>
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
+            className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
           >
             <Plus size={14} />
             Create request
@@ -377,7 +400,7 @@ export default function MaintenanceIncidentsPage() {
                 setCurrentPage(1);
               }}
               placeholder="Search maintenance requests..."
-              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-[10px] outline-none focus:border-[#45b99b]"
+              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
             />
           </div>
 
@@ -421,7 +444,7 @@ export default function MaintenanceIncidentsPage() {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`h-9 px-3 bg-white border rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 whitespace-nowrap ${
+              className={`h-9 px-3 bg-white border rounded-lg text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap ${
                 showFilters
                   ? "border-[#2785b7] text-[#2785b7]"
                   : "border-[#aac4d2]"
@@ -439,13 +462,13 @@ export default function MaintenanceIncidentsPage() {
           <section className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3">
 
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xs font-semibold">
+              <h3 className="text-base font-semibold">
                 Advanced filters
               </h3>
 
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#267ca6] font-semibold"
+                className="text-sm text-[#267ca6] font-semibold"
               >
                 Clear all
               </button>
@@ -462,7 +485,7 @@ export default function MaintenanceIncidentsPage() {
                 }}
               />
 
-              <p className="text-[9px] text-slate-400 self-center">
+              <p className="text-xs text-slate-400 self-center">
                 Filter requests by the shelter where the fault was reported.
               </p>
             </div>
@@ -478,16 +501,16 @@ export default function MaintenanceIncidentsPage() {
           <div className="px-3.5 py-3.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 
             <div>
-              <h2 className="text-xs font-semibold">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Maintenance requests
               </h2>
 
-              <p className="text-[8px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Sensitive information restricted to authorised staff
               </p>
             </div>
 
-            <span className="px-2 py-1 rounded-md bg-[#eaf3f8] text-[#287da7] text-[8px] font-semibold w-fit">
+            <span className="px-2 py-1 rounded-md bg-[#eaf3f8] text-[#287da7] text-xs font-semibold w-fit">
               Authorised access
             </span>
           </div>
@@ -499,7 +522,7 @@ export default function MaintenanceIncidentsPage() {
             <table className="w-full min-w-[900px] text-left">
 
               <thead className="bg-[#f5f9fa] border-b border-slate-200">
-                <tr className="text-[8px] text-slate-500">
+                <tr className="text-sm text-slate-500">
 
                   <th className="px-3 py-3 font-medium">
                     Request ID
@@ -542,7 +565,7 @@ export default function MaintenanceIncidentsPage() {
                   <tr
                     key={request.id}
                     onClick={() => setSelectedRequest(request)}
-                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
+                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-sm transition"
                   >
 
                     <td className="px-3 py-3.5 font-semibold whitespace-nowrap">
@@ -590,7 +613,7 @@ export default function MaintenanceIncidentsPage() {
                   <tr>
                     <td
                       colSpan={9}
-                      className="text-center py-12 text-xs text-slate-400"
+                      className="text-center py-12 text-sm text-slate-400"
                     >
                       No maintenance requests found.
                     </td>
@@ -604,7 +627,7 @@ export default function MaintenanceIncidentsPage() {
 
           <div className="px-3.5 py-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing {filteredRequests.length} records
             </p>
 
@@ -615,7 +638,7 @@ export default function MaintenanceIncidentsPage() {
                 onClick={() =>
                   setCurrentPage((p) => Math.max(1, p - 1))
                 }
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Previous
               </button>
@@ -627,7 +650,7 @@ export default function MaintenanceIncidentsPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-7 h-8 rounded-lg border text-[9px] ${
+                  className={`w-7 h-8 rounded-lg border text-sm ${
                     currentPage === page
                       ? "bg-[#1c638a] text-white border-[#1c638a]"
                       : "border-slate-200 hover:bg-slate-50"
@@ -644,7 +667,7 @@ export default function MaintenanceIncidentsPage() {
                     Math.min(totalPages, p + 1)
                   )
                 }
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Next
               </button>
@@ -762,7 +785,7 @@ export default function MaintenanceIncidentsPage() {
             />
 
             <div>
-              <label className="block text-xs font-medium mb-1.5">
+              <label className="block text-sm font-medium mb-1.5">
                 Description
               </label>
 
@@ -777,7 +800,7 @@ export default function MaintenanceIncidentsPage() {
                   })
                 }
                 placeholder="Describe the issue and required repair..."
-                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b] resize-none"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] resize-none"
               />
             </div>
 
@@ -860,18 +883,18 @@ export default function MaintenanceIncidentsPage() {
             </div>
 
             <div className="mt-7">
-              <h3 className="text-xs font-semibold mb-2">
+              <h3 className="text-base font-semibold mb-2">
                 Description
               </h3>
 
-              <p className="bg-[#f5f9fa] rounded-lg p-3 text-xs text-slate-600 leading-relaxed">
+              <p className="bg-[#f5f9fa] rounded-lg p-3 text-sm text-slate-600 leading-relaxed">
                 {selectedRequest.description}
               </p>
             </div>
 
             <div className="mt-7 space-y-4">
 
-              <h3 className="text-xs font-semibold">
+              <h3 className="text-base font-semibold">
                 Update request
               </h3>
 
@@ -919,7 +942,7 @@ export default function MaintenanceIncidentsPage() {
 
               <button
                 onClick={() => setSelectedRequest(null)}
-                className="w-full bg-[#1c638a] text-white py-3 rounded-lg text-xs font-semibold hover:bg-[#144665]"
+                className="w-full bg-[#1c638a] text-white py-3 rounded-lg text-sm font-semibold hover:bg-[#144665]"
               >
                 Done
               </button>
@@ -935,7 +958,7 @@ export default function MaintenanceIncidentsPage() {
 
           <CheckCircle2 size={17} className="shrink-0" />
 
-          <p className="text-xs">{successMessage}</p>
+          <p className="text-sm">{successMessage}</p>
 
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
@@ -962,7 +985,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full xl:w-[120px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full xl:w-[120px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -990,7 +1013,7 @@ function PriorityBadge({
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[priority]}`}>
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-xs font-semibold ${styles[priority]}`}>
       {priority}
     </span>
   );
@@ -1010,7 +1033,7 @@ function StatusBadge({
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-xs font-semibold ${styles[status]}`}>
       {status}
     </span>
   );
@@ -1039,7 +1062,7 @@ function SummaryCard({
         {icon}
       </div>
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <p className="text-lg font-bold">{value}</p>
       </div>
     </div>
@@ -1059,7 +1082,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1068,7 +1091,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );
@@ -1087,14 +1110,14 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -1125,7 +1148,7 @@ function Modal({
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[13px] text-slate-400 mt-1">
               {subtitle}
             </p>
           </div>
@@ -1158,14 +1181,14 @@ function ModalActions({
       <button
         type="button"
         onClick={onCancel}
-        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50"
+        className="flex-1 border border-slate-200 rounded-lg py-3 text-sm font-semibold hover:bg-slate-50"
       >
         Cancel
       </button>
 
       <button
         type="submit"
-        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#144665]"
       >
         {submitLabel}
       </button>
@@ -1188,8 +1211,8 @@ function DetailRow({
       <div className="text-[#2785b7]">{icon}</div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-sm font-semibold mt-1 break-words">
           {value}
         </p>
       </div>

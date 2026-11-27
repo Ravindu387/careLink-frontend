@@ -1,6 +1,7 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -211,6 +212,27 @@ export default function ResourceInventoryPage() {
     useState<Resource | null>(null);
 
   const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    apiClient.get<any>("/resources").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setResources(
+          items.map((r: any) => ({
+            id: r.id || r.resourceCode || `INV-${Math.floor(Math.random() * 900 + 100)}`,
+            name: r.name || "Resource",
+            category: r.category || "Food & Water",
+            available: Number(r.available ?? r.quantity ?? 0),
+            minimum: Number(r.minimum ?? r.minStock ?? 50),
+            unit: r.unit || "Units",
+            expiry: r.expiry || "—",
+            lastUpdated: r.lastUpdated || "Today",
+            shelter: r.shelter || r.shelterName || "Riverton Central School",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
 
   const [newResource, setNewResource] = useState({
     name: "",
@@ -484,7 +506,7 @@ export default function ResourceInventoryPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="text-slate-400">
@@ -501,11 +523,11 @@ export default function ResourceInventoryPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
 
           <div>
-            <h1 className="text-[23px] md:text-[25px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Resource & Inventory Management
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-2">
+            <p className="text-[13px] text-slate-500 mt-2">
               Track stock, donations, distributions, minimum levels, and expiry risks.
             </p>
           </div>
@@ -514,14 +536,14 @@ export default function ResourceInventoryPage() {
 
             <button
               onClick={() => setDistributionModal(true)}
-              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold hover:bg-slate-50"
+              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-sm font-semibold hover:bg-slate-50"
             >
               Record distribution
             </button>
 
             <button
               onClick={() => setAddModal(true)}
-              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-[#144665]"
+              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#144665]"
             >
               <Plus size={14} />
               Add resource
@@ -572,7 +594,7 @@ export default function ResourceInventoryPage() {
                 setCurrentPage(1);
               }}
               placeholder="Search resource ID or name..."
-              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-[10px] outline-none focus:border-[#45b99b]"
+              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
             />
           </div>
 
@@ -626,7 +648,7 @@ export default function ResourceInventoryPage() {
 
             <button
               onClick={() => setMoreFilters(!moreFilters)}
-              className={`h-9 px-3 bg-white border rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 whitespace-nowrap ${
+              className={`h-9 px-3 bg-white border rounded-lg text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap ${
                 moreFilters
                   ? "border-[#2785b7] text-[#2785b7]"
                   : "border-[#aac4d2]"
@@ -644,13 +666,13 @@ export default function ResourceInventoryPage() {
           <section className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3">
 
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xs font-semibold">
+              <h3 className="text-base font-semibold">
                 Advanced filters
               </h3>
 
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#267ca6] font-semibold"
+                className="text-sm text-[#267ca6] font-semibold"
               >
                 Clear filters
               </button>
@@ -692,11 +714,11 @@ export default function ResourceInventoryPage() {
           <div className="px-3.5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200">
 
             <div>
-              <h2 className="text-xs font-semibold">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Current inventory
               </h2>
 
-              <p className="text-[8px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 {shelterFilter === "All shelters"
                   ? "All registered shelters"
                   : shelterFilter}
@@ -707,7 +729,7 @@ export default function ResourceInventoryPage() {
 
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 text-[10px] font-semibold text-[#1c638a] hover:text-[#144665]"
+              className="flex items-center gap-2 text-sm font-semibold text-[#1c638a] hover:text-[#144665]"
             >
               <Download size={14} />
               Inventory report
@@ -721,7 +743,7 @@ export default function ResourceInventoryPage() {
             <table className="w-full min-w-[1000px] text-left">
 
               <thead className="bg-[#f5f9fa] border-b border-slate-200">
-                <tr className="text-[8px] text-slate-500">
+                <tr className="text-sm text-slate-500">
 
                   <th className="px-3 py-3 font-medium">Resource ID</th>
                   <th className="px-3 py-3 font-medium">Resource Name</th>
@@ -744,7 +766,7 @@ export default function ResourceInventoryPage() {
                     <tr
                       key={resource.id}
                       onClick={() => setDetailsResource(resource)}
-                      className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
+                      className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-sm transition"
                     >
 
                       <td className="px-3 py-3.5 font-semibold text-[#174f75]">
@@ -797,7 +819,7 @@ export default function ResourceInventoryPage() {
                   <tr>
                     <td
                       colSpan={10}
-                      className="text-center py-12 text-xs text-slate-400"
+                      className="text-center py-12 text-sm text-slate-400"
                     >
                       No inventory records found. Try changing your filters.
                     </td>
@@ -811,7 +833,7 @@ export default function ResourceInventoryPage() {
 
           <div className="px-3.5 py-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing{" "}
               {filteredResources.length === 0
                 ? 0
@@ -830,7 +852,7 @@ export default function ResourceInventoryPage() {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Previous
               </button>
@@ -842,7 +864,7 @@ export default function ResourceInventoryPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-7 h-8 rounded-lg border text-[9px] ${
+                  className={`w-7 h-8 rounded-lg border text-sm ${
                     currentPage === page
                       ? "bg-[#1c638a] text-white border-[#1c638a]"
                       : "border-slate-200 hover:bg-slate-50"
@@ -855,7 +877,7 @@ export default function ResourceInventoryPage() {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Next
               </button>
@@ -1025,7 +1047,7 @@ export default function ResourceInventoryPage() {
             />
 
             <div>
-              <label className="block text-xs font-medium mb-1.5">
+              <label className="block text-sm font-medium mb-1.5">
                 Notes
               </label>
 
@@ -1038,7 +1060,7 @@ export default function ResourceInventoryPage() {
                   })
                 }
                 placeholder="Additional distribution details..."
-                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b] resize-none"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] resize-none"
                 rows={3}
               />
             </div>
@@ -1092,7 +1114,7 @@ export default function ResourceInventoryPage() {
             <div className="grid grid-cols-2 gap-3 mt-7">
 
               <div className="bg-[#f4f8fa] rounded-lg p-3">
-                <p className="text-[9px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   Available stock
                 </p>
                 <p className="text-xl font-bold mt-1">
@@ -1101,7 +1123,7 @@ export default function ResourceInventoryPage() {
               </div>
 
               <div className="bg-[#f4f8fa] rounded-lg p-3">
-                <p className="text-[9px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   Minimum stock
                 </p>
                 <p className="text-xl font-bold mt-1">
@@ -1156,14 +1178,14 @@ export default function ResourceInventoryPage() {
                 setDistributionModal(true);
               }}
               disabled={detailsResource.available === 0}
-              className="w-full mt-8 bg-[#1c638a] text-white py-3 rounded-lg text-xs font-semibold hover:bg-[#144665] disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full mt-8 bg-[#1c638a] text-white py-3 rounded-lg text-sm font-semibold hover:bg-[#144665] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Record distribution
             </button>
 
             <button
               onClick={() => setDetailsResource(null)}
-              className="w-full mt-3 border border-slate-200 py-3 rounded-lg text-xs font-semibold hover:bg-slate-50"
+              className="w-full mt-3 border border-slate-200 py-3 rounded-lg text-sm font-semibold hover:bg-slate-50"
             >
               Close details
             </button>
@@ -1178,7 +1200,7 @@ export default function ResourceInventoryPage() {
 
           <CheckCircle2 size={17} className="shrink-0" />
 
-          <p className="text-xs">{successMessage}</p>
+          <p className="text-sm">{successMessage}</p>
 
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
@@ -1216,8 +1238,8 @@ function AlertCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[9px] font-semibold">{title}</p>
-        <p className="text-[8px] text-slate-400 mt-1">
+        <p className="text-xs font-semibold">{title}</p>
+        <p className="text-xs text-slate-400 mt-1">
           {description}
         </p>
       </div>
@@ -1239,7 +1261,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full xl:w-[145px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full xl:w-[145px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -1263,7 +1285,7 @@ function StockBadge({ status }: { status: StockStatus }) {
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-xs font-semibold ${styles[status]}`}>
       {status}
     </span>
   );
@@ -1284,7 +1306,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1295,7 +1317,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );
@@ -1314,7 +1336,7 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1322,7 +1344,7 @@ function FormSelect({
         required
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -1353,7 +1375,7 @@ function Modal({
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[13px] text-slate-400 mt-1">
               {subtitle}
             </p>
           </div>
@@ -1386,14 +1408,14 @@ function ModalActions({
       <button
         type="button"
         onClick={onCancel}
-        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50"
+        className="flex-1 border border-slate-200 rounded-lg py-3 text-sm font-semibold hover:bg-slate-50"
       >
         Cancel
       </button>
 
       <button
         type="submit"
-        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#144665]"
       >
         {submitLabel}
       </button>
@@ -1416,8 +1438,8 @@ function DetailRow({
       <div className="text-[#2785b7]">{icon}</div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-sm font-semibold mt-1 break-words">
           {value}
         </p>
       </div>
