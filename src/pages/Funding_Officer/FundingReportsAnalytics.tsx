@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -94,6 +95,20 @@ export default function FundingReportsAnalytics() {
   );
 
   const [toast, setToast] = useState("");
+  const [sourceList, setSourceList] = useState(sources);
+
+  useEffect(() => {
+    apiClient.get<any>("/funding-reports").then((res) => {
+      if (Array.isArray(res?.sources) && res.sources.length) {
+        setSourceList(
+          res.sources.map((s: any) => ({
+            name: s.name || s.source || "Source",
+            amount: typeof s.amount === "number" ? `$${s.amount.toLocaleString()}` : String(s.amount || "$0"),
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
 
   const showToast = (message: string) => {
     setToast(message);
@@ -128,7 +143,7 @@ export default function FundingReportsAnalytics() {
       ["Verification rate", "99.1%"],
       [],
       ["Contribution source", "Amount"],
-      ...sources.map((source) => [
+      ...sourceList.map((source) => [
         source.name,
         source.amount,
       ]),
@@ -170,7 +185,7 @@ export default function FundingReportsAnalytics() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={11} />
           <span className="text-slate-500">
@@ -187,11 +202,11 @@ export default function FundingReportsAnalytics() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
 
           <div>
-            <h1 className="text-[23px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Funding Reports & Analytics
             </h1>
 
-            <p className="text-[10px] text-slate-500 mt-1">
+            <p className="text-[13px] text-slate-500 mt-1">
               Analyse contribution trends, allocation, expenditure, donor activity, and verification performance.
             </p>
           </div>
@@ -200,7 +215,7 @@ export default function FundingReportsAnalytics() {
 
             <button
               onClick={handlePrint}
-              className="h-[34px] px-3 bg-white border border-[#b9cfda] rounded-lg text-[9px] hover:bg-[#f5fafc] flex items-center gap-2"
+              className="h-[34px] px-3 bg-white border border-[#b9cfda] rounded-lg text-sm hover:bg-[#f5fafc] flex items-center gap-2"
             >
               <Printer size={13} />
               Print
@@ -208,7 +223,7 @@ export default function FundingReportsAnalytics() {
 
             <button
               onClick={handleExport}
-              className="h-[34px] px-3 bg-[#287ba5] text-white rounded-lg text-[9px] font-semibold hover:bg-[#1e6388] flex items-center gap-2"
+              className="h-[34px] px-3 bg-[#287ba5] text-white rounded-lg text-sm font-semibold hover:bg-[#1e6388] flex items-center gap-2"
             >
               <Download size={13} />
               Export report
@@ -224,14 +239,14 @@ export default function FundingReportsAnalytics() {
           <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-2">
 
             <div>
-              <label className="block text-[8px] text-slate-500 mb-1">
+              <label className="block text-sm text-slate-500 mb-1">
                 Date range
               </label>
 
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
-                className="w-full h-[31px] px-2 border border-[#d5e3e9] rounded-md text-[9px] outline-none bg-white"
+                className="w-full h-[31px] px-2 border border-[#d5e3e9] rounded-md text-sm sm:text-[15px] outline-none bg-white"
               >
                 <option>01-30 June 2025</option>
                 <option>01-31 May 2025</option>
@@ -244,14 +259,14 @@ export default function FundingReportsAnalytics() {
             </div>
 
             <div>
-              <label className="block text-[8px] text-slate-500 mb-1">
+              <label className="block text-sm text-slate-500 mb-1">
                 Campaign
               </label>
 
               <select
                 value={campaign}
                 onChange={(e) => setCampaign(e.target.value)}
-                className="w-full h-[31px] px-2 border border-[#d5e3e9] rounded-md text-[9px] outline-none bg-white"
+                className="w-full h-[31px] px-2 border border-[#d5e3e9] rounded-md text-sm sm:text-[15px] outline-none bg-white"
               >
                 <option>All campaigns</option>
                 <option>Flood Response 2025</option>
@@ -262,14 +277,14 @@ export default function FundingReportsAnalytics() {
             </div>
 
             <div>
-              <label className="block text-[8px] text-slate-500 mb-1">
+              <label className="block text-sm text-slate-500 mb-1">
                 Currency
               </label>
 
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full h-[31px] px-2 border border-[#d5e3e9] rounded-md text-[9px] outline-none bg-white"
+                className="w-full h-[31px] px-2 border border-[#d5e3e9] rounded-md text-sm sm:text-[15px] outline-none bg-white"
               >
                 <option value="USD">USD</option>
                 <option value="LKR">LKR</option>
@@ -281,7 +296,7 @@ export default function FundingReportsAnalytics() {
             <div className="flex items-end">
               <button
                 onClick={applyFilters}
-                className="w-full h-[31px] px-3 border border-[#b9cfda] rounded-md text-[9px] hover:bg-[#edf6f8]"
+                className="w-full h-[31px] px-3 border border-[#b9cfda] rounded-md text-sm hover:bg-[#edf6f8]"
               >
                 Apply filters
               </button>
@@ -340,16 +355,16 @@ export default function FundingReportsAnalytics() {
             <div className="px-3 py-3 border-b border-[#d5e3e9] flex items-center justify-between">
 
               <div>
-                <h2 className="text-[11px] font-medium">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Donation and allocation trend
                 </h2>
 
-                <p className="text-[8px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Monthly value · {appliedFilters.currency}
                 </p>
               </div>
 
-              <span className="bg-[#e5f6f0] text-[#159b79] rounded px-2 py-1 text-[8px] font-semibold">
+              <span className="bg-[#e5f6f0] text-[#159b79] rounded px-2 py-1 text-xs font-semibold">
                 +18.4%
               </span>
 
@@ -425,7 +440,7 @@ export default function FundingReportsAnalytics() {
 
               </div>
 
-              <div className="flex justify-between text-[7px] text-slate-400 mt-1 px-1">
+              <div className="flex justify-between text-xs text-slate-400 mt-1 px-1">
                 {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"].map(
                   (month) => (
                     <span key={month}>{month}</span>
@@ -442,11 +457,11 @@ export default function FundingReportsAnalytics() {
           <div className="bg-white border border-[#d5e3e9] rounded-lg shadow-sm overflow-hidden">
 
             <div className="px-3 py-3 border-b border-[#d5e3e9]">
-              <h2 className="text-[10px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Contributions by source
               </h2>
 
-              <p className="text-[8px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 $6.16M combined value
               </p>
             </div>
@@ -458,11 +473,11 @@ export default function FundingReportsAnalytics() {
                   key={source.name}
                   className="flex items-center justify-between gap-2"
                 >
-                  <span className="text-[8px] text-[#45657e]">
+                  <span className="text-xs text-[#45657e]">
                     {source.name}
                   </span>
 
-                  <span className="text-[8px] font-semibold text-[#123e60]">
+                  <span className="text-xs font-semibold text-[#123e60]">
                     {source.amount}
                   </span>
                 </div>
@@ -478,7 +493,7 @@ export default function FundingReportsAnalytics() {
 
         <section className="mb-5">
 
-          <h2 className="text-[10px] font-medium mb-2">
+          <h2 className="text-base sm:text-lg font-semibold mb-2">
             Report library
           </h2>
 
@@ -498,7 +513,7 @@ export default function FundingReportsAnalytics() {
                     <Icon size={16} />
                   </div>
 
-                  <span className="flex-1 text-[8px] font-medium">
+                  <span className="flex-1 text-xs font-medium">
                     {report.title}
                   </span>
 
@@ -542,27 +557,27 @@ export default function FundingReportsAnalytics() {
               <selectedReport.icon size={22} />
             </div>
 
-            <h2 className="text-[16px] font-semibold">
+            <h2 className="text-lg sm:text-xl font-semibold">
               {selectedReport.title}
             </h2>
 
-            <p className="text-[10px] text-slate-500 mt-2">
+            <p className="text-[13px] text-slate-500 mt-2">
               {selectedReport.description}
             </p>
 
             <div className="bg-[#f4f8fa] p-3 rounded-lg mt-5 space-y-2">
 
-              <div className="flex justify-between text-[9px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-slate-500">Date range</span>
                 <span>{appliedFilters.dateRange}</span>
               </div>
 
-              <div className="flex justify-between text-[9px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-slate-500">Campaign</span>
                 <span>{appliedFilters.campaign}</span>
               </div>
 
-              <div className="flex justify-between text-[9px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-slate-500">Currency</span>
                 <span>{appliedFilters.currency}</span>
               </div>
@@ -574,7 +589,7 @@ export default function FundingReportsAnalytics() {
                 showToast(`${selectedReport.title} selected.`);
                 setSelectedReport(null);
               }}
-              className="w-full h-10 bg-[#287ba5] text-white rounded-lg mt-5 text-[10px] font-semibold"
+              className="w-full h-10 bg-[#287ba5] text-white rounded-lg mt-5 text-sm font-semibold"
             >
               Open report
             </button>
@@ -587,7 +602,7 @@ export default function FundingReportsAnalytics() {
       {/* TOAST */}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[100] bg-[#143d5c] text-white rounded-lg px-4 py-3 shadow-xl flex items-center gap-2 text-[10px]">
+        <div className="fixed bottom-5 right-5 z-[100] bg-[#143d5c] text-white rounded-lg px-4 py-3 shadow-xl flex items-center gap-2 text-sm">
           <CheckCircle2 size={15} />
           {toast}
         </div>
@@ -628,7 +643,7 @@ function MetricCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[8px] text-slate-400">
+        <p className="text-xs text-slate-400">
           {title}
         </p>
 
@@ -636,7 +651,7 @@ function MetricCard({
           {value}
         </p>
 
-        <p className="text-[7px] text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-400 mt-0.5">
           {subtitle}
         </p>
       </div>

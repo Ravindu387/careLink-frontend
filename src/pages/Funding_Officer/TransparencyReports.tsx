@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -92,6 +93,23 @@ export default function TransparencyReports() {
 
   const [toast, setToast] = useState("");
 
+  useEffect(() => {
+    apiClient.get<any>("/transparency-reports").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setReports(
+          items.map((r: any) => ({
+            id: r.id || r.reference || "REP-200",
+            title: r.title || "Transparency Report",
+            reference: r.reference || r.id || "REP-200",
+            date: r.date || "Today",
+            status: (r.status as Report["status"]) || "Published",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   const notify = (message: string) => {
     setToast(message);
     window.setTimeout(() => setToast(""), 3000);
@@ -118,6 +136,12 @@ export default function TransparencyReports() {
       notify("Please enter a report title.");
       return;
     }
+
+    apiClient.post("/transparency-reports", {
+      title: reportTitle,
+      description: reportDescription,
+      period: reportPeriod,
+    }).catch(() => {});
 
     const newReport: Report = {
       id: `REP-${Math.floor(200 + Math.random() * 800)}`,
@@ -215,7 +239,7 @@ export default function TransparencyReports() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-8">
+        <div className="flex items-center gap-2 text-xs mb-8">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={11} />
           <span className="text-slate-500">
@@ -232,11 +256,11 @@ export default function TransparencyReports() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
 
           <div>
-            <h1 className="text-[24px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Transparency Reports
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[13px] text-slate-500 mt-1">
               Publish accountable summaries of donations, allocation, expenditure, and remaining funds.
             </p>
           </div>
@@ -245,14 +269,14 @@ export default function TransparencyReports() {
 
             <button
               onClick={() => setShowPolicyModal(true)}
-              className="h-[37px] px-4 bg-white border border-[#b9cfda] rounded-lg text-[10px] text-[#23749e] hover:bg-[#f5fafc]"
+              className="h-[37px] px-4 bg-white border border-[#b9cfda] rounded-lg text-sm text-[#23749e] hover:bg-[#f5fafc]"
             >
               Publishing policy
             </button>
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-[37px] px-4 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-[#175c80]"
+              className="h-[37px] px-4 bg-[#23749e] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#175c80]"
             >
               <Plus size={15} />
               Create report
@@ -274,15 +298,15 @@ export default function TransparencyReports() {
             </div>
 
             <div>
-              <span className="inline-flex px-2 py-1 bg-[#e0f7ef] text-[#087b67] text-[8px] font-bold rounded mb-1.5">
+              <span className="inline-flex px-2 py-1 bg-[#e0f7ef] text-[#087b67] text-xs font-bold rounded mb-1.5">
                 VERIFIED REPORTING
               </span>
 
-              <h2 className="text-[14px] font-semibold text-white">
+              <h2 className="text-base sm:text-lg font-semibold text-white">
                 Flood Response 2025 · Public Funding Summary
               </h2>
 
-              <p className="text-[8px] text-[#c5dce8] mt-1">
+              <p className="text-xs text-[#c5dce8] mt-1">
                 Reporting period: 18–25 June 2025 · Demonstration data
               </p>
             </div>
@@ -290,7 +314,7 @@ export default function TransparencyReports() {
 
           <button
             onClick={downloadReport}
-            className="h-[37px] px-4 bg-white rounded-lg text-[9px] text-[#23749e] flex items-center gap-2 hover:bg-[#edf5f8] shrink-0"
+            className="h-[37px] px-4 bg-white rounded-lg text-sm text-[#23749e] flex items-center gap-2 hover:bg-[#edf5f8] shrink-0"
           >
             <Download size={15} />
             Download PDF
@@ -345,11 +369,11 @@ export default function TransparencyReports() {
 
             <div className="px-4 py-4 border-b border-[#d7e4e9]">
 
-              <h2 className="text-[12px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Allocation by response area
               </h2>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 $3.91M allocated verified funds
               </p>
             </div>
@@ -362,7 +386,7 @@ export default function TransparencyReports() {
                   className="grid grid-cols-[115px_1fr_55px] sm:grid-cols-[120px_1fr_55px] items-center gap-3"
                 >
 
-                  <span className="text-[9px] text-[#365b76]">
+                  <span className="text-xs text-[#365b76]">
                     {item.name}
                   </span>
 
@@ -376,7 +400,7 @@ export default function TransparencyReports() {
                     />
                   </div>
 
-                  <span className="text-[9px] font-semibold text-right">
+                  <span className="text-xs font-semibold text-right">
                     {item.amount}
                   </span>
 
@@ -392,11 +416,11 @@ export default function TransparencyReports() {
 
             <div className="px-4 py-4 border-b border-[#d7e4e9]">
 
-              <h2 className="text-[12px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Reporting completeness
               </h2>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Current response period
               </p>
             </div>
@@ -419,12 +443,12 @@ export default function TransparencyReports() {
                       }`}
                     />
 
-                    <span className="text-[9px] truncate">
+                    <span className="text-xs truncate">
                       {item.name}
                     </span>
                   </div>
 
-                  <span className="text-[9px] font-semibold shrink-0">
+                  <span className="text-xs font-semibold shrink-0">
                     {item.percentage}
                   </span>
 
@@ -439,11 +463,11 @@ export default function TransparencyReports() {
                 />
 
                 <div>
-                  <p className="text-[9px] font-semibold text-[#078c70]">
+                  <p className="text-xs font-semibold text-[#078c70]">
                     Human-reviewed figures
                   </p>
 
-                  <p className="text-[8px] text-[#568c83] mt-1">
+                  <p className="text-xs text-[#568c83] mt-1">
                     All published totals require authorised review.
                   </p>
                 </div>
@@ -460,11 +484,11 @@ export default function TransparencyReports() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
 
             <div>
-              <h2 className="text-[12px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Published and draft reports
               </h2>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Manage transparent financial reporting records.
               </p>
             </div>
@@ -481,14 +505,14 @@ export default function TransparencyReports() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search reports..."
-                  className="h-[34px] w-[155px] sm:w-[180px] pl-8 pr-2 bg-white border border-[#d5e3e9] rounded-lg text-[9px] outline-none focus:border-[#23749e]"
+                  className="h-[34px] w-[155px] sm:w-[180px] pl-8 pr-2 bg-white border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] outline-none focus:border-[#23749e]"
                 />
               </div>
 
               <select
                 value={reportType}
                 onChange={(e) => setReportType(e.target.value)}
-                className="h-[34px] px-2 bg-white border border-[#d5e3e9] rounded-lg text-[9px] outline-none"
+                className="h-[34px] px-2 bg-white border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] outline-none"
               >
                 <option>All report types</option>
                 <option>Weekly</option>
@@ -520,11 +544,11 @@ export default function TransparencyReports() {
 
                   <div className="min-w-0">
 
-                    <h3 className="text-[9px] font-semibold truncate">
+                    <h3 className="text-base font-semibold truncate">
                       {report.title}
                     </h3>
 
-                    <p className="text-[8px] text-slate-400 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       {report.reference} · {report.date}
                     </p>
                   </div>
@@ -532,7 +556,7 @@ export default function TransparencyReports() {
 
                 <button
                   onClick={() => setSelectedReport(report)}
-                  className={`px-2 py-2 rounded-lg text-[8px] font-semibold whitespace-nowrap ${getStatusStyle(
+                  className={`px-2 py-2 rounded-lg text-xs font-semibold whitespace-nowrap ${getStatusStyle(
                     report.status
                   )}`}
                 >
@@ -550,11 +574,11 @@ export default function TransparencyReports() {
                   className="mx-auto text-slate-300 mb-2"
                 />
 
-                <p className="text-[11px] font-medium">
+                <p className="text-sm font-medium">
                   No reports found
                 </p>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Try another search or report type.
                 </p>
               </div>
@@ -575,11 +599,11 @@ export default function TransparencyReports() {
               <FileText size={20} className="text-[#23749e]" />
             </div>
 
-            <h2 className="text-[16px] font-semibold">
+            <h2 className="text-lg sm:text-xl font-semibold">
               Create transparency report
             </h2>
 
-            <p className="text-[9px] text-slate-400 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               Prepare a new public financial reporting document.
             </p>
           </div>
@@ -627,7 +651,7 @@ export default function TransparencyReports() {
                 className="text-[#23749e] shrink-0"
               />
 
-              <p className="text-[9px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 New reports are saved as drafts and must be reviewed before publication.
               </p>
             </div>
@@ -637,14 +661,14 @@ export default function TransparencyReports() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2.5 border border-[#d5e3e9] rounded-lg text-[10px]"
+                className="px-4 py-2.5 border border-[#d5e3e9] rounded-lg text-sm"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="px-4 py-2.5 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold"
+                className="px-4 py-2.5 bg-[#23749e] text-white rounded-lg text-sm font-semibold"
               >
                 Create report
               </button>
@@ -662,11 +686,11 @@ export default function TransparencyReports() {
             <ShieldCheck size={23} className="text-[#078c70]" />
           </div>
 
-          <h2 className="text-[16px] font-semibold">
+          <h2 className="text-lg sm:text-xl font-semibold">
             Publishing policy
           </h2>
 
-          <p className="text-[9px] text-slate-400 mt-1 mb-5">
+          <p className="text-xs text-slate-400 mt-1 mb-5">
             CareLink transparency and financial reporting guidelines.
           </p>
 
@@ -701,16 +725,16 @@ export default function TransparencyReports() {
             ].map((item, index) => (
               <div key={item.title} className="flex gap-3">
 
-                <div className="w-6 h-6 rounded-full bg-[#e8f1f6] text-[#23749e] flex items-center justify-center text-[9px] font-semibold shrink-0">
+                <div className="w-6 h-6 rounded-full bg-[#e8f1f6] text-[#23749e] flex items-center justify-center text-xs font-semibold shrink-0">
                   {index + 1}
                 </div>
 
                 <div>
-                  <h3 className="text-[10px] font-semibold">
+                  <h3 className="text-base font-semibold">
                     {item.title}
                   </h3>
 
-                  <p className="text-[9px] text-slate-500 mt-1 leading-relaxed">
+                  <p className="text-sm text-slate-500 mt-1 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -720,7 +744,7 @@ export default function TransparencyReports() {
 
           <button
             onClick={() => setShowPolicyModal(false)}
-            className="w-full mt-6 h-10 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold"
+            className="w-full mt-6 h-10 bg-[#23749e] text-white rounded-lg text-sm font-semibold"
           >
             Close policy
           </button>
@@ -736,21 +760,21 @@ export default function TransparencyReports() {
           <div className="flex items-start justify-between mb-5">
 
             <div>
-              <p className="text-[9px] text-[#23749e] font-semibold">
+              <p className="text-xs text-[#23749e] font-semibold">
                 {selectedReport.reference}
               </p>
 
-              <h2 className="text-[16px] font-semibold mt-1">
+              <h2 className="text-lg sm:text-xl font-semibold mt-1">
                 {selectedReport.title}
               </h2>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Created {selectedReport.date}
               </p>
             </div>
 
             <span
-              className={`px-2 py-1 rounded-md text-[8px] font-semibold ${getStatusStyle(
+              className={`px-2 py-1 rounded-md text-xs font-semibold ${getStatusStyle(
                 selectedReport.status
               )}`}
             >
@@ -761,31 +785,31 @@ export default function TransparencyReports() {
           <div className="bg-[#eef5f7] p-4 rounded-lg space-y-3 mb-5">
 
             <div className="flex justify-between">
-              <span className="text-[9px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Verified contributions
               </span>
-              <strong className="text-[10px]">$4.82M</strong>
+              <strong className="text-sm">$4.82M</strong>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-[9px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Allocated funds
               </span>
-              <strong className="text-[10px]">$3.91M</strong>
+              <strong className="text-sm">$3.91M</strong>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-[9px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Expenditure
               </span>
-              <strong className="text-[10px]">$2.74M</strong>
+              <strong className="text-sm">$2.74M</strong>
             </div>
 
             <div className="flex justify-between border-t border-[#d5e3e9] pt-3">
-              <span className="text-[9px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 Available balance
               </span>
-              <strong className="text-[10px] text-[#078c70]">
+              <strong className="text-sm text-[#078c70]">
                 $910K
               </strong>
             </div>
@@ -795,7 +819,7 @@ export default function TransparencyReports() {
 
             <button
               onClick={() => downloadIndividualReport(selectedReport)}
-              className="px-3 py-2 border border-[#d5e3e9] rounded-lg text-[9px] flex items-center gap-2"
+              className="px-3 py-2 border border-[#d5e3e9] rounded-lg text-sm flex items-center gap-2"
             >
               <Download size={13} />
               Download
@@ -804,7 +828,7 @@ export default function TransparencyReports() {
             {selectedReport.status !== "Published" && (
               <button
                 onClick={() => publishReport(selectedReport.id)}
-                className="px-3 py-2 bg-[#23749e] text-white rounded-lg text-[9px] flex items-center gap-2"
+                className="px-3 py-2 bg-[#23749e] text-white rounded-lg text-sm flex items-center gap-2"
               >
                 <CheckCircle2 size={13} />
                 Publish report
@@ -813,7 +837,7 @@ export default function TransparencyReports() {
 
             <button
               onClick={() => setSelectedReport(null)}
-              className="px-3 py-2 bg-[#eef5f7] rounded-lg text-[9px]"
+              className="px-3 py-2 bg-[#eef5f7] rounded-lg text-sm"
             >
               Close
             </button>
@@ -824,7 +848,7 @@ export default function TransparencyReports() {
       {/* TOAST */}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[100] bg-[#143d5c] text-white rounded-lg px-4 py-3 shadow-xl flex items-center gap-3 text-[10px]">
+        <div className="fixed bottom-5 right-5 z-[100] bg-[#143d5c] text-white rounded-lg px-4 py-3 shadow-xl flex items-center gap-3 text-sm">
           <CheckCircle2 size={15} />
           {toast}
           <button onClick={() => setToast("")}>
@@ -869,7 +893,7 @@ function SummaryCard({
 
       <div className="min-w-0">
 
-        <p className="text-[8px] text-slate-400">
+        <p className="text-xs text-slate-400">
           {label}
         </p>
 
@@ -877,7 +901,7 @@ function SummaryCard({
           {amount}
         </h3>
 
-        <p className="text-[8px] text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-400 mt-0.5">
           {description}
         </p>
       </div>
@@ -933,7 +957,7 @@ function FormField({
   return (
     <label className="block">
 
-      <span className="block text-[9px] font-medium mb-1.5">
+      <span className="block text-xs font-medium mb-1.5">
         {label}
       </span>
 
