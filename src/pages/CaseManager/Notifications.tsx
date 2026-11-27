@@ -279,7 +279,7 @@ const Notifications: React.FC = () => {
             <button
               onClick={() => loadData(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
               title="Refresh notifications"
             >
               <RefreshCw size={13} className={isRefreshing ? "animate-spin text-[#287da8]" : ""} />
@@ -300,14 +300,14 @@ const Notifications: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={markAllAsRead}
-              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-xs font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
+              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-sm font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
             >
               Mark all as read
             </button>
 
             <button
               onClick={openPreferencesModal}
-              className="flex items-center gap-2 rounded-lg bg-[#287da8] px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#17678f]"
+              className="flex items-center gap-2 rounded-lg bg-[#287da8] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#17678f]"
             >
               <Settings size={15} />
               Preferences
@@ -325,7 +325,7 @@ const Notifications: React.FC = () => {
                   setActiveTab(tab.name);
                   setCurrentPage(1);
                 }}
-                className={`relative flex items-center gap-1.5 py-4 text-xs transition ${
+                className={`relative flex items-center gap-1.5 py-4 text-sm transition ${
                   activeTab === tab.name
                     ? "font-semibold text-[#287da8]"
                     : "text-slate-500 hover:text-sky-700"
@@ -334,7 +334,7 @@ const Notifications: React.FC = () => {
                 {tab.name}
                 {tab.count !== undefined && (
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                       activeTab === tab.name
                         ? "bg-sky-100 text-[#287da8]"
                         : "bg-slate-200 text-slate-600"
@@ -360,7 +360,7 @@ const Notifications: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-[#d2e0e9] bg-white py-1.5 pl-8 pr-7 text-xs outline-none focus:border-sky-500"
+              className="rounded-lg border border-[#d2e0e9] bg-white py-1.5 pl-8 pr-7 text-sm sm:text-[15px] outline-none focus:border-sky-500"
             />
             {searchTerm && (
               <button
@@ -404,13 +404,13 @@ const Notifications: React.FC = () => {
                     {/* Content */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="truncate text-xs font-bold text-[#173e5b]">{item.title}</p>
-                        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-600">
+                        <p className="truncate text-sm font-bold text-[#173e5b]">{item.title}</p>
+                        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600">
                           {item.caseId}
                         </span>
                       </div>
                       <p className="mt-1 truncate text-xs text-slate-500">{item.description}</p>
-                      <p className="mt-1 text-[10px] text-slate-400">{item.time}</p>
+                      <p className="mt-1 text-[13px] text-slate-400">{item.time}</p>
                     </div>
 
                     {/* Actions & Status */}
@@ -454,7 +454,7 @@ const Notifications: React.FC = () => {
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                  className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3 py-1.5 text-xs text-slate-500 hover:bg-slate-50 disabled:opacity-40"
+                  className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:opacity-40"
                 >
                   <ChevronLeft size={13} />
                   Previous
@@ -464,7 +464,7 @@ const Notifications: React.FC = () => {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`h-8 w-8 rounded-lg border text-xs transition ${
+                    className={`h-8 w-8 rounded-lg border text-sm transition ${
                       currentPage === page
                         ? "border-[#287da8] bg-[#287da8] font-semibold text-white"
                         : "border-[#d5e2eb] bg-white text-slate-600 hover:bg-sky-50"
@@ -477,7 +477,7 @@ const Notifications: React.FC = () => {
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                  className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3 py-1.5 text-xs font-medium text-[#287da8] hover:bg-sky-50 disabled:opacity-40"
+                  className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3 py-1.5 text-sm font-medium text-[#287da8] hover:bg-sky-50 disabled:opacity-40"
                 >
                   Next
                   <ChevronRight size={13} />
@@ -488,7 +488,7 @@ const Notifications: React.FC = () => {
 
           {/* Right Notification Summary */}
           <aside className="rounded-xl border border-[#d5e2eb] bg-white p-5 shadow-[0_8px_25px_rgba(30,64,90,0.05)]">
-            <h2 className="mb-5 text-sm font-medium text-[#173e5b]">Notification summary</h2>
+            <h2 className="mb-5 text-base sm:text-lg font-semibold text-[#173e5b]">Notification summary</h2>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -531,7 +531,7 @@ const Notifications: React.FC = () => {
             <div className="my-5 border-t border-[#d5e2eb]" />
 
             {/* Delivery Services */}
-            <h3 className="mb-3 text-sm font-medium text-[#173e5b]">Delivery services</h3>
+            <h3 className="mb-3 text-base font-semibold text-[#173e5b]">Delivery services</h3>
 
             <div className="space-y-3">
               {summary?.deliveryServices && summary.deliveryServices.length > 0 ? (
@@ -615,14 +615,14 @@ const Notifications: React.FC = () => {
 
               <div className="pt-1">
                 <span className="text-slate-400">Description:</span>
-                <p className="mt-1.5 text-xs text-slate-700">{selectedNotification.description}</p>
+                <p className="mt-1.5 text-sm text-slate-700">{selectedNotification.description}</p>
               </div>
             </div>
 
             <div className="mt-6 flex justify-between gap-3">
               <button
                 onClick={() => handleDeleteNotification(selectedNotification.id)}
-                className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-100"
+                className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100"
               >
                 <Trash2 size={14} />
                 Delete
@@ -630,7 +630,7 @@ const Notifications: React.FC = () => {
 
               <button
                 onClick={() => setSelectedNotification(null)}
-                className="rounded-lg bg-[#287da8] px-6 py-2 text-xs font-semibold text-white hover:bg-[#17678f]"
+                className="rounded-lg bg-[#287da8] px-6 py-2 text-sm font-semibold text-white hover:bg-[#17678f]"
               >
                 Close
               </button>
@@ -668,7 +668,7 @@ const Notifications: React.FC = () => {
             </div>
 
             {/* Delivery Channels */}
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+            <h3 className="mb-3 text-base font-bold uppercase tracking-wider text-slate-500">
               Delivery channels
             </h3>
 
@@ -703,8 +703,8 @@ const Notifications: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <div className="rounded-lg bg-sky-50 p-2 text-[#287da8]">{item.icon}</div>
                     <div>
-                      <p className="text-xs font-semibold text-slate-700">{item.title}</p>
-                      <p className="mt-0.5 text-[10px] text-slate-400">{item.description}</p>
+                      <p className="text-sm font-semibold text-slate-700">{item.title}</p>
+                      <p className="mt-0.5 text-[13px] text-slate-400">{item.description}</p>
                     </div>
                   </div>
 
@@ -732,7 +732,7 @@ const Notifications: React.FC = () => {
             </div>
 
             {/* Notification Types */}
-            <h3 className="mb-3 mt-6 text-xs font-bold uppercase tracking-wider text-slate-500">
+            <h3 className="mb-3 mt-6 text-base font-bold uppercase tracking-wider text-slate-500">
               Notification types
             </h3>
 
@@ -788,7 +788,7 @@ const Notifications: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPreferences(false)}
-                className="rounded-lg border border-[#b9d0df] px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-[#b9d0df] px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -797,7 +797,7 @@ const Notifications: React.FC = () => {
                 type="button"
                 disabled={isSavingPrefs}
                 onClick={handleSavePreferences}
-                className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2 text-xs font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2 text-sm font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
               >
                 {isSavingPrefs ? "Saving..." : "Save preferences"}
               </button>

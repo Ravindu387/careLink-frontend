@@ -47,8 +47,8 @@ const Toggle: React.FC<ToggleProps> = ({
   return (
     <div className="flex items-center justify-between gap-4 border-b border-[#e5edf2] py-4 last:border-0">
       <div>
-        <h4 className="text-xs font-semibold text-[#173e5b]">{title}</h4>
-        <p className="mt-0.5 text-[10px] text-slate-400">{description}</p>
+        <h4 className="text-sm font-semibold text-[#173e5b]">{title}</h4>
+        <p className="mt-0.5 text-[13px] text-slate-400">{description}</p>
       </div>
 
       <button
@@ -360,7 +360,7 @@ const Settings: React.FC = () => {
             <button
               onClick={() => loadData(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
               title="Refresh settings"
             >
               <RefreshCw size={13} className={isRefreshing ? "animate-spin text-[#287da8]" : ""} />
@@ -382,7 +382,7 @@ const Settings: React.FC = () => {
             <button
               type="button"
               onClick={handleResetDefaults}
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-2.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
             >
               <RotateCcw size={14} />
               Reset defaults
@@ -391,7 +391,7 @@ const Settings: React.FC = () => {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#17678f] disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#17678f] disabled:opacity-50"
             >
               <Save size={15} />
               {isSaving ? "Saving..." : "Save changes"}
@@ -437,7 +437,7 @@ const Settings: React.FC = () => {
                 {activeTab === "Profile" && (
                   <div>
                     <div className="mb-5 border-b border-[#d5e2eb] pb-3">
-                      <h2 className="text-sm font-semibold text-[#173e5b]">Profile Details</h2>
+                      <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">Profile Details</h2>
                       <p className="mt-0.5 text-xs text-slate-400">
                         Configure identity details for your Case Manager workspace.
                       </p>
@@ -455,12 +455,12 @@ const Settings: React.FC = () => {
                         </div>
 
                         <div>
-                          <p className="text-xs font-semibold text-[#173e5b]">Profile photo</p>
-                          <p className="mt-0.5 text-[10px] text-slate-400">JPG or PNG · maximum 2 MB</p>
+                          <p className="text-sm font-semibold text-[#173e5b]">Profile photo</p>
+                          <p className="mt-0.5 text-[13px] text-slate-400">JPG or PNG · maximum 2 MB</p>
                         </div>
                       </div>
 
-                      <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-2 text-xs font-medium text-[#287da8] transition hover:bg-sky-50">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-2 text-sm font-medium text-[#287da8] transition hover:bg-sky-50">
                         <Upload size={14} />
                         Upload photo
                         <input
@@ -529,13 +529,13 @@ const Settings: React.FC = () => {
                 {activeTab === "Queue Preferences" && (
                   <div>
                     <div className="mb-5 border-b border-[#d5e2eb] pb-3">
-                      <h2 className="text-sm font-semibold text-[#173e5b]">Queue Preferences</h2>
+                      <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">Queue Preferences</h2>
                       <p className="mt-0.5 text-xs text-slate-400">
                         Configure default filters and ordering for your case queues.
                       </p>
                     </div>
 
-                    <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+                    <h3 className="mb-3 text-base font-bold uppercase tracking-wider text-slate-500">
                       Default Queue Filters
                     </h3>
 
@@ -590,7 +590,7 @@ const Settings: React.FC = () => {
                     </div>
 
                     <div className="mt-6 border-t border-[#d5e2eb] pt-4">
-                      <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                      <h3 className="mb-2 text-base font-bold uppercase tracking-wider text-slate-500">
                         Queue Behaviour
                       </h3>
 
@@ -622,14 +622,14 @@ const Settings: React.FC = () => {
                 {activeTab === "Notification Preferences" && (
                   <div>
                     <div className="mb-5 border-b border-[#d5e2eb] pb-3">
-                      <h2 className="text-sm font-semibold text-[#173e5b]">Notification Preferences</h2>
+                      <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">Notification Preferences</h2>
                       <p className="mt-0.5 text-xs text-slate-400">
                         Choose how and when you receive case alerts across all communication channels.
                       </p>
                     </div>
 
                     <div className="mb-5">
-                      <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                      <h3 className="mb-2 text-base font-bold uppercase tracking-wider text-slate-500">
                         Delivery Channels
                       </h3>
 
@@ -656,7 +656,7 @@ const Settings: React.FC = () => {
                     </div>
 
                     <div className="border-t border-[#d5e2eb] pt-4">
-                      <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                      <h3 className="mb-2 text-base font-bold uppercase tracking-wider text-slate-500">
                         Alert Categories
                       </h3>
 
@@ -702,14 +702,14 @@ const Settings: React.FC = () => {
                 {activeTab === "Security & Sessions" && (
                   <div>
                     <div className="mb-5 border-b border-[#d5e2eb] pb-3">
-                      <h2 className="text-sm font-semibold text-[#173e5b]">Security & Sessions</h2>
+                      <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">Security & Sessions</h2>
                       <p className="mt-0.5 text-xs text-slate-400">
                         Manage multi-factor authentication, passwords, and active device sessions.
                       </p>
                     </div>
 
                     <div className="mb-5">
-                      <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                      <h3 className="mb-2 text-base font-bold uppercase tracking-wider text-slate-500">
                         Authentication Security
                       </h3>
 
@@ -730,7 +730,7 @@ const Settings: React.FC = () => {
 
                     {/* Change Password */}
                     <div className="border-t border-[#d5e2eb] pt-5">
-                      <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+                      <h3 className="mb-3 text-base font-bold uppercase tracking-wider text-slate-500">
                         Change Password
                       </h3>
 
@@ -770,7 +770,7 @@ const Settings: React.FC = () => {
                         <button
                           type="button"
                           onClick={handlePasswordChange}
-                          className="rounded-lg bg-[#287da8] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#17678f]"
+                          className="rounded-lg bg-[#287da8] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#17678f]"
                         >
                           Update password
                         </button>
@@ -779,7 +779,7 @@ const Settings: React.FC = () => {
 
                     {/* Active Sessions */}
                     <div className="mt-6 border-t border-[#d5e2eb] pt-5">
-                      <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+                      <h3 className="mb-3 text-base font-bold uppercase tracking-wider text-slate-500">
                         Active Sessions
                       </h3>
 
@@ -800,24 +800,24 @@ const Settings: React.FC = () => {
                               </div>
 
                               <div>
-                                <p className="text-xs font-semibold text-[#173e5b]">
+                                <p className="text-sm font-semibold text-[#173e5b]">
                                   {session.device} · {session.browser}
                                 </p>
-                                <p className="text-[10px] text-slate-400">
+                                <p className="text-[13px] text-slate-400">
                                   {session.location} · {session.lastActive}
                                 </p>
                               </div>
                             </div>
 
                             {session.isCurrent ? (
-                              <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                              <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                                 Current
                               </span>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => handleLogoutSession(session.id)}
-                                className="text-xs font-semibold text-red-500 hover:text-red-700"
+                                className="text-sm font-semibold text-red-500 hover:text-red-700"
                               >
                                 Revoke
                               </button>
