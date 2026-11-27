@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   CitizenDocument,
   CreateDocumentPayload,
@@ -132,7 +132,7 @@ export const documentService = {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_BASE_URL}/documents/${id}/download`, {
+    const response = await authFetch(`${API_BASE_URL}/documents/${id}/download`, {
       headers,
     });
 

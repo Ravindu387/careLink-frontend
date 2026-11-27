@@ -507,7 +507,7 @@ export default function MyHouseholdPage() {
                 </h2>
 
                 {/* BACKEND STATUS BADGE */}
-                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] shadow-xs">
+                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs shadow-xs">
                   {isBackendConnected === true ? (
                     <>
                       <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -538,7 +538,7 @@ export default function MyHouseholdPage() {
               <button
                 onClick={() => fetchHousehold()}
                 disabled={isRefreshing}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
                 title="Refresh household data"
               >
                 <RefreshCw
@@ -550,7 +550,7 @@ export default function MyHouseholdPage() {
 
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#1e668e] transition"
+                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-[#1e668e] transition"
               >
                 <Plus size={14} />
                 Add Person
@@ -562,7 +562,7 @@ export default function MyHouseholdPage() {
           <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-500">
+                <span className="text-[13px] font-semibold text-slate-500">
                   Total Members
                 </span>
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-50 text-[#287da6]">
@@ -572,12 +572,12 @@ export default function MyHouseholdPage() {
               <p className="mt-2 text-xl font-bold text-[#173d5b]">
                 {members.length}
               </p>
-              <p className="text-[9px] text-slate-400">Registered at address</p>
+              <p className="text-xs text-slate-400">Registered at address</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-amber-700">
+                <span className="text-sm font-semibold text-amber-700">
                   Special Support
                 </span>
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
@@ -587,12 +587,12 @@ export default function MyHouseholdPage() {
               <p className="mt-2 text-xl font-bold text-amber-700">
                 {members.filter((m) => m.support !== "No support needs").length}
               </p>
-              <p className="text-[9px] text-slate-400">Mobility or medical needs</p>
+              <p className="text-xs text-slate-400">Mobility or medical needs</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-emerald-700">
+                <span className="text-sm font-semibold text-emerald-700">
                   Readiness Score
                 </span>
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
@@ -602,22 +602,22 @@ export default function MyHouseholdPage() {
               <p className="mt-2 text-xl font-bold text-emerald-700">
                 {progressPercent}%
               </p>
-              <p className="text-[9px] text-slate-400">{completedCount} of {totalReadiness} steps ready</p>
+              <p className="text-xs text-slate-400">{completedCount} of {totalReadiness} steps ready</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-[#287da6]">
+                <span className="text-sm font-semibold text-[#287da6]">
                   Emergency Contact
                 </span>
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-50 text-[#287da6]">
                   <Phone size={14} />
                 </span>
               </div>
-              <p className="mt-2 truncate text-xs font-bold text-[#173d5b]">
+              <p className="mt-2 truncate text-sm font-bold text-[#173d5b]">
                 {contactName}
               </p>
-              <p className="text-[9px] text-slate-400 truncate">{contactPhone}</p>
+              <p className="text-xs text-slate-400 truncate">{contactPhone}</p>
             </div>
           </section>
 
@@ -630,17 +630,17 @@ export default function MyHouseholdPage() {
               />
 
               <div>
-                <p className="text-xs font-bold text-[#173d5b]">
+                <p className="text-sm font-bold text-[#173d5b]">
                   You control this household information
                 </p>
 
-                <p className="mt-0.5 text-[10px] text-slate-600">
+                <p className="mt-0.5 text-sm text-slate-600">
                   Household details and medical requirements are shared strictly with verified disaster response teams to provide accurate rations and shelter accommodations.
                 </p>
               </div>
             </div>
 
-            <span className="hidden text-[10px] font-semibold text-[#287da6] sm:block">
+            <span className="hidden text-sm font-semibold text-[#287da6] sm:block">
               Privacy Protected
             </span>
           </section>
@@ -654,10 +654,10 @@ export default function MyHouseholdPage() {
               <div className="border-b border-slate-100 p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="text-xs font-bold text-[#173d5b]">
+                    <h3 className="text-base font-bold text-[#173d5b]">
                       Household Members ({members.length})
                     </h3>
-                    <p className="mt-0.5 text-[10px] text-slate-400">
+                    <p className="mt-0.5 text-[13px] text-slate-400">
                       People residing at your registered address
                     </p>
                   </div>
@@ -668,7 +668,7 @@ export default function MyHouseholdPage() {
                       <button
                         key={filter}
                         onClick={() => setSupportFilter(filter)}
-                        className={`rounded-lg px-2.5 py-1 text-[10px] font-medium transition ${
+                        className={`rounded-lg px-2.5 py-1 text-xs font-medium transition ${
                           supportFilter === filter
                             ? "bg-[#287da6] text-white shadow-xs"
                             : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -691,7 +691,7 @@ export default function MyHouseholdPage() {
                     value={memberSearch}
                     onChange={(e) => setMemberSearch(e.target.value)}
                     placeholder="Search member by name, role or support needs..."
-                    className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-7 text-xs outline-none focus:border-[#287da6] focus:bg-white"
+                    className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-7 text-sm sm:text-[15px] outline-none focus:border-[#287da6] focus:bg-white"
                   />
                   {memberSearch && (
                     <button
@@ -713,13 +713,13 @@ export default function MyHouseholdPage() {
               ) : filteredMembers.length === 0 ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center text-slate-500">
                   <Users size={28} className="text-slate-300" />
-                  <p className="mt-2 text-xs font-semibold">No household members match your filter.</p>
+                  <p className="mt-2 text-sm font-semibold">No household members match your filter.</p>
                   <button
                     onClick={() => {
                       setMemberSearch("");
                       setSupportFilter("All");
                     }}
-                    className="mt-2 text-[10px] text-[#287da6] underline"
+                    className="mt-2 text-sm text-[#287da6] underline"
                   >
                     Reset filters
                   </button>
@@ -745,22 +745,22 @@ export default function MyHouseholdPage() {
                           className="min-w-0 flex-1 cursor-pointer"
                         >
                           <div className="flex items-center gap-2">
-                            <p className="text-xs font-bold text-[#173d5b] hover:text-[#287da6] transition">
+                            <p className="text-sm font-bold text-[#173d5b] hover:text-[#287da6] transition">
                               {member.name}
                             </p>
                             {member.age && (
-                              <span className="text-[10px] text-slate-400">
+                              <span className="text-[13px] text-slate-400">
                                 ({member.age} yrs)
                               </span>
                             )}
                           </div>
 
-                          <p className="mt-0.5 text-[10px] text-slate-500">
+                          <p className="mt-0.5 text-[13px] text-slate-500">
                             {member.role}
                           </p>
 
                           {member.medicalNotes && (
-                            <p className="mt-1 line-clamp-1 text-[9px] text-slate-400 italic">
+                            <p className="mt-1 line-clamp-1 text-xs text-slate-400 italic">
                               Note: {member.medicalNotes}
                             </p>
                           )}
@@ -768,7 +768,7 @@ export default function MyHouseholdPage() {
 
                         {/* SUPPORT BADGE */}
                         <span
-                          className={`rounded-md px-2.5 py-1 text-[10px] font-semibold ${
+                          className={`rounded-md px-2.5 py-1 text-xs font-semibold ${
                             hasSpecialSupport
                               ? "bg-amber-50 text-amber-700 border border-amber-200/60"
                               : "bg-slate-100 text-slate-600"
@@ -811,26 +811,26 @@ export default function MyHouseholdPage() {
                     <House size={18} />
                   </div>
 
-                  <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[9px] font-bold text-emerald-700">
+                  <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
                     Active Residence
                   </span>
                 </div>
 
-                <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <p className="mt-3 text-xs font-bold uppercase tracking-wider text-slate-400">
                   Saved Address
                 </p>
 
-                <p className="mt-1 text-xs font-bold text-[#173d5b]">
+                <p className="mt-1 text-sm font-bold text-[#173d5b]">
                   {address}
                 </p>
 
-                <p className="mt-1 text-[10px] text-slate-500">
+                <p className="mt-1 text-[13px] text-slate-500">
                   {ward} · {city}
                 </p>
 
                 <button
                   onClick={() => setShowAddressModal(true)}
-                  className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-[#287da6] hover:bg-sky-50 transition"
+                  className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 py-2 text-sm font-semibold text-[#287da6] hover:bg-sky-50 transition"
                 >
                   <Pencil size={12} />
                   Update Address
@@ -844,31 +844,31 @@ export default function MyHouseholdPage() {
                     <Phone size={18} />
                   </div>
 
-                  <span className="rounded-full bg-sky-50 px-2.5 py-0.5 text-[9px] font-bold text-[#287da6]">
+                  <span className="rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-bold text-[#287da6]">
                     Primary Contact
                   </span>
                 </div>
 
-                <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <p className="mt-3 text-xs font-bold uppercase tracking-wider text-slate-400">
                   Emergency Contact
                 </p>
 
                 <div className="mt-1 flex items-center justify-between">
-                  <p className="text-xs font-bold text-[#173d5b]">
+                  <p className="text-sm font-bold text-[#173d5b]">
                     {contactName}
                   </p>
-                  <span className="text-[10px] text-slate-500">
+                  <span className="text-[13px] text-slate-500">
                     ({contactRelation})
                   </span>
                 </div>
 
-                <p className="mt-0.5 text-[11px] font-mono text-slate-600">
+                <p className="mt-0.5 text-sm font-mono text-slate-600">
                   {contactPhone}
                 </p>
 
                 <button
                   onClick={() => setShowContactModal(true)}
-                  className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-[#287da6] hover:bg-sky-50 transition"
+                  className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 py-2 text-sm font-semibold text-[#287da6] hover:bg-sky-50 transition"
                 >
                   <Pencil size={12} />
                   Update Contact
@@ -881,11 +881,11 @@ export default function MyHouseholdPage() {
           <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
             <div className="flex items-center justify-between p-4 pb-3">
               <div>
-                <h3 className="text-xs font-bold text-[#173d5b]">
+                <h3 className="text-base font-bold text-[#173d5b]">
                   Household Readiness Checklist
                 </h3>
 
-                <p className="mt-0.5 text-[10px] text-slate-400">
+                <p className="mt-0.5 text-[13px] text-slate-400">
                   Completing these steps helps local response teams deploy targeted aid without delay.
                 </p>
               </div>
@@ -930,7 +930,7 @@ export default function MyHouseholdPage() {
                     </button>
 
                     <div>
-                      <p className={`text-xs font-semibold ${item.isCompleted ? "text-[#173d5b]" : "text-slate-600"}`}>
+                      <p className={`text-sm font-semibold ${item.isCompleted ? "text-[#173d5b]" : "text-slate-600"}`}>
                         {item.title}
                       </p>
                     </div>
@@ -938,7 +938,7 @@ export default function MyHouseholdPage() {
 
                   <button
                     onClick={() => handleToggleReadiness(item.key, item.isCompleted)}
-                    className={`rounded-full px-3 py-1 text-[9px] font-bold transition ${
+                    className={`rounded-full px-3 py-1 text-xs font-bold transition ${
                       item.isCompleted
                         ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                         : "bg-amber-50 text-amber-700 hover:bg-amber-100"
@@ -952,7 +952,7 @@ export default function MyHouseholdPage() {
           </section>
 
           {/* FOOTER */}
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[10px] text-slate-400">
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[13px] text-slate-400">
             <p>© 2026 ReliefOS Citizen Support · Household Vault</p>
             <p>Stay safe. Stay informed.</p>
           </footer>
@@ -968,7 +968,7 @@ export default function MyHouseholdPage() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 text-[#287da6]">
                   <Plus size={16} />
                 </div>
-                <h3 className="text-sm font-bold text-[#173d5b]">
+                <h3 className="text-base font-bold text-[#173d5b]">
                   Add Household Member
                 </h3>
               </div>
@@ -983,7 +983,7 @@ export default function MyHouseholdPage() {
 
             <div className="mt-4 space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Full Name *
                 </label>
                 <input
@@ -991,19 +991,19 @@ export default function MyHouseholdPage() {
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="e.g. Amir Khan, Layla Khan"
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700">
+                  <label className="block text-sm font-semibold text-slate-700">
                     Relationship
                   </label>
                   <select
                     value={newRole}
                     onChange={(e) => setNewRole(e.target.value)}
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   >
                     {ROLE_OPTIONS.map((r) => (
                       <option key={r} value={r}>
@@ -1014,7 +1014,7 @@ export default function MyHouseholdPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700">
+                  <label className="block text-sm font-semibold text-slate-700">
                     Age (Years)
                   </label>
                   <input
@@ -1024,19 +1024,19 @@ export default function MyHouseholdPage() {
                     value={newAge}
                     onChange={(e) => setNewAge(e.target.value)}
                     placeholder="e.g. 12"
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Support Needs
                 </label>
                 <select
                   value={newSupport}
                   onChange={(e) => setNewSupport(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                 >
                   {SUPPORT_OPTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -1047,7 +1047,7 @@ export default function MyHouseholdPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Medical or Care Notes (Optional)
                 </label>
                 <input
@@ -1055,7 +1055,7 @@ export default function MyHouseholdPage() {
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
                   placeholder="e.g. Wheelchair access needed, daily medication"
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                 />
               </div>
             </div>
@@ -1065,7 +1065,7 @@ export default function MyHouseholdPage() {
                 type="button"
                 onClick={() => setShowAddModal(false)}
                 disabled={isSavingMember}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1074,7 +1074,7 @@ export default function MyHouseholdPage() {
                 type="button"
                 onClick={handleAddMember}
                 disabled={isSavingMember}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1e668e] disabled:opacity-50 transition"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1e668e] disabled:opacity-50 transition"
               >
                 {isSavingMember ? "Adding..." : "Add Person"}
               </button>
@@ -1093,10 +1093,10 @@ export default function MyHouseholdPage() {
                   {selectedMember.initials || getInitials(selectedMember.name)}
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-[#173d5b]">
+                  <h3 className="text-base font-bold text-[#173d5b]">
                     {selectedMember.name}
                   </h3>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[13px] text-slate-400">
                     Edit member details
                   </p>
                 </div>
@@ -1112,7 +1112,7 @@ export default function MyHouseholdPage() {
 
             <div className="mt-4 space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Full Name
                 </label>
                 <input
@@ -1121,13 +1121,13 @@ export default function MyHouseholdPage() {
                   onChange={(e) =>
                     setSelectedMember({ ...selectedMember, name: e.target.value })
                   }
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700">
+                  <label className="block text-sm font-semibold text-slate-700">
                     Role
                   </label>
                   <select
@@ -1135,7 +1135,7 @@ export default function MyHouseholdPage() {
                     onChange={(e) =>
                       setSelectedMember({ ...selectedMember, role: e.target.value })
                     }
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   >
                     {ROLE_OPTIONS.map((r) => (
                       <option key={r} value={r}>
@@ -1146,7 +1146,7 @@ export default function MyHouseholdPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700">
+                  <label className="block text-sm font-semibold text-slate-700">
                     Age
                   </label>
                   <input
@@ -1160,13 +1160,13 @@ export default function MyHouseholdPage() {
                         age: e.target.value ? parseInt(e.target.value, 10) : undefined,
                       })
                     }
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Support Needs
                 </label>
                 <select
@@ -1174,7 +1174,7 @@ export default function MyHouseholdPage() {
                   onChange={(e) =>
                     setSelectedMember({ ...selectedMember, support: e.target.value })
                   }
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                 >
                   {SUPPORT_OPTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -1185,7 +1185,7 @@ export default function MyHouseholdPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Medical Notes
                 </label>
                 <input
@@ -1198,7 +1198,7 @@ export default function MyHouseholdPage() {
                     })
                   }
                   placeholder="e.g. Asthma, allergies, limited mobility"
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                 />
               </div>
             </div>
@@ -1209,7 +1209,7 @@ export default function MyHouseholdPage() {
                 onClick={() => {
                   setDeleteMemberTarget(selectedMember);
                 }}
-                className="flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700"
+                className="flex items-center gap-1 text-sm font-semibold text-red-600 hover:text-red-700"
               >
                 <Trash2 size={13} />
                 Remove
@@ -1220,7 +1220,7 @@ export default function MyHouseholdPage() {
                   type="button"
                   onClick={() => setSelectedMember(null)}
                   disabled={isSavingMember}
-                  className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
@@ -1229,7 +1229,7 @@ export default function MyHouseholdPage() {
                   type="button"
                   onClick={handleSaveMember}
                   disabled={isSavingMember}
-                  className="rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1e668e] transition"
+                  className="rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1e668e] transition"
                 >
                   {isSavingMember ? "Saving..." : "Save Changes"}
                 </button>
@@ -1248,7 +1248,7 @@ export default function MyHouseholdPage() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
                   <House size={16} />
                 </div>
-                <h3 className="text-sm font-bold text-[#173d5b]">Update Saved Address</h3>
+                <h3 className="text-base font-bold text-[#173d5b]">Update Saved Address</h3>
               </div>
 
               <button
@@ -1261,41 +1261,41 @@ export default function MyHouseholdPage() {
 
             <div className="mt-4 space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Street Address
                 </label>
                 <textarea
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   rows={2}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   placeholder="Street and house number"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700">
+                  <label className="block text-sm font-semibold text-slate-700">
                     Ward / Sector
                   </label>
                   <input
                     type="text"
                     value={ward}
                     onChange={(e) => setWard(e.target.value)}
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                     placeholder="e.g. North Ward"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700">
+                  <label className="block text-sm font-semibold text-slate-700">
                     City / Region
                   </label>
                   <input
                     type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                     placeholder="e.g. Greater Riverton"
                   />
                 </div>
@@ -1306,7 +1306,7 @@ export default function MyHouseholdPage() {
               <button
                 type="button"
                 onClick={() => setShowAddressModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -1314,7 +1314,7 @@ export default function MyHouseholdPage() {
               <button
                 type="button"
                 onClick={handleSaveAddress}
-                className="rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1e668e] transition"
+                className="rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1e668e] transition"
               >
                 Save Address
               </button>
@@ -1332,7 +1332,7 @@ export default function MyHouseholdPage() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
                   <Phone size={16} />
                 </div>
-                <h3 className="text-sm font-bold text-[#173d5b]">
+                <h3 className="text-base font-bold text-[#173d5b]">
                   Update Emergency Contact
                 </h3>
               </div>
@@ -1347,40 +1347,40 @@ export default function MyHouseholdPage() {
 
             <div className="mt-4 space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Contact Full Name
                 </label>
                 <input
                   type="text"
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   placeholder="e.g. Rashid Khan"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Phone Number
                 </label>
                 <input
                   type="text"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   placeholder="+94 77 455 0182"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Relationship
                 </label>
                 <input
                   type="text"
                   value={contactRelation}
                   onChange={(e) => setContactRelation(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   placeholder="e.g. Brother, Spouse, Neighbor"
                 />
               </div>
@@ -1390,7 +1390,7 @@ export default function MyHouseholdPage() {
               <button
                 type="button"
                 onClick={() => setShowContactModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -1398,7 +1398,7 @@ export default function MyHouseholdPage() {
               <button
                 type="button"
                 onClick={handleSaveContact}
-                className="rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1e668e] transition"
+                className="rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1e668e] transition"
               >
                 Save Contact
               </button>
@@ -1415,12 +1415,12 @@ export default function MyHouseholdPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
                 <Trash2 size={20} />
               </div>
-              <h3 className="text-sm font-bold text-slate-800">
+              <h3 className="text-base font-bold text-slate-800">
                 Remove Household Member?
               </h3>
             </div>
 
-            <p className="mt-3 text-xs text-slate-600">
+            <p className="mt-3 text-sm text-slate-600">
               Are you sure you want to remove{" "}
               <span className="font-bold text-[#173d5b]">
                 "{deleteMemberTarget.name}"
@@ -1432,7 +1432,7 @@ export default function MyHouseholdPage() {
               <button
                 type="button"
                 onClick={() => setDeleteMemberTarget(null)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -1440,7 +1440,7 @@ export default function MyHouseholdPage() {
               <button
                 type="button"
                 onClick={() => handleDeleteMember(deleteMemberTarget)}
-                className="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700 transition"
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition"
               >
                 Yes, Remove
               </button>

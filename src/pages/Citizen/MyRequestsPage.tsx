@@ -250,7 +250,7 @@ export default function MyRequestsPage() {
                 </h2>
 
                 {/* BACKEND STATUS BADGE */}
-                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] shadow-xs">
+                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs shadow-xs">
                   {isBackendConnected === true ? (
                     <>
                       <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -281,7 +281,7 @@ export default function MyRequestsPage() {
               <button
                 onClick={() => fetchRequests()}
                 disabled={isRefreshing}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
                 title="Refresh requests"
               >
                 <RefreshCw
@@ -293,7 +293,7 @@ export default function MyRequestsPage() {
 
               <button
                 onClick={() => navigate("/citizen/request-help")}
-                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#1d688e] transition"
+                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-[#1d688e] transition"
               >
                 <Plus size={15} />
                 New Request
@@ -304,43 +304,43 @@ export default function MyRequestsPage() {
           {/* KPI COUNTERS */}
           <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Total Requests
               </span>
               <p className="mt-1.5 text-xl font-bold text-[#173d5b]">
                 {summary.totalRequests}
               </p>
-              <p className="text-[9px] text-slate-400">Submitted cases</p>
+              <p className="text-xs text-slate-400">Submitted cases</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#287da6]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#287da6]">
                 In Progress / Active
               </span>
               <p className="mt-1.5 text-xl font-bold text-[#287da6]">
                 {summary.activeCount}
               </p>
-              <p className="text-[9px] text-slate-400">Assigned & dispatching</p>
+              <p className="text-xs text-slate-400">Assigned & dispatching</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
                 Fulfilled / Completed
               </span>
               <p className="mt-1.5 text-xl font-bold text-emerald-600">
                 {summary.completedCount}
               </p>
-              <p className="text-[9px] text-slate-400">Confirmed deliveries</p>
+              <p className="text-xs text-slate-400">Confirmed deliveries</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Drafts
               </span>
               <p className="mt-1.5 text-xl font-bold text-slate-700">
                 {summary.draftsCount}
               </p>
-              <p className="text-[9px] text-slate-400">Saved unfinished</p>
+              <p className="text-xs text-slate-400">Saved unfinished</p>
             </div>
           </section>
 
@@ -355,7 +355,7 @@ export default function MyRequestsPage() {
                     setActiveTab(tab.name as any);
                     setSelectedRequest(null);
                   }}
-                  className={`flex items-center gap-1.5 pb-1 text-xs font-semibold transition ${
+                  className={`flex items-center gap-1.5 pb-1 text-sm font-semibold transition ${
                     activeTab === tab.name
                       ? "border-b-2 border-[#287da6] text-[#287da6]"
                       : "border-b-2 border-transparent text-slate-500 hover:text-[#287da6]"
@@ -363,7 +363,7 @@ export default function MyRequestsPage() {
                 >
                   {tab.name}
                   {tab.count !== undefined && (
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-slate-600">
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">
                       {tab.count}
                     </span>
                   )}
@@ -382,7 +382,7 @@ export default function MyRequestsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by ID, title, or status..."
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-7 text-xs outline-none focus:border-[#287da6] focus:bg-white"
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-7 text-sm sm:text-[15px] outline-none focus:border-[#287da6] focus:bg-white"
               />
               {searchQuery && (
                 <button
@@ -399,20 +399,20 @@ export default function MyRequestsPage() {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white py-16 text-center">
               <RefreshCw size={28} className="animate-spin text-[#287da6]" />
-              <p className="mt-3 text-xs font-semibold text-slate-600">
+              <p className="mt-3 text-sm font-semibold text-slate-600">
                 Loading citizen requests...
               </p>
             </div>
           ) : activeTab === "Saved drafts" ? (
             <div className="rounded-xl border border-slate-200 bg-white p-12 text-center shadow-xs">
               <FileText size={36} className="mx-auto text-slate-300" />
-              <h3 className="mt-3 text-sm font-bold text-slate-700">No saved drafts</h3>
+              <h3 className="mt-3 text-base font-bold text-slate-700">No saved drafts</h3>
               <p className="mt-1 text-xs text-slate-500">
                 Unfinished help requests you started will appear here for you to resume.
               </p>
               <button
                 onClick={() => navigate("/citizen/request-help")}
-                className="mt-4 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d688e]"
+                className="mt-4 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1d688e]"
               >
                 Create Help Request
               </button>
@@ -420,7 +420,7 @@ export default function MyRequestsPage() {
           ) : filteredRequests.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
               <ClipboardList size={36} className="mx-auto text-slate-300" />
-              <h3 className="mt-3 text-sm font-bold text-slate-700">No requests found</h3>
+              <h3 className="mt-3 text-base font-bold text-slate-700">No requests found</h3>
               <p className="mt-1 text-xs text-slate-500">
                 {searchQuery
                   ? "No requests match your current search terms."
@@ -429,14 +429,14 @@ export default function MyRequestsPage() {
               {searchQuery ? (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="mt-3 text-xs font-semibold text-[#287da6] underline"
+                  className="mt-3 text-sm font-semibold text-[#287da6] underline"
                 >
                   Clear search
                 </button>
               ) : (
                 <button
                   onClick={() => navigate("/citizen/request-help")}
-                  className="mt-4 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d688e]"
+                  className="mt-4 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1d688e]"
                 >
                   Request Emergency Help
                 </button>
@@ -472,20 +472,20 @@ export default function MyRequestsPage() {
 
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-[10px] font-bold text-slate-400">
+                            <span className="font-mono text-[13px] font-bold text-slate-400">
                               {request.id}
                             </span>
-                            <span className="text-[10px] text-slate-400">•</span>
-                            <span className="text-[10px] text-slate-500">
+                            <span className="text-[13px] text-slate-400">•</span>
+                            <span className="text-[13px] text-slate-500">
                               {request.formattedDate || request.timeAgo || "Submitted recently"}
                             </span>
                           </div>
 
-                          <h3 className="mt-1 text-sm font-bold text-[#173d5b]">
+                          <h3 className="mt-1 text-base font-bold text-[#173d5b]">
                             {request.title}
                           </h3>
 
-                          <p className="mt-1 text-xs text-slate-600">
+                          <p className="mt-1 text-sm text-slate-600">
                             {request.description}
                           </p>
                         </div>
@@ -493,13 +493,13 @@ export default function MyRequestsPage() {
 
                       <div className="flex items-center gap-2">
                         {request.priority && request.priority !== "Normal" && (
-                          <span className="rounded-md bg-rose-50 px-2 py-0.5 text-[9px] font-bold text-rose-700 border border-rose-200">
+                          <span className="rounded-md bg-rose-50 px-2 py-0.5 text-xs font-bold text-rose-700 border border-rose-200">
                             {request.priority} Priority
                           </span>
                         )}
 
                         <span
-                          className={`rounded-md px-2.5 py-1 text-[10px] font-semibold ${statusBadgeStyle}`}
+                          className={`rounded-md px-2.5 py-1 text-xs font-semibold ${statusBadgeStyle}`}
                         >
                           {request.status}
                         </span>
@@ -545,7 +545,7 @@ export default function MyRequestsPage() {
                                 </div>
 
                                 <span
-                                  className={`mt-2 text-center text-[9px] sm:text-[10px] ${
+                                  className={`mt-2 text-center text-xs sm:text-[13px] ${
                                     completed
                                       ? "font-bold text-[#357c6e]"
                                       : "text-slate-400 font-medium"
@@ -562,7 +562,7 @@ export default function MyRequestsPage() {
 
                     {/* CARD FOOTER */}
                     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 bg-white">
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[13px] text-slate-400">
                         Last updated: {request.updated || request.timeAgo || "Recently"}
                       </p>
 
@@ -570,7 +570,7 @@ export default function MyRequestsPage() {
                         {request.canMessage !== false && !isCancelled && (
                           <button
                             onClick={() => navigate("/citizen/messages")}
-                            className="flex items-center gap-1.5 rounded-lg border border-[#287da6] px-3 py-1.5 text-xs font-semibold text-[#287da6] hover:bg-sky-50 transition"
+                            className="flex items-center gap-1.5 rounded-lg border border-[#287da6] px-3 py-1.5 text-sm font-semibold text-[#287da6] hover:bg-sky-50 transition"
                           >
                             <MessageSquare size={13} />
                             Message Support
@@ -579,7 +579,7 @@ export default function MyRequestsPage() {
 
                         <button
                           onClick={() => setSelectedRequest(request)}
-                          className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#1d688e] transition"
+                          className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-[#1d688e] transition"
                         >
                           <Eye size={13} />
                           View Details
@@ -593,7 +593,7 @@ export default function MyRequestsPage() {
           )}
 
           {/* FOOTER */}
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[10px] text-slate-400">
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[13px] text-slate-400">
             <p>© 2026 ReliefOS Citizen Support · Help Requests</p>
             <p className="flex items-center gap-1.5">
               <Heart size={12} className="text-rose-500 fill-rose-500" />
@@ -613,10 +613,10 @@ export default function MyRequestsPage() {
                   {getCategoryIcon(selectedRequest.category || selectedRequest.title)}
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-[#173d5b]">
+                  <h3 className="text-base font-bold text-[#173d5b]">
                     Request Details
                   </h3>
-                  <p className="font-mono text-[10px] text-slate-400">
+                  <p className="font-mono text-[13px] text-slate-400">
                     {selectedRequest.id}
                   </p>
                 </div>
@@ -634,15 +634,15 @@ export default function MyRequestsPage() {
               {/* STATUS BANNER */}
               <div className="flex items-center justify-between rounded-lg bg-sky-50/80 p-3 border border-sky-100">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                     Current Status
                   </span>
-                  <p className="mt-0.5 text-xs font-bold text-[#173d5b]">
+                  <p className="mt-0.5 text-sm font-bold text-[#173d5b]">
                     {selectedRequest.status}
                   </p>
                 </div>
 
-                <span className="rounded-md bg-white px-2.5 py-1 text-[10px] font-bold text-[#287da6] shadow-xs border border-sky-200">
+                <span className="rounded-md bg-white px-2.5 py-1 text-xs font-bold text-[#287da6] shadow-xs border border-sky-200">
                   Stage {selectedRequest.progress} of 4 ({STAGES[Math.min(3, selectedRequest.progress - 1)]})
                 </span>
               </div>
@@ -710,7 +710,7 @@ export default function MyRequestsPage() {
                 <span className="text-xs font-semibold text-slate-700 block mb-1">
                   Request Description & Notes
                 </span>
-                <p className="rounded-lg border border-slate-200 bg-white p-3 text-xs text-slate-600 leading-relaxed">
+                <p className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-600 leading-relaxed">
                   {selectedRequest.description}
                 </p>
               </div>
@@ -722,7 +722,7 @@ export default function MyRequestsPage() {
                 <button
                   type="button"
                   onClick={() => setCancelTargetRequest(selectedRequest)}
-                  className="text-xs font-semibold text-red-600 hover:text-red-700"
+                  className="text-sm font-semibold text-red-600 hover:text-red-700"
                 >
                   Withdraw Request
                 </button>
@@ -734,7 +734,7 @@ export default function MyRequestsPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedRequest(null)}
-                  className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                 >
                   Close
                 </button>
@@ -746,7 +746,7 @@ export default function MyRequestsPage() {
                       setSelectedRequest(null);
                       navigate("/citizen/messages");
                     }}
-                    className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d688e]"
+                    className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1d688e]"
                   >
                     <MessageSquare size={13} />
                     Message Support
@@ -766,12 +766,12 @@ export default function MyRequestsPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
                 <Trash2 size={20} />
               </div>
-              <h3 className="text-sm font-bold text-slate-800">
+              <h3 className="text-base font-bold text-slate-800">
                 Withdraw Request?
               </h3>
             </div>
 
-            <p className="mt-3 text-xs text-slate-600 leading-relaxed">
+            <p className="mt-3 text-sm text-slate-600 leading-relaxed">
               Are you sure you want to withdraw help request{" "}
               <span className="font-bold text-[#173d5b]">
                 {cancelTargetRequest.id} ({cancelTargetRequest.title})
@@ -783,7 +783,7 @@ export default function MyRequestsPage() {
               <button
                 type="button"
                 onClick={() => setCancelTargetRequest(null)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Keep Request
               </button>
@@ -791,7 +791,7 @@ export default function MyRequestsPage() {
               <button
                 type="button"
                 onClick={() => handleCancelRequest(cancelTargetRequest)}
-                className="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700 transition"
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition"
               >
                 Yes, Withdraw
               </button>
