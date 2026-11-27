@@ -285,12 +285,12 @@ export default function MessagesPage() {
             <div>
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-[#173d5b]">Messages & Support Desk</h2>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-800">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-800">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   Connected to Relief Support
                 </span>
                 {totalUnreadCount > 0 && (
-                  <span className="rounded-full bg-red-500 px-2.5 py-0.5 text-[10px] font-bold text-white">
+                  <span className="rounded-full bg-red-500 px-2.5 py-0.5 text-xs font-bold text-white">
                     {totalUnreadCount} new
                   </span>
                 )}
@@ -306,7 +306,7 @@ export default function MessagesPage() {
                 onClick={() => fetchConversations(true)}
                 disabled={isLoading}
                 title="Refresh messages"
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#173d5b] disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#173d5b] disabled:opacity-50"
               >
                 <RefreshCw size={14} className={isLoading ? "animate-spin text-[#287da6]" : ""} />
                 <span className="hidden sm:inline">Refresh</span>
@@ -314,7 +314,7 @@ export default function MessagesPage() {
 
               <button
                 onClick={() => setIsNewModalOpen(true)}
-                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#1e668e]"
+                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1e668e]"
               >
                 <Plus size={15} />
                 <span>New Inquiry</span>
@@ -350,7 +350,7 @@ export default function MessagesPage() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search by team, subject, or message..."
-                    className="w-full bg-transparent text-xs text-[#173d5b] outline-none placeholder:text-slate-400"
+                    className="w-full bg-transparent text-sm sm:text-[15px] text-[#173d5b] outline-none placeholder:text-slate-400"
                   />
                   {search && (
                     <button onClick={() => setSearch("")} className="text-slate-400 hover:text-slate-600">
@@ -365,7 +365,7 @@ export default function MessagesPage() {
                 {isLoading && conversations.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-8 text-slate-400">
                     <Loader2 size={24} className="animate-spin text-[#287da6]" />
-                    <p className="mt-2 text-xs">Loading conversations...</p>
+                    <p className="mt-2 text-sm">Loading conversations...</p>
                   </div>
                 ) : filteredConversations.length > 0 ? (
                   filteredConversations.map((conversation) => {
@@ -392,35 +392,35 @@ export default function MessagesPage() {
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-baseline justify-between gap-1">
-                            <p className="truncate text-xs font-bold text-[#173d5b]">
+                            <p className="truncate text-sm font-bold text-[#173d5b]">
                               {conversation.name}
                             </p>
-                            <span className="shrink-0 text-[10px] text-slate-400">
+                            <span className="shrink-0 text-[13px] text-slate-400">
                               {conversation.time}
                             </span>
                           </div>
 
                           <div className="mt-0.5 flex items-center gap-1.5">
-                            <span className="truncate text-[11px] font-semibold text-slate-700">
+                            <span className="truncate text-sm font-semibold text-slate-700">
                               {conversation.subject}
                             </span>
                             {conversation.requestId && (
-                              <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.2 text-[9px] font-mono text-slate-600">
+                              <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.2 text-xs font-mono text-slate-600">
                                 {conversation.requestId}
                               </span>
                             )}
                           </div>
 
-                          <p className="mt-1 line-clamp-1 text-[11px] text-slate-500">
+                          <p className="mt-1 line-clamp-1 text-[13px] text-slate-500">
                             {conversation.preview || "No message history"}
                           </p>
 
                           {conversation.unread > 0 && (
                             <div className="mt-2 flex items-center gap-2">
-                              <span className="inline-flex items-center rounded-full bg-[#287da6] px-2 py-0.5 text-[9px] font-bold text-white shadow-xs">
+                              <span className="inline-flex items-center rounded-full bg-[#287da6] px-2 py-0.5 text-xs font-bold text-white shadow-xs">
                                 {conversation.unread} new
                               </span>
-                              <span className="text-[9px] text-[#287da6] font-medium">Unread response</span>
+                              <span className="text-xs text-[#287da6] font-medium">Unread response</span>
                             </div>
                           )}
                         </div>
@@ -431,7 +431,7 @@ export default function MessagesPage() {
                   <div className="p-8 text-center text-xs text-slate-400">
                     <MessageCircle size={32} className="mx-auto mb-2 text-slate-300" />
                     <p className="font-semibold text-slate-600">No conversations found</p>
-                    <p className="mt-1 text-[11px]">
+                    <p className="mt-1 text-sm">
                       {search ? "Try searching for a different keyword." : "Click 'New Inquiry' to start a chat."}
                     </p>
                   </div>
@@ -439,7 +439,7 @@ export default function MessagesPage() {
               </div>
 
               {/* QUICK STATUS FOOTER */}
-              <div className="border-t border-slate-100 bg-slate-50/70 p-3 text-center text-[10px] text-slate-400">
+              <div className="border-t border-slate-100 bg-slate-50/70 p-3 text-center text-[13px] text-slate-400">
                 <span>CareLink Response Network · 24/7 Operations</span>
               </div>
             </div>
@@ -456,16 +456,16 @@ export default function MessagesPage() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-bold text-[#173d5b]">
+                          <h3 className="text-base font-bold text-[#173d5b]">
                             {activeConversation.name}
                           </h3>
                           {activeConversation.category && (
-                            <span className="rounded-md bg-sky-100 px-2 py-0.5 text-[9px] font-semibold text-[#1e668e]">
+                            <span className="rounded-md bg-sky-100 px-2 py-0.5 text-xs font-semibold text-[#1e668e]">
                               {activeConversation.category}
                             </span>
                           )}
                           {activeConversation.requestId && (
-                            <span className="rounded-md bg-amber-50 px-2 py-0.5 text-[9px] font-semibold text-amber-700 border border-amber-200/60">
+                            <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200/60">
                               Ref: {activeConversation.requestId}
                             </span>
                           )}
@@ -480,7 +480,7 @@ export default function MessagesPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setShowDetails(!showDetails)}
-                        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition ${
                           showDetails
                             ? "border-emerald-300 bg-emerald-50 text-emerald-800"
                             : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -501,11 +501,11 @@ export default function MessagesPage() {
                           <p className="font-semibold text-emerald-800">
                             Verified Official Support Channel
                           </p>
-                          <p className="text-[11px] text-emerald-700 leading-relaxed">
+                          <p className="text-sm text-emerald-700 leading-relaxed">
                             Messages exchanged here are reviewed by licensed emergency coordinators and relief workers.
                             Do not disclose banking credentials or one-time passwords. For immediate medical emergencies or life hazard, contact emergency dispatch directly.
                           </p>
-                          <div className="flex items-center gap-4 pt-1 text-[11px]">
+                          <div className="flex items-center gap-4 pt-1 text-sm">
                             <a href="tel:112" className="flex items-center gap-1 font-bold text-red-600 hover:underline">
                               <Phone size={12} /> Call 112 Hotline
                             </a>
@@ -528,7 +528,7 @@ export default function MessagesPage() {
                   {/* MESSAGE HISTORY */}
                   <div className="flex flex-1 flex-col gap-3.5 overflow-y-auto bg-[#f8fafb] p-4 sm:p-6">
                     <div className="flex items-center justify-center">
-                      <span className="rounded-full bg-slate-200/70 px-3 py-1 text-[10px] font-medium text-slate-500">
+                      <span className="rounded-full bg-slate-200/70 px-3 py-1 text-[13px] font-medium text-slate-500">
                         Official Case Communication History
                       </span>
                     </div>
@@ -547,7 +547,7 @@ export default function MessagesPage() {
                                 : "rounded-bl-xs border border-slate-200 bg-white text-slate-800"
                             }`}
                           >
-                            <div className="mb-1 flex items-center justify-between gap-3 text-[10px]">
+                            <div className="mb-1 flex items-center justify-between gap-3 text-sm">
                               <span
                                 className={`font-bold ${
                                   isUser ? "text-[#1e668e]" : "text-slate-600"
@@ -558,18 +558,18 @@ export default function MessagesPage() {
                               <span className="text-slate-400">{message.time}</span>
                             </div>
 
-                            <p className="text-xs leading-relaxed whitespace-pre-wrap">
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">
                               {message.text}
                             </p>
 
                             {message.attachmentName && (
-                              <div className="mt-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-white/70 px-2.5 py-1.5 text-[11px] text-slate-700">
+                              <div className="mt-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-white/70 px-2.5 py-1.5 text-sm text-slate-700">
                                 <FileText size={13} className="text-[#287da6]" />
                                 <span className="font-medium truncate">{message.attachmentName}</span>
                               </div>
                             )}
 
-                            <div className="mt-1.5 flex items-center justify-end gap-1 text-[9px] text-slate-400">
+                            <div className="mt-1.5 flex items-center justify-end gap-1 text-xs text-slate-400">
                               {isUser ? (
                                 <span className="flex items-center gap-1 text-[#287da6]">
                                   <CheckCircle2 size={11} /> Sent to team
@@ -590,8 +590,8 @@ export default function MessagesPage() {
 
                   {/* QUICK PROMPT SUGGESTIONS */}
                   <div className="border-t border-slate-100 bg-[#f8fafb] px-4 py-2 sm:px-6">
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 text-[11px]">
-                      <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 text-sm">
+                      <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-slate-400">
                         Quick Questions:
                       </span>
                       {QUICK_PROMPTS.map((prompt, idx) => (
@@ -613,7 +613,7 @@ export default function MessagesPage() {
                       <div className="flex items-center gap-2 text-xs text-sky-900">
                         <FileText size={15} className="text-[#287da6]" />
                         <span className="font-semibold">{attachment.name}</span>
-                        <span className="text-[10px] text-sky-600">({attachment.size})</span>
+                        <span className="text-sm text-sky-600">({attachment.size})</span>
                       </div>
                       <button
                         onClick={() => setAttachment(null)}
@@ -651,13 +651,13 @@ export default function MessagesPage() {
                       onChange={(e) => setMessageText(e.target.value)}
                       placeholder="Write a message to the support team..."
                       disabled={isSending}
-                      className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-[#173d5b] outline-none transition focus:border-[#287da6] focus:bg-white"
+                      className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none transition focus:border-[#287da6] focus:bg-white"
                     />
 
                     <button
                       type="submit"
                       disabled={(!messageText.trim() && !attachment) || isSending}
-                      className="flex items-center gap-2 rounded-xl bg-[#287da6] px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#1e668e] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex items-center gap-2 rounded-xl bg-[#287da6] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1e668e] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isSending ? (
                         <Loader2 size={14} className="animate-spin" />
@@ -681,7 +681,7 @@ export default function MessagesPage() {
                   </p>
                   <button
                     onClick={() => setIsNewModalOpen(true)}
-                    className="mt-4 flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#1e668e]"
+                    className="mt-4 flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1e668e]"
                   >
                     <Plus size={14} />
                     Start New Inquiry
@@ -692,7 +692,7 @@ export default function MessagesPage() {
           </section>
 
           {/* FOOTER */}
-          <footer className="mt-5 flex flex-wrap justify-between gap-3 border-t border-slate-200 py-4 text-[10px] text-slate-400">
+          <footer className="mt-5 flex flex-wrap justify-between gap-3 border-t border-slate-200 py-4 text-[13px] text-slate-400">
             <p>© 2026 ReliefOS Citizen Support · CareLink Platform</p>
             <p>Direct line to relief authorities and emergency services</p>
           </footer>
@@ -729,7 +729,7 @@ export default function MessagesPage() {
 
             <form onSubmit={handleCreateConversation} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-[#173d5b]">
+                <label className="block text-sm font-bold text-[#173d5b]">
                   Select Support Team
                 </label>
                 <select
@@ -742,7 +742,7 @@ export default function MessagesPage() {
                       setNewSubject(selected.defaultSubject);
                     }
                   }}
-                  className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-[#173d5b] outline-none focus:border-[#287da6] focus:bg-white"
+                  className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-[#173d5b] outline-none focus:border-[#287da6] focus:bg-white"
                 >
                   {SUPPORT_TEAMS.map((team) => (
                     <option key={team.name} value={team.name}>
@@ -753,7 +753,7 @@ export default function MessagesPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#173d5b]">
+                <label className="block text-sm font-bold text-[#173d5b]">
                   Subject
                 </label>
                 <input
@@ -761,24 +761,24 @@ export default function MessagesPage() {
                   onChange={(e) => setNewSubject(e.target.value)}
                   placeholder="E.g., Emergency shelter bed request"
                   required
-                  className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-[#173d5b] outline-none focus:border-[#287da6] focus:bg-white"
+                  className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-[#173d5b] outline-none focus:border-[#287da6] focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#173d5b]">
+                <label className="block text-sm font-bold text-[#173d5b]">
                   Linked Request ID (Optional)
                 </label>
                 <input
                   value={newRequestId}
                   onChange={(e) => setNewRequestId(e.target.value)}
                   placeholder="E.g., REQ-2841"
-                  className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-[#173d5b] outline-none focus:border-[#287da6] focus:bg-white"
+                  className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-[#173d5b] outline-none focus:border-[#287da6] focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#173d5b]">
+                <label className="block text-sm font-bold text-[#173d5b]">
                   Initial Message
                 </label>
                 <textarea
@@ -787,7 +787,7 @@ export default function MessagesPage() {
                   rows={4}
                   required
                   placeholder="Describe your situation, inquiry, or urgent relief requirements..."
-                  className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-[#173d5b] outline-none focus:border-[#287da6] focus:bg-white resize-none"
+                  className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-[#173d5b] outline-none focus:border-[#287da6] focus:bg-white resize-none"
                 />
               </div>
 
@@ -795,14 +795,14 @@ export default function MessagesPage() {
                 <button
                   type="button"
                   onClick={() => setIsNewModalOpen(false)}
-                  className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isCreatingConv}
-                  className="flex items-center gap-2 rounded-xl bg-[#287da6] px-5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#1e668e] disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-xl bg-[#287da6] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1e668e] disabled:opacity-50"
                 >
                   {isCreatingConv ? (
                     <Loader2 size={14} className="animate-spin" />

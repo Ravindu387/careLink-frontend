@@ -242,7 +242,7 @@ export default function NearbySupportPage() {
                 </h2>
 
                 {/* BACKEND STATUS BADGE */}
-                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] shadow-xs">
+                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs shadow-xs">
                   {isBackendConnected === true ? (
                     <>
                       <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -273,7 +273,7 @@ export default function NearbySupportPage() {
               <button
                 onClick={() => fetchLocations()}
                 disabled={isRefreshing}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
                 title="Refresh facility list"
               >
                 <RefreshCw
@@ -286,7 +286,7 @@ export default function NearbySupportPage() {
               <div className="flex rounded-lg bg-slate-200 p-1 shadow-xs">
                 <button
                   onClick={() => setView("map")}
-                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-semibold transition ${
                     view === "map"
                       ? "bg-white text-[#287da6] shadow-xs"
                       : "text-slate-600 hover:text-[#287da6]"
@@ -298,7 +298,7 @@ export default function NearbySupportPage() {
 
                 <button
                   onClick={() => setView("list")}
-                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-semibold transition ${
                     view === "list"
                       ? "bg-white text-[#287da6] shadow-xs"
                       : "text-slate-600 hover:text-[#287da6]"
@@ -314,43 +314,43 @@ export default function NearbySupportPage() {
           {/* KPI COUNTERS */}
           <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Total Facilities
               </span>
               <p className="mt-1.5 text-xl font-bold text-[#173d5b]">
                 {summary.totalLocations}
               </p>
-              <p className="text-[9px] text-slate-400">Active regional points</p>
+              <p className="text-xs text-slate-400">Active regional points</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
                 Open Now
               </span>
               <p className="mt-1.5 text-xl font-bold text-emerald-600">
                 {summary.openCount}
               </p>
-              <p className="text-[9px] text-slate-400">Immediate access</p>
+              <p className="text-xs text-slate-400">Immediate access</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#287da6]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#287da6]">
                 Shelters
               </span>
               <p className="mt-1.5 text-xl font-bold text-[#287da6]">
                 {summary.sheltersCount}
               </p>
-              <p className="text-[9px] text-slate-400">Displacement centers</p>
+              <p className="text-xs text-slate-400">Displacement centers</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
+              <span className="text-xs font-bold uppercase tracking-wider text-rose-600">
                 Medical Clinics
               </span>
               <p className="mt-1.5 text-xl font-bold text-rose-600">
                 {summary.medicalCount}
               </p>
-              <p className="text-[9px] text-slate-400">First aid & prescriptions</p>
+              <p className="text-xs text-slate-400">First aid & prescriptions</p>
             </div>
           </section>
 
@@ -365,7 +365,7 @@ export default function NearbySupportPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search facility name, address, or service (e.g. Food, Medical)..."
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-8 text-xs outline-none focus:border-[#287da6] focus:bg-white"
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-8 text-sm sm:text-[15px] outline-none focus:border-[#287da6] focus:bg-white"
               />
               {search && (
                 <button
@@ -380,7 +380,7 @@ export default function NearbySupportPage() {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none focus:border-[#287da6]"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-[#287da6]"
             >
               <option>All support</option>
               <option>Shelters</option>
@@ -391,7 +391,7 @@ export default function NearbySupportPage() {
             <select
               value={availability}
               onChange={(e) => setAvailability(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none focus:border-[#287da6]"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-[#287da6]"
             >
               <option>Open now</option>
               <option>All availability</option>
@@ -401,7 +401,7 @@ export default function NearbySupportPage() {
             <select
               value={distance}
               onChange={(e) => setDistance(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none focus:border-[#287da6]"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-[#287da6]"
             >
               <option>Within 5 km</option>
               <option>Within 2 km</option>
@@ -410,7 +410,7 @@ export default function NearbySupportPage() {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition ${
+              className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
                 showFilters
                   ? "border-[#287da6] bg-sky-50 text-[#287da6]"
                   : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
@@ -425,8 +425,8 @@ export default function NearbySupportPage() {
           {showFilters && (
             <div className="flex flex-col gap-2 rounded-xl border border-sky-200 bg-sky-50/70 p-4 sm:flex-row sm:items-center sm:justify-between shadow-xs">
               <div>
-                <p className="text-xs font-bold text-[#173d5b]">Active Filter Criteria</p>
-                <p className="mt-0.5 text-[11px] text-slate-600">
+                <p className="text-sm font-bold text-[#173d5b]">Active Filter Criteria</p>
+                <p className="mt-0.5 text-sm text-slate-600">
                   Showing <strong>{category}</strong> • Availability: <strong>{availability}</strong> • Radius: <strong>{distance}</strong>
                 </p>
               </div>
@@ -438,7 +438,7 @@ export default function NearbySupportPage() {
                   setDistance("Within 5 km");
                   setSearch("");
                 }}
-                className="rounded-lg border border-sky-300 bg-white px-3 py-1.5 text-xs font-semibold text-[#287da6] hover:bg-sky-50 transition"
+                className="rounded-lg border border-sky-300 bg-white px-3 py-1.5 text-sm font-semibold text-[#287da6] hover:bg-sky-50 transition"
               >
                 Reset All Filters
               </button>
@@ -449,7 +449,7 @@ export default function NearbySupportPage() {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white py-16 text-center">
               <RefreshCw size={28} className="animate-spin text-[#287da6]" />
-              <p className="mt-3 text-xs font-semibold text-slate-600">
+              <p className="mt-3 text-sm font-semibold text-slate-600">
                 Finding nearby support facilities...
               </p>
             </div>
@@ -471,7 +471,7 @@ export default function NearbySupportPage() {
 
                 {/* RIVER CORRIDOR */}
                 <div className="absolute left-[-10%] top-[47%] h-8 w-[125%] -rotate-[19deg] bg-[#b9dce5] shadow-xs flex items-center justify-center">
-                  <span className="text-[9px] font-bold tracking-widest text-sky-800/60 uppercase">
+                  <span className="text-xs font-bold tracking-widest text-sky-800/60 uppercase">
                     Riverton Waterway
                   </span>
                 </div>
@@ -482,11 +482,11 @@ export default function NearbySupportPage() {
                 <div className="absolute left-[75%] top-0 h-[110%] w-3.5 -rotate-[45deg] bg-white/90 shadow-xs" />
 
                 {/* AREA LABELS */}
-                <div className="absolute left-[8%] top-[8%] rounded bg-white/80 px-2 py-0.5 text-[8px] font-bold tracking-wider text-slate-500 shadow-xs">
+                <div className="absolute left-[8%] top-[8%] rounded bg-white/80 px-2 py-0.5 text-xs font-bold tracking-wider text-slate-500 shadow-xs">
                   NORTH WARD SECTOR
                 </div>
 
-                <div className="absolute bottom-[10%] right-[8%] rounded bg-white/80 px-2 py-0.5 text-[8px] font-bold tracking-wider text-slate-500 shadow-xs">
+                <div className="absolute bottom-[10%] right-[8%] rounded bg-white/80 px-2 py-0.5 text-xs font-bold tracking-wider text-slate-500 shadow-xs">
                   CENTRAL WARD RELIEF ZONE
                 </div>
 
@@ -526,7 +526,7 @@ export default function NearbySupportPage() {
                       <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
                     </span>
                   </div>
-                  <span className="mt-1 whitespace-nowrap rounded-md bg-[#153e5e] px-2 py-0.5 text-[9px] font-bold text-white shadow-xs">
+                  <span className="mt-1 whitespace-nowrap rounded-md bg-[#153e5e] px-2 py-0.5 text-xs font-bold text-white shadow-xs">
                     Your Location (Riverside Lane)
                   </span>
                 </div>
@@ -544,11 +544,11 @@ export default function NearbySupportPage() {
 
                 {/* MAP LEGEND */}
                 <div className="absolute bottom-4 left-4 flex items-center gap-3 rounded-lg border border-slate-200 bg-white/95 px-3 py-2 shadow-xs">
-                  <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-700">
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
                     <span className="h-2.5 w-2.5 rounded-full bg-[#25866e]" />
                     Open / Space Available
                   </span>
-                  <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-700">
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
                     <span className="h-2.5 w-2.5 rounded-full bg-red-600" />
                     Full / Closed
                   </span>
@@ -559,13 +559,13 @@ export default function NearbySupportPage() {
                   <div className="absolute left-1/2 top-4 z-20 w-[90%] max-w-[320px] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-4 shadow-xl animate-in fade-in zoom-in-95">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0 pr-2">
-                        <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-700">
+                        <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700">
                           {selectedPlace.status}
                         </span>
-                        <h4 className="mt-1.5 text-xs font-bold text-[#173d5b] truncate">
+                        <h4 className="mt-1.5 text-sm font-bold text-[#173d5b] truncate">
                           {selectedPlace.name}
                         </h4>
-                        <p className="mt-0.5 text-[10px] text-slate-500">
+                        <p className="mt-0.5 text-[13px] text-slate-500">
                           {selectedPlace.distance} • {selectedPlace.address}
                         </p>
                       </div>
@@ -578,7 +578,7 @@ export default function NearbySupportPage() {
                       </button>
                     </div>
 
-                    <p className="mt-2 text-[10px] text-slate-600 line-clamp-2">
+                    <p className="mt-2 text-sm text-slate-600 line-clamp-2">
                       {selectedPlace.description}
                     </p>
 
@@ -594,7 +594,7 @@ export default function NearbySupportPage() {
                           const element = document.getElementById("selected-facility-details");
                           element?.scrollIntoView({ behavior: "smooth" });
                         }}
-                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                       >
                         Details
                       </button>
@@ -606,10 +606,10 @@ export default function NearbySupportPage() {
               {/* SIDEBAR LIST IN MAP VIEW */}
               <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
                 <div className="flex items-center justify-between border-b border-slate-100 p-3.5">
-                  <h3 className="text-xs font-bold text-[#173d5b]">
+                  <h3 className="text-base font-bold text-[#173d5b]">
                     Facilities in Range
                   </h3>
-                  <span className="text-[10px] font-semibold text-[#287da6]">
+                  <span className="text-sm font-semibold text-[#287da6]">
                     {locations.length} found
                   </span>
                 </div>
@@ -629,7 +629,7 @@ export default function NearbySupportPage() {
                       >
                         <div className="flex items-center justify-between">
                           <span
-                            className={`rounded-md px-2 py-0.5 text-[9px] font-bold ${
+                            className={`rounded-md px-2 py-0.5 text-xs font-bold ${
                               isFull
                                 ? "bg-red-50 text-red-600 border border-red-200"
                                 : "bg-emerald-50 text-emerald-700 border border-emerald-200"
@@ -637,16 +637,16 @@ export default function NearbySupportPage() {
                           >
                             {place.status}
                           </span>
-                          <span className="text-[10px] font-semibold text-slate-400">
+                          <span className="text-[13px] font-semibold text-slate-400">
                             {place.distance}
                           </span>
                         </div>
 
-                        <p className="mt-1.5 text-xs font-bold text-[#173d5b]">
+                        <p className="mt-1.5 text-sm font-bold text-[#173d5b]">
                           {place.name}
                         </p>
 
-                        <p className="mt-0.5 text-[10px] text-slate-500">
+                        <p className="mt-0.5 text-[13px] text-slate-500">
                           {place.category} · {place.address}
                         </p>
 
@@ -654,7 +654,7 @@ export default function NearbySupportPage() {
                           {place.services.map((svc) => (
                             <span
                               key={svc}
-                              className="rounded bg-slate-100 px-1.5 py-0.5 text-[8px] font-medium text-slate-600"
+                              className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600"
                             >
                               {svc}
                             </span>
@@ -693,10 +693,10 @@ export default function NearbySupportPage() {
 
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-bold text-[#173d5b]">
+                          <h3 className="text-base font-bold text-[#173d5b]">
                             {place.name}
                           </h3>
-                          <span className="text-[10px] text-slate-400 font-semibold">
+                          <span className="text-[13px] text-slate-400 font-semibold">
                             • {place.distance}
                           </span>
                         </div>
@@ -709,7 +709,7 @@ export default function NearbySupportPage() {
                           {place.services.map((svc) => (
                             <span
                               key={svc}
-                              className="rounded-md bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-600"
+                              className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600"
                             >
                               {svc}
                             </span>
@@ -720,7 +720,7 @@ export default function NearbySupportPage() {
 
                     <div className="flex items-center gap-2.5 sm:self-center">
                       <span
-                        className={`rounded-md px-2.5 py-1 text-[10px] font-bold ${
+                        className={`rounded-md px-2.5 py-1 text-xs font-bold ${
                           isFull
                             ? "bg-red-50 text-red-600 border border-red-200"
                             : "bg-emerald-50 text-emerald-700 border border-emerald-200"
@@ -731,7 +731,7 @@ export default function NearbySupportPage() {
 
                       <button
                         onClick={() => setSelected(place.id)}
-                        className="rounded-lg bg-[#287da6] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#1e668e] transition"
+                        className="rounded-lg bg-[#287da6] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#1e668e] transition"
                       >
                         View Details
                       </button>
@@ -764,7 +764,7 @@ export default function NearbySupportPage() {
                     {getLocationIcon(selectedPlace)}
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#287da6]">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#287da6]">
                       {selectedPlace.category}
                     </span>
                     <h3 className="text-base font-bold text-[#173d5b]">
@@ -781,7 +781,7 @@ export default function NearbySupportPage() {
                 </button>
               </div>
 
-              <p className="mt-3 text-xs leading-relaxed text-slate-600">
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 {selectedPlace.description}
               </p>
 
@@ -790,40 +790,40 @@ export default function NearbySupportPage() {
                 <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
                   <div className="flex items-center gap-1.5 text-[#287da6]">
                     <MapPin size={15} />
-                    <span className="text-[10px] font-bold uppercase text-slate-400">
+                    <span className="text-xs font-bold uppercase text-slate-400">
                       Address & Sector
                     </span>
                   </div>
-                  <p className="mt-1 text-xs font-bold text-[#173d5b]">
+                  <p className="mt-1 text-sm font-bold text-[#173d5b]">
                     {selectedPlace.address}
                   </p>
-                  <p className="text-[10px] text-slate-400">{selectedPlace.distance} from you</p>
+                  <p className="text-[13px] text-slate-400">{selectedPlace.distance} from you</p>
                 </div>
 
                 <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
                   <div className="flex items-center gap-1.5 text-[#287da6]">
                     <Clock size={15} />
-                    <span className="text-[10px] font-bold uppercase text-slate-400">
+                    <span className="text-xs font-bold uppercase text-slate-400">
                       Operating Hours
                     </span>
                   </div>
-                  <p className="mt-1 text-xs font-bold text-[#173d5b]">
+                  <p className="mt-1 text-sm font-bold text-[#173d5b]">
                     {selectedPlace.hours}
                   </p>
-                  <p className="text-[10px] text-emerald-600 font-semibold">{selectedPlace.status}</p>
+                  <p className="text-sm text-emerald-600 font-semibold">{selectedPlace.status}</p>
                 </div>
 
                 <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
                   <div className="flex items-center gap-1.5 text-[#287da6]">
                     <Phone size={15} />
-                    <span className="text-[10px] font-bold uppercase text-slate-400">
+                    <span className="text-xs font-bold uppercase text-slate-400">
                       Direct Helpline
                     </span>
                   </div>
-                  <p className="mt-1 text-xs font-bold text-[#173d5b]">
+                  <p className="mt-1 text-sm font-bold text-[#173d5b]">
                     {selectedPlace.phone}
                   </p>
-                  <p className="text-[10px] text-slate-400">Staffed hotline</p>
+                  <p className="text-[13px] text-slate-400">Staffed hotline</p>
                 </div>
               </div>
 
@@ -856,7 +856,7 @@ export default function NearbySupportPage() {
 
                 <button
                   onClick={() => setSelected(null)}
-                  className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
                 >
                   Close Details
                 </button>
@@ -865,7 +865,7 @@ export default function NearbySupportPage() {
           )}
 
           {/* FOOTER */}
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[10px] text-slate-400">
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[13px] text-slate-400">
             <p>© 2026 ReliefOS Citizen Support · Nearby Support Network</p>
             <p className="flex items-center gap-1.5">
               <Heart size={12} className="text-rose-500 fill-rose-500" />

@@ -181,7 +181,7 @@ export default function FeedbackPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-[#173d5b]">Feedback</h2>
-                <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-800">
+                <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
                   Citizen Voice
                 </span>
               </div>
@@ -195,7 +195,7 @@ export default function FeedbackPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("form")}
-                className={`flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-semibold transition ${
+                className={`flex items-center gap-2 rounded-md px-3.5 py-1.5 text-sm font-semibold transition ${
                   activeTab === "form"
                     ? "bg-[#287da6] text-white shadow-sm"
                     : "text-slate-600 hover:text-[#173d5b]"
@@ -207,7 +207,7 @@ export default function FeedbackPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("history")}
-                className={`flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-semibold transition ${
+                className={`flex items-center gap-2 rounded-md px-3.5 py-1.5 text-sm font-semibold transition ${
                   activeTab === "history"
                     ? "bg-[#287da6] text-white shadow-sm"
                     : "text-slate-600 hover:text-[#173d5b]"
@@ -217,7 +217,7 @@ export default function FeedbackPage() {
                 Recent Feedback
                 {feedbacks.length > 0 && (
                   <span
-                    className={`rounded-full px-1.5 py-0.2 text-[10px] ${
+                    className={`rounded-full px-1.5 py-0.2 text-sm ${
                       activeTab === "history"
                         ? "bg-white/20 text-white"
                         : "bg-slate-200 text-slate-700"
@@ -234,7 +234,7 @@ export default function FeedbackPage() {
           {summary && summary.totalCount > 0 && (
             <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Average Rating
                 </p>
                 <div className="mt-1 flex items-baseline gap-2">
@@ -255,40 +255,40 @@ export default function FeedbackPage() {
                     ))}
                   </div>
                 </div>
-                <p className="mt-0.5 text-[10px] text-slate-500">out of 5 stars</p>
+                <p className="mt-0.5 text-[13px] text-slate-500">out of 5 stars</p>
               </div>
 
               <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Total Reviews
                 </p>
                 <p className="mt-1 text-2xl font-bold text-[#173d5b]">
                   {summary.totalCount}
                 </p>
-                <p className="mt-0.5 text-[10px] text-slate-500">Citizen submissions</p>
+                <p className="mt-0.5 text-[13px] text-slate-500">Citizen submissions</p>
               </div>
 
               <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   5-Star Ratings
                 </p>
                 <p className="mt-1 text-2xl font-bold text-emerald-600">
                   {summary.fiveStarCount}
                 </p>
-                <p className="mt-0.5 text-[10px] text-slate-500">
+                <p className="mt-0.5 text-[13px] text-slate-500">
                   {Math.round((summary.fiveStarCount / summary.totalCount) * 100)}% highest marks
                 </p>
               </div>
 
               <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Response Status
                 </p>
                 <div className="mt-1 flex items-center gap-1.5 text-xs font-bold text-[#287da6]">
                   <Sparkles size={14} />
                   <span>Actively Monitored</span>
                 </div>
-                <p className="mt-0.5 text-[10px] text-slate-500">Reviewed by city ops</p>
+                <p className="mt-0.5 text-[13px] text-slate-500">Reviewed by city ops</p>
               </div>
             </div>
           )}
@@ -302,14 +302,14 @@ export default function FeedbackPage() {
                   <form onSubmit={handleSubmit}>
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-sm font-bold text-[#173d5b]">
+                        <h3 className="text-base font-bold text-[#173d5b]">
                           Share your experience
                         </h3>
                         <p className="mt-1 text-xs text-slate-500">
                           Your feedback helps make emergency support clearer, safer, and more accessible.
                         </p>
                       </div>
-                      <span className="hidden rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold text-[#287da6] sm:inline-block">
+                      <span className="hidden rounded-full bg-sky-50 px-3 py-1 text-sm font-semibold text-[#287da6] sm:inline-block">
                         Quick & Anonymous option
                       </span>
                     </div>
@@ -325,13 +325,13 @@ export default function FeedbackPage() {
 
                     {/* CATEGORY */}
                     <div className="mb-5">
-                      <label className="mb-2 block text-xs font-semibold text-[#173d5b]">
+                      <label className="mb-2 block text-sm font-semibold text-[#173d5b]">
                         What would you like to comment on?
                       </label>
                       <select
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none transition focus:border-[#287da6] focus:ring-1 focus:ring-[#287da6]"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none transition focus:border-[#287da6] focus:ring-1 focus:ring-[#287da6]"
                       >
                         {categories.map((cat) => (
                           <option key={cat} value={cat}>
@@ -343,7 +343,7 @@ export default function FeedbackPage() {
 
                     {/* STAR RATING */}
                     <div className="mb-5">
-                      <label className="mb-2 block text-xs font-semibold text-[#173d5b]">
+                      <label className="mb-2 block text-sm font-semibold text-[#173d5b]">
                         How was your experience? <span className="text-red-500">*</span>
                       </label>
 
@@ -370,7 +370,7 @@ export default function FeedbackPage() {
                         ))}
                       </div>
 
-                      <p className="mt-2 text-[11px] text-slate-500">
+                      <p className="mt-2 text-[13px] text-slate-500">
                         {rating === 0
                           ? "Select a rating from 1 to 5 stars"
                           : `${rating} out of 5 stars selected - ${
@@ -390,10 +390,10 @@ export default function FeedbackPage() {
                     {/* FEEDBACK TEXT */}
                     <div className="mb-4">
                       <div className="mb-2 flex items-center justify-between">
-                        <label className="text-xs font-semibold text-[#173d5b]">
+                        <label className="text-sm font-semibold text-[#173d5b]">
                           Tell us more <span className="text-red-500">*</span>
                         </label>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-[13px] text-slate-400">
                           {feedback.length} characters
                         </span>
                       </div>
@@ -404,7 +404,7 @@ export default function FeedbackPage() {
                         placeholder="What went well? What could be clearer, faster, or easier?"
                         rows={5}
                         required
-                        className="w-full resize-y rounded-lg border border-slate-300 p-3 text-xs text-[#173d5b] outline-none placeholder:text-slate-400 transition focus:border-[#287da6] focus:ring-1 focus:ring-[#287da6]"
+                        className="w-full resize-y rounded-lg border border-slate-300 p-3 text-sm sm:text-[15px] text-[#173d5b] outline-none placeholder:text-slate-400 transition focus:border-[#287da6] focus:ring-1 focus:ring-[#287da6]"
                       />
                     </div>
 
@@ -418,10 +418,10 @@ export default function FeedbackPage() {
                       />
 
                       <div className="flex-1">
-                        <p className="text-xs font-semibold text-[#173d5b]">
+                        <p className="text-sm font-semibold text-[#173d5b]">
                           Send anonymously
                         </p>
-                        <p className="mt-0.5 text-[11px] text-slate-500">
+                        <p className="mt-0.5 text-[13px] text-slate-500">
                           {anonymous
                             ? "Your name will be hidden. Recorded as 'Anonymous Citizen'."
                             : `Submitting as: ${user?.fullName || "Samira Khan"}`}
@@ -434,7 +434,7 @@ export default function FeedbackPage() {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="flex items-center gap-2 rounded-lg bg-[#287da6] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#1c6388] disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-lg bg-[#287da6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1c6388] disabled:opacity-50"
                       >
                         {isSubmitting ? (
                           <>
@@ -453,7 +453,7 @@ export default function FeedbackPage() {
                         type="button"
                         onClick={resetForm}
                         disabled={isSubmitting}
-                        className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+                        className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
                       >
                         Clear
                       </button>
@@ -470,7 +470,7 @@ export default function FeedbackPage() {
                       Thank you for your feedback!
                     </h3>
 
-                    <p className="mt-2 max-w-md text-xs leading-5 text-slate-500">
+                    <p className="mt-2 max-w-md text-sm leading-5 text-slate-500">
                       Your response has been saved directly to the CareLink Citizen Support system.
                       Reference ID:{" "}
                       <span className="font-mono font-semibold text-[#287da6]">
@@ -493,7 +493,7 @@ export default function FeedbackPage() {
                       <div className="mt-2 flex items-center justify-between">
                         <span className="font-semibold text-slate-600">Status:</span>
                         <span
-                          className={`rounded px-2 py-0.5 text-[10px] font-semibold border ${getStatusBadge(
+                          className={`rounded px-2 py-0.5 text-xs font-semibold border ${getStatusBadge(
                             submittedFeedback.status
                           )}`}
                         >
@@ -511,14 +511,14 @@ export default function FeedbackPage() {
                     <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                       <button
                         onClick={resetForm}
-                        className="rounded-lg bg-[#287da6] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#1c6388]"
+                        className="rounded-lg bg-[#287da6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1c6388]"
                       >
                         Submit another feedback
                       </button>
 
                       <button
                         onClick={() => setActiveTab("history")}
-                        className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-[#287da6] transition hover:bg-slate-50"
+                        className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-[#287da6] transition hover:bg-slate-50"
                       >
                         <MessageSquare size={14} />
                         View in feedback list
@@ -532,7 +532,7 @@ export default function FeedbackPage() {
               <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                   <div>
-                    <h3 className="text-sm font-bold text-[#173d5b]">
+                    <h3 className="text-base font-bold text-[#173d5b]">
                       Citizen Feedback & Reviews
                     </h3>
                     <p className="mt-0.5 text-xs text-slate-500">
@@ -542,7 +542,7 @@ export default function FeedbackPage() {
 
                   <button
                     onClick={loadFeedbacksData}
-                    className="flex items-center gap-1.5 self-start rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 sm:self-auto"
+                    className="flex items-center gap-1.5 self-start rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 sm:self-auto"
                   >
                     <RotateCcw size={13} />
                     Refresh
@@ -558,7 +558,7 @@ export default function FeedbackPage() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search feedback comments..."
-                        className="w-full bg-transparent outline-none placeholder:text-slate-400 text-xs"
+                        className="w-full bg-transparent outline-none placeholder:text-slate-400 text-sm sm:text-[15px]"
                       />
                     </form>
                   </div>
@@ -567,7 +567,7 @@ export default function FeedbackPage() {
                   <select
                     value={selectedCategoryFilter}
                     onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs outline-none focus:border-[#287da6]"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   >
                     <option value="all">All categories</option>
                     {categories.map((c) => (
@@ -581,7 +581,7 @@ export default function FeedbackPage() {
                   <select
                     value={selectedRatingFilter}
                     onChange={(e) => setSelectedRatingFilter(Number(e.target.value))}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs outline-none focus:border-[#287da6]"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   >
                     <option value={0}>All ratings</option>
                     <option value={5}>5 Stars only</option>
@@ -596,13 +596,13 @@ export default function FeedbackPage() {
                 {isLoadingFeedbacks ? (
                   <div className="flex flex-col items-center justify-center py-12 text-slate-400">
                     <Loader2 size={24} className="animate-spin text-[#287da6]" />
-                    <p className="mt-2 text-xs">Loading feedbacks...</p>
+                    <p className="mt-2 text-sm">Loading feedbacks...</p>
                   </div>
                 ) : feedbacks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 py-12 text-center">
                     <MessageSquare size={32} className="text-slate-300" />
-                    <p className="mt-2 text-xs font-semibold text-slate-600">No feedback found</p>
-                    <p className="mt-1 text-[11px] text-slate-400">
+                    <p className="mt-2 text-sm font-semibold text-slate-600">No feedback found</p>
+                    <p className="mt-1 text-[13px] text-slate-400">
                       No feedback matches your filter criteria. Be the first to leave one!
                     </p>
                     <button
@@ -611,7 +611,7 @@ export default function FeedbackPage() {
                         setSelectedRatingFilter(0);
                         setSearchQuery("");
                       }}
-                      className="mt-3 text-xs font-semibold text-[#287da6] hover:underline"
+                      className="mt-3 text-sm font-semibold text-[#287da6] hover:underline"
                     >
                       Clear filters
                     </button>
@@ -625,10 +625,10 @@ export default function FeedbackPage() {
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-[10px] font-semibold text-slate-400">
+                            <span className="font-mono text-[13px] font-semibold text-slate-400">
                               {fb.id}
                             </span>
-                            <span className="rounded-md bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-[#287da6]">
+                            <span className="rounded-md bg-sky-50 px-2 py-0.5 text-xs font-semibold text-[#287da6]">
                               {fb.category}
                             </span>
                           </div>
@@ -651,7 +651,7 @@ export default function FeedbackPage() {
 
                             {/* Status */}
                             <span
-                              className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${getStatusBadge(
+                              className={`rounded-full border px-2 py-0.5 text-xs font-bold ${getStatusBadge(
                                 fb.status
                               )}`}
                             >
@@ -661,12 +661,12 @@ export default function FeedbackPage() {
                         </div>
 
                         {/* Comment text */}
-                        <p className="mt-2.5 text-xs leading-relaxed text-[#173d5b]">
+                        <p className="mt-2.5 text-sm leading-relaxed text-[#173d5b]">
                           {fb.comment}
                         </p>
 
                         {/* Footer info: author & date */}
-                        <div className="mt-3 flex items-center justify-between text-[10px] text-slate-400">
+                        <div className="mt-3 flex items-center justify-between text-[13px] text-slate-400">
                           <div className="flex items-center gap-1.5">
                             <UserIcon size={12} className="text-slate-400" />
                             <span>
@@ -694,28 +694,28 @@ export default function FeedbackPage() {
                   <TriangleAlert size={19} />
                 </div>
 
-                <h3 className="text-xs font-bold text-[#173d5b]">
+                <h3 className="text-base font-bold text-[#173d5b]">
                   Need to report a safety concern?
                 </h3>
 
-                <p className="mt-1 text-[11px] leading-5 text-slate-500">
+                <p className="mt-1 text-sm leading-5 text-slate-500">
                   For urgent safety issues, physical hazard or misleading news, use the dedicated emergency reporting channel.
                 </p>
 
                 <button
                   type="button"
                   onClick={() => setShowConcern(!showConcern)}
-                  className="mt-3 rounded-lg border border-slate-300 px-3 py-2 text-[11px] font-semibold text-[#287da6] transition hover:bg-sky-50"
+                  className="mt-3 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-[#287da6] transition hover:bg-sky-50"
                 >
                   {showConcern ? "Close" : "Report a concern"}
                 </button>
 
                 {showConcern && (
                   <div className="mt-3 rounded-lg bg-sky-50 p-3">
-                    <p className="text-[11px] font-bold text-[#173d5b]">
+                    <p className="text-sm font-bold text-[#173d5b]">
                       Emergency Operations
                     </p>
-                    <p className="mt-1 text-[10px] leading-4 text-slate-600">
+                    <p className="mt-1 text-sm leading-4 text-slate-600">
                       Emergency hotlines are available 24/7 for life-threatening events.
                     </p>
                     <a
@@ -734,11 +734,11 @@ export default function FeedbackPage() {
                   <Phone size={18} />
                 </div>
 
-                <h3 className="text-xs font-bold text-[#173d5b]">
+                <h3 className="text-base font-bold text-[#173d5b]">
                   Prefer to speak with someone?
                 </h3>
 
-                <p className="mt-1 text-[11px] leading-5 text-slate-500">
+                <p className="mt-1 text-sm leading-5 text-slate-500">
                   Citizen support helpline is available if you need human assistance or language translation.
                 </p>
 
@@ -753,7 +753,7 @@ export default function FeedbackPage() {
               {/* DATA TRANSPARENCY NOTICE */}
               <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm text-xs">
                 <h4 className="font-bold text-[#173d5b]">Citizen Privacy</h4>
-                <p className="mt-1 text-[10px] leading-4 text-slate-500">
+                <p className="mt-1 text-[13px] leading-4 text-slate-500">
                   Anonymous submissions do not store your user ID or contact information. Your feedback is exclusively used to improve relief workflows.
                 </p>
               </div>
@@ -761,7 +761,7 @@ export default function FeedbackPage() {
           </div>
 
           {/* FOOTER */}
-          <footer className="mt-8 flex flex-wrap justify-between gap-3 border-t border-slate-200 py-4 text-[10px] text-slate-400">
+          <footer className="mt-8 flex flex-wrap justify-between gap-3 border-t border-slate-200 py-4 text-[13px] text-slate-400">
             <p>© 2026 ReliefOS Citizen Support · Powered by CareLink</p>
             <p>Stay safe. Stay informed.</p>
           </footer>
