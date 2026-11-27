@@ -189,7 +189,7 @@ function PriorityBadge({ priority }: { priority: Priority }) {
 
   return (
     <span
-      className={`inline-flex rounded-md px-2 py-1 text-[9px] font-bold ${styles[priority]}`}
+      className={`inline-flex rounded-md px-2 py-1 text-xs font-bold ${styles[priority]}`}
     >
       {priority}
     </span>
@@ -209,7 +209,7 @@ function StatusBadge({ status }: { status: RequestStatus }) {
 
   return (
     <span
-      className={`inline-flex whitespace-nowrap rounded-md px-2 py-1 text-[9px] font-semibold ${styles[status]}`}
+      className={`inline-flex whitespace-nowrap rounded-md px-2 py-1 text-xs font-semibold ${styles[status]}`}
     >
       {status}
     </span>
@@ -251,15 +251,15 @@ function RequestDrawer({
         <div className="border-b border-[#64C9AD] px-5 py-5">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[9px] font-bold tracking-widest text-[#2785B2]">
+              <p className="text-xs font-bold tracking-widest text-[#2785B2]">
                 REQUEST {request.id}
               </p>
 
-              <h2 className="mt-2 text-xl font-medium text-[#123B5C]">
+              <h2 className="mt-2 text-xl font-semibold text-[#123B5C]">
                 {request.category} needed
               </h2>
 
-              <p className="mt-2 text-[10px] text-slate-500">
+              <p className="mt-2 text-[13px] text-slate-500">
                 Submitted {request.time} · Citizen mobile portal
               </p>
             </div>
@@ -285,11 +285,11 @@ function RequestDrawer({
             />
 
             <div>
-              <p className="text-[11px] font-bold text-red-800">
+              <p className="text-sm font-bold text-red-800">
                 {request.reported} priority recommended
               </p>
 
-              <p className="mt-1 text-[10px] leading-5 text-red-700">
+              <p className="mt-1 text-sm leading-5 text-red-700">
                 Flood water is entering the home. Household includes
                 vulnerable members who may require urgent assistance.
               </p>
@@ -301,7 +301,7 @@ function RequestDrawer({
             <button
               onClick={onVerify}
               disabled={request.status === "Verified"}
-              className="flex items-center gap-2 rounded-md bg-[#123B5C] px-3 py-2.5 text-[10px] font-semibold text-white transition hover:bg-[#1D5F8A] disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex items-center gap-2 rounded-md bg-[#123B5C] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1D5F8A] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Check size={14} />
               {request.status === "Verified"
@@ -311,14 +311,14 @@ function RequestDrawer({
 
             <button
               onClick={onAssign}
-              className="rounded-md border border-[#2785B2] bg-white px-3 py-2.5 text-[10px] font-medium text-[#2785B2] hover:bg-sky-50"
+              className="rounded-md border border-[#2785B2] bg-white px-3 py-2.5 text-sm font-medium text-[#2785B2] hover:bg-sky-50"
             >
               Assign team
             </button>
 
             <button
               onClick={() => setShowMoreActions(!showMoreActions)}
-              className="rounded-md border border-[#2785B2] bg-white px-3 py-2.5 text-[10px] font-medium text-[#2785B2] hover:bg-sky-50"
+              className="rounded-md border border-[#2785B2] bg-white px-3 py-2.5 text-sm font-medium text-[#2785B2] hover:bg-sky-50"
             >
               More
               <ChevronDown size={12} className="ml-1 inline" />
@@ -333,7 +333,7 @@ function RequestDrawer({
                   onUpdateStatus("Completed");
                   setShowMoreActions(false);
                 }}
-                className="block w-full rounded px-3 py-2 text-left text-[10px] text-slate-600 hover:bg-slate-50"
+                className="block w-full rounded px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50"
               >
                 Mark as completed
               </button>
@@ -343,14 +343,14 @@ function RequestDrawer({
                   onUpdateStatus("In progress");
                   setShowMoreActions(false);
                 }}
-                className="block w-full rounded px-3 py-2 text-left text-[10px] text-slate-600 hover:bg-slate-50"
+                className="block w-full rounded px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50"
               >
                 Mark as in progress
               </button>
 
               <button
                 onClick={() => setShowMoreActions(false)}
-                className="block w-full rounded px-3 py-2 text-left text-[10px] text-red-600 hover:bg-red-50"
+                className="block w-full rounded px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
               >
                 Cancel action
               </button>
@@ -359,50 +359,50 @@ function RequestDrawer({
 
           {/* Citizen Information */}
           <section className="rounded-lg border border-[#64C9AD] bg-white p-4">
-            <h3 className="mb-4 text-[10px] font-semibold text-[#123B5C]">
+            <h3 className="mb-4 text-base font-semibold text-[#123B5C]">
               Citizen-submitted information
             </h3>
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-4">
               <div>
-                <p className="text-[9px] uppercase tracking-wide text-slate-400">
+                <p className="text-xs uppercase tracking-wide text-slate-400">
                   Category
                 </p>
-                <p className="mt-1 text-[11px] font-semibold">
+                <p className="mt-1 text-sm font-semibold">
                   {request.category}
                 </p>
               </div>
 
               <div>
-                <p className="text-[9px] uppercase tracking-wide text-slate-400">
+                <p className="text-xs uppercase tracking-wide text-slate-400">
                   Affected people
                 </p>
-                <p className="mt-1 text-[11px] font-semibold">
+                <p className="mt-1 text-sm font-semibold">
                   {request.affectedPeople} people
                 </p>
               </div>
 
               <div>
-                <p className="text-[9px] uppercase tracking-wide text-slate-400">
+                <p className="text-xs uppercase tracking-wide text-slate-400">
                   Location
                 </p>
-                <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold">
+                <p className="mt-1 flex items-center gap-1 text-sm font-semibold">
                   <MapPin size={12} />
                   {request.location}
                 </p>
               </div>
 
               <div>
-                <p className="text-[9px] uppercase tracking-wide text-slate-400">
+                <p className="text-xs uppercase tracking-wide text-slate-400">
                   Contact
                 </p>
-                <p className="mt-1 text-[11px] font-semibold">
+                <p className="mt-1 text-sm font-semibold">
                   {request.contact}
                 </p>
               </div>
             </div>
 
-            <blockquote className="mt-4 border-l-2 border-slate-400 bg-slate-50 p-3 text-[10px] leading-5 text-slate-600">
+            <blockquote className="mt-4 border-l-2 border-slate-400 bg-slate-50 p-3 text-sm leading-5 text-slate-600">
               "{request.description}"
             </blockquote>
           </section>
@@ -416,30 +416,30 @@ function RequestDrawer({
                 </div>
 
                 <div>
-                  <h3 className="text-[10px] font-bold">
+                  <h3 className="text-base font-bold">
                     AI decision support
                   </h3>
-                  <p className="mt-1 text-[9px] text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500">
                     Recommendation ready for human review
                   </p>
                 </div>
               </div>
 
-              <span className="rounded-md bg-red-50 px-2 py-1 text-[9px] font-bold text-red-600">
+              <span className="rounded-md bg-red-50 px-2 py-1 text-xs font-bold text-red-600">
                 {request.confidence} confidence
               </span>
             </div>
 
             <div className="mt-3 rounded-lg border border-purple-100 p-3">
-              <p className="text-[9px] uppercase tracking-wide text-slate-400">
+              <p className="text-xs uppercase tracking-wide text-slate-400">
                 Recommended priority
               </p>
 
-              <p className="mt-2 text-[11px] font-bold text-[#123B5C]">
+              <p className="mt-2 text-sm font-bold text-[#123B5C]">
                 {request.reported} · Immediate assistance support
               </p>
 
-              <p className="mt-2 text-[10px] leading-5 text-slate-600">
+              <p className="mt-2 text-sm leading-5 text-slate-600">
                 Recommendation based on reported urgency, affected
                 household members and reported location.
               </p>
@@ -447,7 +447,7 @@ function RequestDrawer({
 
             <button
               onClick={() => navigate(`/admin/ai-review?requestId=${request.id}`)}
-              className="mt-3 flex items-center gap-2 rounded-md border border-[#2785B2] px-3 py-2 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50 transition active:scale-95"
+              className="mt-3 flex items-center gap-2 rounded-md border border-[#2785B2] px-3 py-2 text-sm font-semibold text-[#2785B2] hover:bg-sky-50 transition active:scale-95"
             >
               Review recommendation
               <ArrowRight size={13} />
@@ -456,7 +456,7 @@ function RequestDrawer({
 
           {/* Case Timeline */}
           <section className="rounded-lg border border-[#64C9AD] bg-white p-4">
-            <h3 className="mb-4 text-[10px] font-semibold">
+            <h3 className="mb-4 text-base font-semibold">
               Case timeline
             </h3>
 
@@ -464,11 +464,11 @@ function RequestDrawer({
               <div className="relative">
                 <span className="absolute -left-[21px] top-0.5 h-3 w-3 rounded-full border-2 border-white bg-[#63BDA6] ring-1 ring-[#63BDA6]" />
 
-                <p className="text-[10px] font-semibold">
+                <p className="text-sm font-semibold">
                   Request received
                 </p>
 
-                <p className="mt-1 text-[9px] text-slate-500">
+                <p className="mt-1 text-xs text-slate-500">
                   12:58 · Mobile portal
                 </p>
               </div>
@@ -476,11 +476,11 @@ function RequestDrawer({
               <div className="relative">
                 <span className="absolute -left-[21px] top-0.5 h-3 w-3 rounded-full border-2 border-white bg-[#63BDA6] ring-1 ring-[#63BDA6]" />
 
-                <p className="text-[10px] font-semibold">
+                <p className="text-sm font-semibold">
                   Identity and contact verified
                 </p>
 
-                <p className="mt-1 text-[9px] text-slate-500">
+                <p className="mt-1 text-xs text-slate-500">
                   13:00 · Automated check
                 </p>
               </div>
@@ -494,13 +494,13 @@ function RequestDrawer({
                   }`}
                 />
 
-                <p className="text-[10px] font-semibold">
+                <p className="text-sm font-semibold">
                   {request.status === "Awaiting review"
                     ? "Awaiting coordinator review"
                     : "Request verified"}
                 </p>
 
-                <p className="mt-1 text-[9px] text-slate-500">
+                <p className="mt-1 text-xs text-slate-500">
                   {request.status === "Awaiting review"
                     ? "Human decision required"
                     : "Human verification completed"}
@@ -511,11 +511,11 @@ function RequestDrawer({
                 <div className="relative">
                   <span className="absolute -left-[21px] top-0.5 h-3 w-3 rounded-full border-2 border-white bg-[#63BDA6] ring-1 ring-[#63BDA6]" />
 
-                  <p className="text-[10px] font-semibold">
+                  <p className="text-sm font-semibold">
                     Team assigned
                   </p>
 
-                  <p className="mt-1 text-[9px] text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500">
                     Assigned to {request.assignedTo}
                   </p>
                 </div>
@@ -528,13 +528,13 @@ function RequestDrawer({
         {/* Drawer Footer */}
         <div className="border-t border-slate-200 bg-white px-5 py-3">
           <div className="flex items-center justify-between">
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Request ID: {request.id}
             </p>
 
             <button
               onClick={onClose}
-              className="rounded-md bg-[#123B5C] px-4 py-2 text-[10px] font-semibold text-white hover:bg-[#1D5F8A]"
+              className="rounded-md bg-[#123B5C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1D5F8A]"
             >
               Close details
             </button>
@@ -832,7 +832,7 @@ export default function AssistanceRequests() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex h-8 items-center gap-2 border-b border-[#64C9AD] bg-white px-6 text-[10px] text-slate-500">
+        <div className="flex h-8 items-center gap-2 border-b border-[#64C9AD] bg-white px-6 text-[13px] text-slate-500">
           <span>Operations</span>
           <ChevronRight size={11} />
 
@@ -840,7 +840,7 @@ export default function AssistanceRequests() {
             Requests
           </span>
 
-          <span className="ml-auto hidden items-center gap-1 text-[9px] text-emerald-600 sm:flex">
+          <span className="ml-auto hidden items-center gap-1 text-xs text-emerald-600 sm:flex">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             Live data · Updated just now
           </span>
@@ -854,18 +854,18 @@ export default function AssistanceRequests() {
 
           <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>
-              <h1 className="text-2xl font-medium tracking-tight text-[#123B5C]">
+              <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-[#123B5C]">
                 Assistance requests
               </h1>
 
-              <p className="mt-2 text-xs text-slate-600">
+              <p className="mt-2 text-sm text-slate-600">
                 Verify, prioritise and coordinate humanitarian assistance cases.
               </p>
             </div>
 
             <button
               onClick={() => setShowCreateForm(true)}
-              className="flex items-center justify-center gap-2 rounded-md bg-[#123B5C] px-4 py-2.5 text-xs font-semibold text-white shadow-md transition hover:bg-[#1D5F8A]"
+              className="flex items-center justify-center gap-2 rounded-md bg-[#123B5C] px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#1D5F8A]"
             >
               <Plus size={15} />
               Create request
@@ -885,14 +885,14 @@ export default function AssistanceRequests() {
                   setPage(1);
                 }}
                 placeholder="Search by ID, person or location"
-                className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+                className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:flex">
 
               <select
-                className="h-10 rounded-lg border border-[#64C9AD] bg-white px-3 text-[10px] outline-none"
+                className="h-10 rounded-lg border border-[#64C9AD] bg-white px-3 text-sm sm:text-[15px] outline-none"
                 defaultValue="All crises"
               >
                 <option>All crises</option>
@@ -905,7 +905,7 @@ export default function AssistanceRequests() {
                   setPriority(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-lg border border-[#64C9AD] bg-white px-3 text-[10px] outline-none"
+                className="h-10 rounded-lg border border-[#64C9AD] bg-white px-3 text-sm sm:text-[15px] outline-none"
               >
                 <option>Any priority</option>
                 <option>Critical</option>
@@ -919,7 +919,7 @@ export default function AssistanceRequests() {
                   setCategory(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-lg border border-[#64C9AD] bg-white px-3 text-[10px] outline-none"
+                className="h-10 rounded-lg border border-[#64C9AD] bg-white px-3 text-sm sm:text-[15px] outline-none"
               >
                 <option>Any category</option>
                 <option>Emergency shelter</option>
@@ -934,7 +934,7 @@ export default function AssistanceRequests() {
                   setStatus(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-lg border border-[#64C9AD] bg-white px-3 text-[10px] outline-none"
+                className="h-10 rounded-lg border border-[#64C9AD] bg-white px-3 text-sm sm:text-[15px] outline-none"
               >
                 <option>All statuses</option>
                 <option>Awaiting review</option>
@@ -947,7 +947,7 @@ export default function AssistanceRequests() {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex h-10 items-center justify-center gap-2 rounded-lg border border-[#2785B2] bg-white px-4 text-xs font-medium text-[#2785B2] hover:bg-sky-50"
+              className="flex h-10 items-center justify-center gap-2 rounded-lg border border-[#2785B2] bg-white px-4 text-sm font-medium text-[#2785B2] hover:bg-sky-50"
             >
               <Filter size={14} />
               More filters
@@ -962,7 +962,7 @@ export default function AssistanceRequests() {
                 Additional filters
               </span>
 
-              <label className="flex items-center gap-2 text-xs">
+              <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
                   className="accent-[#123B5C]"
@@ -970,7 +970,7 @@ export default function AssistanceRequests() {
                 Include completed requests
               </label>
 
-              <label className="flex items-center gap-2 text-xs">
+              <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
                   className="accent-[#123B5C]"
@@ -987,7 +987,7 @@ export default function AssistanceRequests() {
                   setActiveTab("All requests");
                   setPage(1);
                 }}
-                className="ml-auto text-xs font-semibold text-sky-700"
+                className="ml-auto text-sm font-semibold text-sky-700"
               >
                 Clear filters
               </button>
@@ -1011,7 +1011,7 @@ export default function AssistanceRequests() {
                       setActiveTab(tab.label);
                       setPage(1);
                     }}
-                    className={`flex shrink-0 items-center gap-1.5 border-b-2 px-0 py-4 text-[10px] transition ${
+                    className={`flex shrink-0 items-center gap-1.5 border-b-2 px-0 py-4 text-sm transition ${
                       active
                         ? "border-[#2785B2] font-bold text-[#123B5C]"
                         : "border-transparent text-slate-500 hover:text-[#123B5C]"
@@ -1019,7 +1019,7 @@ export default function AssistanceRequests() {
                   >
                     {tab.label}
 
-                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] text-slate-500">
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">
                       {tab.count}
                     </span>
                   </button>
@@ -1032,7 +1032,7 @@ export default function AssistanceRequests() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[950px] text-left">
                 <thead>
-                  <tr className="border-b border-[#64C9AD] bg-[#F0F6F7] text-[9px] font-bold text-[#123B5C]">
+                  <tr className="border-b border-[#64C9AD] bg-[#F0F6F7] text-sm font-bold text-[#123B5C]">
                     <th className="px-3 py-3">Request</th>
                     <th className="px-3 py-3">Category & location</th>
                     <th className="px-3 py-3">Reported</th>
@@ -1047,14 +1047,14 @@ export default function AssistanceRequests() {
                   {displayedRequests.map((request) => (
                     <tr
                       key={request.id}
-                      className="border-b border-slate-100 text-[10px] transition hover:bg-[#F8FBFC]"
+                      className="border-b border-slate-100 text-sm transition hover:bg-[#F8FBFC]"
                     >
                       <td className="px-3 py-3">
                         <p className="font-bold text-[#123B5C]">
                           {request.id}
                         </p>
 
-                        <p className="mt-1 text-[9px] text-slate-400">
+                        <p className="mt-1 text-xs text-slate-400">
                           {request.time}
                         </p>
                       </td>
@@ -1064,7 +1064,7 @@ export default function AssistanceRequests() {
                           {request.category}
                         </p>
 
-                        <p className="mt-1 text-[9px] text-slate-500">
+                        <p className="mt-1 text-xs text-slate-500">
                           {request.location}
                         </p>
                       </td>
@@ -1078,7 +1078,7 @@ export default function AssistanceRequests() {
                           {request.recommendation}
                         </p>
 
-                        <p className="mt-1 text-[9px] text-slate-500">
+                        <p className="mt-1 text-xs text-slate-500">
                           {request.confidence} confidence
                         </p>
                       </td>
@@ -1107,7 +1107,7 @@ export default function AssistanceRequests() {
                     <tr>
                       <td
                         colSpan={7}
-                        className="py-12 text-center text-xs text-slate-500"
+                        className="py-12 text-center text-sm text-slate-500"
                       >
                         No requests found. Try changing your filters.
                       </td>
@@ -1120,7 +1120,7 @@ export default function AssistanceRequests() {
             {/* PAGINATION */}
 
             <div className="flex flex-col items-center justify-between gap-3 px-4 py-3 sm:flex-row">
-              <p className="text-[10px] text-slate-600">
+              <p className="text-sm text-slate-600">
                 Showing{" "}
                 {filteredRequests.length === 0
                   ? 0
@@ -1139,13 +1139,13 @@ export default function AssistanceRequests() {
                     setPage((p) => Math.max(1, p - 1))
                   }
                   disabled={page === 1}
-                  className="flex items-center gap-1 rounded-lg border border-[#2785B2] px-3 py-2 text-[10px] font-medium text-[#2785B2] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex items-center gap-1 rounded-lg border border-[#2785B2] px-3 py-2 text-sm font-medium text-[#2785B2] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ArrowLeft size={12} />
                   Previous
                 </button>
 
-                <span className="text-[10px] text-slate-500">
+                <span className="text-[13px] text-slate-500">
                   {page} / {totalPages}
                 </span>
 
@@ -1154,7 +1154,7 @@ export default function AssistanceRequests() {
                     setPage((p) => Math.min(totalPages, p + 1))
                   }
                   disabled={page === totalPages}
-                  className="flex items-center gap-1 rounded-lg border border-[#2785B2] px-3 py-2 text-[10px] font-medium text-[#2785B2] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex items-center gap-1 rounded-lg border border-[#2785B2] px-3 py-2 text-sm font-medium text-[#2785B2] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Next
                   <ArrowRight size={12} />
@@ -1163,7 +1163,7 @@ export default function AssistanceRequests() {
             </div>
           </section>
 
-          <footer className="flex flex-col justify-between gap-2 pb-3 pt-4 text-[9px] text-slate-400 sm:flex-row">
+          <footer className="flex flex-col justify-between gap-2 pb-3 pt-4 text-xs text-slate-400 sm:flex-row">
             <p>© 2026 Humanitarian Aid Platform · CareLink</p>
             <p>Secure operations environment</p>
           </footer>
@@ -1188,7 +1188,7 @@ export default function AssistanceRequests() {
           <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[9px] font-bold tracking-widest text-sky-600">
+                <p className="text-xs font-bold tracking-widest text-sky-600">
                   NEW ASSISTANCE CASE
                 </p>
 
@@ -1217,11 +1217,11 @@ export default function AssistanceRequests() {
               className="mt-4 space-y-3"
             >
               <div>
-                <label className="text-[10px] font-semibold text-slate-700">Category</label>
+                <label className="text-sm font-semibold text-slate-700">Category</label>
                 <select
                   value={formCategory}
                   onChange={(e) => setFormCategory(e.target.value)}
-                  className="mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-xs outline-none focus:border-[#2785B2]"
+                  className="mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                 >
                   <option>Food & water</option>
                   <option>Emergency shelter</option>
@@ -1232,21 +1232,21 @@ export default function AssistanceRequests() {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] font-semibold text-slate-700">Location</label>
+                  <label className="text-sm font-semibold text-slate-700">Location</label>
                   <input
                     type="text"
                     required
                     value={formLocation}
                     onChange={(e) => setFormLocation(e.target.value)}
-                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3 text-xs outline-none focus:border-[#2785B2]"
+                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-semibold text-slate-700">Priority</label>
+                  <label className="text-sm font-semibold text-slate-700">Priority</label>
                   <select
                     value={formPriority}
                     onChange={(e) => setFormPriority(e.target.value as Priority)}
-                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-xs outline-none focus:border-[#2785B2]"
+                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                   >
                     <option value="Critical">Critical</option>
                     <option value="High">High</option>
@@ -1257,41 +1257,41 @@ export default function AssistanceRequests() {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] font-semibold text-slate-700">Affected People</label>
+                  <label className="text-sm font-semibold text-slate-700">Affected People</label>
                   <input
                     type="number"
                     min="1"
                     value={formPeople}
                     onChange={(e) => setFormPeople(e.target.value)}
-                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3 text-xs outline-none focus:border-[#2785B2]"
+                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-semibold text-slate-700">Contact</label>
+                  <label className="text-sm font-semibold text-slate-700">Contact</label>
                   <input
                     type="text"
                     value={formContact}
                     onChange={(e) => setFormContact(e.target.value)}
-                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3 text-xs outline-none focus:border-[#2785B2]"
+                    className="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-semibold text-slate-700">Description</label>
+                <label className="text-sm font-semibold text-slate-700">Description</label>
                 <textarea
                   rows={3}
                   required
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-300 p-2.5 text-xs outline-none focus:border-[#2785B2]"
+                  className="mt-1 w-full rounded-lg border border-slate-300 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isActionLoading}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-[#123B5C] py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-[#1D5F8A] disabled:opacity-60"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-[#123B5C] py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1D5F8A] disabled:opacity-60"
               >
                 {isActionLoading ? (
                   <Loader2 size={14} className="animate-spin" />

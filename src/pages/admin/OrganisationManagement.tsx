@@ -122,7 +122,7 @@ function StatusBadge({ status }: { status: OrganisationStatus }) {
   };
 
   return (
-    <span className={`rounded-md px-2.5 py-1 text-[9px] font-semibold ${styles[status]}`}>
+    <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${styles[status]}`}>
       {status}
     </span>
   );
@@ -131,15 +131,34 @@ function StatusBadge({ status }: { status: OrganisationStatus }) {
 function VerificationBadge({
   verification,
 }: {
-  verification: VerificationStatus;
+  verification: string;
 }) {
-  return verification === "Verified" ? (
-    <span className="inline-flex items-center gap-1 rounded-md bg-[#E5F6F1] px-2.5 py-1 text-[9px] font-semibold text-[#16866A]">
-      <Check size={11} />
-      Verified
-    </span>
-  ) : (
-    <span className="inline-flex items-center gap-1 rounded-md bg-orange-50 px-2.5 py-1 text-[9px] font-semibold text-orange-700">
+  if (verification === "Verified") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-md bg-[#E5F6F1] px-2.5 py-1 text-xs font-semibold text-[#16866A]">
+        <Check size={11} />
+        Verified
+      </span>
+    );
+  }
+  if (verification === "Additional Info") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+        <Clock size={11} />
+        Additional Info
+      </span>
+    );
+  }
+  if (verification === "Rejected") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-md bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600">
+        <Ban size={11} />
+        Rejected
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-md bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700">
       <Clock size={11} />
       Pending Review
     </span>
@@ -167,11 +186,11 @@ function StatCard({
         </div>
 
         <div>
-          <p className="text-[9px] text-slate-500">{title}</p>
+          <p className="text-xs text-slate-500">{title}</p>
           <h3 className="mt-0.5 text-2xl font-bold text-[#123B5C]">
             {value}
           </h3>
-          <p className="mt-0.5 text-[9px] text-slate-400">
+          <p className="mt-0.5 text-xs text-slate-400">
             {description}
           </p>
         </div>
@@ -215,6 +234,8 @@ export default function OrganisationManagement() {
   const [actionScope, setActionScope] = useState("Local NGOs");
   const [modalError, setModalError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [reviewRationale, setReviewRationale] = useState("");
+  const [isReviewing, setIsReviewing] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
@@ -309,10 +330,7 @@ export default function OrganisationManagement() {
     e.preventDefault();
     setModalError(null);
 
-    const nameToRegister = (
-      newOrgName.trim() ||
-      (actionTitle && actionTitle !== "Register Organisation" ? actionTitle.trim() : "")
-    ).trim();
+    const nameToRegister = (newOrgName.trim() || actionTitle.trim()).trim();
 
     if (!nameToRegister) {
       setModalError("Organisation name is required.");
@@ -401,6 +419,47 @@ export default function OrganisationManagement() {
     }
   };
 
+  const handleReviewDecision = async (
+    id: string,
+    decision: "Approve" | "Reject" | "RequestInfo"
+  ) => {
+    const note =
+      reviewRationale.trim() ||
+      (decision === "Approve"
+        ? "Partner Organisation credentials verified and approved."
+        : "");
+
+    if (!note) {
+      setToastMessage(
+        "Please enter a review rationale or comment before rejecting or requesting additional information."
+      );
+      return;
+    }
+
+    setIsReviewing(true);
+    try {
+      const updated = await organizationService.reviewOrganization(id, {
+        decision,
+        rationale: note,
+      });
+      setOrganisations((prev) =>
+        prev.map((org) => (org.id === id ? updated : org))
+      );
+      setShowDetails(updated);
+      setReviewRationale("");
+      setToastMessage(
+        `Decision "${decision}" recorded for "${updated.name}".`
+      );
+      organizationService.getStats().then(setStats).catch(() => {});
+    } catch (err: any) {
+      setToastMessage(
+        err.message || "Failed to record organisation review decision."
+      );
+    } finally {
+      setIsReviewing(false);
+    }
+  };
+
   const exportCSV = () => {
     const headers = [
       "Organisation ID",
@@ -451,7 +510,7 @@ export default function OrganisationManagement() {
 
       {/* BREADCRUMB */}
 
-      <div className="flex h-10 items-center gap-2 border-b border-[#64C9AD] bg-white px-6 text-[9px] text-slate-500">
+      <div className="flex h-10 items-center gap-2 border-b border-[#64C9AD] bg-white px-6 text-xs text-slate-500">
         <span>Administration</span>
         <ChevronRight size={12} />
         <span className="font-semibold text-[#123B5C]">
@@ -480,7 +539,7 @@ export default function OrganisationManagement() {
         <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
 
           <div>
-            <h1 className="text-2xl font-medium tracking-tight text-[#123B5C] md:text-[28px]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-[#123B5C]">
               Organisation Management
             </h1>
 
@@ -493,7 +552,7 @@ export default function OrganisationManagement() {
 
             <button
               onClick={exportCSV}
-              className="flex items-center gap-2 rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+              className="flex items-center gap-2 rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-sm font-semibold text-[#2785B2] hover:bg-sky-50"
             >
               <Download size={15} />
               Export
@@ -515,7 +574,7 @@ export default function OrganisationManagement() {
                 setModalError(null);
                 setShowRegisterModal(true);
               }}
-              className="flex items-center gap-2 rounded-lg bg-[#2785B2] px-4 py-3 text-[10px] font-semibold text-white shadow-sm transition hover:bg-[#1D6F98]"
+              className="flex items-center gap-2 rounded-lg bg-[#2785B2] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1D6F98]"
             >
               <Plus size={16} />
               Register organisation
@@ -576,7 +635,7 @@ export default function OrganisationManagement() {
                 setCurrentPage(1);
               }}
               placeholder="Search organisation name or ID..."
-              className="w-full bg-transparent text-[10px] outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
           </div>
 
@@ -588,7 +647,7 @@ export default function OrganisationManagement() {
                 setTypeFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All organisation types</option>
               <option>Government Agency</option>
@@ -603,7 +662,7 @@ export default function OrganisationManagement() {
                 setRegionFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All regions</option>
               {[...new Set(organisations.map((org) => org.scope))].map(
@@ -619,7 +678,7 @@ export default function OrganisationManagement() {
                 setVerificationFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-11 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All verification states</option>
               <option>Verified</option>
@@ -630,7 +689,7 @@ export default function OrganisationManagement() {
 
           <button
             onClick={() => setShowMoreFilters(!showMoreFilters)}
-            className="flex h-11 items-center justify-center gap-2 rounded-lg border border-[#B9D1DD] bg-white px-4 text-[10px] font-medium text-[#2785B2] hover:bg-sky-50"
+            className="flex h-11 items-center justify-center gap-2 rounded-lg border border-[#B9D1DD] bg-white px-4 text-sm font-medium text-[#2785B2] hover:bg-sky-50"
           >
             More filters
           </button>
@@ -642,7 +701,7 @@ export default function OrganisationManagement() {
         {showMoreFilters && (
           <div className="mb-4 flex flex-wrap items-center gap-4 rounded-lg border border-[#D7E5EA] bg-white p-4">
 
-            <label className="flex items-center gap-2 text-[10px] text-slate-600">
+            <label className="flex items-center gap-2 text-sm text-slate-600">
               <input
                 type="checkbox"
                 onChange={(e) => {
@@ -656,7 +715,7 @@ export default function OrganisationManagement() {
               Verified organisations only
             </label>
 
-            <label className="flex items-center gap-2 text-[10px] text-slate-600">
+            <label className="flex items-center gap-2 text-sm text-slate-600">
               <input
                 type="checkbox"
                 onChange={(e) => {
@@ -680,7 +739,7 @@ export default function OrganisationManagement() {
                 setVerificationFilter("All verification states");
                 setCurrentPage(1);
               }}
-              className="ml-auto text-[10px] font-semibold text-[#2785B2]"
+              className="ml-auto text-sm font-semibold text-[#2785B2]"
             >
               Clear filters
             </button>
@@ -697,7 +756,7 @@ export default function OrganisationManagement() {
             <table className="w-full min-w-[950px] text-left">
 
               <thead>
-                <tr className="border-b border-[#D7E5EA] bg-[#F6F9FA] text-[9px] font-medium text-slate-500">
+                <tr className="border-b border-[#D7E5EA] bg-[#F6F9FA] text-[13px] font-medium text-slate-500">
                   <th className="px-4 py-4">Organisation ID</th>
                   <th className="px-4 py-4">Name</th>
                   <th className="px-4 py-4">Type</th>
@@ -715,7 +774,7 @@ export default function OrganisationManagement() {
 
                   <tr
                     key={org.id}
-                    className="border-b border-[#E5EDF1] text-[10px] text-slate-600 transition hover:bg-[#F8FBFC]"
+                    className="border-b border-[#E5EDF1] text-sm text-slate-600 transition hover:bg-[#F8FBFC]"
                   >
 
                     <td className="px-4 py-4 font-bold text-[#123B5C]" title={org.id}>
@@ -767,7 +826,7 @@ export default function OrganisationManagement() {
                               setShowDetails(org);
                               setMenuId(null);
                             }}
-                            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-[10px] hover:bg-slate-50"
+                            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-slate-50"
                           >
                             <Eye size={13} />
                             View details
@@ -776,7 +835,7 @@ export default function OrganisationManagement() {
                           {org.status === "Pending" && (
                             <button
                               onClick={() => updateStatus(org.id, "Active")}
-                              className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-[10px] text-emerald-700 hover:bg-emerald-50"
+                              className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50"
                             >
                               <Check size={13} />
                               Verify organisation
@@ -792,7 +851,7 @@ export default function OrganisationManagement() {
                                   : "Suspended"
                               )
                             }
-                            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-[10px] text-red-600 hover:bg-red-50"
+                            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
                           >
                             <Ban size={13} />
                             {org.status === "Suspended"
@@ -814,7 +873,7 @@ export default function OrganisationManagement() {
                   <tr>
                     <td
                       colSpan={8}
-                      className="px-4 py-12 text-center text-xs text-slate-400"
+                      className="px-4 py-12 text-center text-sm text-slate-400"
                     >
                       No organisations found. Try changing your search or filters.
                     </td>
@@ -831,7 +890,7 @@ export default function OrganisationManagement() {
 
           <div className="flex flex-col items-center justify-between gap-3 px-4 py-4 sm:flex-row">
 
-            <p className="text-[9px] text-slate-500">
+            <p className="text-xs text-slate-500">
               Showing{" "}
               {filteredOrganisations.length === 0
                 ? 0
@@ -846,7 +905,7 @@ export default function OrganisationManagement() {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="rounded-lg border border-[#D7E5EA] px-4 py-2 text-[9px] text-[#2785B2] disabled:opacity-40"
+                className="rounded-lg border border-[#D7E5EA] px-4 py-2 text-sm text-[#2785B2] disabled:opacity-40"
               >
                 Previous
               </button>
@@ -856,7 +915,7 @@ export default function OrganisationManagement() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`rounded-lg border px-3 py-2 text-[9px] ${
+                    className={`rounded-lg border px-3 py-2 text-sm ${
                       currentPage === page
                         ? "border-[#2785B2] bg-[#2785B2] font-bold text-white"
                         : "border-[#D7E5EA] text-[#123B5C] hover:bg-sky-50"
@@ -872,7 +931,7 @@ export default function OrganisationManagement() {
                 onClick={() =>
                   setCurrentPage((p) => Math.min(totalPages, p + 1))
                 }
-                className="rounded-lg border border-[#B9D1DD] px-4 py-2 text-[9px] font-medium text-[#2785B2] disabled:opacity-40"
+                className="rounded-lg border border-[#B9D1DD] px-4 py-2 text-sm font-medium text-[#2785B2] disabled:opacity-40"
               >
                 Next
               </button>
@@ -883,7 +942,7 @@ export default function OrganisationManagement() {
 
         </section>
 
-        <footer className="py-5 text-[9px] text-slate-400">
+        <footer className="py-5 text-xs text-slate-400">
           © 2026 Humanitarian Aid Platform · CareLink
         </footer>
 
@@ -901,10 +960,10 @@ export default function OrganisationManagement() {
             {/* Modal header */}
             <div className="flex items-center justify-between border-b border-[#DCE7EC] px-6 py-5">
               <div>
-                <p className="text-[9px] font-bold tracking-wider text-[#56B69E]">
+                <p className="text-xs font-bold tracking-wider text-[#56B69E]">
                   SECURE ADMINISTRATIVE ACTION
                 </p>
-                <h2 className="mt-2 text-[19px] font-medium text-[#34495B]">
+                <h2 className="mt-2 text-[19px] font-semibold text-[#34495B]">
                   Register Organisation
                 </h2>
               </div>
@@ -931,7 +990,7 @@ export default function OrganisationManagement() {
             <form onSubmit={handleAdministrativeAction} className="space-y-4 p-6">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Organisation Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -943,12 +1002,12 @@ export default function OrganisationManagement() {
                       if (modalError) setModalError(null);
                     }}
                     placeholder="e.g. World Health Organization"
-                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-[11px] outline-none focus:border-[#287FA8]"
+                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Organisation Type <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -958,7 +1017,7 @@ export default function OrganisationManagement() {
                         setNewOrgType(e.target.value);
                         setActionScope(e.target.value);
                       }}
-                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-[11px] outline-none focus:border-[#287FA8]"
+                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                     >
                       <option value="Local NGO">Local NGO</option>
                       <option value="International NGO">International NGO</option>
@@ -974,14 +1033,14 @@ export default function OrganisationManagement() {
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Operational Scope / Region
                   </label>
                   <div className="relative">
                     <select
                       value={newOrgScope}
                       onChange={(e) => setNewOrgScope(e.target.value)}
-                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-[11px] outline-none focus:border-[#287FA8]"
+                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                     >
                       <option value="Greater Riverton">Greater Riverton</option>
                       <option value="National">National</option>
@@ -996,21 +1055,21 @@ export default function OrganisationManagement() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Registration / NGO Number
                   </label>
                   <input
                     value={registrationNumber}
                     onChange={(e) => setRegistrationNumber(e.target.value)}
                     placeholder="e.g. NGO-2026-9041"
-                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-[11px] outline-none focus:border-[#287FA8]"
+                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Contact Email
                   </label>
                   <input
@@ -1018,12 +1077,12 @@ export default function OrganisationManagement() {
                     value={newOrgEmail}
                     onChange={(e) => setNewOrgEmail(e.target.value)}
                     placeholder="e.g. operations@who.org"
-                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-[11px] outline-none focus:border-[#287FA8]"
+                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Contact Phone
                   </label>
                   <input
@@ -1031,21 +1090,21 @@ export default function OrganisationManagement() {
                     value={newOrgPhone}
                     onChange={(e) => setNewOrgPhone(e.target.value)}
                     placeholder="e.g. +1 (555) 019-2834"
-                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-[11px] outline-none focus:border-[#287FA8]"
+                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Environment
                   </label>
                   <div className="relative">
                     <select
                       value={environment}
                       onChange={(e) => setEnvironment(e.target.value)}
-                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-[11px] outline-none focus:border-[#287FA8]"
+                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                     >
                       <option>Production</option>
                       <option>Staging</option>
@@ -1056,14 +1115,14 @@ export default function OrganisationManagement() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Approval Type
                   </label>
                   <div className="relative">
                     <select
                       value={approvalType}
                       onChange={(e) => setApprovalType(e.target.value)}
-                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-[11px] outline-none focus:border-[#287FA8]"
+                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 pr-10 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                     >
                       <option>Standard administrator approval</option>
                       <option>Senior administrator approval</option>
@@ -1076,7 +1135,7 @@ export default function OrganisationManagement() {
               </div>
 
               <div>
-                <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                   Administrative Rationale / Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -1085,13 +1144,13 @@ export default function OrganisationManagement() {
                   value={administrativeRationale}
                   onChange={(e) => setAdministrativeRationale(e.target.value)}
                   placeholder="Explain the authorised reason or operational scope for onboarding this agency..."
-                  className="w-full resize-y rounded-lg border border-[#D5E3EA] p-3 text-[11px] outline-none placeholder:text-slate-400 focus:border-[#287FA8]"
+                  className="w-full resize-y rounded-lg border border-[#D5E3EA] p-3 text-sm sm:text-[15px] outline-none placeholder:text-slate-400 focus:border-[#287FA8]"
                 />
               </div>
 
               <div className="flex items-center gap-3 rounded-lg bg-[#EFF6F7] border border-[#C5DFEA] px-4 py-3">
                 <ShieldCheck size={20} className="shrink-0 text-[#2785B2]" />
-                <p className="text-[10px] leading-5 text-[#1D5F8A]">
+                <p className="text-sm leading-5 text-[#1D5F8A]">
                   This registration record is synchronized directly with the CareLink API and enforced under administrator governance audit standards.
                 </p>
               </div>
@@ -1101,14 +1160,14 @@ export default function OrganisationManagement() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => setShowRegisterModal(false)}
-                  className="h-11 rounded-lg border border-[#C7D8E2] bg-white px-5 text-[11px] font-semibold text-[#287FA8] hover:bg-slate-50 disabled:opacity-50"
+                  className="h-11 rounded-lg border border-[#C7D8E2] bg-white px-5 text-sm font-semibold text-[#287FA8] hover:bg-slate-50 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex items-center gap-2 h-11 rounded-lg bg-[#287FA8] px-5 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#1C668C] disabled:opacity-50"
+                  className="flex items-center gap-2 h-11 rounded-lg bg-[#287FA8] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1C668C] disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
@@ -1137,13 +1196,13 @@ export default function OrganisationManagement() {
             className="absolute inset-0 bg-slate-900/40"
           />
 
-          <aside className="absolute right-0 top-0 flex h-full w-full max-w-[450px] flex-col bg-white shadow-2xl">
+          <aside className="absolute right-0 top-0 flex h-full w-full max-w-[540px] flex-col bg-white shadow-2xl">
 
             <div className="flex items-center justify-between border-b border-slate-200 p-5">
 
               <div>
-                <p className="text-[9px] font-bold tracking-widest text-[#2785B2]">
-                  ORGANISATION PROFILE
+                <p className="text-xs font-bold tracking-widest text-[#2785B2]">
+                  ORGANISATION PROFILE &amp; VERIFICATION
                 </p>
 
                 <h2 className="mt-2 text-lg font-semibold text-[#123B5C]">
@@ -1169,134 +1228,266 @@ export default function OrganisationManagement() {
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-bold text-[#123B5C]">
+                  <h3 className="text-base font-bold text-[#123B5C]">
                     {showDetails.name}
                   </h3>
 
-                  <p className="mt-1 text-[10px] text-slate-400">
-                    {showDetails.id}
+                  <p className="mt-1 text-[13px] text-slate-400">
+                    {showDetails.code || showDetails.id} · Registered{" "}
+                    {new Date(showDetails.createdAt).toLocaleDateString()}
                   </p>
 
-                  <div className="mt-2">
+                  <div className="mt-2 flex items-center gap-2">
                     <StatusBadge status={showDetails.status} />
+                    <VerificationBadge
+                      verification={
+                        showDetails.verificationStatus ??
+                        (showDetails as any).verification ??
+                        "Verified"
+                      }
+                    />
                   </div>
                 </div>
 
               </div>
 
-              <div className="space-y-4 rounded-lg border border-slate-200 p-4">
+              {/* BASIC INFORMATION */}
+              <div className="space-y-3 rounded-lg border border-slate-200 p-4 text-xs">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#2785B2]">
+                  Basic &amp; Registration Details
+                </p>
 
-                <div>
-                  <p className="text-[9px] text-slate-400">
-                    ORGANISATION TYPE
-                  </p>
-                  <p className="mt-1 text-xs font-semibold text-[#123B5C]">
-                    {showDetails.type}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[9px] text-slate-400">
-                    OPERATIONAL SCOPE
-                  </p>
-                  <p className="mt-1 flex items-center gap-2 text-xs font-semibold text-[#123B5C]">
-                    <MapPin size={13} />
-                    {showDetails.scope}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[9px] text-slate-400">
-                    MEMBERS
-                  </p>
-                  <p className="mt-1 flex items-center gap-2 text-xs font-semibold text-[#123B5C]">
-                    <Users size={13} />
-                    {showDetails.membersCount ?? (showDetails as any).members ?? 0}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[9px] text-slate-400">
-                    VERIFICATION
-                  </p>
-                  <div className="mt-2">
-                    <VerificationBadge verification={showDetails.verificationStatus ?? (showDetails as any).verification ?? "Verified"} />
-                  </div>
-                </div>
-
-                {showDetails.registrationNumber && (
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-[9px] text-slate-400">
-                      REGISTRATION NUMBER
-                    </p>
-                    <p className="mt-1 text-xs font-semibold text-[#123B5C]">
-                      {showDetails.registrationNumber}
+                    <p className="text-xs text-slate-400">ORGANISATION TYPE</p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {showDetails.type}
+                      {showDetails.otherOrganizationType
+                        ? ` (${showDetails.otherOrganizationType})`
+                        : ""}
                     </p>
                   </div>
-                )}
 
-                {showDetails.contactEmail && (
                   <div>
-                    <p className="text-[9px] text-slate-400">
-                      CONTACT EMAIL
-                    </p>
-                    <p className="mt-1 text-xs font-semibold text-[#123B5C]">
-                      {showDetails.contactEmail}
+                    <p className="text-xs text-slate-400">REGISTRATION NUMBER</p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {showDetails.registrationNumber || "Not provided"}
                     </p>
                   </div>
-                )}
 
-                {showDetails.contactPhone && (
                   <div>
-                    <p className="text-[9px] text-slate-400">
-                      CONTACT PHONE
-                    </p>
-                    <p className="mt-1 text-xs font-semibold text-[#123B5C]">
-                      {showDetails.contactPhone}
+                    <p className="text-xs text-slate-400">OFFICIAL EMAIL</p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {showDetails.contactEmail || "Not provided"}
                     </p>
                   </div>
-                )}
+
+                  <div>
+                    <p className="text-xs text-slate-400">CONTACT NUMBER</p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {showDetails.contactPhone || "Not provided"}
+                      {showDetails.secondaryContactPhone
+                        ? ` / ${showDetails.secondaryContactPhone}`
+                        : ""}
+                    </p>
+                  </div>
+
+                  <div className="col-span-2">
+                    <p className="text-xs text-slate-400">
+                      ADDRESS, DISTRICT &amp; PROVINCE
+                    </p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {[
+                        showDetails.address,
+                        showDetails.district,
+                        showDetails.province,
+                        showDetails.registrationCountry,
+                      ]
+                        .filter(Boolean)
+                        .join(", ") || showDetails.scope}
+                    </p>
+                  </div>
+                </div>
 
                 {showDetails.description && (
                   <div>
-                    <p className="text-[9px] text-slate-400">
-                      DESCRIPTION / RATIONALE
+                    <p className="text-xs text-slate-400">
+                      OPERATIONAL SCOPE / DESCRIPTION
                     </p>
-                    <p className="mt-1 text-xs text-slate-600">
+                    <p className="mt-0.5 text-slate-600">
                       {showDetails.description}
                     </p>
                   </div>
                 )}
-
               </div>
 
-              <div className="rounded-lg border border-sky-100 bg-sky-50 p-4">
+              {/* HUMANITARIAN OPERATIONAL INFORMATION */}
+              <div className="space-y-3 rounded-lg border border-slate-200 p-4 text-xs">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#2785B2]">
+                  Humanitarian Capabilities
+                </p>
 
-                <div className="flex items-center gap-2 text-[#2785B2]">
-                  <ShieldCheck size={16} />
-                  <p className="text-[10px] font-semibold">
-                    Organisation verification
+                <div>
+                  <p className="text-xs text-slate-400">
+                    AREAS OF OPERATION
+                  </p>
+                  <p className="mt-0.5 font-semibold text-[#123B5C]">
+                    {showDetails.areasOfOperation &&
+                    showDetails.areasOfOperation.length > 0
+                      ? showDetails.areasOfOperation.join(", ")
+                      : showDetails.scope}
                   </p>
                 </div>
 
-                <p className="mt-2 text-[9px] leading-5 text-slate-600">
-                  Organisation registration and verification should be reviewed by an authorised administrator before granting operational access.
-                </p>
+                {showDetails.areasOfAssistance &&
+                  showDetails.areasOfAssistance.length > 0 && (
+                    <div>
+                      <p className="text-xs text-slate-400">
+                        HUMANITARIAN SERVICES
+                      </p>
+                      <p className="mt-0.5 font-semibold text-[#123B5C]">
+                        {showDetails.areasOfAssistance.join(", ")}
+                      </p>
+                    </div>
+                  )}
 
+                {showDetails.operationalCapacity && (
+                  <div>
+                    <p className="text-xs text-slate-400">
+                      OPERATIONAL CAPACITY
+                    </p>
+                    <p className="mt-0.5 text-slate-600">
+                      {showDetails.operationalCapacity}
+                    </p>
+                  </div>
+                )}
+
+                {showDetails.emergencyResponseAvailability && (
+                  <div>
+                    <p className="text-xs text-slate-400">
+                      EMERGENCY AVAILABILITY
+                    </p>
+                    <p className="mt-0.5 font-semibold text-[#123B5C]">
+                      {showDetails.emergencyResponseAvailability}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* AUTHORISED REPRESENTATIVE */}
+              {(showDetails.representativeFullName ||
+                showDetails.representativeEmail) && (
+                <div className="space-y-2 rounded-lg border border-slate-200 p-4 text-xs">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#2785B2]">
+                    Authorised Representative
+                  </p>
+                  <p className="font-semibold text-[#123B5C]">
+                    {showDetails.representativeFullName}{" "}
+                    {showDetails.representativeDesignation
+                      ? `(${showDetails.representativeDesignation})`
+                      : ""}
+                  </p>
+                  <p className="text-slate-600">
+                    {showDetails.representativeEmail} ·{" "}
+                    {showDetails.representativePhone}
+                  </p>
+                </div>
+              )}
+
+              {/* UPLOADED VERIFICATION DOCUMENTS */}
+              {showDetails.documents && showDetails.documents.length > 0 && (
+                <div className="space-y-2 rounded-lg border border-slate-200 p-4 text-xs">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#2785B2]">
+                    Uploaded Verification Documents (
+                    {showDetails.documents.length})
+                  </p>
+                  {showDetails.documents.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-semibold text-[#123B5C]">
+                          {doc.label}
+                        </p>
+                        <p className="truncate text-[13px] text-slate-500">
+                          {doc.originalFileName} ({doc.fileSizeDisplay})
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          organizationService.downloadDocument(
+                            showDetails.id,
+                            doc.id,
+                            doc.originalFileName
+                          )
+                        }
+                        className="shrink-0 rounded border border-[#2785B2] bg-white px-2.5 py-1 text-xs font-semibold text-[#2785B2] hover:bg-sky-50"
+                      >
+                        Download
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* REVIEW DECISION CONTROLS */}
+              <div className="space-y-3 rounded-lg border border-sky-200 bg-sky-50/60 p-4">
+                <div className="flex items-center gap-2 text-[#123B5C]">
+                  <ShieldCheck size={16} className="text-[#2785B2]" />
+                  <p className="text-sm font-bold">
+                    Administrator Verification Decision
+                  </p>
+                </div>
+
+                <textarea
+                  rows={2}
+                  value={reviewRationale}
+                  onChange={(e) => setReviewRationale(e.target.value)}
+                  placeholder="Enter decision rationale, rejection reason, or additional information request..."
+                  className="w-full rounded-lg border border-slate-300 bg-white p-2.5 text-sm sm:text-[15px] text-[#123B5C] outline-none focus:border-[#2785B2]"
+                />
+
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  <button
+                    type="button"
+                    disabled={isReviewing}
+                    onClick={() =>
+                      handleReviewDecision(showDetails.id, "Approve")
+                    }
+                    className="rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                  >
+                    Approve Organisation
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isReviewing}
+                    onClick={() =>
+                      handleReviewDecision(showDetails.id, "RequestInfo")
+                    }
+                    className="rounded-lg border border-[#2785B2] bg-white py-2 text-sm font-semibold text-[#2785B2] hover:bg-sky-50 disabled:opacity-50"
+                  >
+                    Request Info
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isReviewing}
+                    onClick={() =>
+                      handleReviewDecision(showDetails.id, "Reject")
+                    }
+                    className="rounded-lg bg-red-600 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                  >
+                    Reject Organisation
+                  </button>
+                </div>
               </div>
 
             </div>
 
             <div className="space-y-2 border-t border-slate-200 p-4">
-
-              {showDetails.status === "Pending" && (
-                <button
-                  onClick={() => updateStatus(showDetails.id, "Active")}
-                  className="w-full rounded-lg bg-emerald-600 py-3 text-xs font-semibold text-white hover:bg-emerald-700"
-                >
-                  Verify and activate organisation
-                </button>
-              )}
 
               <button
                 onClick={() =>
@@ -1307,7 +1498,7 @@ export default function OrganisationManagement() {
                       : "Suspended"
                   )
                 }
-                className="w-full rounded-lg border border-red-200 py-3 text-xs font-semibold text-red-600 hover:bg-red-50"
+                className="w-full rounded-lg border border-red-200 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50"
               >
                 {showDetails.status === "Suspended"
                   ? "Reactivate organisation"
