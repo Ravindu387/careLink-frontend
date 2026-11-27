@@ -1,3 +1,13 @@
+import { request, authFetch } from "./api";
+import type {
+  AssistanceRequest as LegacyAssistanceRequest,
+  AssistanceRequestStats,
+  AssistanceRequestQuery,
+  CreateAssistanceRequestPayload as AdminCreatePayload,
+  UpdateAssistanceRequestPayload as AdminUpdatePayload,
+} from "../types/assistanceRequest";
+import type { PaginatedList } from "../types/user";
+
 export interface AssistanceRequest {
   id: string;
   category: string;
@@ -114,23 +124,52 @@ export const assistanceRequestService = {
     if (filters?.unassignedOnly) params.append("unassignedOnly", "true");
 
     const query = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${API_BASE}/api/assistancerequests${query}`);
+    const response = await authFetch(`${API_BASE}/api/assistancerequests${query}`);
     if (!response.ok) {
       throw new Error(`Failed to load assistance requests: ${response.status} ${response.statusText}`);
     }
     return response.json();
   },
 
+  async getRequests(query?: AssistanceRequestQuery): Promise<PaginatedList<LegacyAssistanceRequest>> {
+    const params = new URLSearchParams();
+    if (query?.search) params.append("search", query.search);
+    if (query?.status && query.status !== "All") params.append("status", query.status);
+    if (query?.priority && query.priority !== "All") params.append("priority", query.priority);
+    if (query?.category && query.category !== "All") params.append("category", query.category);
+    if (query?.crisis) params.append("crisis", query.crisis);
+    if (query?.pageNumber) params.append("pageNumber", query.pageNumber.toString());
+    if (query?.pageSize) params.append("pageSize", query.pageSize.toString());
+
+    const qs = params.toString() ? `?${params.toString()}` : "";
+    const res = await request<PaginatedList<LegacyAssistanceRequest>>(`/assistance-requests${qs}`, {
+      method: "GET",
+    });
+    return res.data;
+  },
+
   async getMetrics(): Promise<AssistanceRequestMetrics> {
-    const response = await fetch(`${API_BASE}/api/assistancerequests/metrics`);
+    const response = await authFetch(`${API_BASE}/api/assistancerequests/metrics`);
     if (!response.ok) {
       throw new Error(`Failed to load metrics: ${response.status}`);
     }
     return response.json();
   },
 
-  async getById(id: string): Promise<AssistanceRequest> {
-    const response = await fetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}`);
+  async getStats(): Promise<AssistanceRequestStats> {
+    const res = await request<AssistanceRequestStats>("/assistance-requests/stats", {
+      method: "GET",
+    });
+    return res.data;
+  },
+
+  async getById(id: string): Promise<any> {
+    const res = await request<any>(`/assistance-requests/${id}`, {
+      method: "GET",
+    });
+    if (res?.data) return res.data;
+
+    const response = await authFetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}`);
     if (!response.ok) {
       throw new Error(`Failed to load assistance request ${id}: ${response.status}`);
     }
@@ -138,7 +177,7 @@ export const assistanceRequestService = {
   },
 
   async create(payload: CreateAssistanceRequestPayload): Promise<AssistanceRequest> {
-    const response = await fetch(`${API_BASE}/api/assistancerequests`, {
+    const response = await authFetch(`${API_BASE}/api/assistancerequests`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -153,8 +192,16 @@ export const assistanceRequestService = {
     return response.json();
   },
 
+  async createRequest(payload: AdminCreatePayload): Promise<LegacyAssistanceRequest> {
+    const res = await request<LegacyAssistanceRequest>("/assistance-requests", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return res.data;
+  },
+
   async update(id: string, payload: UpdateAssistanceRequestPayload): Promise<AssistanceRequest> {
-    const response = await fetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -169,8 +216,16 @@ export const assistanceRequestService = {
     return response.json();
   },
 
+  async updateRequest(id: string, payload: AdminUpdatePayload): Promise<LegacyAssistanceRequest> {
+    const res = await request<LegacyAssistanceRequest>(`/assistance-requests/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+    return res.data;
+  },
+
   async assign(id: string, payload: AssignPayload): Promise<AssistanceRequest> {
-    const response = await fetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}/assign`, {
+    const response = await authFetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}/assign`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -185,13 +240,34 @@ export const assistanceRequestService = {
     return response.json();
   },
 
-  async updateStatus(id: string, payload: UpdateStatusPayload): Promise<AssistanceRequest> {
-    const response = await fetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}/status`, {
+  async assignRequest(id: string, assignedTo: string, instructions?: string): Promise<LegacyAssistanceRequest> {
+    const res = await request<LegacyAssistanceRequest>(`/assistance-requests/${id}/assign`, {
+      method: "POST",
+      body: JSON.stringify({ assignedTo, instructions }),
+    });
+    return res.data;
+  },
+
+  async updateStatus(
+    id: string,
+    payloadOrStatus: UpdateStatusPayload | string,
+    reason?: string,
+    note?: string
+  ): Promise<any> {
+    if (typeof payloadOrStatus === "string") {
+      const res = await request<LegacyAssistanceRequest>(`/assistance-requests/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: payloadOrStatus, reason, note }),
+      });
+      return res.data;
+    }
+
+    const response = await authFetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(payloadOrStatus),
     });
 
     if (!response.ok) {
@@ -201,8 +277,16 @@ export const assistanceRequestService = {
     return response.json();
   },
 
+  async updatePriority(id: string, priority: string, rationale?: string): Promise<LegacyAssistanceRequest> {
+    const res = await request<LegacyAssistanceRequest>(`/assistance-requests/${id}/priority`, {
+      method: "PATCH",
+      body: JSON.stringify({ priority, rationale }),
+    });
+    return res.data;
+  },
+
   async delete(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${API_BASE}/api/assistancerequests/${encodeURIComponent(id)}`, {
       method: "DELETE",
     });
 
@@ -211,8 +295,15 @@ export const assistanceRequestService = {
     }
   },
 
+  async deleteRequest(id: string): Promise<boolean> {
+    const res = await request<boolean>(`/assistance-requests/${id}`, {
+      method: "DELETE",
+    });
+    return res.data ?? false;
+  },
+
   async reset(): Promise<{ message: string; metrics: AssistanceRequestMetrics }> {
-    const response = await fetch(`${API_BASE}/api/assistancerequests/reset`, {
+    const response = await authFetch(`${API_BASE}/api/assistancerequests/reset`, {
       method: "POST",
     });
 
@@ -220,92 +311,5 @@ export const assistanceRequestService = {
       throw new Error(`Failed to reset assistance requests: ${response.status}`);
     }
     return response.json();
-import { request } from "./api";
-import type {
-  AssistanceRequest,
-  AssistanceRequestStats,
-  AssistanceRequestQuery,
-  CreateAssistanceRequestPayload,
-  UpdateAssistanceRequestPayload,
-} from "../types/assistanceRequest";
-import type { PaginatedList } from "../types/user";
-
-export const assistanceRequestService = {
-  async getRequests(query?: AssistanceRequestQuery): Promise<PaginatedList<AssistanceRequest>> {
-    const params = new URLSearchParams();
-    if (query?.search) params.append("search", query.search);
-    if (query?.status && query.status !== "All") params.append("status", query.status);
-    if (query?.priority && query.priority !== "All") params.append("priority", query.priority);
-    if (query?.category && query.category !== "All") params.append("category", query.category);
-    if (query?.crisis) params.append("crisis", query.crisis);
-    if (query?.pageNumber) params.append("pageNumber", query.pageNumber.toString());
-    if (query?.pageSize) params.append("pageSize", query.pageSize.toString());
-
-    const qs = params.toString() ? `?${params.toString()}` : "";
-    const res = await request<PaginatedList<AssistanceRequest>>(`/assistance-requests${qs}`, {
-      method: "GET",
-    });
-    return res.data;
-  },
-
-  async getStats(): Promise<AssistanceRequestStats> {
-    const res = await request<AssistanceRequestStats>("/assistance-requests/stats", {
-      method: "GET",
-    });
-    return res.data;
-  },
-
-  async getById(id: string): Promise<AssistanceRequest> {
-    const res = await request<AssistanceRequest>(`/assistance-requests/${id}`, {
-      method: "GET",
-    });
-    return res.data;
-  },
-
-  async createRequest(payload: CreateAssistanceRequestPayload): Promise<AssistanceRequest> {
-    const res = await request<AssistanceRequest>("/assistance-requests", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-    return res.data;
-  },
-
-  async updateRequest(id: string, payload: UpdateAssistanceRequestPayload): Promise<AssistanceRequest> {
-    const res = await request<AssistanceRequest>(`/assistance-requests/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(payload),
-    });
-    return res.data;
-  },
-
-  async updateStatus(id: string, status: string, reason?: string, note?: string): Promise<AssistanceRequest> {
-    const res = await request<AssistanceRequest>(`/assistance-requests/${id}/status`, {
-      method: "PATCH",
-      body: JSON.stringify({ status, reason, note }),
-    });
-    return res.data;
-  },
-
-  async updatePriority(id: string, priority: string, rationale?: string): Promise<AssistanceRequest> {
-    const res = await request<AssistanceRequest>(`/assistance-requests/${id}/priority`, {
-      method: "PATCH",
-      body: JSON.stringify({ priority, rationale }),
-    });
-    return res.data;
-  },
-
-  async assignRequest(id: string, assignedTo: string, instructions?: string): Promise<AssistanceRequest> {
-    const res = await request<AssistanceRequest>(`/assistance-requests/${id}/assign`, {
-      method: "POST",
-      body: JSON.stringify({ assignedTo, instructions }),
-    });
-    return res.data;
-  },
-
-  async deleteRequest(id: string): Promise<boolean> {
-    const res = await request<boolean>(`/assistance-requests/${id}`, {
-      method: "DELETE",
-    });
-    return res.data ?? false;
   },
 };

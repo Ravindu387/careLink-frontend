@@ -391,7 +391,7 @@ export default function AssistanceRequests() {
   };
 
   const selectClass =
-    "min-w-0 w-full rounded-lg border border-[#d6e2e9] bg-white px-2.5 py-2.5 text-[9px] text-slate-700 outline-none focus:border-sky-500";
+    "min-w-0 w-full rounded-lg border border-[#d6e2e9] bg-white px-2.5 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-sky-500";
 
   return (
     <div className="min-h-screen bg-[#edf4f7] px-4 py-6 sm:px-6 lg:px-7">
@@ -399,23 +399,23 @@ export default function AssistanceRequests() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-medium text-[#153f5e] sm:text-2xl">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
               Assistance Requests
             </h1>
             {isLiveConnected ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold text-emerald-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Backend Live
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
                 <Clock size={10} />
                 Connecting...
               </span>
             )}
           </div>
 
-          <p className="mt-1 text-[10px] text-slate-500 sm:text-xs">
+          <p className="mt-1 text-[13px] text-slate-500 sm:text-xs">
             Monitor verification, priority, assignment, and response status across active cases.
           </p>
         </div>
@@ -424,7 +424,7 @@ export default function AssistanceRequests() {
           <button
             onClick={handleManualRefresh}
             disabled={loading}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-[10px] font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
             title="Refresh requests from server"
           >
             <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
@@ -433,7 +433,7 @@ export default function AssistanceRequests() {
 
           <button
             onClick={handleResetData}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
             title="Reset data to baseline"
           >
             <RotateCcw size={12} />
@@ -442,7 +442,7 @@ export default function AssistanceRequests() {
 
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 rounded-lg border border-sky-600 bg-white px-3 py-2 text-[10px] font-medium text-sky-800 hover:bg-sky-50 shadow-sm"
+            className="flex items-center gap-1.5 rounded-lg border border-sky-600 bg-white px-3 py-2 text-sm font-medium text-sky-800 hover:bg-sky-50 shadow-sm"
           >
             <Download size={13} />
             Export
@@ -450,7 +450,7 @@ export default function AssistanceRequests() {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-[10px] font-semibold text-white hover:bg-[#1e668b] shadow-sm"
+            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#1e668b] shadow-sm"
           >
             <Plus size={14} />
             Create request
@@ -463,11 +463,11 @@ export default function AssistanceRequests() {
         <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
           <div className="flex items-center gap-2">
             <AlertTriangle size={16} />
-            <span className="text-[10px] font-medium">{error}</span>
+            <span className="text-sm font-medium">{error}</span>
           </div>
           <button
             onClick={handleManualRefresh}
-            className="rounded bg-red-600 px-2.5 py-1 text-[9px] font-semibold text-white hover:bg-red-700"
+            className="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
           >
             Retry Connection
           </button>
@@ -483,7 +483,7 @@ export default function AssistanceRequests() {
               setActiveTab(tab.name);
               setCurrentPage(1);
             }}
-            className={`flex items-center gap-1.5 whitespace-nowrap border-b-2 px-0 pb-3 text-[9px] transition ${
+            className={`flex items-center gap-1.5 whitespace-nowrap border-b-2 px-0 pb-3 text-sm transition ${
               activeTab === tab.name
                 ? "border-[#287da5] font-semibold text-[#287da5]"
                 : "border-transparent text-slate-500 hover:text-sky-800"
@@ -491,7 +491,7 @@ export default function AssistanceRequests() {
           >
             {tab.name}
 
-            <span className={`rounded-full px-1.5 py-0.5 text-[8px] ${
+            <span className={`rounded-full px-1.5 py-0.5 text-xs ${
               activeTab === tab.name ? "bg-sky-100 text-sky-800 font-bold" : "bg-slate-200/70 text-slate-500"
             }`}>
               {tab.count}
@@ -512,7 +512,7 @@ export default function AssistanceRequests() {
               setCurrentPage(1);
             }}
             placeholder="Search request ID, category, location, or assigned unit..."
-            className="w-full bg-transparent text-[10px] outline-none placeholder:text-slate-400"
+            className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
           />
 
           {search && (
@@ -604,7 +604,7 @@ export default function AssistanceRequests() {
 
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="col-span-2 flex items-center justify-center gap-2 rounded-lg border border-sky-600 bg-white px-3 py-2.5 text-[10px] font-medium text-sky-800 hover:bg-sky-50 sm:col-span-1"
+            className="col-span-2 flex items-center justify-center gap-2 rounded-lg border border-sky-600 bg-white px-3 py-2.5 text-sm font-medium text-sky-800 hover:bg-sky-50 sm:col-span-1"
           >
             <Filter size={13} />
             More filters
@@ -616,13 +616,13 @@ export default function AssistanceRequests() {
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d6e2e9] bg-white p-3">
           <div className="flex items-center gap-2">
             <Clock size={15} className="text-sky-600" />
-            <span className="text-[10px] font-medium text-sky-950">
+            <span className="text-sm font-medium text-sky-950">
               Advanced request filters
             </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-1.5 text-[9px] text-slate-600 cursor-pointer">
+            <label className="flex items-center gap-1.5 text-sm text-slate-600 cursor-pointer">
               <input
                 type="checkbox"
                 checked={verifiedOnly}
@@ -635,7 +635,7 @@ export default function AssistanceRequests() {
               Verified only
             </label>
 
-            <label className="flex items-center gap-1.5 text-[9px] text-slate-600 cursor-pointer">
+            <label className="flex items-center gap-1.5 text-sm text-slate-600 cursor-pointer">
               <input
                 type="checkbox"
                 checked={unassignedOnly}
@@ -650,7 +650,7 @@ export default function AssistanceRequests() {
 
             <button
               onClick={resetFilters}
-              className="text-[9px] font-semibold text-sky-700 hover:underline"
+              className="text-sm font-semibold text-sky-700 hover:underline"
             >
               Clear filters
             </button>
@@ -678,7 +678,7 @@ export default function AssistanceRequests() {
                 ].map((heading, index) => (
                   <th
                     key={index}
-                    className="whitespace-nowrap px-3 py-3 text-[8px] font-semibold text-slate-500"
+                    className="whitespace-nowrap px-3 py-3 text-[13px] font-semibold text-slate-500"
                   >
                     {heading}
                   </th>
@@ -701,25 +701,25 @@ export default function AssistanceRequests() {
                     onClick={() => setSelectedRequest(request)}
                     className="cursor-pointer border-b border-slate-100 transition hover:bg-[#f0f6f8]"
                   >
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] font-semibold text-sky-950">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm font-semibold text-sky-950">
                       {request.id}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-700">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-700">
                       {request.category}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-600">
                       {request.location}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-500">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-500">
                       {request.reported}
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
                       <span
-                        className={`rounded-md px-2 py-1 text-[8px] font-semibold ${
+                        className={`rounded-md px-2 py-1 text-xs font-semibold ${
                           request.priority.startsWith("Critical")
                             ? "bg-red-100 text-red-700"
                             : request.priority.startsWith("High")
@@ -731,21 +731,21 @@ export default function AssistanceRequests() {
                       </span>
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px]">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm">
                       {request.verification === "Verified" || request.verification === "Contact verified" ? (
-                        <span className="rounded-md bg-emerald-100 px-2 py-1 text-[8px] font-semibold text-emerald-700">
+                        <span className="rounded-md bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">
                           {request.verification}
                         </span>
                       ) : (
-                        <span className="rounded-md bg-slate-100 px-2 py-1 text-[8px] font-medium text-slate-600">
+                        <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
                           {request.verification}
                         </span>
                       )}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-600">
                       {request.assigned === "Unassigned" ? (
-                        <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[8px] font-semibold text-amber-700 border border-amber-200">
+                        <span className="rounded bg-amber-50 px-1.5 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
                           Unassigned
                         </span>
                       ) : (
@@ -754,14 +754,14 @@ export default function AssistanceRequests() {
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
-                      <span className="rounded-md bg-sky-100 px-2 py-1 text-[8px] font-semibold text-sky-700">
+                      <span className="rounded-md bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-700">
                         {request.age}
                       </span>
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
                       <span
-                        className={`rounded-md px-2 py-1 text-[8px] font-semibold ${
+                        className={`rounded-md px-2 py-1 text-xs font-semibold ${
                           request.status === "Escalated"
                             ? "bg-red-100 text-red-700"
                             : request.status === "Under Review"
@@ -790,17 +790,17 @@ export default function AssistanceRequests() {
         {!loading && filteredRequests.length === 0 && (
           <div className="py-14 text-center">
             <FileText size={26} className="mx-auto mb-2 text-slate-300" />
-            <p className="text-xs font-medium text-slate-600">
+            <p className="text-sm font-medium text-slate-600">
               No assistance requests found
             </p>
-            <p className="mt-1 text-[9px] text-slate-400">
+            <p className="mt-1 text-xs text-slate-400">
               Try changing your search or filters.
             </p>
           </div>
         )}
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">
-          <p className="text-[9px] text-slate-500">
+          <p className="text-xs text-slate-500">
             Showing {filteredRequests.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredRequests.length)} of {filteredRequests.length} requests
             {requests.length > 0 && ` (${requests.length} active in memory)`}
           </p>
@@ -809,7 +809,7 @@ export default function AssistanceRequests() {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-[9px] text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
             >
               Previous
             </button>
@@ -818,7 +818,7 @@ export default function AssistanceRequests() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`h-7 w-7 rounded-md border text-[9px] ${
+                className={`h-7 w-7 rounded-md border text-sm ${
                   currentPage === page
                     ? "border-[#287da5] bg-[#287da5] font-semibold text-white"
                     : "border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -831,7 +831,7 @@ export default function AssistanceRequests() {
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-[9px] text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
             >
               Next
             </button>
@@ -848,10 +848,10 @@ export default function AssistanceRequests() {
           >
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold text-sky-950">
+                <h2 className="text-lg sm:text-xl font-semibold text-sky-950">
                   Create assistance request
                 </h2>
-                <p className="mt-1 text-[9px] text-slate-500">
+                <p className="mt-1 text-xs text-slate-500">
                   Register a new humanitarian assistance case with automated AI triage.
                 </p>
               </div>
@@ -866,7 +866,7 @@ export default function AssistanceRequests() {
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="sm:col-span-2">
-                <span className="mb-1 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1 block text-sm font-medium text-slate-600">
                   Assistance category *
                 </span>
                 <select
@@ -884,7 +884,7 @@ export default function AssistanceRequests() {
               </label>
 
               <label className="sm:col-span-2">
-                <span className="mb-1 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1 block text-sm font-medium text-slate-600">
                   Location / Sector *
                 </span>
                 <input
@@ -897,7 +897,7 @@ export default function AssistanceRequests() {
               </label>
 
               <label>
-                <span className="mb-1 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1 block text-sm font-medium text-slate-600">
                   Priority
                 </span>
                 <select
@@ -913,7 +913,7 @@ export default function AssistanceRequests() {
               </label>
 
               <label>
-                <span className="mb-1 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1 block text-sm font-medium text-slate-600">
                   Assignment
                 </span>
                 <select
@@ -931,7 +931,7 @@ export default function AssistanceRequests() {
               </label>
 
               <label>
-                <span className="mb-1 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1 block text-sm font-medium text-slate-600">
                   Estimated Affected People
                 </span>
                 <input
@@ -945,7 +945,7 @@ export default function AssistanceRequests() {
               </label>
 
               <label>
-                <span className="mb-1 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1 block text-sm font-medium text-slate-600">
                   Organisation
                 </span>
                 <select
@@ -962,7 +962,7 @@ export default function AssistanceRequests() {
               </label>
 
               <label className="sm:col-span-2">
-                <span className="mb-1 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1 block text-sm font-medium text-slate-600">
                   Incident Description & Conditions
                 </span>
                 <textarea
@@ -982,7 +982,7 @@ export default function AssistanceRequests() {
                     onChange={(e) => setNewRequest({ ...newRequest, isLifeThreatening: e.target.checked })}
                     className="h-3 w-3 rounded accent-red-600"
                   />
-                  <span className="text-[9px] font-medium text-red-700">
+                  <span className="text-xs font-medium text-red-700">
                     Immediate life threat / high urgency rescue
                   </span>
                 </label>
@@ -994,7 +994,7 @@ export default function AssistanceRequests() {
                     onChange={(e) => setNewRequest({ ...newRequest, hasVulnerableMembers: e.target.checked })}
                     className="h-3 w-3 rounded accent-sky-700"
                   />
-                  <span className="text-[9px] font-medium text-slate-700">
+                  <span className="text-xs font-medium text-slate-700">
                     Includes vulnerable individuals (elderly, infants, disabled)
                   </span>
                 </label>
@@ -1005,7 +1005,7 @@ export default function AssistanceRequests() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-[10px] text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -1013,7 +1013,7 @@ export default function AssistanceRequests() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-4 py-2 text-[10px] font-semibold text-white hover:bg-[#1e668b] disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1e668b] disabled:opacity-50"
               >
                 {submitting && <Loader2 size={12} className="animate-spin" />}
                 <Plus size={13} />
@@ -1030,10 +1030,10 @@ export default function AssistanceRequests() {
           <div className="w-full max-w-lg rounded-xl bg-white p-5 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <p className="text-[9px] font-semibold text-sky-600">
+                <p className="text-xs font-semibold text-sky-600">
                   REQUEST DETAILS
                 </p>
-                <h2 className="mt-1 text-base font-semibold text-sky-950">
+                <h2 className="mt-1 text-lg sm:text-xl font-semibold text-sky-950">
                   {selectedRequest.id} · {selectedRequest.crisisEvent}
                 </h2>
               </div>
@@ -1045,10 +1045,10 @@ export default function AssistanceRequests() {
 
             <div className="mb-4 rounded-lg bg-slate-50 p-3 border border-slate-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-sky-950">
+                <h3 className="text-base font-semibold text-sky-950">
                   {selectedRequest.category}
                 </h3>
-                <span className={`rounded px-2 py-0.5 text-[8px] font-semibold ${
+                <span className={`rounded px-2 py-0.5 text-xs font-semibold ${
                   selectedRequest.priority.startsWith("Critical")
                     ? "bg-red-100 text-red-700"
                     : "bg-amber-100 text-amber-700"
@@ -1056,11 +1056,11 @@ export default function AssistanceRequests() {
                   {selectedRequest.priority}
                 </span>
               </div>
-              <p className="mt-1 text-[10px] text-slate-600">
+              <p className="mt-1 text-sm text-slate-600">
                 {selectedRequest.location}
               </p>
               {selectedRequest.description && (
-                <p className="mt-2 text-[10px] text-slate-500 italic border-t border-slate-200/60 pt-2">
+                <p className="mt-2 text-[13px] text-slate-500 italic border-t border-slate-200/60 pt-2">
                   "{selectedRequest.description}"
                 </p>
               )}
@@ -1078,8 +1078,8 @@ export default function AssistanceRequests() {
                 ["Affected Persons", `${selectedRequest.affectedPeopleCount} people`],
               ].map(([label, value]) => (
                 <div key={label} className="flex justify-between gap-3 border-b border-slate-100 pb-1.5">
-                  <span className="text-[10px] text-slate-500">{label}</span>
-                  <span className="text-right text-[10px] font-medium text-sky-950">{value}</span>
+                  <span className="text-[13px] text-slate-500">{label}</span>
+                  <span className="text-right text-sm font-medium text-sky-950">{value}</span>
                 </div>
               ))}
             </div>
@@ -1087,7 +1087,7 @@ export default function AssistanceRequests() {
             {/* Quick Actions inside modal */}
             <div className="space-y-3 rounded-lg bg-[#edf4f7] p-3 border border-sky-100">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold text-[#153f5e] flex items-center gap-1">
+                <span className="text-sm font-semibold text-[#153f5e] flex items-center gap-1">
                   <UserCheck size={12} /> Quick Assignment
                 </span>
                 {updatingAssignment && <Loader2 size={11} className="animate-spin text-[#287da5]" />}
@@ -1105,7 +1105,7 @@ export default function AssistanceRequests() {
                     key={unit}
                     onClick={() => handleAssignInModal(unit)}
                     disabled={updatingAssignment || selectedRequest.assigned === unit}
-                    className={`rounded px-2.5 py-1 text-[8px] font-medium transition ${
+                    className={`rounded px-2.5 py-1 text-xs font-medium transition ${
                       selectedRequest.assigned === unit
                         ? "bg-[#287da5] text-white font-semibold"
                         : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
@@ -1117,7 +1117,7 @@ export default function AssistanceRequests() {
               </div>
 
               <div className="flex items-center justify-between pt-1">
-                <span className="text-[10px] font-semibold text-[#153f5e]">Update Status</span>
+                <span className="text-sm font-semibold text-[#153f5e]">Update Status</span>
                 {updatingStatus && <Loader2 size={11} className="animate-spin text-[#287da5]" />}
               </div>
 
@@ -1133,7 +1133,7 @@ export default function AssistanceRequests() {
                     key={st}
                     onClick={() => handleStatusChangeInModal(st)}
                     disabled={updatingStatus || selectedRequest.status === st}
-                    className={`rounded px-2.5 py-1 text-[8px] font-medium transition ${
+                    className={`rounded px-2.5 py-1 text-xs font-medium transition ${
                       selectedRequest.status === st
                         ? "bg-sky-950 text-white font-semibold"
                         : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
@@ -1147,7 +1147,7 @@ export default function AssistanceRequests() {
 
             <button
               onClick={() => setSelectedRequest(null)}
-              className="mt-4 w-full rounded-lg bg-sky-950 py-2.5 text-[10px] font-semibold text-white hover:bg-sky-900"
+              className="mt-4 w-full rounded-lg bg-sky-950 py-2.5 text-sm font-semibold text-white hover:bg-sky-900"
             >
               Close
             </button>
