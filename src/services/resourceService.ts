@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 /**
  * Resource Service
  * Connects the Emergency Coordinator Resource Overview to the CareLink .NET backend.
@@ -159,7 +160,7 @@ export const resourceService = {
 
     const query = params.toString() ? `?${params.toString()}` : "";
     try {
-      const response = await fetch(`${BASE_URL}${query}`, {
+      const response = await authFetch(`${BASE_URL}${query}`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) throw new Error(`HTTP error ${response.status}`);
@@ -193,7 +194,7 @@ export const resourceService = {
 
   async getMetrics(): Promise<ResourceMetrics> {
     try {
-      const response = await fetch(`${BASE_URL}/metrics`, {
+      const response = await authFetch(`${BASE_URL}/metrics`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) throw new Error(`HTTP error ${response.status}`);
@@ -204,7 +205,7 @@ export const resourceService = {
   },
 
   async createRequest(payload: CreateResourceRequestPayload): Promise<ResourceRequestResponse> {
-    const response = await fetch(`${BASE_URL}/requests`, {
+    const response = await authFetch(`${BASE_URL}/requests`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -223,7 +224,7 @@ export const resourceService = {
 
   async reset(): Promise<boolean> {
     try {
-      const response = await fetch(`${BASE_URL}/reset`, {
+      const response = await authFetch(`${BASE_URL}/reset`, {
         method: "POST",
         headers: { Accept: "application/json" },
       });

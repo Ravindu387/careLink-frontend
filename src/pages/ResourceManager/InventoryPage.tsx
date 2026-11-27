@@ -180,7 +180,7 @@ const statusClasses: Record<InventoryStatus, string> = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-sky-500";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500";
 
 export default function InventoryPage() {
   const navigate = useNavigate();
@@ -506,21 +506,21 @@ export default function InventoryPage() {
             <Package size={23} />
           </div>
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">Resource Management</p>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">Resource Management</p>
           </div>
         </div>
 
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
-          <p className="mt-2 text-xs font-bold">Monsoon Floods 2025</p>
-          <p className="mt-1 text-[10px] text-sky-200">Greater Riverton · Level 4</p>
+          <p className="mt-2 text-sm font-bold">Monsoon Floods 2025</p>
+          <p className="mt-1 text-sm text-sky-200">Greater Riverton · Level 4</p>
         </div>
 
         <nav className="mt-5 flex-1 overflow-y-auto px-3">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -536,7 +536,7 @@ export default function InventoryPage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -545,7 +545,7 @@ export default function InventoryPage() {
                 <Icon size={17} />
                 <span className="flex-1">{item.label}</span>
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] text-white">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs text-white">
                     {item.count}
                   </span>
                 )}
@@ -559,8 +559,8 @@ export default function InventoryPage() {
             DP
           </div>
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">Resource Manager</p>
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">Resource Manager</p>
           </div>
           <ChevronRight size={18} />
         </div>
@@ -595,21 +595,21 @@ export default function InventoryPage() {
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
             {search && (
               <button onClick={() => setSearch("")} aria-label="Clear search">
                 <X size={14} className="text-slate-400 hover:text-slate-600" />
               </button>
             )}
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+            <span className="hidden rounded border bg-white px-2 py-1 text-xs text-slate-400 sm:block">
               ⌘ K
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Backend Connection Badge */}
-            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600">
+            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
               {isBackendConnected === true ? (
                 <>
                   <Wifi size={13} className="text-emerald-500" />
@@ -638,15 +638,15 @@ export default function InventoryPage() {
             </button>
 
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">Primary Hub</p>
-              <p className="text-[10px] font-bold">Central Logistics Hub</p>
+              <p className="text-xs uppercase text-slate-400">Primary Hub</p>
+              <p className="text-sm font-bold">Central Logistics Hub</p>
             </div>
             <button className="hidden rounded-lg border p-2.5 sm:block" aria-label="Security">
               <ShieldCheck size={18} />
             </button>
             <button className="relative rounded-lg border p-2.5" aria-label="Notifications">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -654,8 +654,8 @@ export default function InventoryPage() {
               DP
             </div>
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">Resource Manager</p>
+              <p className="text-sm font-bold">Daniel P.</p>
+              <p className="text-xs text-slate-400">Resource Manager</p>
             </div>
             <ChevronRight size={17} className="hidden sm:block" />
           </div>
@@ -665,7 +665,7 @@ export default function InventoryPage() {
           {/* Breadcrumb and heading */}
           <section className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-[10px] text-slate-400 mb-1">
+              <p className="text-[13px] text-slate-400 mb-1">
                 Resource Operations <ChevronRight size={12} className="mx-1 inline" />
                 <span className="font-semibold text-[#163d5c]">Inventory</span>
               </p>
@@ -680,13 +680,13 @@ export default function InventoryPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={exportInventory}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
               >
                 <Download size={14} /> Export CSV
               </button>
               <button
                 onClick={() => setShowAddForm(true)}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
               >
                 <Plus size={15} /> Add Resource
               </button>
@@ -708,9 +708,9 @@ export default function InventoryPage() {
                     <Icon size={20} />
                   </div>
                   <div>
-                    <p className="text-[11px] text-slate-400">{card.title}</p>
+                    <p className="text-[13px] text-slate-400">{card.title}</p>
                     <h3 className="text-2xl font-bold text-slate-800">{card.value}</h3>
-                    <p className="text-[10px] text-slate-400">{card.note}</p>
+                    <p className="text-[13px] text-slate-400">{card.note}</p>
                   </div>
                 </div>
               );
@@ -727,7 +727,7 @@ export default function InventoryPage() {
                     setActiveTab(tab);
                     setCurrentPage(1);
                   }}
-                  className={`relative flex items-center gap-1.5 pb-3 text-xs font-medium transition ${
+                  className={`relative flex items-center gap-1.5 pb-3 text-sm font-medium transition ${
                     activeTab === tab
                       ? "font-bold text-sky-700"
                       : "text-slate-500 hover:text-slate-700"
@@ -735,12 +735,12 @@ export default function InventoryPage() {
                 >
                   {tab}
                   {tab === "All" && (
-                    <span className="rounded-full bg-sky-100 px-1.5 py-0.2 text-[10px] text-sky-800 font-semibold">
+                    <span className="rounded-full bg-sky-100 px-1.5 py-0.2 text-sm text-sky-800 font-semibold">
                       {inventory.length}
                     </span>
                   )}
                   {tab === "Needs action" && (
-                    <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[10px] text-amber-800 font-semibold">
+                    <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-sm text-amber-800 font-semibold">
                       {inventory.filter((i) => i.status !== "Healthy").length}
                     </span>
                   )}
@@ -763,7 +763,7 @@ export default function InventoryPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search inventory..."
-                className="w-full py-2.5 text-xs outline-none"
+                className="w-full py-2.5 text-sm sm:text-[15px] outline-none"
               />
             </div>
 
@@ -826,7 +826,7 @@ export default function InventoryPage() {
 
             <button
               onClick={() => setShowMoreFilters(true)}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 text-xs font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 text-sm font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
             >
               <Filter size={14} /> More filters
             </button>
@@ -838,7 +838,7 @@ export default function InventoryPage() {
               activeTab !== "All") && (
               <button
                 onClick={resetFilters}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-200 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 transition"
               >
                 <RotateCcw size={13} /> Reset
               </button>
@@ -849,7 +849,7 @@ export default function InventoryPage() {
           <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1000px] text-left">
-                <thead className="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-wider">
+                <thead className="bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wider">
                   <tr>
                     <th className="px-4 py-3.5 font-semibold">Resource ID</th>
                     <th className="px-4 py-3.5 font-semibold">Resource</th>
@@ -868,7 +868,7 @@ export default function InventoryPage() {
                   {displayedItems.map((item) => (
                     <tr
                       key={item.id}
-                      className="border-t border-slate-100 text-xs hover:bg-slate-50/80 transition"
+                      className="border-t border-slate-100 text-sm hover:bg-slate-50/80 transition"
                     >
                       <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-800">
                         {item.id}
@@ -896,7 +896,7 @@ export default function InventoryPage() {
                       </td>
                       <td className="whitespace-nowrap px-4 py-3.5">
                         <span
-                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusClasses[item.status]}`}
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusClasses[item.status]}`}
                         >
                           {item.status}
                         </span>
@@ -930,7 +930,7 @@ export default function InventoryPage() {
 
             {/* Pagination */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 text-xs">
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[13px] text-slate-500">
                 Showing{" "}
                 <span className="font-semibold text-slate-700">
                   {filteredInventory.length === 0 ? 0 : (safePage - 1) * pageSize + 1}
@@ -950,7 +950,7 @@ export default function InventoryPage() {
                 <button
                   disabled={safePage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
                 >
                   Previous
                 </button>
@@ -972,7 +972,7 @@ export default function InventoryPage() {
                 <button
                   disabled={safePage === totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
                 >
                   Next
                 </button>
@@ -980,7 +980,7 @@ export default function InventoryPage() {
             </div>
           </section>
 
-          <footer className="py-2 text-center text-[10px] text-slate-400">
+          <footer className="py-2 text-center text-[13px] text-slate-400">
             ReliefOS · Humanitarian Resource Management Platform
           </footer>
         </div>
@@ -996,7 +996,7 @@ export default function InventoryPage() {
             <div className="flex items-center justify-between border-b pb-3">
               <div>
                 <h3 className="text-lg font-bold text-slate-800">Add New Resource</h3>
-                <p className="mt-0.5 text-[11px] text-slate-400">
+                <p className="mt-0.5 text-[13px] text-slate-400">
                   Register SKU in warehouse ledger
                 </p>
               </div>
@@ -1108,13 +1108,13 @@ export default function InventoryPage() {
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-[#287ba5] px-4 py-2 text-xs font-bold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-4 py-2 text-sm font-bold text-white hover:bg-[#1c668d]"
               >
                 Save Resource
               </button>
@@ -1132,7 +1132,7 @@ export default function InventoryPage() {
                 <h3 className="text-lg font-bold text-slate-800">
                   {selectedItem.resource}
                 </h3>
-                <p className="mt-0.5 font-mono text-xs text-[#287ba5]">
+                <p className="mt-0.5 font-mono text-sm text-[#287ba5]">
                   {selectedItem.id}
                 </p>
               </div>
@@ -1147,13 +1147,13 @@ export default function InventoryPage() {
             <div className="mb-4 rounded-xl border border-sky-100 bg-sky-50/80 p-3.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">
+                  <span className="text-xs uppercase font-bold text-slate-400">
                     Location
                   </span>
                   <p className="font-bold text-slate-800">{selectedItem.warehouse}</p>
                 </div>
                 <span
-                  className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusClasses[selectedItem.status]}`}
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusClasses[selectedItem.status]}`}
                 >
                   {selectedItem.status}
                 </span>
@@ -1162,35 +1162,35 @@ export default function InventoryPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Category</p>
+                <p className="text-[13px] text-slate-400">Category</p>
                 <p className="font-bold text-slate-800 mt-0.5">{selectedItem.category}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Available</p>
+                <p className="text-[13px] text-slate-400">Available</p>
                 <p className="font-bold text-slate-800 mt-0.5 font-mono">
                   {formatNumber(selectedItem.available)} {selectedItem.unit || "units"}
                 </p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">On Hand</p>
+                <p className="text-[13px] text-slate-400">On Hand</p>
                 <p className="font-semibold text-slate-700 mt-0.5 font-mono">
                   {formatNumber(selectedItem.onHand)}
                 </p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Reserved</p>
+                <p className="text-[13px] text-slate-400">Reserved</p>
                 <p className="font-semibold text-slate-700 mt-0.5 font-mono">
                   {formatNumber(selectedItem.reserved)}
                 </p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">In Transit</p>
+                <p className="text-[13px] text-slate-400">In Transit</p>
                 <p className="font-semibold text-slate-700 mt-0.5 font-mono">
                   {formatNumber(selectedItem.inTransit)}
                 </p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Unit</p>
+                <p className="text-[13px] text-slate-400">Unit</p>
                 <p className="font-semibold text-slate-700 mt-0.5">
                   {selectedItem.unit || "units"}
                 </p>
@@ -1199,35 +1199,35 @@ export default function InventoryPage() {
 
             {/* QUICK ADJUSTMENT CONTROLS */}
             <div className="mt-4 border-t pt-3">
-              <p className="text-[11px] font-semibold text-slate-700 mb-2">
+              <p className="text-sm font-semibold text-slate-700 mb-2">
                 Quick Stock Adjustment:
               </p>
               <div className="grid grid-cols-4 gap-2 mb-3">
                 <button
                   disabled={actionInProgress === selectedItem.id}
                   onClick={() => handleStockAdjustment(10)}
-                  className="flex items-center justify-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                  className="flex items-center justify-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
                 >
                   <TrendingUp size={12} /> +10
                 </button>
                 <button
                   disabled={actionInProgress === selectedItem.id}
                   onClick={() => handleStockAdjustment(50)}
-                  className="flex items-center justify-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                  className="flex items-center justify-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
                 >
                   <TrendingUp size={12} /> +50
                 </button>
                 <button
                   disabled={actionInProgress === selectedItem.id || selectedItem.onHand < 10}
                   onClick={() => handleStockAdjustment(-10)}
-                  className="flex items-center justify-center gap-1 rounded-lg border border-amber-200 bg-amber-50 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 disabled:opacity-40"
+                  className="flex items-center justify-center gap-1 rounded-lg border border-amber-200 bg-amber-50 py-1.5 text-sm font-semibold text-amber-700 hover:bg-amber-100 disabled:opacity-40"
                 >
                   <TrendingDown size={12} /> -10
                 </button>
                 <button
                   disabled={actionInProgress === selectedItem.id || selectedItem.onHand < 50}
                   onClick={() => handleStockAdjustment(-50)}
-                  className="flex items-center justify-center gap-1 rounded-lg border border-amber-200 bg-amber-50 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 disabled:opacity-40"
+                  className="flex items-center justify-center gap-1 rounded-lg border border-amber-200 bg-amber-50 py-1.5 text-sm font-semibold text-amber-700 hover:bg-amber-100 disabled:opacity-40"
                 >
                   <TrendingDown size={12} /> -50
                 </button>
@@ -1239,7 +1239,7 @@ export default function InventoryPage() {
                   placeholder="Custom +/- amount"
                   value={adjustmentAmount}
                   onChange={(e) => setAdjustmentAmount(e.target.value)}
-                  className="flex-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs outline-none"
+                  className="flex-1 rounded-lg border border-slate-200 px-3 py-1.5 text-sm sm:text-[15px] outline-none"
                 />
                 <button
                   disabled={!adjustmentAmount || actionInProgress === selectedItem.id}
@@ -1249,7 +1249,7 @@ export default function InventoryPage() {
                       handleStockAdjustment(val);
                     }
                   }}
-                  className="rounded-lg bg-[#287ba5] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#1c668d] disabled:opacity-40"
+                  className="rounded-lg bg-[#287ba5] px-3 py-1.5 text-sm font-bold text-white hover:bg-[#1c668d] disabled:opacity-40"
                 >
                   Apply
                 </button>
@@ -1260,13 +1260,13 @@ export default function InventoryPage() {
               <button
                 disabled={actionInProgress === selectedItem.id}
                 onClick={() => handleDeleteItem(selectedItem.id)}
-                className="flex items-center justify-center gap-1 rounded-lg border border-rose-200 bg-rose-50 py-2 px-3 text-xs font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-40"
+                className="flex items-center justify-center gap-1 rounded-lg border border-rose-200 bg-rose-50 py-2 px-3 text-sm font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-40"
               >
                 <Trash2 size={13} /> Delete SKU
               </button>
               <button
                 onClick={() => setSelectedItem(null)}
-                className="flex-1 rounded-lg bg-slate-100 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+                className="flex-1 rounded-lg bg-slate-100 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition"
               >
                 Close
               </button>
@@ -1357,7 +1357,7 @@ export default function InventoryPage() {
                   resetFilters();
                   setShowMoreFilters(false);
                 }}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 <RotateCcw size={13} /> Reset
               </button>
@@ -1366,7 +1366,7 @@ export default function InventoryPage() {
                   setCurrentPage(1);
                   setShowMoreFilters(false);
                 }}
-                className="rounded-lg bg-[#287ba5] px-5 py-2 text-xs font-semibold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1c668d]"
               >
                 Apply Filters
               </button>

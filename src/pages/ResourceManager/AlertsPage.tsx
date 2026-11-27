@@ -415,8 +415,8 @@ export default function AlertsPage() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">
               Resource Management
             </p>
           </div>
@@ -424,22 +424,22 @@ export default function AlertsPage() {
 
         {/* ACTIVE OPERATION */}
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
 
-          <p className="mt-2 text-xs font-bold">
+          <p className="mt-2 text-sm font-bold">
             Monsoon Floods 2025
           </p>
 
-          <p className="mt-1 text-[10px] text-sky-200">
+          <p className="mt-1 text-sm text-sky-200">
             Greater Riverton · Level 4
           </p>
         </div>
 
         {/* NAVIGATION */}
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -456,7 +456,7 @@ export default function AlertsPage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -467,7 +467,7 @@ export default function AlertsPage() {
                 <span className="flex-1">{item.label}</span>
 
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px]">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs">
                     {item.count}
                   </span>
                 )}
@@ -483,8 +483,8 @@ export default function AlertsPage() {
           </div>
 
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">
               Resource Manager
             </p>
           </div>
@@ -522,7 +522,7 @@ export default function AlertsPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search resources, requests, dispatches..."
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
 
             {search && (
@@ -534,7 +534,7 @@ export default function AlertsPage() {
 
           <div className="flex items-center gap-3">
             {/* BACKEND API STATUS BADGE */}
-            <div className="hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 text-[10px]">
+            <div className="hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 text-sm">
               {isBackendConnected ? (
                 <>
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -555,10 +555,10 @@ export default function AlertsPage() {
             </div>
 
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">
+              <p className="text-xs uppercase text-slate-400">
                 Primary Hub
               </p>
-              <p className="text-[10px] font-bold">
+              <p className="text-sm font-bold">
                 Central Logistics Hub
               </p>
             </div>
@@ -577,7 +577,7 @@ export default function AlertsPage() {
 
             <button className="relative rounded-lg border p-2.5">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 {alerts.filter(a => a.status === "Open").length}
               </span>
             </button>
@@ -587,8 +587,8 @@ export default function AlertsPage() {
             </div>
 
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-sm font-bold">Daniel P.</p>
+              <p className="text-xs text-slate-400">
                 Resource Manager
               </p>
             </div>
@@ -599,7 +599,7 @@ export default function AlertsPage() {
         <div className="space-y-6 p-4 sm:p-6 lg:p-7">
 
           {/* BREADCRUMB */}
-          <div className="text-[10px] text-slate-400">
+          <div className="text-[13px] text-slate-400">
             Resource Operations
             <ChevronRight size={12} className="mx-1 inline" />
             <span className="font-semibold text-[#163d5c]">
@@ -622,7 +622,7 @@ export default function AlertsPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-xs font-semibold text-white hover:bg-emerald-700 transition"
+                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 transition"
               >
                 <Plus size={15} />
                 New alert
@@ -630,14 +630,14 @@ export default function AlertsPage() {
 
               <button
                 onClick={handleMarkAllReviewed}
-                className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-semibold text-sky-700 hover:bg-slate-50 transition"
+                className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-sky-700 hover:bg-slate-50 transition"
               >
                 Mark all reviewed
               </button>
 
               <button
                 onClick={() => setShowRules(true)}
-                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-3 text-xs font-semibold text-white hover:bg-[#1c668d] transition"
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-3 text-sm font-semibold text-white hover:bg-[#1c668d] transition"
               >
                 <SlidersHorizontal size={15} />
                 Alert rules
@@ -690,7 +690,7 @@ export default function AlertsPage() {
                   </div>
 
                   <div>
-                    <p className="text-[10px] text-slate-400">
+                    <p className="text-[13px] text-slate-400">
                       {card.title}
                     </p>
 
@@ -698,7 +698,7 @@ export default function AlertsPage() {
                       {card.value}
                     </h3>
 
-                    <p className="text-[9px] text-slate-400">
+                    <p className="text-xs text-slate-400">
                       {card.note}
                     </p>
                   </div>
@@ -722,7 +722,7 @@ export default function AlertsPage() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`relative flex items-center gap-1.5 pb-4 text-[11px] transition ${
+                    className={`relative flex items-center gap-1.5 pb-4 text-sm transition ${
                       activeTab === tab
                         ? "font-bold text-sky-700"
                         : "text-slate-500 hover:text-sky-700"
@@ -731,7 +731,7 @@ export default function AlertsPage() {
                     {tab}
 
                     {count !== undefined && (
-                      <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px]">
+                      <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-xs">
                         {count}
                       </span>
                     )}
@@ -753,7 +753,7 @@ export default function AlertsPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search alerts by title, description, location, or severity..."
-              className="w-full py-3 text-xs outline-none"
+              className="w-full py-3 text-sm sm:text-[15px] outline-none"
             />
 
             {search && (
@@ -783,26 +783,26 @@ export default function AlertsPage() {
                 <div className="min-w-0 flex-1">
 
                   <div className="mb-1 flex items-center gap-2">
-                    <span className={`rounded-md px-2 py-1 text-[9px] font-bold ${
+                    <span className={`rounded-md px-2 py-1 text-xs font-bold ${
                       severityStyles[alert.severity]
                     }`}>
                       {alert.severity}
                     </span>
 
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[13px] text-slate-400">
                       ALT-{alert.id.toString().padStart(4, "0")}
                     </span>
                   </div>
 
-                  <h3 className="text-[12px] font-bold text-slate-800">
+                  <h3 className="text-base font-bold text-slate-800">
                     {alert.title}
                   </h3>
 
-                  <p className="mt-1 text-[11px] text-slate-500">
+                  <p className="mt-1 text-[13px] text-slate-500">
                     {alert.description}
                   </p>
 
-                  <div className="mt-1 flex items-center gap-3 text-[10px] text-slate-400">
+                  <div className="mt-1 flex items-center gap-3 text-[13px] text-slate-400">
                     <span>{alert.location}</span>
                     <span>•</span>
                     <span>{alert.time}</span>
@@ -827,7 +827,7 @@ export default function AlertsPage() {
                     <button
                       onClick={() => handleAcknowledge(alert.id)}
                       disabled={actionInProgress === alert.id}
-                      className="hidden sm:inline-flex rounded-lg border border-sky-300 bg-sky-50 px-3 py-2 text-[10px] font-semibold text-sky-700 hover:bg-sky-100 transition"
+                      className="hidden sm:inline-flex rounded-lg border border-sky-300 bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-100 transition"
                     >
                       Acknowledge
                     </button>
@@ -837,7 +837,7 @@ export default function AlertsPage() {
                     <button
                       onClick={() => handleResolve(alert.id)}
                       disabled={actionInProgress === alert.id}
-                      className="hidden sm:inline-flex rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 transition"
+                      className="hidden sm:inline-flex rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition"
                     >
                       Resolve
                     </button>
@@ -845,7 +845,7 @@ export default function AlertsPage() {
 
                   <button
                     onClick={() => handleReview(alert)}
-                    className="shrink-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-[10px] font-semibold text-slate-700 hover:bg-slate-50 transition"
+                    className="shrink-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
                   >
                     Details
                   </button>
@@ -880,7 +880,7 @@ export default function AlertsPage() {
           </section>
 
           {/* BOTTOM INFO */}
-          <div className="flex items-center gap-2 text-[10px] text-slate-400">
+          <div className="flex items-center gap-2 text-[13px] text-slate-400">
             <CircleCheck size={14} />
             Alerts synchronize with CareLink Logistics API backend.
           </div>
@@ -924,35 +924,35 @@ export default function AlertsPage() {
               {selectedAlert.title}
             </h4>
 
-            <p className="mt-2 text-xs leading-6 text-slate-500">
+            <p className="mt-2 text-sm leading-6 text-slate-500">
               {selectedAlert.description}
             </p>
 
             <div className="mt-4 space-y-3 rounded-xl bg-slate-50 p-4">
 
               <div>
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[13px] text-slate-400">
                   Location
                 </p>
-                <p className="mt-1 text-xs font-semibold text-slate-700">
+                <p className="mt-1 text-sm font-semibold text-slate-700">
                   {selectedAlert.location}
                 </p>
               </div>
 
               <div>
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[13px] text-slate-400">
                   Reported
                 </p>
-                <p className="mt-1 text-xs font-semibold text-slate-700">
+                <p className="mt-1 text-sm font-semibold text-slate-700">
                   {selectedAlert.time}
                 </p>
               </div>
 
               <div>
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[13px] text-slate-400">
                   Current Status
                 </p>
-                <p className="mt-1 text-xs font-semibold text-slate-700">
+                <p className="mt-1 text-sm font-semibold text-slate-700">
                   {selectedAlert.status}
                 </p>
               </div>
@@ -962,7 +962,7 @@ export default function AlertsPage() {
 
               <button
                 onClick={() => setSelectedAlert(null)}
-                className="rounded-lg border px-4 py-2.5 text-xs font-semibold text-slate-600"
+                className="rounded-lg border px-4 py-2.5 text-sm font-semibold text-slate-600"
               >
                 Close
               </button>
@@ -973,7 +973,7 @@ export default function AlertsPage() {
                     <button
                       onClick={() => handleAcknowledge(selectedAlert.id)}
                       disabled={actionInProgress === selectedAlert.id}
-                      className="rounded-lg bg-sky-700 px-4 py-2.5 text-xs font-semibold text-white hover:bg-sky-800"
+                      className="rounded-lg bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-800"
                     >
                       Acknowledge
                     </button>
@@ -982,7 +982,7 @@ export default function AlertsPage() {
                   <button
                     onClick={() => handleResolve(selectedAlert.id)}
                     disabled={actionInProgress === selectedAlert.id}
-                    className="rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700"
+                    className="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
                   >
                     Mark Resolved
                   </button>
@@ -1011,35 +1011,35 @@ export default function AlertsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700">Alert Title</label>
+              <label className="block text-sm font-semibold text-slate-700">Alert Title</label>
               <input
                 required
                 value={newAlertForm.title}
                 onChange={e => setNewAlertForm({ ...newAlertForm, title: e.target.value })}
                 placeholder="e.g. Critical stock shortage · Trauma Medical Kits"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700">Description</label>
+              <label className="block text-sm font-semibold text-slate-700">Description</label>
               <textarea
                 required
                 rows={3}
                 value={newAlertForm.description}
                 onChange={e => setNewAlertForm({ ...newAlertForm, description: e.target.value })}
                 placeholder="Provide details on quantity, thresholds, or affected units..."
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700">Severity</label>
+                <label className="block text-sm font-semibold text-slate-700">Severity</label>
                 <select
                   value={newAlertForm.severity}
                   onChange={e => setNewAlertForm({ ...newAlertForm, severity: e.target.value as AlertSeverity })}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500 bg-white"
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500 bg-white"
                 >
                   <option value="Critical">Critical</option>
                   <option value="Delayed">Delayed</option>
@@ -1051,11 +1051,11 @@ export default function AlertsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">Category Icon</label>
+                <label className="block text-sm font-semibold text-slate-700">Category Icon</label>
                 <select
                   value={newAlertForm.icon}
                   onChange={e => setNewAlertForm({ ...newAlertForm, icon: e.target.value })}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500 bg-white"
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500 bg-white"
                 >
                   <option value="alert">Alert / Supplies</option>
                   <option value="truck">Dispatch / Vehicle</option>
@@ -1066,12 +1066,12 @@ export default function AlertsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700">Location / Hub</label>
+              <label className="block text-sm font-semibold text-slate-700">Location / Hub</label>
               <input
                 value={newAlertForm.location}
                 onChange={e => setNewAlertForm({ ...newAlertForm, location: e.target.value })}
                 placeholder="e.g. Central Logistics Hub"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
@@ -1079,13 +1079,13 @@ export default function AlertsPage() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border px-4 py-2 text-xs font-semibold"
+                className="rounded-lg border px-4 py-2 text-sm font-semibold"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
               >
                 Create Alert
               </button>
@@ -1131,7 +1131,7 @@ export default function AlertsPage() {
             ].map(([key, label]) => (
               <label
                 key={key}
-                className="flex cursor-pointer items-center justify-between border-b border-slate-100 py-4 text-xs font-medium text-slate-700"
+                className="flex cursor-pointer items-center justify-between border-b border-slate-100 py-4 text-sm font-medium text-slate-700"
               >
                 {label}
 
@@ -1153,14 +1153,14 @@ export default function AlertsPage() {
               <button
                 type="button"
                 onClick={() => setShowRules(false)}
-                className="rounded-lg border px-4 py-2.5 text-xs font-semibold"
+                className="rounded-lg border px-4 py-2.5 text-sm font-semibold"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d]"
               >
                 Save Rules
               </button>
