@@ -145,7 +145,7 @@ let fallbackPreferences: NotificationPreferencesDto = {
 export const notificationsService = {
   async getSummary(): Promise<{ data: NotificationSummaryDto; isLiveBackend: boolean }> {
     try {
-      const response = await request<NotificationSummaryDto>("/notifications/summary");
+      const response = await request<NotificationSummaryDto>("/case-manager/notifications/summary");
       if (response && response.success && response.data) {
         return { data: response.data, isLiveBackend: true };
       }
@@ -193,7 +193,7 @@ export const notificationsService = {
       if (query.pageNumber) params.append("pageNumber", String(query.pageNumber));
       if (query.pageSize) params.append("pageSize", String(query.pageSize));
 
-      const url = `/notifications${params.toString() ? `?${params.toString()}` : ""}`;
+      const url = `/case-manager/notifications${params.toString() ? `?${params.toString()}` : ""}`;
       const response = await request<PaginatedResult<NotificationItem>>(url);
       if (response && response.success && response.data) {
         return { data: response.data, isLiveBackend: true };
@@ -254,7 +254,7 @@ export const notificationsService = {
 
   async markAsRead(id: number): Promise<{ isLiveBackend: boolean; message: string }> {
     try {
-      const response = await request<boolean>(`/notifications/${id}/read`, {
+      const response = await request<boolean>(`/case-manager/notifications/${id}/read`, {
         method: "PATCH",
       });
       if (response && response.success) {
@@ -277,7 +277,7 @@ export const notificationsService = {
 
   async markAllAsRead(): Promise<{ isLiveBackend: boolean; count: number; message: string }> {
     try {
-      const response = await request<number>("/notifications/mark-all-read", {
+      const response = await request<number>("/case-manager/notifications/mark-all-read", {
         method: "POST",
       });
       if (response && response.success) {
@@ -306,7 +306,7 @@ export const notificationsService = {
 
   async deleteNotification(id: number): Promise<{ isLiveBackend: boolean; message: string }> {
     try {
-      const response = await request<boolean>(`/notifications/${id}`, {
+      const response = await request<boolean>(`/case-manager/notifications/${id}`, {
         method: "DELETE",
       });
       if (response && response.success) {
@@ -327,7 +327,7 @@ export const notificationsService = {
     req: CreateNotificationRequest
   ): Promise<{ data: NotificationItem; isLiveBackend: boolean; message: string }> {
     try {
-      const response = await request<NotificationItem>("/notifications", {
+      const response = await request<NotificationItem>("/case-manager/notifications", {
         method: "POST",
         body: JSON.stringify(req),
       });
@@ -372,7 +372,7 @@ export const notificationsService = {
     isLiveBackend: boolean;
   }> {
     try {
-      const response = await request<NotificationPreferencesDto>("/notifications/preferences");
+      const response = await request<NotificationPreferencesDto>("/case-manager/notifications/preferences");
       if (response && response.success && response.data) {
         return { data: response.data, isLiveBackend: true };
       }
@@ -390,7 +390,7 @@ export const notificationsService = {
     prefs: NotificationPreferencesDto
   ): Promise<{ data: NotificationPreferencesDto; isLiveBackend: boolean; message: string }> {
     try {
-      const response = await request<NotificationPreferencesDto>("/notifications/preferences", {
+      const response = await request<NotificationPreferencesDto>("/case-manager/notifications/preferences", {
         method: "PUT",
         body: JSON.stringify(prefs),
       });

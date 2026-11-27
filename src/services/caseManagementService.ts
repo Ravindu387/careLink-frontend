@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   CaseDashboardResponse,
   CaseItem,
@@ -283,7 +283,7 @@ export const caseManagementService = {
       const headers: Record<string, string> = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(`${API_BASE_URL}/casemanagement/export`, { headers });
+      const res = await authFetch(`${API_BASE_URL}/casemanagement/export`, { headers });
       if (res.ok) {
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);

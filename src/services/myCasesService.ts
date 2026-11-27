@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   MyCase,
   MyCasesStatsDto,
@@ -386,7 +386,7 @@ export const myCasesService = {
       if (query.dateRange) params.append("dateRange", query.dateRange);
 
       const url = `${API_BASE_URL}/mycases/export?${params.toString()}`;
-      const res = await fetch(url);
+      const res = await authFetch(url);
       if (res.ok) {
         const blob = await res.blob();
         const downloadUrl = window.URL.createObjectURL(blob);
