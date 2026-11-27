@@ -326,7 +326,7 @@ export default function NotificationsPage() {
     <div className="min-h-full bg-[#EFF6F8] text-[#173B59]">
       <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 xl:p-8">
         {/* Breadcrumb */}
-        <div className="mb-5 flex items-center gap-2 text-[11px] text-slate-500">
+        <div className="mb-5 flex items-center gap-2 text-[13px] text-slate-500">
           <span>Operations</span>
           <ChevronRight size={13} />
           <span className="font-semibold text-[#173B59]">Notifications</span>
@@ -339,11 +339,11 @@ export default function NotificationsPage() {
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E0F1F5] text-[#247DA8]">
                 <Bell size={18} />
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#319A89]">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#319A89]">
                 Live Operational Network
               </span>
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight text-[#123B5B] sm:text-[30px]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-[#123B5B]">
               Command Notifications
             </h1>
             <p className="mt-1 text-[12px] text-slate-500 sm:text-sm">
@@ -354,7 +354,7 @@ export default function NotificationsPage() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setIsCreateOpen(true)}
-              className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2785B2] px-3.5 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#1E6B91]"
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#2785B2] px-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1E6B91]"
             >
               <Plus size={15} /> Broadcast Alert
             </button>
@@ -362,14 +362,14 @@ export default function NotificationsPage() {
             <button
               onClick={markAllRead}
               disabled={unreadCount === 0}
-              className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#C8DCE5] bg-white px-3 text-[11px] font-semibold text-[#276F96] transition hover:bg-[#F4FAFC] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#C8DCE5] bg-white px-3 text-sm font-semibold text-[#276F96] transition hover:bg-[#F4FAFC] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <CheckCheck size={15} /> Mark all as read
             </button>
 
             <button
               onClick={loadPreferences}
-              className={`inline-flex h-10 items-center gap-2 rounded-lg border px-3 text-[11px] font-semibold transition ${
+              className={`inline-flex h-10 items-center gap-2 rounded-lg border px-3 text-sm font-semibold transition ${
                 showFilters
                   ? "border-[#247DA8] bg-[#E8F3F8] text-[#176F9F]"
                   : "border-[#C8DCE5] bg-white text-[#276F96] hover:bg-[#F4FAFC]"
@@ -392,35 +392,35 @@ export default function NotificationsPage() {
         <section className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-[#D8E5EB] bg-white p-4 shadow-[0_4px_14px_rgba(24,62,86,0.04)]">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-slate-500">Total notifications</span>
+              <span className="text-[13px] font-medium text-slate-500">Total notifications</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <Bell size={16} />
               </span>
             </div>
             <p className="mt-2 text-2xl font-bold text-[#123B5B]">{totalCount}</p>
-            <p className="mt-1 text-[10px] text-slate-400">Recorded across active operational scope</p>
+            <p className="mt-1 text-[13px] text-slate-400">Recorded across active operational scope</p>
           </div>
 
           <div className="rounded-xl border border-[#D8E5EB] bg-white p-4 shadow-[0_4px_14px_rgba(24,62,86,0.04)]">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-slate-500">Unread notifications</span>
+              <span className="text-[13px] font-medium text-slate-500">Unread notifications</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-rose-600">
                 <Bell size={16} />
               </span>
             </div>
             <p className="mt-2 text-2xl font-bold text-[#123B5B]">{unreadCount}</p>
-            <p className="mt-1 text-[10px] text-rose-600 font-medium">Require operator action</p>
+            <p className="mt-1 text-sm text-rose-600 font-medium">Require operator action</p>
           </div>
 
           <div className="rounded-xl border border-[#D8E5EB] bg-white p-4 shadow-[0_4px_14px_rgba(24,62,86,0.04)]">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-slate-500">Critical alerts</span>
+              <span className="text-[13px] font-medium text-slate-500">Critical alerts</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
                 <AlertTriangle size={16} />
               </span>
             </div>
             <p className="mt-2 text-2xl font-bold text-[#123B5B]">{criticalCount}</p>
-            <p className="mt-1 text-[10px] text-slate-400">Emergency & severe threshold alerts</p>
+            <p className="mt-1 text-[13px] text-slate-400">Emergency & severe threshold alerts</p>
           </div>
         </section>
 
@@ -429,8 +429,8 @@ export default function NotificationsPage() {
           <div className="border-b border-[#E3EDF1] p-4 sm:p-5">
             <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
               <div>
-                <h2 className="text-sm font-semibold text-[#173B59]">All notifications</h2>
-                <p className="mt-1 text-[10px] text-slate-400">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#173B59]">All notifications</h2>
+                <p className="mt-1 text-[13px] text-slate-400">
                   {unreadCount} unread · {totalCount} total in system
                 </p>
               </div>
@@ -442,13 +442,13 @@ export default function NotificationsPage() {
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Search notifications..."
-                    className="h-10 w-full rounded-lg border border-[#D8E5EB] bg-[#FBFDFE] pl-9 pr-3 text-[11px] outline-none transition placeholder:text-slate-400 focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10"
+                    className="h-10 w-full rounded-lg border border-[#D8E5EB] bg-[#FBFDFE] pl-9 pr-3 text-sm sm:text-[15px] outline-none transition placeholder:text-slate-400 focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10"
                   />
                 </div>
 
                 <button
                   onClick={() => setShowFilters((value) => !value)}
-                  className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-3 text-[11px] font-medium transition ${
+                  className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium transition ${
                     showFilters || priority !== "All priorities"
                       ? "border-[#2785B2] bg-[#EAF4F8] text-[#176F9F]"
                       : "border-[#D8E5EB] text-slate-600 hover:bg-slate-50"
@@ -462,14 +462,14 @@ export default function NotificationsPage() {
             {showFilters && (
               <div className="mt-4 flex flex-col gap-3 rounded-lg bg-[#F5F9FB] p-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-[10px] font-semibold text-[#173B59]">Priority Classification</p>
-                  <p className="mt-1 text-[10px] text-slate-400">Filter notifications by operational severity.</p>
+                  <p className="text-sm font-semibold text-[#173B59]">Priority Classification</p>
+                  <p className="mt-1 text-[13px] text-slate-400">Filter notifications by operational severity.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <select
                     value={priority}
                     onChange={(event) => setPriority(event.target.value)}
-                    className="h-9 rounded-lg border border-[#D8E5EB] bg-white px-3 text-[10px] text-[#173B59] outline-none"
+                    className="h-9 rounded-lg border border-[#D8E5EB] bg-white px-3 text-sm sm:text-[15px] text-[#173B59] outline-none"
                   >
                     <option>All priorities</option>
                     <option>Critical</option>
@@ -482,7 +482,7 @@ export default function NotificationsPage() {
                       setPriority("All priorities");
                       setSearch("");
                     }}
-                    className="h-9 rounded-lg px-3 text-[10px] font-semibold text-[#247DA8] hover:bg-white"
+                    className="h-9 rounded-lg px-3 text-sm font-semibold text-[#247DA8] hover:bg-white"
                   >
                     Clear filters
                   </button>
@@ -498,7 +498,7 @@ export default function NotificationsPage() {
                   <button
                     key={filter}
                     onClick={() => setActiveFilter(filter)}
-                    className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-[10px] font-semibold transition ${
+                    className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
                       activeFilter === filter
                         ? "bg-[#E7F2F7] text-[#176F9F]"
                         : "text-slate-500 hover:bg-slate-50 hover:text-[#173B59]"
@@ -506,7 +506,7 @@ export default function NotificationsPage() {
                   >
                     {filter}
                     <span
-                      className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${
+                      className={`rounded-full px-1.5 py-0.5 text-xs font-bold ${
                         activeFilter === filter
                           ? "bg-white text-[#176F9F]"
                           : "bg-slate-100 text-slate-500"
@@ -523,19 +523,19 @@ export default function NotificationsPage() {
           {/* Batch Actions Bar */}
           {selected.length > 0 && (
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E3EDF1] bg-[#F4F9FB] px-4 py-3">
-              <span className="text-[11px] font-semibold text-[#173B59]">
+              <span className="text-sm font-semibold text-[#173B59]">
                 {selected.length} notification{selected.length > 1 ? "s" : ""} selected
               </span>
               <div className="flex gap-2">
                 <button
                   onClick={markSelectedAsRead}
-                  className="rounded-md border border-[#C8DCE5] bg-white px-3 py-1.5 text-[10px] font-semibold text-[#247DA8] transition hover:bg-slate-50"
+                  className="rounded-md border border-[#C8DCE5] bg-white px-3 py-1.5 text-sm font-semibold text-[#247DA8] transition hover:bg-slate-50"
                 >
                   Mark as read
                 </button>
                 <button
                   onClick={archiveSelected}
-                  className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-white px-3 py-1.5 text-[10px] font-semibold text-rose-600 transition hover:bg-rose-50"
+                  className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-white px-3 py-1.5 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
                 >
                   <Archive size={13} /> Archive
                 </button>
@@ -545,7 +545,7 @@ export default function NotificationsPage() {
 
           {/* User Notice Toast */}
           {notice && (
-            <div className="flex items-center justify-between border-b border-emerald-100 bg-emerald-50 px-4 py-2.5 text-[10px] font-medium text-emerald-700">
+            <div className="flex items-center justify-between border-b border-emerald-100 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-700">
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 size={13} />
                 {notice}
@@ -561,7 +561,7 @@ export default function NotificationsPage() {
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20 text-slate-400">
                 <RefreshCw size={26} className="animate-spin text-[#2785B2]" />
-                <p className="mt-3 text-[11px] font-medium">Synchronizing live notifications...</p>
+                <p className="mt-3 text-sm font-medium">Synchronizing live notifications...</p>
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center py-16 text-center text-rose-600">
@@ -569,7 +569,7 @@ export default function NotificationsPage() {
                 <p className="text-sm font-semibold">{error}</p>
                 <button
                   onClick={() => fetchNotifications()}
-                  className="mt-3 rounded-lg bg-rose-600 px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-rose-700"
+                  className="mt-3 rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-rose-700"
                 >
                   Retry
                 </button>
@@ -579,8 +579,8 @@ export default function NotificationsPage() {
                 <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
                   <Bell size={21} />
                 </span>
-                <h3 className="text-sm font-semibold text-[#173B59]">No notifications found</h3>
-                <p className="mt-1 text-[11px] text-slate-400">
+                <h3 className="text-base font-semibold text-[#173B59]">No notifications found</h3>
+                <p className="mt-1 text-[13px] text-slate-400">
                   Try adjusting your search query, priority filter, or view tabs.
                 </p>
               </div>
@@ -613,7 +613,7 @@ export default function NotificationsPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3
-                          className={`text-[12px] ${
+                          className={`text-base ${
                             item.unread ? "font-bold text-[#173B59]" : "font-semibold text-slate-700"
                           }`}
                         >
@@ -622,28 +622,28 @@ export default function NotificationsPage() {
 
                         {item.unread && <span className="h-2 w-2 rounded-full bg-[#2785B2]" />}
 
-                        <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${style.badge}`}>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${style.badge}`}>
                           {item.type}
                         </span>
 
                         {item.priority === "Critical" && (
-                          <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[9px] font-bold text-rose-700">
+                          <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-bold text-rose-700">
                             Critical
                           </span>
                         )}
 
                         {item.priority === "High" && (
-                          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-bold text-amber-800">
+                          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
                             High priority
                           </span>
                         )}
                       </div>
 
-                      <p className="mt-1.5 max-w-4xl text-[11px] leading-5 text-slate-600 sm:text-[11px]">
+                      <p className="mt-1.5 max-w-4xl text-sm leading-5 text-slate-600 sm:text-[13px]">
                         {item.message}
                       </p>
 
-                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-slate-400">
+                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-slate-400">
                         <span className="inline-flex items-center gap-1 font-medium">
                           <Clock3 size={11} />
                           {item.time}
@@ -660,7 +660,7 @@ export default function NotificationsPage() {
                         {item.action && (
                           <button
                             onClick={() => handleActionClick(item)}
-                            className="inline-flex items-center gap-1 rounded-md bg-[#EAF4F8] px-2.5 py-1.5 text-[10px] font-semibold text-[#176F9F] transition hover:bg-[#DCEEF5]"
+                            className="inline-flex items-center gap-1 rounded-md bg-[#EAF4F8] px-2.5 py-1.5 text-sm font-semibold text-[#176F9F] transition hover:bg-[#DCEEF5]"
                           >
                             {item.action} <ExternalLink size={10} />
                           </button>
@@ -669,7 +669,7 @@ export default function NotificationsPage() {
                         {item.unread && (
                           <button
                             onClick={() => markRead(item.id)}
-                            className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-[10px] font-semibold text-slate-500 hover:bg-slate-100"
+                            className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-100"
                           >
                             <Check size={11} /> Mark as read
                           </button>
@@ -677,14 +677,14 @@ export default function NotificationsPage() {
 
                         <button
                           onClick={() => archiveSingle(item.id)}
-                          className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-[10px] font-medium text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                          className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                         >
                           <Archive size={11} /> Archive
                         </button>
                       </div>
                     </div>
 
-                    <span className="hidden shrink-0 pt-1 text-[10px] font-medium text-slate-400 sm:block">
+                    <span className="hidden shrink-0 pt-1 text-[13px] font-medium text-slate-400 sm:block">
                       {item.date}
                     </span>
                   </article>
@@ -693,7 +693,7 @@ export default function NotificationsPage() {
             )}
           </div>
 
-          <div className="flex flex-col gap-2 border-t border-[#E3EDF1] bg-[#FCFDFE] px-4 py-3 text-[10px] text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 border-t border-[#E3EDF1] bg-[#FCFDFE] px-4 py-3 text-[13px] text-slate-400 sm:flex-row sm:items-center sm:justify-between">
             <span>
               Showing {notifications.length} of {totalCount} notifications
             </span>
@@ -715,7 +715,7 @@ export default function NotificationsPage() {
                 </span>
                 <div>
                   <h3 className="text-base font-bold text-[#123B5C]">Notification Preferences</h3>
-                  <p className="text-[10px] text-slate-400">Configure alert channels and domain triggers</p>
+                  <p className="text-[13px] text-slate-400">Configure alert channels and domain triggers</p>
                 </div>
               </div>
               <button
@@ -726,13 +726,13 @@ export default function NotificationsPage() {
               </button>
             </div>
 
-            <div className="space-y-3.5 text-[11px] text-slate-600">
+            <div className="space-y-3.5 text-sm text-slate-600">
               <label className="flex items-center justify-between rounded-xl border border-slate-100 p-3 hover:bg-slate-50">
                 <div className="flex items-center gap-2.5">
                   <Mail size={16} className="text-[#2785B2]" />
                   <div>
                     <span className="font-semibold text-[#173B59]">Email Alerts</span>
-                    <p className="text-[10px] text-slate-400">Send dispatch digests to registered admin email</p>
+                    <p className="text-[13px] text-slate-400">Send dispatch digests to registered admin email</p>
                   </div>
                 </div>
                 <input
@@ -748,7 +748,7 @@ export default function NotificationsPage() {
                   <Smartphone size={16} className="text-[#2785B2]" />
                   <div>
                     <span className="font-semibold text-[#173B59]">Push Notifications</span>
-                    <p className="text-[10px] text-slate-400">Browser toast alerts for high priority incidents</p>
+                    <p className="text-[13px] text-slate-400">Browser toast alerts for high priority incidents</p>
                   </div>
                 </div>
                 <input
@@ -764,7 +764,7 @@ export default function NotificationsPage() {
                   <Volume2 size={16} className="text-rose-500" />
                   <div>
                     <span className="font-semibold text-[#173B59]">Critical Emergency Audible Alarm</span>
-                    <p className="text-[10px] text-slate-400">Audible tone when Level-1 disaster escalations occur</p>
+                    <p className="text-[13px] text-slate-400">Audible tone when Level-1 disaster escalations occur</p>
                   </div>
                 </div>
                 <input
@@ -778,7 +778,7 @@ export default function NotificationsPage() {
               <label className="flex items-center justify-between rounded-xl border border-slate-100 p-3 hover:bg-slate-50">
                 <div>
                   <span className="font-semibold text-[#173B59]">Assistance Requisitions</span>
-                  <p className="text-[10px] text-slate-400">Notify when citizen requests require triage</p>
+                  <p className="text-[13px] text-slate-400">Notify when citizen requests require triage</p>
                 </div>
                 <input
                   type="checkbox"
@@ -791,7 +791,7 @@ export default function NotificationsPage() {
               <label className="flex items-center justify-between rounded-xl border border-slate-100 p-3 hover:bg-slate-50">
                 <div>
                   <span className="font-semibold text-[#173B59]">Volunteer Check-in Alerts</span>
-                  <p className="text-[10px] text-slate-400">Alerts for deployment shift completions</p>
+                  <p className="text-[13px] text-slate-400">Alerts for deployment shift completions</p>
                 </div>
                 <input
                   type="checkbox"
@@ -804,7 +804,7 @@ export default function NotificationsPage() {
               <label className="flex items-center justify-between rounded-xl border border-slate-100 p-3 hover:bg-slate-50">
                 <div>
                   <span className="font-semibold text-[#173B59]">Low Resource Stock Warnings</span>
-                  <p className="text-[10px] text-slate-400">Notify when warehouse inventory drops below 20%</p>
+                  <p className="text-[13px] text-slate-400">Notify when warehouse inventory drops below 20%</p>
                 </div>
                 <input
                   type="checkbox"
@@ -819,7 +819,7 @@ export default function NotificationsPage() {
               <button
                 type="button"
                 onClick={() => setIsPreferencesOpen(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-[11px] font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -827,7 +827,7 @@ export default function NotificationsPage() {
                 type="button"
                 disabled={savingPrefs}
                 onClick={handleSavePreferences}
-                className="flex items-center gap-1.5 rounded-lg bg-[#2785B2] px-4 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-[#1E6B91] disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-[#2785B2] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E6B91] disabled:opacity-50"
               >
                 {savingPrefs ? "Saving..." : "Save Preferences"}
               </button>
@@ -850,7 +850,7 @@ export default function NotificationsPage() {
                 </span>
                 <div>
                   <h3 className="text-base font-bold text-[#123B5C]">Broadcast Operational Alert</h3>
-                  <p className="text-[10px] text-slate-400">Send an immediate notification to platform coordinators</p>
+                  <p className="text-[13px] text-slate-400">Send an immediate notification to platform coordinators</p>
                 </div>
               </div>
               <button
@@ -862,7 +862,7 @@ export default function NotificationsPage() {
               </button>
             </div>
 
-            <div className="space-y-3.5 text-[11px]">
+            <div className="space-y-3.5 text-sm">
               <div>
                 <label className="mb-1 block font-semibold text-[#173B59]">Alert Headline / Title *</label>
                 <input
@@ -956,14 +956,14 @@ export default function NotificationsPage() {
               <button
                 type="button"
                 onClick={() => setIsCreateOpen(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-[11px] font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={creating}
-                className="flex items-center gap-1.5 rounded-lg bg-[#2785B2] px-4 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-[#1E6B91] disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-[#2785B2] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1E6B91] disabled:opacity-50"
               >
                 <Send size={13} />
                 {creating ? "Broadcasting..." : "Broadcast Alert"}
