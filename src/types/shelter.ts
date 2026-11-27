@@ -17,6 +17,10 @@ export interface Shelter {
   operatingHours?: string;
   isEvacuationHub?: boolean;
   occupancyPercentage?: number;
+  location?: string;
+  notes?: string;
+  remaining?: number;
+  contactPerson?: string;
 }
 
 export interface ShelterSummary {
