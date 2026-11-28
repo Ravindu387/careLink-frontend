@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 /**
  * Organisation Profile Service
  * Connects the Partner Officer Organisation Profile page to the CareLink .NET backend.
@@ -153,7 +154,7 @@ const FALLBACK_PROFILE: OrganisationProfile = {
 class OrganisationProfileService {
   async getProfile(): Promise<OrganisationProfile> {
     try {
-      const response = await fetch(API_BASE_URL, {
+      const response = await authFetch(API_BASE_URL, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -167,7 +168,7 @@ class OrganisationProfileService {
   }
 
   async updateProfile(payload: UpdateProfilePayload): Promise<OrganisationProfile> {
-    const response = await fetch(API_BASE_URL, {
+    const response = await authFetch(API_BASE_URL, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -184,7 +185,7 @@ class OrganisationProfileService {
   }
 
   async updateCapabilities(payload: UpdateCapabilitiesPayload): Promise<OrganisationProfile> {
-    const response = await fetch(`${API_BASE_URL}/capabilities`, {
+    const response = await authFetch(`${API_BASE_URL}/capabilities`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -201,7 +202,7 @@ class OrganisationProfileService {
   }
 
   async resetProfile(): Promise<OrganisationProfile> {
-    const response = await fetch(`${API_BASE_URL}/reset`, {
+    const response = await authFetch(`${API_BASE_URL}/reset`, {
       method: "POST",
       headers: { Accept: "application/json" },
     });

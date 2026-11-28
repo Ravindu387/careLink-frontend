@@ -147,7 +147,7 @@ const OrganisationProfile = () => {
               <span className="font-semibold text-slate-800">Organisation Profile</span>
             </p>
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                 isConnected
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -158,7 +158,7 @@ const OrganisationProfile = () => {
             </span>
           </div>
 
-          <h1 className="text-2xl font-semibold text-[#153e5b]">Organisation Profile</h1>
+          <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">Organisation Profile</h1>
 
           <p className="mt-1 text-sm text-slate-500">
             Manage verified capability, operational coverage, contacts, and data-sharing status.
@@ -169,7 +169,7 @@ const OrganisationProfile = () => {
           <button
             onClick={() => loadProfile(false)}
             disabled={isSyncing}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
             title="Refresh profile data"
           >
             <RefreshCw size={14} className={isSyncing ? "animate-spin text-[#267ba4]" : ""} />
@@ -178,7 +178,7 @@ const OrganisationProfile = () => {
 
           <button
             onClick={() => setShowPreviewModal(true)}
-            className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             <Eye size={15} />
             Preview public profile
@@ -186,7 +186,7 @@ const OrganisationProfile = () => {
 
           <button
             onClick={() => setShowEditModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Edit size={15} />
             Edit profile
@@ -222,7 +222,7 @@ const OrganisationProfile = () => {
                 </div>
 
                 <div>
-                  <span className="inline-block rounded bg-[#e3f5f0] px-2 py-1 text-[9px] font-bold tracking-wide text-[#26977c]">
+                  <span className="inline-block rounded bg-[#e3f5f0] px-2 py-1 text-xs font-bold tracking-wide text-[#26977c]">
                     {profile.verification.toUpperCase()} PARTNER
                   </span>
 
@@ -238,7 +238,7 @@ const OrganisationProfile = () => {
                     {profile.sectors.map((item) => (
                       <span
                         key={item}
-                        className="rounded-md bg-[#edf4f7] px-2 py-1 text-[9px] font-medium text-[#42677e]"
+                        className="rounded-md bg-[#edf4f7] px-2 py-1 text-xs font-medium text-[#42677e]"
                       >
                         {item}
                       </span>
@@ -249,7 +249,7 @@ const OrganisationProfile = () => {
 
               {/* Profile Completeness */}
               <div className="w-full max-w-48 sm:text-right">
-                <p className="text-[9px] font-medium text-slate-500">
+                <p className="text-xs font-medium text-slate-500">
                   PROFILE COMPLETENESS
                 </p>
 
@@ -264,7 +264,7 @@ const OrganisationProfile = () => {
                   />
                 </div>
 
-                <p className="mt-1 text-[9px] text-slate-400">
+                <p className="mt-1 text-xs text-slate-400">
                   {profile.completenessReviewItems} items to review
                 </p>
               </div>
@@ -277,16 +277,16 @@ const OrganisationProfile = () => {
             <div className="overflow-hidden rounded-xl border border-[#d7e5eb] bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-[#d7e5eb] px-4 py-3">
                 <div>
-                  <h3 className="text-sm font-medium text-[#153e5b]">
+                  <h3 className="text-base font-semibold text-[#153e5b]">
                     Organisation details
                   </h3>
-                  <p className="mt-0.5 text-[10px] text-slate-500">
+                  <p className="mt-0.5 text-[13px] text-slate-500">
                     Verified legal and operational information
                   </p>
                 </div>
                 <button
                   onClick={() => setShowEditModal(true)}
-                  className="text-xs font-medium text-[#267ba4] hover:underline"
+                  className="text-sm font-medium text-[#267ba4] hover:underline"
                 >
                   Edit
                 </button>
@@ -304,8 +304,8 @@ const OrganisationProfile = () => {
                   ["Official website", profile.website],
                 ].map(([label, value]) => (
                   <div key={label}>
-                    <p className="text-[10px] text-slate-400">{label}</p>
-                    <p className="mt-1 text-xs font-semibold text-[#183e58] break-words">
+                    <p className="text-[13px] text-slate-400">{label}</p>
+                    <p className="mt-1 text-sm font-semibold text-[#183e58] break-words">
                       {value || "—"}
                     </p>
                   </div>
@@ -316,10 +316,10 @@ const OrganisationProfile = () => {
             {/* Verification & Agreements */}
             <div className="overflow-hidden rounded-xl border border-[#d7e5eb] bg-white shadow-sm">
               <div className="border-b border-[#d7e5eb] px-4 py-3">
-                <h3 className="text-sm font-medium text-[#153e5b]">
+                <h3 className="text-base font-semibold text-[#153e5b]">
                   Verification & Agreements
                 </h3>
-                <p className="mt-0.5 text-[10px] text-slate-500">
+                <p className="mt-0.5 text-[13px] text-slate-500">
                   Partner assurance and sharing controls
                 </p>
               </div>
@@ -336,16 +336,16 @@ const OrganisationProfile = () => {
                   )}
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-semibold text-[#153e5b]">
+                    <p className="text-sm font-semibold text-[#153e5b]">
                       {item.title}
                     </p>
-                    <p className="mt-0.5 text-[9px] text-slate-400">
+                    <p className="mt-0.5 text-xs text-slate-400">
                       {item.subtitle}
                     </p>
                   </div>
 
                   <span
-                    className={`min-w-24 rounded-md px-2 py-1 text-center text-[9px] font-medium ${
+                    className={`min-w-24 rounded-md px-2 py-1 text-center text-xs font-medium ${
                       item.done
                         ? "bg-[#e3f5f0] text-[#26977c]"
                         : "bg-[#fff3dc] text-[#b7791f]"
@@ -362,17 +362,17 @@ const OrganisationProfile = () => {
           <div className="overflow-hidden rounded-xl border border-[#d7e5eb] bg-white shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#d7e5eb] px-4 py-3">
               <div>
-                <h3 className="text-sm font-medium text-[#153e5b]">
+                <h3 className="text-base font-semibold text-[#153e5b]">
                   Operational capability
                 </h3>
-                <p className="mt-0.5 text-[10px] text-slate-500">
+                <p className="mt-0.5 text-[13px] text-slate-500">
                   Capacity visible to authorised coordination partners
                 </p>
               </div>
 
               <button
                 onClick={() => setShowCapabilityModal(true)}
-                className="rounded-lg border border-[#b9d0dc] px-4 py-2 text-[10px] font-medium text-[#267ba4] hover:bg-[#f0f7fa] transition"
+                className="rounded-lg border border-[#b9d0dc] px-4 py-2 text-sm font-medium text-[#267ba4] hover:bg-[#f0f7fa] transition"
               >
                 Update capability
               </button>
@@ -417,9 +417,9 @@ const OrganisationProfile = () => {
                     </div>
 
                     <div>
-                      <p className="text-[9px] text-slate-500">{item.title}</p>
-                      <p className="mt-1 text-xs font-bold text-[#153e5b]">{item.value}</p>
-                      <p className="mt-1 text-[9px] text-slate-400">{item.sub}</p>
+                      <p className="text-xs text-slate-500">{item.title}</p>
+                      <p className="mt-1 text-sm font-bold text-[#153e5b]">{item.value}</p>
+                      <p className="mt-1 text-xs text-slate-400">{item.sub}</p>
                     </div>
                   </div>
                 );
@@ -507,7 +507,7 @@ function EditProfileModal({
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-[#153e5b]">Edit Organisation Profile</h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Update legal information, primary contact, and operational sectors.
             </p>
           </div>
@@ -518,76 +518,76 @@ function EditProfileModal({
 
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">Legal Name</label>
+            <label className="mb-1 block text-sm font-medium text-slate-600">Legal Name</label>
             <input
               required
               value={legalName}
               onChange={(e) => setLegalName(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">Head Office</label>
+              <label className="mb-1 block text-sm font-medium text-slate-600">Head Office</label>
               <input
                 required
                 value={headOffice}
                 onChange={(e) => setHeadOffice(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">Primary Contact</label>
+              <label className="mb-1 block text-sm font-medium text-slate-600">Primary Contact</label>
               <input
                 required
                 value={primaryContact}
                 onChange={(e) => setPrimaryContact(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">Contact Email</label>
+              <label className="mb-1 block text-sm font-medium text-slate-600">Contact Email</label>
               <input
                 required
                 type="email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">Emergency Line</label>
+              <label className="mb-1 block text-sm font-medium text-slate-600">Emergency Line</label>
               <input
                 required
                 value={emergencyLine}
                 onChange={(e) => setEmergencyLine(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">Official Website</label>
+            <label className="mb-1 block text-sm font-medium text-slate-600">Official Website</label>
             <input
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-sm font-medium text-slate-600">
               Operational Sectors (comma-separated)
             </label>
             <input
               value={sectorsStr}
               onChange={(e) => setSectorsStr(e.target.value)}
               placeholder="e.g. Food Security, WASH, Community Health"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
         </div>
@@ -596,14 +596,14 @@ function EditProfileModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2 text-xs text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2 text-xs font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2 text-sm font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
           >
             {isSubmitting && <RefreshCw size={14} className="animate-spin" />}
             Save Profile
@@ -659,7 +659,7 @@ function UpdateCapabilityModal({
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-[#153e5b]">Update Operational Capability</h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Update staffing, fleet, supply stock, and coverage districts visible to coordination partners.
             </p>
           </div>
@@ -670,113 +670,113 @@ function UpdateCapabilityModal({
 
         <div className="space-y-4">
           <div className="rounded-lg bg-slate-50 p-3">
-            <p className="text-xs font-semibold text-[#153e5b] mb-2 flex items-center gap-1.5">
+            <p className="text-sm font-semibold text-[#153e5b] mb-2 flex items-center gap-1.5">
               <Users size={15} /> Personnel Capacity
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] text-slate-500">Total Active Staff</label>
+                <label className="text-sm text-slate-500">Total Active Staff</label>
                 <input
                   type="number"
                   min="0"
                   value={personnelActive}
                   onChange={(e) => setPersonnelActive(Number(e.target.value))}
-                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-xs outline-none"
+                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500">Deployable Today</label>
+                <label className="text-sm text-slate-500">Deployable Today</label>
                 <input
                   type="number"
                   min="0"
                   value={personnelDeployable}
                   onChange={(e) => setPersonnelDeployable(Number(e.target.value))}
-                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-xs outline-none"
+                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
             </div>
           </div>
 
           <div className="rounded-lg bg-slate-50 p-3">
-            <p className="text-xs font-semibold text-[#153e5b] mb-2 flex items-center gap-1.5">
+            <p className="text-sm font-semibold text-[#153e5b] mb-2 flex items-center gap-1.5">
               <Truck size={15} /> Transport & Fleet
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] text-slate-500">Total Fleet Vehicles</label>
+                <label className="text-sm text-slate-500">Total Fleet Vehicles</label>
                 <input
                   type="number"
                   min="0"
                   value={fleetTotal}
                   onChange={(e) => setFleetTotal(Number(e.target.value))}
-                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-xs outline-none"
+                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500">Available Vehicles</label>
+                <label className="text-sm text-slate-500">Available Vehicles</label>
                 <input
                   type="number"
                   min="0"
                   value={fleetAvailable}
                   onChange={(e) => setFleetAvailable(Number(e.target.value))}
-                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-xs outline-none"
+                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
             </div>
           </div>
 
           <div className="rounded-lg bg-slate-50 p-3">
-            <p className="text-xs font-semibold text-[#153e5b] mb-2 flex items-center gap-1.5">
+            <p className="text-sm font-semibold text-[#153e5b] mb-2 flex items-center gap-1.5">
               <Package size={15} /> Resource Stock
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] text-slate-500">Resource Categories</label>
+                <label className="text-sm text-slate-500">Resource Categories</label>
                 <input
                   type="number"
                   min="0"
                   value={stockCategories}
                   onChange={(e) => setStockCategories(Number(e.target.value))}
-                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-xs outline-none"
+                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500">Availability Percent (%)</label>
+                <label className="text-sm text-slate-500">Availability Percent (%)</label>
                 <input
                   type="number"
                   min="0"
                   max="100"
                   value={stockAvailabilityPercent}
                   onChange={(e) => setStockAvailabilityPercent(Number(e.target.value))}
-                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-xs outline-none"
+                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
             </div>
           </div>
 
           <div className="rounded-lg bg-slate-50 p-3">
-            <p className="text-xs font-semibold text-[#153e5b] mb-2 flex items-center gap-1.5">
+            <p className="text-sm font-semibold text-[#153e5b] mb-2 flex items-center gap-1.5">
               <Map size={15} /> Geographic Coverage
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] text-slate-500">Total Districts</label>
+                <label className="text-sm text-slate-500">Total Districts</label>
                 <input
                   type="number"
                   min="0"
                   value={coverageTotal}
                   onChange={(e) => setCoverageTotal(Number(e.target.value))}
-                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-xs outline-none"
+                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500">Active Now</label>
+                <label className="text-sm text-slate-500">Active Now</label>
                 <input
                   type="number"
                   min="0"
                   value={coverageActive}
                   onChange={(e) => setCoverageActive(Number(e.target.value))}
-                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-xs outline-none"
+                  className="w-full rounded border border-slate-200 px-2 py-1.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
             </div>
@@ -787,14 +787,14 @@ function UpdateCapabilityModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2 text-xs text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2 text-xs font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2 text-sm font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
           >
             {isSubmitting && <RefreshCw size={14} className="animate-spin" />}
             Save Capabilities
@@ -819,7 +819,7 @@ function PreviewProfileModal({
         <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
             <Building2 size={20} className="text-[#267ba4]" />
-            <h2 className="text-base font-semibold text-[#153e5b]">Public Profile Preview</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-[#153e5b]">Public Profile Preview</h2>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
             <X size={20} />
@@ -829,7 +829,7 @@ function PreviewProfileModal({
         <div className="rounded-xl border border-slate-200 p-5 bg-[#fafcfd]">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <span className="inline-flex items-center gap-1 rounded bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[9px] font-bold border border-emerald-200">
+              <span className="inline-flex items-center gap-1 rounded bg-emerald-50 text-emerald-700 px-2 py-0.5 text-xs font-bold border border-emerald-200">
                 <ShieldCheck size={12} />
                 VERIFIED PARTNER
               </span>
@@ -847,7 +847,7 @@ function PreviewProfileModal({
             {profile.sectors.map((s) => (
               <span
                 key={s}
-                className="rounded-md bg-white border border-slate-200 px-2 py-0.5 text-[10px] text-slate-600"
+                className="rounded-md bg-white border border-slate-200 px-2 py-0.5 text-xs text-slate-600"
               >
                 {s}
               </span>
@@ -882,25 +882,25 @@ function PreviewProfileModal({
           </div>
 
           <div className="mt-5 rounded-lg bg-white border border-slate-200 p-3">
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
               Declared Operational Capacity
             </p>
             <div className="grid grid-cols-4 gap-2 text-center">
               <div>
-                <p className="text-xs font-bold text-[#153e5b]">{profile.capabilities.personnel.totalCount}</p>
-                <p className="text-[9px] text-slate-400">Staff</p>
+                <p className="text-sm font-bold text-[#153e5b]">{profile.capabilities.personnel.totalCount}</p>
+                <p className="text-xs text-slate-400">Staff</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#153e5b]">{profile.capabilities.fleet.totalCount}</p>
-                <p className="text-[9px] text-slate-400">Fleet</p>
+                <p className="text-sm font-bold text-[#153e5b]">{profile.capabilities.fleet.totalCount}</p>
+                <p className="text-xs text-slate-400">Fleet</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#153e5b]">{profile.capabilities.stock.activeCount}%</p>
-                <p className="text-[9px] text-slate-400">Stock Avail</p>
+                <p className="text-sm font-bold text-[#153e5b]">{profile.capabilities.stock.activeCount}%</p>
+                <p className="text-xs text-slate-400">Stock Avail</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#153e5b]">{profile.capabilities.coverage.activeCount}</p>
-                <p className="text-[9px] text-slate-400">Districts</p>
+                <p className="text-sm font-bold text-[#153e5b]">{profile.capabilities.coverage.activeCount}</p>
+                <p className="text-xs text-slate-400">Districts</p>
               </div>
             </div>
           </div>
@@ -909,7 +909,7 @@ function PreviewProfileModal({
         <div className="mt-5 flex justify-end">
           <button
             onClick={onClose}
-            className="rounded-lg bg-[#267ba4] px-4 py-2 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="rounded-lg bg-[#267ba4] px-4 py-2 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             Close Preview
           </button>

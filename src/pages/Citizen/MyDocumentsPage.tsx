@@ -462,7 +462,7 @@ export default function MyDocumentsPage() {
                 </h2>
 
                 {/* BACKEND STATUS BADGE */}
-                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] shadow-xs">
+                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs shadow-xs">
                   {isBackendConnected === true ? (
                     <>
                       <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -493,7 +493,7 @@ export default function MyDocumentsPage() {
               <button
                 onClick={() => fetchDocuments()}
                 disabled={isRefreshing}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
                 title="Refresh documents list"
               >
                 <RefreshCw
@@ -505,7 +505,7 @@ export default function MyDocumentsPage() {
 
               <button
                 onClick={() => setShowUpload(true)}
-                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#1e668e] transition"
+                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-[#1e668e] transition"
               >
                 <Upload size={14} />
                 Upload Document
@@ -517,7 +517,7 @@ export default function MyDocumentsPage() {
           <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-500">
+                <span className="text-[13px] font-semibold text-slate-500">
                   Total Files
                 </span>
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-50 text-[#287da6]">
@@ -527,12 +527,12 @@ export default function MyDocumentsPage() {
               <p className="mt-2 text-xl font-bold text-[#173d5b]">
                 {summary.totalDocuments}
               </p>
-              <p className="text-[9px] text-slate-400">All registered items</p>
+              <p className="text-xs text-slate-400">All registered items</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-emerald-700">
+                <span className="text-sm font-semibold text-emerald-700">
                   Verified
                 </span>
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
@@ -542,12 +542,12 @@ export default function MyDocumentsPage() {
               <p className="mt-2 text-xl font-bold text-emerald-700">
                 {summary.verifiedCount}
               </p>
-              <p className="text-[9px] text-slate-400">Ready for instant support</p>
+              <p className="text-xs text-slate-400">Ready for instant support</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-amber-700">
+                <span className="text-sm font-semibold text-amber-700">
                   Under Review
                 </span>
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
@@ -557,12 +557,12 @@ export default function MyDocumentsPage() {
               <p className="mt-2 text-xl font-bold text-amber-700">
                 {summary.underReviewCount}
               </p>
-              <p className="text-[9px] text-slate-400">Officer validation pending</p>
+              <p className="text-xs text-slate-400">Officer validation pending</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-sky-700">
+                <span className="text-sm font-semibold text-sky-700">
                   Saved / Action
                 </span>
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-50 text-sky-600">
@@ -572,7 +572,7 @@ export default function MyDocumentsPage() {
               <p className="mt-2 text-xl font-bold text-sky-800">
                 {summary.savedCount}
               </p>
-              <p className="text-[9px] text-slate-400">Stored in household vault</p>
+              <p className="text-xs text-slate-400">Stored in household vault</p>
             </div>
           </section>
 
@@ -582,10 +582,10 @@ export default function MyDocumentsPage() {
               <Lock size={18} />
             </div>
             <div className="flex-1">
-              <p className="text-xs font-bold text-[#173d5b]">
+              <p className="text-sm font-bold text-[#173d5b]">
                 Encrypted Vault & Strict Access Control
               </p>
-              <p className="mt-0.5 text-[10px] text-slate-600">
+              <p className="mt-0.5 text-sm text-slate-600">
                 Documents are encrypted at rest and in transit. Files are accessible solely to verified disaster relief coordinators when processing your specific aid requests.
               </p>
             </div>
@@ -602,7 +602,7 @@ export default function MyDocumentsPage() {
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                      className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                         isActive
                           ? "bg-[#287da6] text-white shadow-xs"
                           : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -627,7 +627,7 @@ export default function MyDocumentsPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search documents..."
-                    className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-7 text-xs outline-none focus:border-[#287da6] focus:bg-white"
+                    className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-7 text-sm sm:text-[15px] outline-none focus:border-[#287da6] focus:bg-white"
                   />
                   {searchQuery && (
                     <button
@@ -643,7 +643,7 @@ export default function MyDocumentsPage() {
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-700 outline-none focus:border-[#287da6]"
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-sm sm:text-[15px] text-slate-700 outline-none focus:border-[#287da6]"
                 >
                   {STATUS_OPTIONS.map((st) => (
                     <option key={st} value={st}>
@@ -659,7 +659,7 @@ export default function MyDocumentsPage() {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white py-16 text-center">
               <RefreshCw size={28} className="animate-spin text-[#287da6]" />
-              <p className="mt-3 text-xs font-semibold text-slate-600">
+              <p className="mt-3 text-sm font-semibold text-slate-600">
                 Loading citizen documents...
               </p>
             </div>
@@ -668,7 +668,7 @@ export default function MyDocumentsPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
                 <FileText size={24} />
               </div>
-              <h3 className="mt-3 text-sm font-bold text-slate-700">
+              <h3 className="mt-3 text-base font-bold text-slate-700">
                 No documents found
               </h3>
               <p className="mt-1 max-w-sm text-xs text-slate-500">
@@ -683,7 +683,7 @@ export default function MyDocumentsPage() {
                   setSelectedStatus("All");
                   setShowUpload(true);
                 }}
-                className="mt-4 flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1e668e]"
+                className="mt-4 flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1e668e]"
               >
                 <Upload size={14} />
                 Upload New Document
@@ -709,7 +709,7 @@ export default function MyDocumentsPage() {
 
                         {/* STATUS BADGE */}
                         <span
-                          className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold ${
+                          className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold ${
                             isVerified
                               ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
                               : isUnderReview
@@ -730,19 +730,19 @@ export default function MyDocumentsPage() {
 
                       {/* DOCUMENT TITLE & CATEGORY */}
                       <div className="mt-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#287da6]">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#287da6]">
                           {doc.category}
                         </span>
-                        <h3 className="mt-0.5 text-xs font-bold text-[#173d5b]">
+                        <h3 className="mt-0.5 text-base font-bold text-[#173d5b]">
                           {doc.name}
                         </h3>
-                        <p className="mt-1 line-clamp-2 text-[11px] text-slate-500">
+                        <p className="mt-1 line-clamp-2 text-[13px] text-slate-500">
                           {doc.description || doc.fileName}
                         </p>
                       </div>
 
                       {/* META INFORMATION */}
-                      <div className="mt-3 flex items-center gap-3 text-[10px] text-slate-400">
+                      <div className="mt-3 flex items-center gap-3 text-[13px] text-slate-400">
                         <span className="flex items-center gap-1">
                           <Calendar size={11} />
                           {doc.date}
@@ -795,11 +795,11 @@ export default function MyDocumentsPage() {
                   <Upload size={20} />
                 </div>
 
-                <p className="mt-3 text-xs font-bold text-[#173d5b]">
+                <p className="mt-3 text-sm font-bold text-[#173d5b]">
                   Add another document
                 </p>
 
-                <p className="mt-1 text-[10px] text-slate-400">
+                <p className="mt-1 text-[13px] text-slate-400">
                   PDF, JPG or PNG · Up to 10 MB
                 </p>
               </button>
@@ -808,7 +808,7 @@ export default function MyDocumentsPage() {
 
           {/* BEFORE YOU UPLOAD ADVISORY SECTION */}
           <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
-            <h3 className="text-xs font-bold text-[#173d5b]">
+            <h3 className="text-base font-bold text-[#173d5b]">
               Before you upload
             </h3>
 
@@ -818,7 +818,7 @@ export default function MyDocumentsPage() {
                   size={15}
                   className="mt-0.5 shrink-0 text-emerald-600"
                 />
-                <p className="text-[11px] text-slate-600">
+                <p className="text-sm text-slate-600">
                   Upload valid proof of identity or residence required for shelter and allowance allocation.
                 </p>
               </div>
@@ -828,7 +828,7 @@ export default function MyDocumentsPage() {
                   size={15}
                   className="mt-0.5 shrink-0 text-emerald-600"
                 />
-                <p className="text-[11px] text-slate-600">
+                <p className="text-sm text-slate-600">
                   Cover unnecessary financial or sensitive family details before uploading photos or scans.
                 </p>
               </div>
@@ -838,7 +838,7 @@ export default function MyDocumentsPage() {
                   size={15}
                   className="mt-0.5 shrink-0 text-[#287da6]"
                 />
-                <p className="text-[11px] text-slate-600">
+                <p className="text-sm text-slate-600">
                   Never upload account passwords, ATM PINs, or credit card numbers. ReliefOS will never request these.
                 </p>
               </div>
@@ -846,7 +846,7 @@ export default function MyDocumentsPage() {
           </section>
 
           {/* FOOTER */}
-          <footer className="flex flex-wrap justify-between gap-3 border-t border-slate-200 py-4 text-[10px] text-slate-400">
+          <footer className="flex flex-wrap justify-between gap-3 border-t border-slate-200 py-4 text-[13px] text-slate-400">
             <p>© 2026 ReliefOS Citizen Support · Disaster Response & Document Vault</p>
             <p>Protected by Relief Security Protocol v4.2</p>
           </footer>
@@ -862,7 +862,7 @@ export default function MyDocumentsPage() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 text-[#287da6]">
                   <Upload size={16} />
                 </div>
-                <h3 className="text-sm font-bold text-[#173d5b]">
+                <h3 className="text-base font-bold text-[#173d5b]">
                   Upload New Document
                 </h3>
               </div>
@@ -877,7 +877,7 @@ export default function MyDocumentsPage() {
 
             <div className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Document Name
                 </label>
                 <input
@@ -885,18 +885,18 @@ export default function MyDocumentsPage() {
                   value={documentName}
                   onChange={(e) => setDocumentName(e.target.value)}
                   placeholder="e.g. National ID Card, Water Bill, Clinic Card"
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Document Category
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                 >
                   <option value="Identity">Identity (National ID, Passport, Driver's License)</option>
                   <option value="Medical">Medical (Prescription, Medical Report, Disability Pass)</option>
@@ -906,7 +906,7 @@ export default function MyDocumentsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-slate-700">
                   Description / Notes (Optional)
                 </label>
                 <input
@@ -914,13 +914,13 @@ export default function MyDocumentsPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="e.g. Samira Khan · Riverton Ward 4"
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                 />
               </div>
 
               {/* FILE PICKER */}
               <div>
-                <p className="text-xs font-semibold text-slate-700">
+                <p className="text-sm font-semibold text-slate-700">
                   Select File
                 </p>
 
@@ -954,11 +954,11 @@ export default function MyDocumentsPage() {
                 >
                   <Upload size={22} className="text-[#287da6]" />
 
-                  <p className="mt-2 text-xs font-semibold text-[#173d5b]">
+                  <p className="mt-2 text-sm font-semibold text-[#173d5b]">
                     {uploadFile ? uploadFile.name : "Click to select a file"}
                   </p>
 
-                  <p className="mt-1 text-[10px] text-slate-400">
+                  <p className="mt-1 text-[13px] text-slate-400">
                     {uploadFile
                       ? `${formatFileSize(uploadFile.size)} · Click to change file`
                       : "PDF, JPG or PNG · Maximum 10 MB"}
@@ -969,7 +969,7 @@ export default function MyDocumentsPage() {
               {/* SECURITY PILL */}
               <div className="flex items-center gap-2 rounded-lg bg-sky-50 p-2.5">
                 <ShieldCheck size={16} className="text-[#287da6] shrink-0" />
-                <p className="text-[10px] text-slate-600">
+                <p className="text-sm text-slate-600">
                   Files are saved securely in your citizen record and visible to authorized relief staff.
                 </p>
               </div>
@@ -981,7 +981,7 @@ export default function MyDocumentsPage() {
                 type="button"
                 onClick={() => setShowUpload(false)}
                 disabled={isUploading}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -990,7 +990,7 @@ export default function MyDocumentsPage() {
                 type="button"
                 onClick={handleUpload}
                 disabled={isUploading}
-                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1e668e] disabled:opacity-50 transition"
+                className="flex items-center gap-2 rounded-lg bg-[#287da6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1e668e] disabled:opacity-50 transition"
               >
                 {isUploading ? (
                   <>
@@ -1014,7 +1014,7 @@ export default function MyDocumentsPage() {
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
           <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-sm font-bold text-[#173d5b]">
+              <h3 className="text-base font-bold text-[#173d5b]">
                 Document Details
               </h3>
               <button
@@ -1032,16 +1032,16 @@ export default function MyDocumentsPage() {
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="truncate text-xs font-bold text-[#173d5b]">
+                <p className="truncate text-sm font-bold text-[#173d5b]">
                   {selectedDocument.name}
                 </p>
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[13px] text-slate-500">
                   {selectedDocument.category} Document
                 </p>
               </div>
 
               <span
-                className={`rounded-md px-2 py-0.5 text-[9px] font-bold ${
+                className={`rounded-md px-2 py-0.5 text-xs font-bold ${
                   selectedDocument.status.toLowerCase() === "verified"
                     ? "bg-emerald-100 text-emerald-800"
                     : selectedDocument.status.toLowerCase() === "under review"
@@ -1064,7 +1064,7 @@ export default function MyDocumentsPage() {
 
               <div className="flex justify-between py-2">
                 <span className="text-slate-500">Uploaded File</span>
-                <span className="font-mono text-[11px] text-slate-700 text-right">
+                <span className="font-mono text-sm text-slate-700 text-right">
                   {selectedDocument.fileName || "document.pdf"}
                 </span>
               </div>
@@ -1095,7 +1095,7 @@ export default function MyDocumentsPage() {
               {selectedDocument.verificationNotes && (
                 <div className="py-2">
                   <span className="text-slate-500 block mb-1">Verification Record</span>
-                  <p className="rounded-lg bg-slate-50 p-2.5 text-[10px] text-slate-600 border border-slate-200">
+                  <p className="rounded-lg bg-slate-50 p-2.5 text-sm text-slate-600 border border-slate-200">
                     {selectedDocument.verificationNotes}
                   </p>
                 </div>
@@ -1107,7 +1107,7 @@ export default function MyDocumentsPage() {
               <button
                 type="button"
                 onClick={() => setSelectedDocument(null)}
-                className="flex-1 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex-1 rounded-lg border border-slate-200 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Close
               </button>
@@ -1115,7 +1115,7 @@ export default function MyDocumentsPage() {
               <button
                 type="button"
                 onClick={() => handleDownload(selectedDocument)}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#287da6] py-2 text-xs font-semibold text-white hover:bg-[#1e668e]"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#287da6] py-2 text-sm font-semibold text-white hover:bg-[#1e668e]"
               >
                 <Download size={14} />
                 Download
@@ -1133,12 +1133,12 @@ export default function MyDocumentsPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
                 <Trash2 size={20} />
               </div>
-              <h3 className="text-sm font-bold text-slate-800">
+              <h3 className="text-base font-bold text-slate-800">
                 Delete Document?
               </h3>
             </div>
 
-            <p className="mt-3 text-xs text-slate-600">
+            <p className="mt-3 text-sm text-slate-600">
               Are you sure you want to delete{" "}
               <span className="font-bold text-[#173d5b]">
                 "{deleteConfirmDoc.name}"
@@ -1150,7 +1150,7 @@ export default function MyDocumentsPage() {
               <button
                 type="button"
                 onClick={() => setDeleteConfirmDoc(null)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -1158,7 +1158,7 @@ export default function MyDocumentsPage() {
               <button
                 type="button"
                 onClick={() => handleDelete(deleteConfirmDoc)}
-                className="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700"
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
               >
                 Yes, Delete
               </button>

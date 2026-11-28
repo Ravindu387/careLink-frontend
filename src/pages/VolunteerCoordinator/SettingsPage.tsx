@@ -108,7 +108,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-[9px] font-medium text-[#123c5b] mb-2">
+      <label className="block text-sm font-medium text-[#123c5b] mb-2">
         {label}
       </label>
 
@@ -117,7 +117,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] text-[#123c5b] outline-none focus:border-[#287fa9] focus:ring-2 focus:ring-[#287fa9]/10 transition-all bg-white"
+        className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] text-[#123c5b] outline-none focus:border-[#287fa9] focus:ring-2 focus:ring-[#287fa9]/10 transition-all bg-white"
       />
     </div>
   );
@@ -134,11 +134,11 @@ function SectionHeader({
 }) {
   return (
     <div className="border-b border-[#d5e3e9] pb-4 mb-4">
-      <h2 className="text-[13px] font-medium text-[#123c5b]">
+      <h2 className="text-base sm:text-lg font-semibold text-[#123c5b]">
         {title}
       </h2>
 
-      <p className="text-[9px] text-[#8296aa] mt-1">
+      <p className="text-xs text-[#8296aa] mt-1">
         {description}
       </p>
     </div>
@@ -409,8 +409,8 @@ export default function SettingsPage() {
   }) => (
     <div className="flex items-center justify-between gap-4 py-4 border-b border-[#edf2f5]">
       <div>
-        <p className="text-[10px] font-medium text-[#123c5b]">{title}</p>
-        <p className="text-[9px] text-[#8296aa] mt-1">{description}</p>
+        <p className="text-sm font-medium text-[#123c5b]">{title}</p>
+        <p className="text-xs text-[#8296aa] mt-1">{description}</p>
       </div>
 
       <Toggle enabled={enabled} onChange={onChange} />
@@ -423,7 +423,7 @@ export default function SettingsPage() {
       <main className="max-w-[1600px] mx-auto px-6 pt-5 pb-10">
         {/* BREADCRUMB & API STATUS */}
         <div className="flex items-center justify-between gap-2 mb-7">
-          <div className="flex items-center gap-2 text-[9px]">
+          <div className="flex items-center gap-2 text-xs">
             <span className="text-[#8296aa]">Operations</span>
             <ChevronRight size={12} className="text-[#8296aa]" />
             <span className="text-[#8296aa]">Volunteer Coordination</span>
@@ -434,7 +434,7 @@ export default function SettingsPage() {
           {/* BACKEND API STATUS BADGE */}
           <div className="flex items-center gap-2">
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-semibold tracking-wide border shadow-xs ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide border shadow-xs ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                   : "bg-amber-50 text-amber-700 border-amber-200"
@@ -464,8 +464,8 @@ export default function SettingsPage() {
         {/* PAGE HEADER */}
         <div className="flex items-center justify-between gap-4 mb-5">
           <div>
-            <h1 className="text-[23px] font-normal">Settings</h1>
-            <p className="text-[10px] text-[#718ba0] mt-2">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">Settings</h1>
+            <p className="text-sm text-[#718ba0] mt-2">
               Manage your coordinator profile, matching rules, notifications, and security.
             </p>
           </div>
@@ -474,7 +474,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={handleResetDefaults}
-              className="h-[36px] px-3.5 bg-white border border-[#d5e3e9] text-[#718ba0] hover:text-[#123c5b] hover:bg-slate-50 rounded-lg flex items-center gap-2 text-[9px] font-semibold transition cursor-pointer"
+              className="h-[36px] px-3.5 bg-white border border-[#d5e3e9] text-[#718ba0] hover:text-[#123c5b] hover:bg-slate-50 rounded-lg flex items-center gap-2 text-sm font-semibold transition cursor-pointer"
             >
               <RotateCcw size={12} />
               Reset defaults
@@ -484,7 +484,7 @@ export default function SettingsPage() {
               type="button"
               onClick={handleSave}
               disabled={isSaving || isLoading}
-              className="h-[36px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[9px] font-semibold transition cursor-pointer disabled:opacity-50 shadow-xs"
+              className="h-[36px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-sm font-semibold transition cursor-pointer disabled:opacity-50 shadow-xs"
             >
               <Save size={13} />
               <span>{isSaving ? "Saving..." : "Save changes"}</span>
@@ -512,7 +512,7 @@ export default function SettingsPage() {
                 >
                   <div className="flex items-center gap-3">
                     <Icon size={17} />
-                    <span className="text-[9px] font-medium">{item.name}</span>
+                    <span className="text-xs font-medium">{item.name}</span>
                   </div>
 
                   <ChevronRight size={16} />
@@ -550,14 +550,14 @@ export default function SettingsPage() {
                     </div>
 
                     <div>
-                      <p className="text-[9px] font-semibold">Profile photo</p>
-                      <p className="text-[8px] text-[#8296aa] mt-1">
+                      <p className="text-xs font-semibold">Profile photo</p>
+                      <p className="text-xs text-[#8296aa] mt-1">
                         JPG or PNG · maximum 2 MB
                       </p>
                     </div>
                   </div>
 
-                  <label className="h-[36px] px-3 border border-[#b9d0dc] rounded-lg text-[9px] text-[#17648e] flex items-center gap-2 cursor-pointer hover:bg-[#f5fafc] transition">
+                  <label className="h-[36px] px-3 border border-[#b9d0dc] rounded-lg text-sm text-[#17648e] flex items-center gap-2 cursor-pointer hover:bg-[#f5fafc] transition">
                     <Upload size={13} />
                     Upload photo
                     <input
@@ -591,14 +591,14 @@ export default function SettingsPage() {
                   />
 
                   <div>
-                    <label className="block text-[9px] font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2">
                       Operational area
                     </label>
 
                     <select
                       value={profile.area}
                       onChange={(e) => updateProfile("area", e.target.value)}
-                      className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none focus:border-[#287fa9] bg-white cursor-pointer"
+                      className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9] bg-white cursor-pointer"
                     >
                       <option>Greater Riverton</option>
                       <option>North Ward</option>
@@ -624,7 +624,7 @@ export default function SettingsPage() {
                 {/* MATCH SCORE */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                   <div>
-                    <label className="block text-[10px] font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2">
                       Minimum suitability score (%)
                     </label>
 
@@ -639,16 +639,16 @@ export default function SettingsPage() {
                           minimumScore: e.target.value,
                         }))
                       }
-                      className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none focus:border-[#287fa9] bg-white"
+                      className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9] bg-white"
                     />
 
-                    <p className="text-[8px] text-[#8296aa] mt-1">
+                    <p className="text-xs text-[#8296aa] mt-1">
                       Candidates below this score will not be recommended.
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2">
                       Maximum travel distance (km)
                     </label>
 
@@ -662,7 +662,7 @@ export default function SettingsPage() {
                           travelDistance: e.target.value,
                         }))
                       }
-                      className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 text-[10px] outline-none focus:border-[#287fa9] bg-white"
+                      className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none focus:border-[#287fa9] bg-white"
                     />
                   </div>
                 </div>
@@ -670,7 +670,7 @@ export default function SettingsPage() {
                 <div className="bg-[#f5f9fb] rounded-lg p-4 mb-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles size={17} className="text-[#7953c6]" />
-                    <h3 className="text-[10px] font-semibold">Matching criteria</h3>
+                    <h3 className="text-base font-semibold">Matching criteria</h3>
                   </div>
 
                   <SettingRow
@@ -761,7 +761,7 @@ export default function SettingsPage() {
                   description="Manage the alerts and updates you receive from CareLink."
                 />
 
-                <h3 className="text-[10px] font-semibold mb-2">Notification categories</h3>
+                <h3 className="text-base font-semibold mb-2">Notification categories</h3>
 
                 <SettingRow
                   title="Assignment updates"
@@ -824,7 +824,7 @@ export default function SettingsPage() {
                 />
 
                 {/* DELIVERY CHANNELS */}
-                <h3 className="text-[10px] font-semibold mt-6 mb-2">Delivery channels</h3>
+                <h3 className="text-base font-semibold mt-6 mb-2">Delivery channels</h3>
 
                 <SettingRow
                   title="In-app notifications"
@@ -864,7 +864,7 @@ export default function SettingsPage() {
 
                 <div className="mt-4 bg-[#eaf5f9] rounded-lg p-3 flex gap-2 border border-[#d2e7f0]">
                   <AlertCircle size={15} className="text-[#287fa9] shrink-0 mt-0.5" />
-                  <p className="text-[9px] text-[#527d96] leading-4">
+                  <p className="text-xs text-[#527d96] leading-4">
                     Critical safety alerts may still be delivered according to your
                     organization's emergency communication policy.
                   </p>
@@ -886,12 +886,12 @@ export default function SettingsPage() {
                 <div className="mb-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Lock size={17} className="text-[#287fa9]" />
-                    <h3 className="text-[11px] font-semibold">Change password</h3>
+                    <h3 className="text-base font-semibold">Change password</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="md:col-span-2">
-                      <label className="block text-[9px] font-medium mb-2">
+                      <label className="block text-sm font-medium mb-2">
                         Current password
                       </label>
 
@@ -905,7 +905,7 @@ export default function SettingsPage() {
                               currentPassword: e.target.value,
                             }))
                           }
-                          className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 pr-10 text-[10px] outline-none focus:border-[#287fa9] bg-white"
+                          className="w-full h-[39px] border border-[#d5e3e9] rounded-lg px-3 pr-10 text-sm sm:text-[15px] outline-none focus:border-[#287fa9] bg-white"
                           placeholder="Enter current password"
                         />
 
@@ -946,7 +946,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <p className="text-[8px] text-[#8296aa] mt-2">
+                  <p className="text-xs text-[#8296aa] mt-2">
                     Password must contain at least 8 characters.
                   </p>
                 </div>
@@ -955,7 +955,7 @@ export default function SettingsPage() {
                 <div className="border-t border-[#d5e3e9] pt-5">
                   <div className="flex items-center gap-2 mb-2">
                     <ShieldCheck size={17} className="text-[#239879]" />
-                    <h3 className="text-[11px] font-semibold">Two-factor authentication</h3>
+                    <h3 className="text-base font-semibold">Two-factor authentication</h3>
                   </div>
 
                   <SettingRow
@@ -973,7 +973,7 @@ export default function SettingsPage() {
 
                 {/* ACTIVE SESSIONS */}
                 <div className="border-t border-[#d5e3e9] pt-5 mt-5">
-                  <h3 className="text-[11px] font-semibold mb-4">Active sessions</h3>
+                  <h3 className="text-base font-semibold mb-4">Active sessions</h3>
 
                   <div className="space-y-2.5">
                     {activeSessions.map((session) => (
@@ -993,14 +993,14 @@ export default function SettingsPage() {
 
                           <div>
                             <div className="flex items-center gap-2">
-                              <p className="text-[10px] font-semibold">{session.device}</p>
+                              <p className="text-sm font-semibold">{session.device}</p>
                               {session.isCurrent && (
-                                <span className="text-[8px] text-[#287fa9] font-medium">
+                                <span className="text-xs text-[#287fa9] font-medium">
                                   (Current session)
                                 </span>
                               )}
                             </div>
-                            <p className="text-[8px] text-[#8296aa] mt-0.5">
+                            <p className="text-xs text-[#8296aa] mt-0.5">
                               {session.browser} · {session.location} · {session.lastActive}
                             </p>
                           </div>
@@ -1008,14 +1008,14 @@ export default function SettingsPage() {
 
                         <div className="flex items-center gap-2">
                           {session.isCurrent ? (
-                            <span className="bg-[#e5f5ef] text-[#239879] rounded-md px-2.5 py-1 text-[8px] font-semibold">
+                            <span className="bg-[#e5f5ef] text-[#239879] rounded-md px-2.5 py-1 text-xs font-semibold">
                               Active
                             </span>
                           ) : (
                             <button
                               type="button"
                               onClick={() => handleRevokeSession(session.id)}
-                              className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-2 py-1 rounded text-[8px] font-semibold flex items-center gap-1 transition cursor-pointer"
+                              className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-2 py-1 rounded text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
                             >
                               <Trash2 size={11} />
                               Revoke

@@ -388,7 +388,7 @@ export default function SecurityEvents() {
 
       {/* TOP BREADCRUMB */}
       <div className="border-b border-[#DCE7EC] bg-white px-6 py-3">
-        <div className="flex items-center gap-2 text-[10px]">
+        <div className="flex items-center gap-2 text-sm">
           <span className="text-slate-400">Administration</span>
           <ChevronRight size={12} className="text-slate-400" />
           <span className="font-semibold text-[#153B59]">Security Events</span>
@@ -401,7 +401,7 @@ export default function SecurityEvents() {
         <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold tracking-tight text-[#123B5C] md:text-[28px]">
+              <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-[#123B5C]">
                 Security Events
               </h1>
               <button
@@ -422,7 +422,7 @@ export default function SecurityEvents() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex h-11 items-center gap-2 rounded-lg border border-[#C7D8E2] bg-white px-4 text-[11px] font-semibold text-[#287FA8] hover:bg-slate-50"
+              className="flex h-11 items-center gap-2 rounded-lg border border-[#C7D8E2] bg-white px-4 text-sm font-semibold text-[#287FA8] hover:bg-slate-50"
             >
               <Plus size={15} />
               Record event
@@ -430,7 +430,7 @@ export default function SecurityEvents() {
 
             <button
               onClick={handleExportCsv}
-              className="flex h-11 items-center gap-2 rounded-lg border border-[#C7D8E2] bg-white px-4 text-[11px] font-semibold text-[#287FA8] hover:bg-slate-50"
+              className="flex h-11 items-center gap-2 rounded-lg border border-[#C7D8E2] bg-white px-4 text-sm font-semibold text-[#287FA8] hover:bg-slate-50"
             >
               <Download size={15} />
               Export report
@@ -441,7 +441,7 @@ export default function SecurityEvents() {
                 setPolicyTitle("Security Policy");
                 setShowPolicyModal(true);
               }}
-              className="h-11 rounded-lg bg-[#287FA8] px-5 text-[11px] font-semibold text-white transition hover:bg-[#1C668C]"
+              className="h-11 rounded-lg bg-[#287FA8] px-5 text-sm font-semibold text-white transition hover:bg-[#1C668C]"
             >
               Security policy
             </button>
@@ -457,7 +457,7 @@ export default function SecurityEvents() {
             </div>
             <button
               onClick={() => loadData()}
-              className="rounded-lg bg-red-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-red-700"
+              className="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
             >
               Retry
             </button>
@@ -476,18 +476,18 @@ export default function SecurityEvents() {
             </div>
 
             <div>
-              <p className={`text-[11px] font-bold ${threatBannerConfig.textColor}`}>
+              <p className={`text-sm font-bold ${threatBannerConfig.textColor}`}>
                 Current threat level: {threatLevel}
               </p>
 
-              <h2 className={`mt-1 text-base font-medium md:text-lg ${threatBannerConfig.textColor}`}>
+              <h2 className={`mt-1 text-lg sm:text-xl font-semibold md:text-lg ${threatBannerConfig.textColor} font-semibold`}>
                 {threatHeadline}
               </h2>
             </div>
           </div>
 
           <div
-            className={`ml-auto w-full rounded-lg px-3 py-2 text-center text-[10px] font-semibold md:w-auto md:min-w-[140px] ${threatBannerConfig.badgeBg}`}
+            className={`ml-auto w-full rounded-lg px-3 py-2 text-center text-sm font-semibold md:w-auto md:min-w-[140px] ${threatBannerConfig.badgeBg}`}
           >
             {stats?.monitoringStatus || "Monitoring active"}
           </div>
@@ -510,11 +510,11 @@ export default function SecurityEvents() {
                 </div>
 
                 <div>
-                  <p className="text-[10px] text-slate-500">{stat.label}</p>
+                  <p className="text-[13px] text-slate-500">{stat.label}</p>
 
                   <h3 className="mt-1 text-2xl font-bold text-[#153B59]">{stat.value}</h3>
 
-                  <p className="mt-1 text-[9px] text-slate-400">{stat.detail}</p>
+                  <p className="mt-1 text-xs text-slate-400">{stat.detail}</p>
                 </div>
               </div>
             );
@@ -536,7 +536,7 @@ export default function SecurityEvents() {
                 setCurrentPage(1);
               }}
               placeholder="Search event ID, type, user, source, or description..."
-              className="h-11 w-full rounded-lg border border-[#D3E1E8] bg-white pl-11 pr-4 text-xs outline-none focus:border-[#287FA8]"
+              className="h-11 w-full rounded-lg border border-[#D3E1E8] bg-white pl-11 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
             />
           </div>
 
@@ -547,7 +547,7 @@ export default function SecurityEvents() {
                 setSeverityFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D3E1E8] bg-white px-3 text-[11px] outline-none"
+              className="h-11 rounded-lg border border-[#D3E1E8] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All severities</option>
               <option>High</option>
@@ -561,7 +561,7 @@ export default function SecurityEvents() {
                 setTypeFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D3E1E8] bg-white px-3 text-[11px] outline-none max-w-[200px] truncate"
+              className="h-11 rounded-lg border border-[#D3E1E8] bg-white px-3 text-sm sm:text-[15px] outline-none max-w-[200px] truncate"
             >
               <option>All event types</option>
               {eventTypes.map((type) => (
@@ -577,7 +577,7 @@ export default function SecurityEvents() {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D3E1E8] bg-white px-3 text-[11px] outline-none"
+              className="h-11 rounded-lg border border-[#D3E1E8] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All statuses</option>
               <option>Investigating</option>
@@ -591,7 +591,7 @@ export default function SecurityEvents() {
                 setDateFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-11 rounded-lg border border-[#D3E1E8] bg-white px-3 text-[11px] outline-none"
+              className="h-11 rounded-lg border border-[#D3E1E8] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>Last 24 hours</option>
               <option>Last 7 days</option>
@@ -602,7 +602,7 @@ export default function SecurityEvents() {
 
           <button
             onClick={() => setShowMoreFilters(!showMoreFilters)}
-            className="h-11 rounded-lg border border-[#C7D8E2] bg-white px-4 text-[11px] font-semibold text-[#287FA8] hover:bg-slate-50"
+            className="h-11 rounded-lg border border-[#C7D8E2] bg-white px-4 text-sm font-semibold text-[#287FA8] hover:bg-slate-50"
           >
             {showMoreFilters ? "Hide options" : "More options"}
           </button>
@@ -610,7 +610,7 @@ export default function SecurityEvents() {
 
         {showMoreFilters && (
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#D3E1E8] bg-white p-4">
-            <p className="text-xs text-slate-600">
+            <p className="text-sm text-slate-600">
               Filter by date range, specific threat signatures, or reset all active filter criteria.
             </p>
 
@@ -624,7 +624,7 @@ export default function SecurityEvents() {
                   setDateFilter("Last 24 hours");
                   setCurrentPage(1);
                 }}
-                className="text-xs font-semibold text-[#287FA8] hover:underline"
+                className="text-sm font-semibold text-[#287FA8] hover:underline"
               >
                 Clear all filters
               </button>
@@ -637,7 +637,7 @@ export default function SecurityEvents() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[850px] border-collapse text-left">
               <thead>
-                <tr className="bg-[#F5F8F9] text-[10px] font-semibold text-slate-500">
+                <tr className="bg-[#F5F8F9] text-sm font-semibold text-slate-500">
                   <th className="border-b border-[#DCE7EC] px-4 py-4">Event ID</th>
                   <th className="border-b border-[#DCE7EC] px-4 py-4">Event Type</th>
                   <th className="border-b border-[#DCE7EC] px-4 py-4">Associated User</th>
@@ -652,7 +652,7 @@ export default function SecurityEvents() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={8} className="py-16 text-center text-xs text-slate-400">
+                    <td colSpan={8} className="py-16 text-center text-sm text-slate-400">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <Loader2 size={24} className="animate-spin text-[#287FA8]" />
                         <span>Loading security events from backend...</span>
@@ -661,7 +661,7 @@ export default function SecurityEvents() {
                   </tr>
                 ) : events.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-16 text-center text-xs text-slate-400">
+                    <td colSpan={8} className="py-16 text-center text-sm text-slate-400">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <ShieldCheck size={28} className="text-slate-300" />
                         <span>No security events found matching the criteria.</span>
@@ -671,32 +671,32 @@ export default function SecurityEvents() {
                 ) : (
                   events.map((event) => (
                     <tr key={event.id} className="transition hover:bg-[#F7FAFB]">
-                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-[11px] font-bold text-[#123B5C]">
+                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-sm font-bold text-[#123B5C]">
                         {event.id}
                       </td>
 
-                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-[11px]">
+                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-sm">
                         <span className="font-medium text-slate-800">{event.type}</span>
                         {event.description && (
-                          <p className="mt-0.5 line-clamp-1 text-[10px] text-slate-400">
+                          <p className="mt-0.5 line-clamp-1 text-[13px] text-slate-400">
                             {event.description}
                           </p>
                         )}
                       </td>
 
-                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-[11px] text-slate-700">
+                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-sm text-slate-700">
                         {event.user}
                       </td>
 
-                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-[11px] text-slate-600">
-                        <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px]">
+                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-sm text-slate-600">
+                        <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">
                           {event.source}
                         </span>
                       </td>
 
                       <td className="border-b border-[#E7EEF1] px-4 py-5">
                         <span
-                          className={`inline-block rounded-md px-2 py-1 text-[9px] font-semibold ${getSeverityClass(
+                          className={`inline-block rounded-md px-2 py-1 text-xs font-semibold ${getSeverityClass(
                             event.severity
                           )}`}
                         >
@@ -704,14 +704,14 @@ export default function SecurityEvents() {
                         </span>
                       </td>
 
-                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-[11px] text-slate-500">
+                      <td className="border-b border-[#E7EEF1] px-4 py-5 text-sm text-slate-500">
                         {event.timestamp}
                       </td>
 
                       <td className="border-b border-[#E7EEF1] px-4 py-5">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`inline-block rounded-md px-2 py-1 text-[9px] font-semibold ${getStatusClass(
+                            className={`inline-block rounded-md px-2 py-1 text-xs font-semibold ${getStatusClass(
                               event.status
                             )}`}
                           >
@@ -725,7 +725,7 @@ export default function SecurityEvents() {
                             onChange={(e) =>
                               handleChangeStatus(event, e.target.value as SecurityEventStatus)
                             }
-                            className="h-6 rounded border border-[#D5E3EA] bg-white px-1 text-[9px] text-slate-600 outline-none hover:border-[#287FA8]"
+                            className="h-6 rounded border border-[#D5E3EA] bg-white px-1 text-sm sm:text-[15px] text-slate-600 outline-none hover:border-[#287FA8]"
                           >
                             <option value="Investigating">Investigating</option>
                             <option value="Review Required">Review Required</option>
@@ -781,7 +781,7 @@ export default function SecurityEvents() {
 
           {/* PAGINATION */}
           <div className="flex flex-col justify-between gap-3 px-4 py-4 sm:flex-row sm:items-center">
-            <p className="text-[10px] text-slate-500">
+            <p className="text-[13px] text-slate-500">
               Showing{" "}
               {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1}
               –
@@ -792,19 +792,19 @@ export default function SecurityEvents() {
               <button
                 disabled={currentPage === 1 || loading}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="h-9 rounded-lg border border-[#D3E1E8] px-4 text-[10px] font-medium text-[#287FA8] disabled:opacity-40"
+                className="h-9 rounded-lg border border-[#D3E1E8] px-4 text-sm font-medium text-[#287FA8] disabled:opacity-40"
               >
                 Previous
               </button>
 
-              <span className="flex h-9 min-w-9 items-center justify-center rounded-lg bg-[#287FA8] px-3 text-[11px] font-semibold text-white">
+              <span className="flex h-9 min-w-9 items-center justify-center rounded-lg bg-[#287FA8] px-3 text-sm font-semibold text-white">
                 {currentPage} / {totalPages}
               </span>
 
               <button
                 disabled={currentPage >= totalPages || loading}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="h-9 rounded-lg border border-[#D3E1E8] px-4 text-[10px] font-medium text-[#287FA8] disabled:opacity-40"
+                className="h-9 rounded-lg border border-[#D3E1E8] px-4 text-sm font-medium text-[#287FA8] disabled:opacity-40"
               >
                 Next
               </button>
@@ -824,7 +824,7 @@ export default function SecurityEvents() {
           <div className="max-h-[90vh] w-full max-w-[620px] overflow-y-auto rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#DCE7EC] px-6 py-5">
               <div>
-                <span className="text-[10px] font-bold tracking-wider text-[#287FA8]">
+                <span className="text-xs font-bold tracking-wider text-[#287FA8]">
                   SECURITY INCIDENT DOSSIER
                 </span>
                 <h2 className="mt-1 text-lg font-bold text-[#153B59]">
@@ -842,10 +842,10 @@ export default function SecurityEvents() {
             <div className="space-y-4 p-6 text-xs text-slate-700">
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-lg border border-[#E7EEF1] bg-[#F9FBFC] p-3">
-                  <span className="text-[10px] font-semibold text-slate-400">SEVERITY</span>
+                  <span className="text-[13px] font-semibold text-slate-400">SEVERITY</span>
                   <div className="mt-1">
                     <span
-                      className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold ${getSeverityClass(
+                      className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${getSeverityClass(
                         selectedEvent.severity
                       )}`}
                     >
@@ -855,10 +855,10 @@ export default function SecurityEvents() {
                 </div>
 
                 <div className="rounded-lg border border-[#E7EEF1] bg-[#F9FBFC] p-3">
-                  <span className="text-[10px] font-semibold text-slate-400">STATUS</span>
+                  <span className="text-[13px] font-semibold text-slate-400">STATUS</span>
                   <div className="mt-1">
                     <span
-                      className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold ${getStatusClass(
+                      className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${getStatusClass(
                         selectedEvent.status
                       )}`}
                     >
@@ -870,23 +870,23 @@ export default function SecurityEvents() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-[10px] font-semibold text-slate-400">ASSOCIATED USER</span>
+                  <span className="text-[13px] font-semibold text-slate-400">ASSOCIATED USER</span>
                   <p className="mt-1 font-medium text-slate-800">{selectedEvent.user}</p>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-semibold text-slate-400">SOURCE IP / AGENT</span>
+                  <span className="text-[13px] font-semibold text-slate-400">SOURCE IP / AGENT</span>
                   <p className="mt-1 font-mono text-slate-800">{selectedEvent.source}</p>
                 </div>
               </div>
 
               <div>
-                <span className="text-[10px] font-semibold text-slate-400">TIMESTAMP</span>
+                <span className="text-[13px] font-semibold text-slate-400">TIMESTAMP</span>
                 <p className="mt-1 text-slate-600">{selectedEvent.timestamp}</p>
               </div>
 
               <div>
-                <span className="text-[10px] font-semibold text-slate-400">INCIDENT DETAILS</span>
+                <span className="text-[13px] font-semibold text-slate-400">INCIDENT DETAILS</span>
                 <p className="mt-1 rounded-lg border border-[#E7EEF1] bg-[#F9FBFC] p-3 text-slate-700 leading-relaxed">
                   {selectedEvent.description || "No additional technical notes provided for this event."}
                 </p>
@@ -894,15 +894,15 @@ export default function SecurityEvents() {
 
               {selectedEvent.status === "Resolved" && (
                 <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3 text-emerald-900">
-                  <div className="flex items-center gap-1.5 font-semibold text-[11px]">
+                  <div className="flex items-center gap-1.5 font-semibold text-sm">
                     <Check size={14} className="text-emerald-700" />
                     <span>Resolution Summary</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-emerald-800">
+                  <p className="mt-1 text-sm text-emerald-800">
                     {selectedEvent.resolutionNote || "Event marked as resolved by administrator."}
                   </p>
                   {selectedEvent.resolvedBy && (
-                    <p className="mt-1 text-[10px] text-emerald-700 font-medium">
+                    <p className="mt-1 text-sm text-emerald-700 font-medium">
                       Resolved by: {selectedEvent.resolvedBy}
                     </p>
                   )}
@@ -917,14 +917,14 @@ export default function SecurityEvents() {
                     setResolvingEvent(selectedEvent);
                     setSelectedEvent(null);
                   }}
-                  className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
                 >
                   Mark as resolved
                 </button>
               )}
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="rounded-lg border border-[#C7D8E2] px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="rounded-lg border border-[#C7D8E2] px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 Close
               </button>
@@ -944,8 +944,8 @@ export default function SecurityEvents() {
           <div className="w-full max-w-[500px] rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#DCE7EC] px-6 py-5">
               <div>
-                <span className="text-[10px] font-bold text-emerald-600">RESOLUTION WORKFLOW</span>
-                <h2 className="mt-1 text-base font-bold text-[#153B59]">
+                <span className="text-sm font-bold text-emerald-600">RESOLUTION WORKFLOW</span>
+                <h2 className="mt-1 text-lg sm:text-xl font-bold text-[#153B59]">
                   Resolve {resolvingEvent.id}
                 </h2>
               </div>
@@ -958,14 +958,14 @@ export default function SecurityEvents() {
             </div>
 
             <form onSubmit={handleConfirmResolve} className="space-y-4 p-6">
-              <p className="text-xs text-slate-600">
+              <p className="text-sm text-slate-600">
                 You are marking security event <strong>{resolvingEvent.id}</strong> (
                 {resolvingEvent.type}) as <strong>Resolved</strong>. Please supply an optional
                 administrative audit note:
               </p>
 
               <div>
-                <label className="mb-1 block text-[10px] font-semibold text-slate-500">
+                <label className="mb-1 block text-sm font-semibold text-slate-500">
                   RESOLUTION RATIONALE / REMEDIATION NOTE
                 </label>
                 <textarea
@@ -973,7 +973,7 @@ export default function SecurityEvents() {
                   value={resolutionNote}
                   onChange={(e) => setResolutionNote(e.target.value)}
                   placeholder="e.g. Account unlocked, OTP verified, or IP blocked at firewall..."
-                  className="w-full rounded-lg border border-[#D5E3EA] p-3 text-xs outline-none focus:border-[#287FA8]"
+                  className="w-full rounded-lg border border-[#D5E3EA] p-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                 />
               </div>
 
@@ -981,14 +981,14 @@ export default function SecurityEvents() {
                 <button
                   type="button"
                   onClick={() => setResolvingEvent(null)}
-                  className="h-10 rounded-lg border border-[#C7D8E2] px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  className="h-10 rounded-lg border border-[#C7D8E2] px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updatingId === resolvingEvent.id}
-                  className="flex h-10 items-center gap-1.5 rounded-lg bg-emerald-600 px-4 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                  className="flex h-10 items-center gap-1.5 rounded-lg bg-emerald-600 px-4 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
                 >
                   {updatingId === resolvingEvent.id && (
                     <Loader2 size={14} className="animate-spin" />
@@ -1012,7 +1012,7 @@ export default function SecurityEvents() {
           <div className="max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#DCE7EC] px-6 py-5">
               <div>
-                <span className="text-[10px] font-bold text-[#287FA8]">RECORD SECURITY EVENT</span>
+                <span className="text-sm font-bold text-[#287FA8]">RECORD SECURITY EVENT</span>
                 <h2 className="mt-1 text-lg font-bold text-[#153B59]">
                   Log New Security Incident
                 </h2>
@@ -1027,13 +1027,13 @@ export default function SecurityEvents() {
 
             <form onSubmit={handleCreateEventSubmit} className="space-y-4 p-6">
               <div>
-                <label className="mb-1 block text-[10px] font-semibold text-slate-600">
+                <label className="mb-1 block text-sm font-semibold text-slate-600">
                   EVENT TYPE <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={newType}
                   onChange={(e) => setNewType(e.target.value)}
-                  className="h-11 w-full rounded-lg border border-[#D5E3EA] px-3 text-xs outline-none focus:border-[#287FA8]"
+                  className="h-11 w-full rounded-lg border border-[#D5E3EA] px-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                 >
                   <option>Repeated failed sign-in</option>
                   <option>Privileged role assignment</option>
@@ -1048,7 +1048,7 @@ export default function SecurityEvents() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-[10px] font-semibold text-slate-600">
+                  <label className="mb-1 block text-sm font-semibold text-slate-600">
                     ASSOCIATED USER / EMAIL <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1056,12 +1056,12 @@ export default function SecurityEvents() {
                     value={newUser}
                     onChange={(e) => setNewUser(e.target.value)}
                     placeholder="e.g. USR-10482 or user@carelink.org"
-                    className="h-11 w-full rounded-lg border border-[#D5E3EA] px-3 text-xs outline-none focus:border-[#287FA8]"
+                    className="h-11 w-full rounded-lg border border-[#D5E3EA] px-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-[10px] font-semibold text-slate-600">
+                  <label className="mb-1 block text-sm font-semibold text-slate-600">
                     SOURCE / IP / CHANNEL <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1069,19 +1069,19 @@ export default function SecurityEvents() {
                     value={newSource}
                     onChange={(e) => setNewSource(e.target.value)}
                     placeholder="e.g. 192.168.1.100 or Web Portal"
-                    className="h-11 w-full rounded-lg border border-[#D5E3EA] px-3 text-xs outline-none focus:border-[#287FA8]"
+                    className="h-11 w-full rounded-lg border border-[#D5E3EA] px-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-[10px] font-semibold text-slate-600">
+                <label className="mb-1 block text-sm font-semibold text-slate-600">
                   SEVERITY
                 </label>
                 <select
                   value={newSeverity}
                   onChange={(e) => setNewSeverity(e.target.value as SecuritySeverity)}
-                  className="h-11 w-full rounded-lg border border-[#D5E3EA] px-3 text-xs outline-none focus:border-[#287FA8]"
+                  className="h-11 w-full rounded-lg border border-[#D5E3EA] px-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                 >
                   <option value="High">High (Immediate investigation)</option>
                   <option value="Medium">Medium (Review required)</option>
@@ -1090,7 +1090,7 @@ export default function SecurityEvents() {
               </div>
 
               <div>
-                <label className="mb-1 block text-[10px] font-semibold text-slate-600">
+                <label className="mb-1 block text-sm font-semibold text-slate-600">
                   TECHNICAL DESCRIPTION
                 </label>
                 <textarea
@@ -1098,7 +1098,7 @@ export default function SecurityEvents() {
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                   placeholder="Detail relevant indicators of compromise or alert telemetry..."
-                  className="w-full rounded-lg border border-[#D5E3EA] p-3 text-xs outline-none focus:border-[#287FA8]"
+                  className="w-full rounded-lg border border-[#D5E3EA] p-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                 />
               </div>
 
@@ -1106,14 +1106,14 @@ export default function SecurityEvents() {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="h-10 rounded-lg border border-[#C7D8E2] px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  className="h-10 rounded-lg border border-[#C7D8E2] px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={creatingEvent}
-                  className="flex h-10 items-center gap-1.5 rounded-lg bg-[#287FA8] px-5 text-xs font-semibold text-white hover:bg-[#1C668C] disabled:opacity-50"
+                  className="flex h-10 items-center gap-1.5 rounded-lg bg-[#287FA8] px-5 text-sm font-semibold text-white hover:bg-[#1C668C] disabled:opacity-50"
                 >
                   {creatingEvent && <Loader2 size={14} className="animate-spin" />}
                   Record event
@@ -1136,10 +1136,10 @@ export default function SecurityEvents() {
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-[#DCE7EC] px-6 py-5">
               <div>
-                <p className="text-[9px] font-bold tracking-wider text-[#56B69E]">
+                <p className="text-xs font-bold tracking-wider text-[#56B69E]">
                   SECURE ADMINISTRATIVE ACTION
                 </p>
-                <h2 className="mt-2 text-[19px] font-medium text-[#34495B]">
+                <h2 className="mt-2 text-[19px] font-semibold text-[#34495B]">
                   Security Policy Enforcement
                 </h2>
               </div>
@@ -1156,26 +1156,26 @@ export default function SecurityEvents() {
             <form onSubmit={handlePolicySubmit} className="space-y-5 p-6">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Action title <span className="text-red-500">*</span>
                   </label>
                   <input
                     required
                     value={policyTitle}
                     onChange={(e) => setPolicyTitle(e.target.value)}
-                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-[11px] outline-none focus:border-[#287FA8]"
+                    className="h-12 w-full rounded-lg border border-[#D5E3EA] px-3 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Environment
                   </label>
                   <div className="relative">
                     <select
                       value={environment}
                       onChange={(e) => setEnvironment(e.target.value)}
-                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 text-[11px] outline-none focus:border-[#287FA8]"
+                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                     >
                       <option>Production</option>
                       <option>Staging</option>
@@ -1191,14 +1191,14 @@ export default function SecurityEvents() {
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Scope
                   </label>
                   <div className="relative">
                     <select
                       value={scope}
                       onChange={(e) => setScope(e.target.value)}
-                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 text-[11px] outline-none focus:border-[#287FA8]"
+                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                     >
                       <option>Selected record</option>
                       <option>All security events</option>
@@ -1214,14 +1214,14 @@ export default function SecurityEvents() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                  <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                     Approval type
                   </label>
                   <div className="relative">
                     <select
                       value={approvalType}
                       onChange={(e) => setApprovalType(e.target.value)}
-                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 text-[11px] outline-none focus:border-[#287FA8]"
+                      className="h-12 w-full appearance-none rounded-lg border border-[#D5E3EA] bg-white px-4 text-sm sm:text-[15px] outline-none focus:border-[#287FA8]"
                     >
                       <option>Standard administrator approval</option>
                       <option>Senior administrator approval</option>
@@ -1237,7 +1237,7 @@ export default function SecurityEvents() {
               </div>
 
               <div>
-                <label className="mb-2 block text-[10px] font-semibold text-[#34495B]">
+                <label className="mb-2 block text-sm font-semibold text-[#34495B]">
                   Administrative rationale <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -1246,14 +1246,14 @@ export default function SecurityEvents() {
                   value={policyReason}
                   onChange={(e) => setPolicyReason(e.target.value)}
                   placeholder="Explain the authorized operational reason for this security policy change..."
-                  className="w-full resize-y rounded-lg border border-[#D5E3EA] p-3 text-[11px] outline-none placeholder:text-slate-400 focus:border-[#287FA8]"
+                  className="w-full resize-y rounded-lg border border-[#D5E3EA] p-3 text-sm sm:text-[15px] outline-none placeholder:text-slate-400 focus:border-[#287FA8]"
                 />
               </div>
 
               {/* Warning note */}
               <div className="flex items-center gap-3 rounded-lg bg-[#FFF6E3] px-4 py-4">
                 <ShieldCheck size={21} className="shrink-0 text-[#98630C]" />
-                <p className="text-[10px] leading-5 text-[#94620B]">
+                <p className="text-sm leading-5 text-[#94620B]">
                   Security policy actions are verified against current administrative privileges and
                   logged permanently to the system security ledger.
                 </p>
@@ -1264,14 +1264,14 @@ export default function SecurityEvents() {
                 <button
                   type="button"
                   onClick={() => setShowPolicyModal(false)}
-                  className="h-11 rounded-lg border border-[#C7D8E2] bg-white px-5 text-[11px] font-semibold text-[#287FA8] hover:bg-slate-50"
+                  className="h-11 rounded-lg border border-[#C7D8E2] bg-white px-5 text-sm font-semibold text-[#287FA8] hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingPolicy}
-                  className="flex h-11 items-center gap-2 rounded-lg bg-[#287FA8] px-5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#1C668C] disabled:opacity-50"
+                  className="flex h-11 items-center gap-2 rounded-lg bg-[#287FA8] px-5 text-sm font-semibold text-white shadow-sm hover:bg-[#1C668C] disabled:opacity-50"
                 >
                   {submittingPolicy && <Loader2 size={15} className="animate-spin" />}
                   Confirm &amp; record

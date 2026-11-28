@@ -1,5 +1,13 @@
 import { request } from "./api";
-import type { AuthResponse, LoginPayload, RegisterPayload, User } from "../types/auth";
+import type {
+  AuthResponse,
+  LoginPayload,
+  PartnerAdditionalInfoSubmission,
+  RegisterPayload,
+  RegisterResponse,
+  SetupPasswordPayload,
+  User,
+} from "../types/auth";
 
 const TOKEN_KEY = "carelink_token";
 const USER_KEY = "carelink_user";
@@ -19,18 +27,49 @@ export const authService = {
     return res.data;
   },
 
-  async register(payload: RegisterPayload): Promise<AuthResponse> {
-    const res = await request<AuthResponse>("/auth/register", {
+  async register(payload: RegisterPayload): Promise<RegisterResponse> {
+    const res = await request<RegisterResponse>("/auth/register", {
       method: "POST",
       body: JSON.stringify(payload),
     });
 
-    if (res.data?.token) {
+    if (res.data?.token && res.data?.user && !res.data?.requiresAdminApproval) {
       localStorage.setItem(TOKEN_KEY, res.data.token);
       localStorage.setItem(USER_KEY, JSON.stringify(res.data.user));
     }
 
     return res.data;
+  },
+
+  async submitPartnerAdditionalInfo(
+    payload: PartnerAdditionalInfoSubmission
+  ): Promise<string> {
+    const res = await request<boolean>("/auth/partner-additional-info", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return (
+      res.message ||
+      "Additional verification information submitted successfully."
+    );
+  },
+
+  async verifySetupToken(email: string, token: string): Promise<boolean> {
+    const res = await request<boolean>(
+      `/auth/verify-setup-token?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`,
+      {
+        method: "GET",
+      }
+    );
+    return res.data ?? false;
+  },
+
+  async setupPassword(payload: SetupPasswordPayload): Promise<string> {
+    const res = await request<boolean>("/auth/setup-password", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return res.message || "Password configured successfully. You can now sign in.";
   },
 
   async getMe(): Promise<User> {
@@ -50,6 +89,13 @@ export const authService = {
       method: "GET",
     });
     return res.data || [];
+  },
+
+  async getPublicRoles(): Promise<string[]> {
+    const res = await request<string[]>("/auth/public-roles", {
+      method: "GET",
+    });
+    return res.data || ["Citizen", "Volunteer", "PartnerOfficer"];
   },
 
   async resendVerification(email: string): Promise<string> {

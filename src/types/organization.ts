@@ -1,18 +1,63 @@
+export interface OrganizationDocumentItem {
+  id: string;
+  organizationId: string;
+  category: string;
+  label: string;
+  originalFileName: string;
+  contentType: string;
+  fileSizeBytes: number;
+  fileSizeDisplay: string;
+  uploadedAt: string;
+}
+
 export interface Organization {
   id: string;
   code: string;
   name: string;
   type: string;
+  otherOrganizationType?: string;
   scope: string;
+  registrationCountry?: string;
   registrationNumber?: string;
+  yearEstablished?: number;
+  website?: string;
   contactEmail?: string;
   contactPhone?: string;
-  membersCount: number;
-  verificationStatus: "Verified" | "Pending Review";
-  status: "Active" | "Pending" | "Suspended";
-  isActive: boolean;
-  createdAt: string;
+  secondaryContactPhone?: string;
+  address?: string;
+  district?: string;
+  province?: string;
   description?: string;
+
+  areasOfOperation?: string[];
+  areasOfAssistance?: string[];
+  otherAreaOfAssistance?: string;
+  operationalCapacity?: string;
+  emergencyResponseAvailability?: string;
+  additionalResources?: string;
+
+  representativeUserId?: string;
+  representativeFirstName?: string;
+  representativeLastName?: string;
+  representativeFullName?: string;
+  representativeDesignation?: string;
+  representativeEmail?: string;
+  representativePhone?: string;
+  representativeAlternativePhone?: string;
+
+  membersCount: number;
+  verificationStatus: "Verified" | "Pending Review" | "Additional Info" | "Rejected";
+  status: "Active" | "Pending" | "Suspended";
+  approvalStatus?: string;
+  isActive: boolean;
+  rejectionReason?: string;
+  additionalInfoRequest?: string;
+  additionalInfoResponse?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  createdAt: string;
+  emailSent?: boolean;
+  documents?: OrganizationDocumentItem[];
 }
 
 export interface OrganizationStats {
@@ -21,6 +66,8 @@ export interface OrganizationStats {
   pendingOrganizations: number;
   suspendedOrganizations: number;
   verifiedOrganizations: number;
+  additionalInfoOrganizations?: number;
+  rejectedOrganizations?: number;
 }
 
 export interface OrganizationQuery {
@@ -38,6 +85,9 @@ export interface CreateOrganizationPayload {
   registrationNumber?: string;
   contactEmail?: string;
   contactPhone?: string;
+  address?: string;
+  district?: string;
+  province?: string;
   description?: string;
 }
 
@@ -48,5 +98,13 @@ export interface UpdateOrganizationPayload {
   registrationNumber?: string;
   contactEmail?: string;
   contactPhone?: string;
+  address?: string;
+  district?: string;
+  province?: string;
   description?: string;
+}
+
+export interface OrganizationReviewDecisionPayload {
+  decision: "Approve" | "Reject" | "RequestInfo";
+  rationale: string;
 }

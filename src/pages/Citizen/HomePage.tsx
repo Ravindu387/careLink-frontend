@@ -223,7 +223,7 @@ export default function HomePage() {
               <div className="max-w-[580px]">
                 <div className="flex items-center gap-2">
                   <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <p className="text-xs font-medium text-sky-100">
+                  <p className="text-sm font-medium text-sky-100">
                     Good afternoon, {citizenDisplayName}
                   </p>
                 </div>
@@ -232,7 +232,7 @@ export default function HomePage() {
                   How can we support you today?
                 </h2>
 
-                <p className="mt-2.5 text-xs text-sky-100/90 leading-relaxed">
+                <p className="mt-2.5 text-sm text-sky-100/90 leading-relaxed">
                   Request immediate supplies, monitor application updates, and find verified emergency centres near North Ward.
                 </p>
 
@@ -242,7 +242,7 @@ export default function HomePage() {
                       setSelectedCategory("Emergency shelter");
                       setShowRequest(true);
                     }}
-                    className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-600"
+                    className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
                   >
                     <Plus size={16} />
                     Request help now
@@ -250,7 +250,7 @@ export default function HomePage() {
 
                   <button
                     onClick={() => navigate("/citizen/nearby-support")}
-                    className="flex items-center gap-2 rounded-lg bg-white/95 px-4 py-2.5 text-xs font-semibold text-[#173d5b] shadow-sm transition hover:bg-white"
+                    className="flex items-center gap-2 rounded-lg bg-white/95 px-4 py-2.5 text-sm font-semibold text-[#173d5b] shadow-sm transition hover:bg-white"
                   >
                     <Map size={16} />
                     Find nearby support
@@ -266,26 +266,26 @@ export default function HomePage() {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-red-100 px-1.5 py-0.5 text-[9px] font-bold text-red-700">
+                    <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs font-bold text-red-700">
                       ACTIVE ALERT
                     </span>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[13px] text-slate-400">
                       {operation?.region || "Greater Riverton"}
                     </span>
                   </div>
 
-                  <p className="mt-1 text-xs font-bold text-[#173d5b]">
+                  <p className="mt-1 text-sm font-bold text-[#173d5b]">
                     {operation?.activeAlertTitle || "Evacuation notice for Riverside blocks A-D"}
                   </p>
 
-                  <p className="mt-1 text-[10px] leading-4 text-slate-500">
+                  <p className="mt-1 text-[13px] leading-4 text-slate-500">
                     {operation?.activeAlertDescription ||
                       "Use Market Road to reach North Community Hall. Do not use Riverside Bridge."}
                   </p>
 
                   <button
                     onClick={() => navigate("/citizen/safety-updates")}
-                    className="mt-2.5 flex items-center gap-1 text-[10px] font-bold text-[#287da6] hover:underline"
+                    className="mt-2.5 flex items-center gap-1 text-sm font-bold text-[#287da6] hover:underline"
                   >
                     Read safety update
                     <ArrowRight size={13} />
@@ -327,10 +327,10 @@ export default function HomePage() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-[#173d5b] group-hover:text-[#287da6] transition">
+                      <p className="text-sm font-bold text-[#173d5b] group-hover:text-[#287da6] transition">
                         {category.title}
                       </p>
-                      <p className="mt-0.5 text-[10px] text-slate-500 truncate">
+                      <p className="mt-0.5 text-[13px] text-slate-500 truncate">
                         {category.description}
                       </p>
                     </div>
@@ -352,23 +352,23 @@ export default function HomePage() {
               <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-[#173d5b]">
+                    <h3 className="text-base font-bold text-[#173d5b]">
                       Your active requests
                     </h3>
                     {requests.length > 0 && (
-                      <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-bold text-[#287da6]">
+                      <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-bold text-[#287da6]">
                         {requests.length} Active
                       </span>
                     )}
                   </div>
-                  <p className="mt-0.5 text-[10px] text-slate-400">
+                  <p className="mt-0.5 text-[13px] text-slate-400">
                     Real-time status updates from the field dispatch team.
                   </p>
                 </div>
 
                 <button
                   onClick={() => navigate("/citizen/my-requests")}
-                  className="flex items-center gap-1 text-[11px] font-semibold text-[#287da6] hover:underline"
+                  className="flex items-center gap-1 text-sm font-semibold text-[#287da6] hover:underline"
                 >
                   View all
                   <ChevronRight size={14} />
@@ -383,8 +383,8 @@ export default function HomePage() {
               ) : filteredRequests.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 text-center text-slate-400">
                   <Package size={28} className="text-slate-300" />
-                  <p className="mt-2 text-xs font-semibold text-slate-600">No active requests</p>
-                  <p className="mt-0.5 text-[10px] text-slate-400">
+                  <p className="mt-2 text-sm font-semibold text-slate-600">No active requests</p>
+                  <p className="mt-0.5 text-[13px] text-slate-400">
                     You currently have no open assistance requests.
                   </p>
                   <button
@@ -392,7 +392,7 @@ export default function HomePage() {
                       setSelectedCategory("Food and water");
                       setShowRequest(true);
                     }}
-                    className="mt-3 text-xs font-semibold text-[#287da6] hover:underline"
+                    className="mt-3 text-sm font-semibold text-[#287da6] hover:underline"
                   >
                     Submit a new request
                   </button>
@@ -414,26 +414,26 @@ export default function HomePage() {
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-[9px] font-bold text-slate-400">
+                            <span className="font-mono text-xs font-bold text-slate-400">
                               {request.id}
                             </span>
-                            <span className="rounded bg-slate-100 px-1.5 py-0.2 text-[9px] font-semibold text-slate-600">
+                            <span className="rounded bg-slate-100 px-1.5 py-0.2 text-xs font-semibold text-slate-600">
                               {request.category}
                             </span>
                           </div>
 
-                          <p className="mt-1 text-xs font-bold text-[#173d5b]">
+                          <p className="mt-1 text-sm font-bold text-[#173d5b]">
                             {request.title}
                           </p>
 
-                          <p className="mt-0.5 text-[10px] text-slate-500 line-clamp-1">
+                          <p className="mt-0.5 text-[13px] text-slate-500 line-clamp-1">
                             {request.description}
                           </p>
                         </div>
 
                         <div className="text-right shrink-0">
                           <span
-                            className={`inline-block rounded-md px-2 py-1 text-[9px] font-bold border ${
+                            className={`inline-block rounded-md px-2 py-1 text-xs font-bold border ${
                               request.status === "Help on the way"
                                 ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                 : request.status === "Under review"
@@ -444,7 +444,7 @@ export default function HomePage() {
                             {request.status}
                           </span>
 
-                          <p className="mt-1.5 text-[9px] text-slate-400">
+                          <p className="mt-1.5 text-xs text-slate-400">
                             {request.timeAgo}
                           </p>
                         </div>
@@ -461,17 +461,17 @@ export default function HomePage() {
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                 <div>
-                  <h3 className="text-sm font-bold text-[#173d5b]">
+                  <h3 className="text-base font-bold text-[#173d5b]">
                     Closest help centres
                   </h3>
-                  <p className="mt-0.5 text-[10px] text-slate-400">
+                  <p className="mt-0.5 text-[13px] text-slate-400">
                     Based on North Ward radius
                   </p>
                 </div>
 
                 <button
                   onClick={() => navigate("/citizen/nearby-support")}
-                  className="text-[11px] font-semibold text-[#287da6] hover:underline"
+                  className="text-sm font-semibold text-[#287da6] hover:underline"
                 >
                   View map
                 </button>
@@ -485,7 +485,7 @@ export default function HomePage() {
               ) : filteredFacilities.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center text-slate-400">
                   <MapPin size={24} className="text-slate-300" />
-                  <p className="mt-2 text-xs font-semibold text-slate-600">No facilities nearby</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-600">No facilities nearby</p>
                 </div>
               ) : (
                 <div className="divide-y divide-slate-100">
@@ -499,16 +499,16 @@ export default function HomePage() {
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-[#173d5b] truncate">
+                        <p className="text-sm font-bold text-[#173d5b] truncate">
                           {facility.name}
                         </p>
-                        <p className="mt-0.5 text-[10px] text-slate-500">
+                        <p className="mt-0.5 text-[13px] text-slate-500">
                           {facility.distance} · {facility.hours}
                         </p>
                       </div>
 
                       <span
-                        className={`rounded-md px-2 py-1 text-[9px] font-semibold border ${
+                        className={`rounded-md px-2 py-1 text-xs font-semibold border ${
                           facility.status.toLowerCase().includes("space")
                             ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                             : "bg-sky-50 text-[#23866f] border-sky-100"
@@ -530,7 +530,7 @@ export default function HomePage() {
                   </div>
                   <a
                     href="tel:112"
-                    className="rounded bg-red-600 px-3 py-1 text-[11px] font-bold text-white shadow-sm hover:bg-red-700"
+                    className="rounded bg-red-600 px-3 py-1 text-sm font-bold text-white shadow-sm hover:bg-red-700"
                   >
                     Call 112
                   </a>
@@ -540,7 +540,7 @@ export default function HomePage() {
           </section>
 
           {/* FOOTER */}
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[10px] text-slate-400">
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[13px] text-slate-400">
             <p>© 2026 ReliefOS Citizen Support · Powered by CareLink</p>
             <p className="flex items-center gap-2">
               <ShieldCheck size={14} className="text-emerald-500" />
@@ -595,13 +595,13 @@ export default function HomePage() {
 
                 {/* CATEGORY SELECTOR */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#173d5b]">
+                  <label className="block text-sm font-semibold text-[#173d5b]">
                     Assistance Category <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white p-2.5 text-xs text-[#173d5b] outline-none focus:border-[#287da6]"
+                    className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white p-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none focus:border-[#287da6]"
                   >
                     {defaultCategories.map((cat) => (
                       <option key={cat.title} value={cat.title}>
@@ -613,7 +613,7 @@ export default function HomePage() {
 
                 {/* SITUATION DETAILS */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#173d5b]">
+                  <label className="block text-sm font-semibold text-[#173d5b]">
                     Describe your situation
                   </label>
                   <textarea
@@ -621,20 +621,20 @@ export default function HomePage() {
                     onChange={(e) => setRequestDescription(e.target.value)}
                     placeholder="Tell us what you need, number of people affected, or special requirements..."
                     rows={3}
-                    className="mt-1.5 w-full resize-y rounded-lg border border-slate-300 p-2.5 text-xs text-[#173d5b] outline-none placeholder:text-slate-400 focus:border-[#287da6]"
+                    className="mt-1.5 w-full resize-y rounded-lg border border-slate-300 p-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none placeholder:text-slate-400 focus:border-[#287da6]"
                   />
                 </div>
 
                 {/* PRIORITY & CONTACT IN TWO COLUMNS */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-[#173d5b]">
+                    <label className="block text-sm font-semibold text-[#173d5b]">
                       Urgency Level
                     </label>
                     <select
                       value={requestPriority}
                       onChange={(e) => setRequestPriority(e.target.value)}
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white p-2.5 text-xs outline-none focus:border-[#287da6]"
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                     >
                       <option value="Normal">Normal</option>
                       <option value="High">High</option>
@@ -643,28 +643,28 @@ export default function HomePage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-[#173d5b]">
+                    <label className="block text-sm font-semibold text-[#173d5b]">
                       Contact Phone
                     </label>
                     <input
                       type="text"
                       value={requestPhone}
                       onChange={(e) => setRequestPhone(e.target.value)}
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                      className="mt-1.5 w-full rounded-lg border border-slate-300 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                     />
                   </div>
                 </div>
 
                 {/* ADDRESS */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#173d5b]">
+                  <label className="block text-sm font-semibold text-[#173d5b]">
                     Delivery / Current Location
                   </label>
                   <input
                     type="text"
                     value={requestAddress}
                     onChange={(e) => setRequestAddress(e.target.value)}
-                    className="mt-1.5 w-full rounded-lg border border-slate-300 p-2.5 text-xs outline-none focus:border-[#287da6]"
+                    className="mt-1.5 w-full rounded-lg border border-slate-300 p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287da6]"
                   />
                 </div>
 
@@ -674,7 +674,7 @@ export default function HomePage() {
                     type="button"
                     onClick={() => setShowRequest(false)}
                     disabled={isSubmitting}
-                    className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                   >
                     Cancel
                   </button>
@@ -682,7 +682,7 @@ export default function HomePage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#1c6388] disabled:opacity-50"
+                    className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1c6388] disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>

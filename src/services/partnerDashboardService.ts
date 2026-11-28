@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface SummaryCard {
   label: string;
   value: string;
@@ -47,7 +48,17 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5277";
 export const partnerDashboardService = {
   async getDashboard(partnerId?: string): Promise<PartnerDashboardData> {
     const query = partnerId ? `?partnerId=${encodeURIComponent(partnerId)}` : "";
-    const response = await fetch(`${API_BASE}/api/partner-dashboard${query}`);
+    const token = localStorage.getItem("carelink_token") || localStorage.getItem("token");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await authFetch(`${API_BASE}/api/partner-dashboard${query}`, {
+      headers,
+    });
     if (!response.ok) {
       throw new Error(`Failed to load partner dashboard: ${response.status} ${response.statusText}`);
     }
@@ -55,11 +66,17 @@ export const partnerDashboardService = {
   },
 
   async logActivity(payload: CreatePartnerActivityPayload): Promise<PartnerActivity> {
-    const response = await fetch(`${API_BASE}/api/partner-dashboard/activities`, {
+    const token = localStorage.getItem("carelink_token") || localStorage.getItem("token");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await authFetch(`${API_BASE}/api/partner-dashboard/activities`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -70,8 +87,15 @@ export const partnerDashboardService = {
   },
 
   async reset(): Promise<{ message: string; data: PartnerDashboardData }> {
-    const response = await fetch(`${API_BASE}/api/partner-dashboard/reset`, {
+    const token = localStorage.getItem("carelink_token") || localStorage.getItem("token");
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await authFetch(`${API_BASE}/api/partner-dashboard/reset`, {
       method: "POST",
+      headers,
     });
     if (!response.ok) {
       throw new Error(`Failed to reset partner dashboard: ${response.status}`);

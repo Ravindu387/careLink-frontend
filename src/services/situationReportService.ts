@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 /**
  * Situation Report Service
  * Connects the Situation Reports interface to the CareLink .NET backend.
@@ -128,7 +129,7 @@ export const situationReportService = {
 
     const query = params.toString() ? `?${params.toString()}` : "";
     try {
-      const response = await fetch(`${BASE_URL}${query}`, {
+      const response = await authFetch(`${BASE_URL}${query}`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) throw new Error(`HTTP error ${response.status}`);
@@ -156,7 +157,7 @@ export const situationReportService = {
 
   async getMetrics(): Promise<SituationReportMetrics> {
     try {
-      const response = await fetch(`${BASE_URL}/metrics`, {
+      const response = await authFetch(`${BASE_URL}/metrics`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) throw new Error(`HTTP error ${response.status}`);
@@ -168,7 +169,7 @@ export const situationReportService = {
 
   async getById(id: string): Promise<SituationReport | null> {
     try {
-      const response = await fetch(`${BASE_URL}/${encodeURIComponent(id)}`, {
+      const response = await authFetch(`${BASE_URL}/${encodeURIComponent(id)}`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) throw new Error(`HTTP error ${response.status}`);
@@ -179,7 +180,7 @@ export const situationReportService = {
   },
 
   async create(payload: CreateSituationReportPayload): Promise<SituationReport> {
-    const response = await fetch(BASE_URL, {
+    const response = await authFetch(BASE_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -200,7 +201,7 @@ export const situationReportService = {
     id: string,
     payload: UpdateSituationReportStatusPayload
   ): Promise<SituationReport> {
-    const response = await fetch(`${BASE_URL}/${encodeURIComponent(id)}/status`, {
+    const response = await authFetch(`${BASE_URL}/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -219,7 +220,7 @@ export const situationReportService = {
 
   async delete(id: string): Promise<boolean> {
     try {
-      const response = await fetch(`${BASE_URL}/${encodeURIComponent(id)}`, {
+      const response = await authFetch(`${BASE_URL}/${encodeURIComponent(id)}`, {
         method: "DELETE",
         headers: { Accept: "application/json" },
       });
@@ -231,7 +232,7 @@ export const situationReportService = {
 
   async reset(): Promise<boolean> {
     try {
-      const response = await fetch(`${BASE_URL}/reset`, {
+      const response = await authFetch(`${BASE_URL}/reset`, {
         method: "POST",
         headers: { Accept: "application/json" },
       });

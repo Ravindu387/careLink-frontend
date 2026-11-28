@@ -20,8 +20,8 @@ import { auditLogService } from "../../services/auditLogService";
 import type { AuditRecord, AuditLogStats } from "../../types/auditLog";
 
 const inputClass =
-  "h-11 rounded-lg border border-[#D5E3EA] bg-white px-3 text-[11px] text-[#29445A] outline-none focus:border-[#2785B2]";
-const labelClass = "mb-2 block text-[10px] font-semibold text-[#34495B]";
+  "h-11 rounded-lg border border-[#D5E3EA] bg-white px-3 text-sm sm:text-[15px] text-[#29445A] outline-none focus:border-[#2785B2]";
+const labelClass = "mb-2 block text-[13px] font-semibold text-[#34495B]";
 
 export default function AuditLogs() {
   const [records, setRecords] = useState<AuditRecord[]>([]);
@@ -177,13 +177,13 @@ export default function AuditLogs() {
       {/* HEADER */}
       <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
-          <div className="mb-3 flex items-center gap-2 text-[9px] text-slate-500">
+          <div className="mb-3 flex items-center gap-2 text-xs text-slate-500">
             <span>Administration</span>
             <ChevronRight size={12} />
             <span className="font-semibold text-[#123B5C]">Audit Logs</span>
           </div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-medium tracking-tight text-[#123B5C] md:text-[27px]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-[#123B5C]">
               Audit Logs
             </h1>
             <button
@@ -203,13 +203,13 @@ export default function AuditLogs() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setShowRetention(true)}
-            className="rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+            className="rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-sm font-semibold text-[#2785B2] hover:bg-sky-50"
           >
             Retention policy
           </button>
           <button
             onClick={() => openExport()}
-            className="flex items-center gap-2 rounded-lg bg-[#2785B2] px-4 py-3 text-[10px] font-semibold text-white hover:bg-[#1D6F98]"
+            className="flex items-center gap-2 rounded-lg bg-[#2785B2] px-4 py-3 text-sm font-semibold text-white hover:bg-[#1D6F98]"
           >
             <Download size={15} />
             Export audit log
@@ -226,7 +226,7 @@ export default function AuditLogs() {
           </div>
           <button
             onClick={() => loadData()}
-            className="rounded-lg bg-red-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-red-700"
+            className="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
           >
             Retry
           </button>
@@ -237,12 +237,12 @@ export default function AuditLogs() {
       <div className="mb-4 flex items-center gap-3 rounded-lg border border-[#D5E0E5] border-l-[3px] border-l-[#718A99] bg-[#F5F8F9] px-4 py-3">
         <LockKeyhole size={18} className="shrink-0 text-[#527185]" />
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold text-[#344F61]">Read-only audit records</p>
-          <p className="mt-1 text-[9px] text-slate-500">
+          <p className="text-sm font-bold text-[#344F61]">Read-only audit records</p>
+          <p className="mt-1 text-xs text-slate-500">
             Audit events are immutable and cannot be modified or deleted. Every export action is logged.
           </p>
         </div>
-        <span className="hidden text-[9px] text-slate-500 sm:block">
+        <span className="hidden text-xs text-slate-500 sm:block">
           Retention: {stats?.retentionPeriod || "7 years"}
         </span>
       </div>
@@ -258,7 +258,7 @@ export default function AuditLogs() {
               setCurrentPage(1);
             }}
             placeholder="Search event ID, action, user, or record..."
-            className="w-full bg-transparent text-[10px] outline-none placeholder:text-slate-400"
+            className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
           />
         </div>
 
@@ -312,7 +312,7 @@ export default function AuditLogs() {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="h-11 rounded-lg border border-[#B9D1DD] bg-white px-4 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+          className="h-11 rounded-lg border border-[#B9D1DD] bg-white px-4 text-sm font-semibold text-[#2785B2] hover:bg-sky-50"
         >
           {showFilters ? "Hide options" : "More options"}
         </button>
@@ -320,7 +320,7 @@ export default function AuditLogs() {
 
       {showFilters && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#D7E5EA] bg-white p-4">
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[13px] text-slate-500">
             Total recorded audit trails: <strong>{totalCount.toLocaleString()}</strong> events across{" "}
             <strong>{stats?.uniqueActors ?? 0}</strong> active actors.
           </p>
@@ -332,7 +332,7 @@ export default function AuditLogs() {
               setRecordFilter("All record types");
               setCurrentPage(1);
             }}
-            className="text-[10px] font-semibold text-[#2785B2] hover:underline"
+            className="text-sm font-semibold text-[#2785B2] hover:underline"
           >
             Clear all filters
           </button>
@@ -344,7 +344,7 @@ export default function AuditLogs() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1050px] text-left">
             <thead>
-              <tr className="border-b border-[#D7E5EA] bg-[#F6F9FA] text-[9px] font-medium text-slate-500">
+              <tr className="border-b border-[#D7E5EA] bg-[#F6F9FA] text-[13px] font-medium text-slate-500">
                 <th className="px-3 py-3">Event ID</th>
                 <th className="px-3 py-3">Action</th>
                 <th className="px-3 py-3">Actor</th>
@@ -358,7 +358,7 @@ export default function AuditLogs() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-xs text-slate-400">
+                  <td colSpan={8} className="py-16 text-center text-sm text-slate-400">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <Loader2 size={24} className="animate-spin text-[#2785B2]" />
                       <span>Loading audit logs from backend...</span>
@@ -367,7 +367,7 @@ export default function AuditLogs() {
                 </tr>
               ) : records.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-16 text-center text-xs text-slate-400">
+                  <td colSpan={8} className="px-4 py-16 text-center text-sm text-slate-400">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <FileText size={28} className="text-slate-300" />
                       <span>No audit records match your search criteria.</span>
@@ -378,20 +378,20 @@ export default function AuditLogs() {
                 records.map((r) => (
                   <tr
                     key={r.id}
-                    className="border-b border-[#E5EDF1] text-[9px] text-slate-600 hover:bg-[#F8FBFC] transition"
+                    className="border-b border-[#E5EDF1] text-sm text-slate-600 hover:bg-[#F8FBFC] transition"
                   >
                     <td className="px-3 py-4 font-bold text-[#123B5C]">{r.id}</td>
                     <td className="px-3 py-4 font-medium text-slate-800">{r.action}</td>
                     <td className="px-3 py-4">{r.actor}</td>
                     <td className="px-3 py-4 whitespace-nowrap text-slate-500">{r.timestamp}</td>
                     <td className="px-3 py-4">
-                      <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] text-slate-700">
+                      <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs text-slate-700">
                         {r.record}
                       </span>
                     </td>
-                    <td className="px-3 py-4 font-mono text-[9px] text-slate-600">{r.change}</td>
+                    <td className="px-3 py-4 font-mono text-sm text-slate-600">{r.change}</td>
                     <td className="px-3 py-4">
-                      <span className="rounded-md bg-[#EDF2F5] px-2 py-1 text-[8px] font-semibold text-[#557084]">
+                      <span className="rounded-md bg-[#EDF2F5] px-2 py-1 text-xs font-semibold text-[#557084]">
                         {r.rationale}
                       </span>
                     </td>
@@ -411,14 +411,14 @@ export default function AuditLogs() {
                               setSelectedRecord(r);
                               setMenuId(null);
                             }}
-                            className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-[10px] hover:bg-slate-50 text-slate-700"
+                            className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm hover:bg-slate-50 text-slate-700"
                           >
                             <Eye size={13} className="text-[#2785B2]" />
                             View event
                           </button>
                           <button
                             onClick={() => handleCopyId(r.id)}
-                            className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-[10px] hover:bg-slate-50 text-slate-700"
+                            className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm hover:bg-slate-50 text-slate-700"
                           >
                             <Copy size={13} className="text-slate-400" />
                             Copy event ID
@@ -428,7 +428,7 @@ export default function AuditLogs() {
                               setMenuId(null);
                               openExport(r);
                             }}
-                            className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-[10px] hover:bg-slate-50 text-slate-700"
+                            className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm hover:bg-slate-50 text-slate-700"
                           >
                             <Download size={13} className="text-emerald-600" />
                             Export this record
@@ -445,7 +445,7 @@ export default function AuditLogs() {
 
         {/* PAGINATION */}
         <div className="flex flex-col items-center justify-between gap-3 px-4 py-3 sm:flex-row">
-          <p className="text-[9px] text-slate-500">
+          <p className="text-xs text-slate-500">
             Showing {totalCount ? (currentPage - 1) * pageSize + 1 : 0}–
             {Math.min(currentPage * pageSize, totalCount)} of {totalCount.toLocaleString()} events
           </p>
@@ -453,7 +453,7 @@ export default function AuditLogs() {
             <button
               disabled={currentPage === 1 || loading}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#D7E5EA] px-3 py-2 text-[9px] text-[#2785B2] disabled:opacity-40"
+              className="rounded-lg border border-[#D7E5EA] px-3 py-2 text-sm text-[#2785B2] disabled:opacity-40"
             >
               Previous
             </button>
@@ -461,7 +461,7 @@ export default function AuditLogs() {
               <button
                 key={p}
                 onClick={() => setCurrentPage(p)}
-                className={`rounded-lg border px-3 py-2 text-[9px] ${
+                className={`rounded-lg border px-3 py-2 text-sm ${
                   p === currentPage
                     ? "border-[#2785B2] bg-[#2785B2] text-white"
                     : "border-[#D7E5EA] text-[#123B5C] hover:bg-slate-50"
@@ -473,7 +473,7 @@ export default function AuditLogs() {
             <button
               disabled={currentPage === totalPages || loading}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#B9D1DD] px-3 py-2 text-[9px] text-[#2785B2] disabled:opacity-40"
+              className="rounded-lg border border-[#B9D1DD] px-3 py-2 text-sm text-[#2785B2] disabled:opacity-40"
             >
               Next
             </button>
@@ -492,10 +492,10 @@ export default function AuditLogs() {
           <div className="w-full max-w-[750px] overflow-hidden rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#D7E5EA] px-6 py-5">
               <div>
-                <p className="text-[9px] font-bold tracking-wider text-[#56B69E]">
+                <p className="text-xs font-bold tracking-wider text-[#56B69E]">
                   SECURE ADMINISTRATIVE ACTION
                 </p>
-                <h2 className="mt-2 text-lg font-medium text-[#34495B]">Audit Export</h2>
+                <h2 className="mt-2 text-lg font-semibold text-[#34495B]">Audit Export</h2>
               </div>
               <button
                 onClick={() => setShowExport(false)}
@@ -570,11 +570,11 @@ export default function AuditLogs() {
                   onChange={(e) => setRationale(e.target.value)}
                   rows={4}
                   placeholder="Explain the authorised operational reason for this export..."
-                  className="w-full rounded-lg border border-[#D5E3EA] p-3 text-[11px] outline-none focus:border-[#2785B2]"
+                  className="w-full rounded-lg border border-[#D5E3EA] p-3 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                 />
               </label>
 
-              <div className="flex items-start gap-3 rounded-lg bg-[#FFF6E4] px-4 py-3 text-[9px] leading-5 text-[#94621B]">
+              <div className="flex items-start gap-3 rounded-lg bg-[#FFF6E4] px-4 py-3 text-xs leading-5 text-[#94621B]">
                 <ShieldCheck size={18} className="mt-0.5 shrink-0 text-[#98630C]" />
                 <span>
                   Export actions are permanently preserved as tamper-evident entries in the system audit
@@ -586,14 +586,14 @@ export default function AuditLogs() {
                 <button
                   type="button"
                   onClick={() => setShowExport(false)}
-                  className="rounded-lg border border-[#B9D1DD] px-5 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-slate-50"
+                  className="rounded-lg border border-[#B9D1DD] px-5 py-3 text-sm font-semibold text-[#2785B2] hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!rationale.trim() || exporting}
-                  className="flex items-center gap-1.5 rounded-lg bg-[#2785B2] px-5 py-3 text-[10px] font-semibold text-white disabled:opacity-40 hover:bg-[#1D6F98]"
+                  className="flex items-center gap-1.5 rounded-lg bg-[#2785B2] px-5 py-3 text-sm font-semibold text-white disabled:opacity-40 hover:bg-[#1D6F98]"
                 >
                   {exporting && <Loader2 size={13} className="animate-spin" />}
                   Confirm &amp; record export
@@ -615,8 +615,8 @@ export default function AuditLogs() {
           <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b p-5">
               <div>
-                <p className="text-[9px] font-bold tracking-wider text-[#56B69E]">AUDIT GOVERNANCE</p>
-                <h2 className="mt-1 text-lg font-medium text-[#123B5C]">Retention policy</h2>
+                <p className="text-xs font-bold tracking-wider text-[#56B69E]">AUDIT GOVERNANCE</p>
+                <h2 className="mt-1 text-lg font-semibold text-[#123B5C]">Retention policy</h2>
               </div>
               <button
                 onClick={() => setShowRetention(false)}
@@ -627,7 +627,7 @@ export default function AuditLogs() {
               </button>
             </div>
 
-            <div className="space-y-4 p-5 text-[10px] text-slate-600">
+            <div className="space-y-4 p-5 text-sm text-slate-600">
               <div className="rounded-lg bg-[#F4F8FA] p-4">
                 <p className="text-slate-400">Current retention period</p>
                 <p className="mt-1 text-2xl font-semibold text-[#123B5C]">
@@ -653,7 +653,7 @@ export default function AuditLogs() {
             <div className="flex justify-end border-t p-4">
               <button
                 onClick={() => setShowRetention(false)}
-                className="rounded-lg bg-[#2785B2] px-5 py-2.5 text-[10px] font-semibold text-white hover:bg-[#1D6F98]"
+                className="rounded-lg bg-[#2785B2] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1D6F98]"
               >
                 Close
               </button>
@@ -673,10 +673,10 @@ export default function AuditLogs() {
           <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b p-5">
               <div>
-                <p className="text-[9px] font-bold tracking-wider text-[#56B69E]">
+                <p className="text-xs font-bold tracking-wider text-[#56B69E]">
                   READ-ONLY AUDIT RECORD
                 </p>
-                <h2 className="mt-1 text-lg font-medium text-[#123B5C]">{selectedRecord.id}</h2>
+                <h2 className="mt-1 text-lg font-semibold text-[#123B5C]">{selectedRecord.id}</h2>
               </div>
               <button
                 onClick={() => setSelectedRecord(null)}
@@ -687,7 +687,7 @@ export default function AuditLogs() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-5 p-5 text-[10px]">
+            <div className="grid grid-cols-2 gap-5 p-5 text-sm">
               {[
                 ["Action", selectedRecord.action],
                 ["Actor", selectedRecord.actor],
@@ -709,18 +709,18 @@ export default function AuditLogs() {
             <div className="flex items-center justify-between gap-2 border-t p-4">
               <div className="flex items-center gap-1.5 text-slate-500">
                 <FileText size={15} className="text-[#2785B2]" />
-                <span className="text-[9px]">This record is immutable and verified.</span>
+                <span className="text-xs">This record is immutable and verified.</span>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleCopyId(selectedRecord.id)}
-                  className="rounded-lg border border-[#B9D1DD] px-4 py-2 text-[10px] font-semibold text-[#2785B2] hover:bg-slate-50"
+                  className="rounded-lg border border-[#B9D1DD] px-4 py-2 text-sm font-semibold text-[#2785B2] hover:bg-slate-50"
                 >
                   Copy ID
                 </button>
                 <button
                   onClick={() => setSelectedRecord(null)}
-                  className="rounded-lg bg-[#2785B2] px-5 py-2 text-[10px] font-semibold text-white hover:bg-[#1D6F98]"
+                  className="rounded-lg bg-[#2785B2] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1D6F98]"
                 >
                   Close
                 </button>

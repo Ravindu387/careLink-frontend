@@ -165,10 +165,10 @@ export default function ShelterAdminDashboard() {
   useEffect(() => {
     accommodationService
       .getRequests({ pageSize: 5 })
-      .then((res) => {
+      .then((res: any) => {
         if (res.items && res.items.length > 0) {
           setRequests(
-            res.items.map((r) => ({
+            res.items.map((r: any) => ({
               id: r.id,
               applicant: r.applicant,
               people: r.familyMembers,
@@ -179,7 +179,7 @@ export default function ShelterAdminDashboard() {
           );
         }
       })
-      .catch((err) => console.error("Error loading dashboard requests:", err));
+      .catch((err: any) => console.error("Error loading dashboard requests:", err));
   }, []);
 
   const filteredRequests = requests.filter((request) =>
@@ -267,7 +267,7 @@ export default function ShelterAdminDashboard() {
       <main className="max-w-[1500px] mx-auto px-4 md:px-7 py-6">
 
         {/* BREADCRUMB */}
-        <div className="flex items-center gap-2 text-[10px] mb-6">
+        <div className="flex items-center gap-2 text-sm mb-6">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="text-slate-400">Shelter Administration</span>
@@ -281,11 +281,11 @@ export default function ShelterAdminDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
 
           <div>
-            <h1 className="text-xl md:text-2xl font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Shelter Admin Dashboard
             </h1>
 
-            <p className="text-[10px] text-slate-500 mt-1">
+            <p className="text-[13px] text-slate-500 mt-1">
               Monitor shelter capacity, resident wellbeing, resources, and urgent operations.
             </p>
           </div>
@@ -294,7 +294,7 @@ export default function ShelterAdminDashboard() {
 
             <button
               onClick={handleGenerateReport}
-              className="h-9 px-3 bg-white border border-[#9ebdcd] rounded-md text-[10px] font-medium flex items-center gap-2 hover:bg-slate-50"
+              className="h-9 px-3 bg-white border border-[#9ebdcd] rounded-md text-sm font-medium flex items-center gap-2 hover:bg-slate-50"
             >
               <Download size={13} />
               Generate report
@@ -302,7 +302,7 @@ export default function ShelterAdminDashboard() {
 
             <button
               onClick={() => navigate("/shelter-admin/shelters")}
-              className="h-9 px-3 bg-[#1c5d83] text-white rounded-md text-[10px] font-semibold flex items-center gap-2 hover:bg-[#124768]"
+              className="h-9 px-3 bg-[#1c5d83] text-white rounded-md text-sm font-semibold flex items-center gap-2 hover:bg-[#124768]"
             >
               <Plus size={13} />
               Register shelter
@@ -316,16 +316,16 @@ export default function ShelterAdminDashboard() {
           <CheckCircle2 size={15} className="text-[#35a985] shrink-0" />
 
           <div>
-            <p className="text-[10px] font-semibold text-[#23775e]">
+            <p className="text-sm font-semibold text-[#23775e]">
               Demonstration environment
             </p>
 
-            <p className="text-[8px] text-[#398b70]">
+            <p className="text-xs text-[#398b70]">
               Operational figures below are realistic sample data for CareLink coursework.
             </p>
           </div>
 
-          <span className="ml-auto text-[8px] text-slate-400 hidden sm:block">
+          <span className="ml-auto text-xs text-slate-400 hidden sm:block">
             Updated just now
           </span>
         </div>
@@ -408,18 +408,18 @@ export default function ShelterAdminDashboard() {
 
             <div className="px-4 py-3 border-b border-slate-200 flex justify-between items-center">
               <div>
-                <h2 className="text-xs font-semibold">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Shelter occupancy overview
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Current occupancy across active shelters
                 </p>
               </div>
 
               <button
                 onClick={() => setModal("occupancy")}
-                className="text-[9px] text-[#267ca7] flex items-center gap-1"
+                className="text-sm text-[#267ca7] flex items-center gap-1"
               >
                 View occupancy
                 <ChevronRight size={11} />
@@ -439,17 +439,17 @@ export default function ShelterAdminDashboard() {
                     <div className="flex justify-between items-center mb-1.5">
 
                       <div>
-                        <p className="text-[9px] font-semibold">
+                        <p className="text-xs font-semibold">
                           {shelter.name}
                         </p>
 
-                        <p className="text-[8px] text-slate-400">
+                        <p className="text-xs text-slate-400">
                           {shelter.occupied} of {shelter.capacity} occupied
                         </p>
                       </div>
 
                       <span
-                        className="text-[9px] font-semibold"
+                        className="text-xs font-semibold"
                         style={{ color: shelter.color }}
                       >
                         {percentage}%
@@ -501,16 +501,16 @@ export default function ShelterAdminDashboard() {
             <div className="px-4 py-3 border-b border-slate-200 flex justify-between items-center">
 
               <div>
-                <h2 className="text-xs font-semibold">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Admissions &amp; departures
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Last seven days
                 </p>
               </div>
 
-              <span className="bg-[#e6f8f1] text-[#219c78] rounded px-2 py-1 text-[8px] font-semibold">
+              <span className="bg-[#e6f8f1] text-[#219c78] rounded px-2 py-1 text-xs font-semibold">
                 +100 residents
               </span>
             </div>
@@ -590,18 +590,18 @@ export default function ShelterAdminDashboard() {
             <div className="px-4 py-3 border-b border-slate-200 flex justify-between items-center">
 
               <div>
-                <h2 className="text-xs font-semibold">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Pending accommodation requests
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Highest-priority requests requiring review
                 </p>
               </div>
 
               <button
                 onClick={() => setModal("requests")}
-                className="text-[9px] text-[#267ca7] flex items-center gap-1"
+                className="text-sm text-[#267ca7] flex items-center gap-1"
               >
                 View all
                 <ChevronRight size={11} />
@@ -614,7 +614,7 @@ export default function ShelterAdminDashboard() {
 
                 <thead className="bg-[#f5f8fa] border-b border-slate-200">
 
-                  <tr className="text-[8px] text-slate-500">
+                  <tr className="text-sm text-slate-500">
                     <th className="px-3 py-3">Request</th>
                     <th className="px-3 py-3">Applicant</th>
                     <th className="px-3 py-3">People</th>
@@ -630,7 +630,7 @@ export default function ShelterAdminDashboard() {
 
                     <tr
                       key={request.id}
-                      className="border-b border-slate-100 hover:bg-slate-50 text-[8px]"
+                      className="border-b border-slate-100 hover:bg-slate-50 text-sm"
                     >
 
                       <td className="px-3 py-3 font-semibold text-[#267ca7]">
@@ -676,7 +676,7 @@ export default function ShelterAdminDashboard() {
                     <tr>
                       <td
                         colSpan={7}
-                        className="text-center py-8 text-xs text-slate-400"
+                        className="text-center py-8 text-sm text-slate-400"
                       >
                         No requests found.
                       </td>
@@ -694,16 +694,16 @@ export default function ShelterAdminDashboard() {
             <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
 
               <div>
-                <h2 className="text-xs font-semibold">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Critical alerts
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Immediate attention required
                 </p>
               </div>
 
-              <span className="bg-[#fff0f0] text-red-600 rounded px-2 py-1 text-[8px] font-semibold">
+              <span className="bg-[#fff0f0] text-red-600 rounded px-2 py-1 text-xs font-semibold">
                 5 open
               </span>
             </div>
@@ -727,11 +727,11 @@ export default function ShelterAdminDashboard() {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-[9px] font-semibold truncate">
+                    <p className="text-xs font-semibold truncate">
                       {alert.title}
                     </p>
 
-                    <p className="text-[8px] text-slate-400 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       {alert.description}
                     </p>
                   </div>
@@ -751,7 +751,7 @@ export default function ShelterAdminDashboard() {
 
         <section>
 
-          <h2 className="text-xs font-semibold mb-3">
+          <h2 className="text-base sm:text-lg font-semibold mb-3">
             Quick actions
           </h2>
 
@@ -805,7 +805,7 @@ export default function ShelterAdminDashboard() {
           <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-5">
 
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-semibold">
+              <h2 className="text-lg sm:text-xl font-semibold">
                 {modal === "register" && "Register New Shelter"}
                 {modal === "resident" && "Add Resident"}
                 {modal === "beds" && "Manage Beds"}
@@ -860,7 +860,7 @@ export default function ShelterAdminDashboard() {
 
                 <button
                   type="submit"
-                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-xs font-semibold"
+                  className="w-full bg-[#1c5d83] text-white rounded-lg py-3 text-sm font-semibold"
                 >
                   Register shelter
                 </button>
@@ -876,7 +876,7 @@ export default function ShelterAdminDashboard() {
                 <button
                   onClick={() => approveRequest(selectedRequest.id)}
                   disabled={selectedRequest.status === "Approved"}
-                  className="w-full bg-[#1c5d83] disabled:bg-emerald-600 text-white rounded-lg py-3 text-xs font-semibold"
+                  className="w-full bg-[#1c5d83] disabled:bg-emerald-600 text-white rounded-lg py-3 text-sm font-semibold"
                 >
                   {selectedRequest.status === "Approved"
                     ? "Already approved"
@@ -912,7 +912,7 @@ export default function ShelterAdminDashboard() {
                 setModal("");
                 setSelectedRequest(null);
               }}
-              className="w-full mt-4 border border-slate-200 rounded-lg py-2.5 text-xs font-medium hover:bg-slate-50"
+              className="w-full mt-4 border border-slate-200 rounded-lg py-2.5 text-sm font-medium hover:bg-slate-50"
             >
               Close
             </button>
@@ -954,7 +954,7 @@ function KpiCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[8px] text-slate-500">
+        <p className="text-xs text-slate-500">
           {title}
         </p>
 
@@ -962,7 +962,7 @@ function KpiCard({
           {value}
         </h3>
 
-        <p className="text-[7px] text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-400 mt-0.5">
           {description}
         </p>
       </div>
@@ -981,7 +981,7 @@ function MiniSummary({
 }) {
   return (
     <div className="border-r last:border-r-0 border-slate-200 px-2">
-      <p className="text-[8px] text-slate-400">
+      <p className="text-xs text-slate-400">
         {label}
       </p>
 
@@ -990,7 +990,7 @@ function MiniSummary({
           className="w-1.5 h-1.5 rounded-sm"
           style={{ backgroundColor: color }}
         />
-        <span className="text-[9px] font-semibold">
+        <span className="text-xs font-semibold">
           {value}
         </span>
       </div>
@@ -1006,7 +1006,7 @@ function StatusBadge({ status }: { status: RequestStatus }) {
   };
 
   return (
-    <span className={`px-2 py-1 rounded text-[8px] font-semibold whitespace-nowrap ${styles[status]}`}>
+    <span className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${styles[status]}`}>
       {status}
     </span>
   );
@@ -1030,7 +1030,7 @@ function QuickAction({
         {icon}
       </div>
 
-      <span className="text-[8px] font-semibold text-left flex-1">
+      <span className="text-xs font-semibold text-left flex-1">
         {label}
       </span>
 
@@ -1057,7 +1057,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1068,7 +1068,7 @@ function FormInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );

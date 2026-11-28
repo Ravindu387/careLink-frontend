@@ -69,10 +69,10 @@ function StatCard({ item }: { item: StatMetric }) {
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between">
-          <p className="text-[10px] font-medium text-slate-500">{item.label}</p>
+          <p className="text-[13px] font-medium text-slate-500">{item.label}</p>
           {item.change && (
             <span
-              className={`text-[9px] font-semibold ${
+              className={`text-xs font-semibold ${
                 item.change.startsWith("+")
                   ? "text-[#159879]"
                   : item.change.startsWith("-")
@@ -85,7 +85,7 @@ function StatCard({ item }: { item: StatMetric }) {
           )}
         </div>
         <p className="mt-0.5 text-[20px] font-bold leading-6 text-[#123B5C]">{item.value}</p>
-        <p className="mt-0.5 text-[9px] text-slate-400">{item.note}</p>
+        <p className="mt-0.5 text-xs text-slate-400">{item.note}</p>
       </div>
     </div>
   );
@@ -97,7 +97,7 @@ function AdoptionChart({ trend }: { trend: { month: string; activeUsers: number;
 
   if (!trend || trend.length === 0) {
     return (
-      <div className="flex h-[200px] items-center justify-center text-[11px] text-slate-400">
+      <div className="flex h-[200px] items-center justify-center text-[13px] text-slate-400">
         No trend data available.
       </div>
     );
@@ -123,7 +123,7 @@ function AdoptionChart({ trend }: { trend: { month: string; activeUsers: number;
   return (
     <div className="relative h-[220px] w-full px-4 pb-3 pt-2">
       {hoveredPoint && (
-        <div className="absolute right-4 top-2 rounded-md border border-[#CDE1EB] bg-[#F4F9FB] px-2.5 py-1 text-[10px] text-[#123B5C] shadow-sm">
+        <div className="absolute right-4 top-2 rounded-md border border-[#CDE1EB] bg-[#F4F9FB] px-2.5 py-1 text-xs text-[#123B5C] shadow-sm">
           <span className="font-semibold">{hoveredPoint.month}:</span> {hoveredPoint.activeUsers.toLocaleString()} active users
         </div>
       )}
@@ -179,7 +179,7 @@ function BadgeRenderer({ value }: { value: string }) {
   }
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-semibold ${bg}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${bg}`}>
       {value}
     </span>
   );
@@ -349,8 +349,8 @@ export default function ReportsPage() {
       {/* Header Banner */}
       <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-xl font-bold text-[#123B5C]">System & Governance Reports</h1>
-          <p className="text-[11px] text-slate-500">
+          <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#123B5C]">System & Governance Reports</h1>
+          <p className="text-[13px] text-slate-500">
             Real-time administrative telemetry, compliance certifications, and humanitarian response analytics.
           </p>
         </div>
@@ -358,7 +358,7 @@ export default function ReportsPage() {
           <button
             type="button"
             onClick={resetFilters}
-            className="flex items-center gap-1.5 rounded-lg border border-[#B9D0DC] bg-white px-3 py-2 text-[10px] font-medium text-[#176F9F] shadow-sm transition hover:bg-[#EDF6FA]"
+            className="flex items-center gap-1.5 rounded-lg border border-[#B9D0DC] bg-white px-3 py-2 text-sm font-medium text-[#176F9F] shadow-sm transition hover:bg-[#EDF6FA]"
             title="Reset to default filters"
           >
             <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
@@ -370,13 +370,13 @@ export default function ReportsPage() {
       {/* Report filters */}
       <section className="mb-4 grid grid-cols-1 gap-3 rounded-xl border border-[#D8E5EB] bg-white p-3.5 shadow-[0_4px_12px_rgba(24,62,86,0.04)] md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_auto]">
         <label className="block">
-          <span className="mb-1.5 flex items-center gap-1 text-[10px] font-semibold text-slate-600">
+          <span className="mb-1.5 flex items-center gap-1 text-sm font-semibold text-slate-600">
             <SlidersHorizontal size={12} className="text-[#2383B5]" /> Date range
           </span>
           <select
             value={dateRange}
             onChange={(event) => setDateRange(event.target.value)}
-            className="h-10 w-full rounded-lg border border-[#D5E3EA] bg-white px-3 text-[11px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10"
+            className="h-10 w-full rounded-lg border border-[#D5E3EA] bg-white px-3 text-sm sm:text-[15px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10"
           >
             {filterOptions.dateRanges.map((r) => (
               <option key={r} value={r}>
@@ -387,13 +387,13 @@ export default function ReportsPage() {
         </label>
 
         <label className="block">
-          <span className="mb-1.5 flex items-center gap-1 text-[10px] font-semibold text-slate-600">
+          <span className="mb-1.5 flex items-center gap-1 text-sm font-semibold text-slate-600">
             Organisation
           </span>
           <select
             value={organisation}
             onChange={(event) => setOrganisation(event.target.value)}
-            className="h-10 w-full rounded-lg border border-[#D5E3EA] bg-white px-3 text-[11px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10"
+            className="h-10 w-full rounded-lg border border-[#D5E3EA] bg-white px-3 text-sm sm:text-[15px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10"
           >
             {filterOptions.organisations.map((org) => (
               <option key={org} value={org}>
@@ -404,13 +404,13 @@ export default function ReportsPage() {
         </label>
 
         <label className="block">
-          <span className="mb-1.5 flex items-center gap-1 text-[10px] font-semibold text-slate-600">
+          <span className="mb-1.5 flex items-center gap-1 text-sm font-semibold text-slate-600">
             Region
           </span>
           <select
             value={region}
             onChange={(event) => setRegion(event.target.value)}
-            className="h-10 w-full rounded-lg border border-[#D5E3EA] bg-white px-3 text-[11px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10"
+            className="h-10 w-full rounded-lg border border-[#D5E3EA] bg-white px-3 text-sm sm:text-[15px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10"
           >
             {filterOptions.regions.map((reg) => (
               <option key={reg} value={reg}>
@@ -424,7 +424,7 @@ export default function ReportsPage() {
           <button
             type="button"
             onClick={applyFilters}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-[#2785B2] px-6 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#1F6E95] xl:w-auto"
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-[#2785B2] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1F6E95] xl:w-auto"
           >
             Apply filters
           </button>
@@ -435,7 +435,7 @@ export default function ReportsPage() {
       {(appliedFilters.organisation !== "All organisations" ||
         appliedFilters.region !== "All regions" ||
         appliedFilters.dateRange !== filterOptions.dateRanges[0]) && (
-        <div className="mb-3 flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
+        <div className="mb-3 flex flex-wrap items-center gap-2 text-[13px] text-slate-500">
           <span className="font-semibold text-[#173B59]">Active Filters:</span>
           <span className="inline-flex items-center gap-1 rounded-md bg-white px-2.5 py-1 font-medium text-[#123B5C] shadow-sm">
             {appliedFilters.dateRange}
@@ -453,7 +453,7 @@ export default function ReportsPage() {
           <button
             type="button"
             onClick={resetFilters}
-            className="text-[9px] text-[#2785B2] underline hover:text-[#185370]"
+            className="text-sm text-[#2785B2] underline hover:text-[#185370]"
           >
             Clear all
           </button>
@@ -463,14 +463,14 @@ export default function ReportsPage() {
       {/* Error state alert */}
       {error && (
         <div className="mb-4 flex items-center justify-between rounded-lg border border-rose-200 bg-rose-50 p-3 text-rose-700">
-          <div className="flex items-center gap-2 text-[11px]">
+          <div className="flex items-center gap-2 text-sm">
             <AlertCircle size={16} />
             <span>{error}</span>
           </div>
           <button
             type="button"
             onClick={applyFilters}
-            className="text-[10px] font-semibold underline hover:no-underline"
+            className="text-sm font-semibold underline hover:no-underline"
           >
             Retry
           </button>
@@ -489,10 +489,10 @@ export default function ReportsPage() {
         <div className="overflow-hidden rounded-xl border border-[#D8E5EB] bg-white shadow-[0_4px_12px_rgba(24,62,86,0.04)]">
           <div className="flex items-center justify-between border-b border-[#DCE7EC] px-4 py-3">
             <div>
-              <h2 className="text-[12px] font-bold text-[#173B59]">User adoption trend</h2>
-              <p className="mt-0.5 text-[9px] text-slate-400">Monthly active users across relief network</p>
+              <h2 className="text-base sm:text-lg font-bold text-[#173B59]">User adoption trend</h2>
+              <p className="mt-0.5 text-xs text-slate-400">Monthly active users across relief network</p>
             </div>
-            <span className="rounded-md bg-[#E6F7F1] px-2 py-0.5 text-[9px] font-bold text-[#16896F]">
+            <span className="rounded-md bg-[#E6F7F1] px-2 py-0.5 text-xs font-bold text-[#16896F]">
               {overview?.adoptionGrowthBadge || "+8.4%"}
             </span>
           </div>
@@ -501,8 +501,8 @@ export default function ReportsPage() {
 
         <div className="rounded-xl border border-[#D8E5EB] bg-white shadow-[0_4px_12px_rgba(24,62,86,0.04)]">
           <div className="border-b border-[#DCE7EC] px-4 py-3">
-            <h2 className="text-[12px] font-bold text-[#173B59]">Users by role</h2>
-            <p className="mt-0.5 text-[9px] text-slate-400">
+            <h2 className="text-base sm:text-lg font-bold text-[#173B59]">Users by role</h2>
+            <p className="mt-0.5 text-xs text-slate-400">
               {overview?.totalRegisteredUsers
                 ? `${overview.totalRegisteredUsers.toLocaleString()} registered users`
                 : "18,482 registered users"}
@@ -511,14 +511,14 @@ export default function ReportsPage() {
           <div className="space-y-4 px-4 py-4">
             {roleData.map((role) => (
               <div key={role.label} className="grid grid-cols-[90px_1fr_45px] items-center gap-2.5">
-                <span className="truncate text-[10px] font-medium text-[#526C80]">{role.label}</span>
+                <span className="truncate text-sm font-medium text-[#526C80]">{role.label}</span>
                 <div className="h-[7px] overflow-hidden rounded-full bg-[#E8EEF1]">
                   <div
                     className="h-full rounded-full bg-[#63B9A4] transition-all duration-500"
                     style={{ width: role.width }}
                   />
                 </div>
-                <span className="text-right text-[10px] font-bold text-[#173B59]">{role.value}</span>
+                <span className="text-right text-sm font-bold text-[#173B59]">{role.value}</span>
               </div>
             ))}
           </div>
@@ -529,12 +529,12 @@ export default function ReportsPage() {
       <section className="mt-5">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h2 className="text-[13px] font-bold text-[#173B59]">Report library</h2>
-            <p className="text-[10px] text-slate-400">
+            <h2 className="text-base sm:text-lg font-bold text-[#173B59]">Report library</h2>
+            <p className="text-[13px] text-slate-400">
               Generate on-demand compliance previews and export official audit datasets.
             </p>
           </div>
-          <span className="text-[10px] font-semibold text-slate-500">
+          <span className="text-[13px] font-semibold text-slate-500">
             {catalogReports.length} reports available
           </span>
         </div>
@@ -554,19 +554,19 @@ export default function ReportsPage() {
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F2F8] text-[#2383B5] transition group-hover:bg-[#2785B2] group-hover:text-white">
                       <Icon size={19} />
                     </span>
-                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-slate-500">
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">
                       {report.category}
                     </span>
                   </div>
-                  <h3 className="mt-3 text-[11px] font-bold text-[#173B59] group-hover:text-[#2785B2]">
+                  <h3 className="mt-3 text-base font-bold text-[#173B59] group-hover:text-[#2785B2]">
                     {report.title}
                   </h3>
-                  <p className="mt-1 line-clamp-2 text-[9px] leading-4 text-slate-500">
+                  <p className="mt-1 line-clamp-2 text-xs leading-4 text-slate-500">
                     {report.description}
                   </p>
                 </div>
 
-                <div className="mt-3 flex items-center justify-between border-t border-[#EEF4F7] pt-2 text-[9px] text-slate-400">
+                <div className="mt-3 flex items-center justify-between border-t border-[#EEF4F7] pt-2 text-xs text-slate-400">
                   <span>~{report.estimatedRecords.toLocaleString()} records</span>
                   <span className="flex items-center gap-1 font-semibold text-[#2785B2] transition group-hover:translate-x-0.5">
                     Preview & Export <ChevronRight size={13} />
@@ -591,11 +591,11 @@ export default function ReportsPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-bold text-[#123B5C]">{activeModalReport.title}</h3>
-                    <span className="rounded bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-600">
+                    <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
                       {activeModalReport.category}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[13px] text-slate-400">
                     {modalDetail ? modalDetail.filterSummary : "Standard humanitarian scope"}
                   </p>
                 </div>
@@ -628,7 +628,7 @@ export default function ReportsPage() {
                     <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                       {Object.entries(modalDetail.summaryMetrics).map(([key, val]) => (
                         <div key={key} className="rounded-xl border border-[#DCE7EC] bg-[#F8FBFC] p-3 text-center">
-                          <p className="text-[9px] font-medium text-slate-500">{key}</p>
+                          <p className="text-xs font-medium text-slate-500">{key}</p>
                           <p className="mt-0.5 text-base font-bold text-[#123B5C]">{val}</p>
                         </div>
                       ))}
@@ -644,7 +644,7 @@ export default function ReportsPage() {
                         placeholder="Search within preview..."
                         value={previewSearch}
                         onChange={(e) => setPreviewSearch(e.target.value)}
-                        className="h-9 w-full rounded-lg border border-[#D5E3EA] bg-white pl-9 pr-3 text-[11px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-1 focus:ring-[#2785B2]"
+                        className="h-9 w-full rounded-lg border border-[#D5E3EA] bg-white pl-9 pr-3 text-sm sm:text-[15px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-1 focus:ring-[#2785B2]"
                       />
                     </div>
 
@@ -653,7 +653,7 @@ export default function ReportsPage() {
                         type="button"
                         disabled={exportLoading !== null}
                         onClick={() => handleExport("csv")}
-                        className="flex items-center gap-1.5 rounded-lg border border-[#B9D0DC] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#176F9F] shadow-sm transition hover:bg-[#EDF6FA] disabled:opacity-50"
+                        className="flex items-center gap-1.5 rounded-lg border border-[#B9D0DC] bg-white px-3 py-1.5 text-sm font-semibold text-[#176F9F] shadow-sm transition hover:bg-[#EDF6FA] disabled:opacity-50"
                       >
                         <FileSpreadsheet size={14} className="text-[#159879]" />
                         {exportLoading === "csv" ? "Exporting..." : "Export CSV"}
@@ -663,7 +663,7 @@ export default function ReportsPage() {
                         type="button"
                         disabled={exportLoading !== null}
                         onClick={() => handleExport("json")}
-                        className="flex items-center gap-1.5 rounded-lg border border-[#B9D0DC] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#176F9F] shadow-sm transition hover:bg-[#EDF6FA] disabled:opacity-50"
+                        className="flex items-center gap-1.5 rounded-lg border border-[#B9D0DC] bg-white px-3 py-1.5 text-sm font-semibold text-[#176F9F] shadow-sm transition hover:bg-[#EDF6FA] disabled:opacity-50"
                       >
                         <FileCode size={14} className="text-[#2383B5]" />
                         {exportLoading === "json" ? "Exporting..." : "Export JSON"}
@@ -672,7 +672,7 @@ export default function ReportsPage() {
                   </div>
 
                   {exportNotice && (
-                    <div className="mb-3 flex items-center gap-2 rounded-lg bg-[#E6F7F1] px-3 py-2 text-[10px] font-medium text-[#16896F]">
+                    <div className="mb-3 flex items-center gap-2 rounded-lg bg-[#E6F7F1] px-3 py-2 text-sm font-medium text-[#16896F]">
                       <CheckCircle2 size={14} />
                       <span>{exportNotice}</span>
                     </div>
@@ -680,7 +680,7 @@ export default function ReportsPage() {
 
                   {/* Preview Table */}
                   <div className="overflow-x-auto rounded-xl border border-[#DCE7EC]">
-                    <table className="w-full border-collapse text-left text-[11px]">
+                    <table className="w-full border-collapse text-left text-sm">
                       <thead>
                         <tr className="border-b border-[#DCE7EC] bg-[#F4F9FB]">
                           {modalDetail.columns.map((col) => (
@@ -741,7 +741,7 @@ export default function ReportsPage() {
                   </div>
 
                   {/* Record Count Note */}
-                  <div className="mt-3 flex items-center justify-between text-[10px] text-slate-400">
+                  <div className="mt-3 flex items-center justify-between text-[13px] text-slate-400">
                     <span>
                       Showing {filteredRows.length} preview records • Total dataset records: {modalDetail.totalRecords.toLocaleString()}
                     </span>
@@ -756,7 +756,7 @@ export default function ReportsPage() {
               <button
                 type="button"
                 onClick={closeReportModal}
-                className="rounded-lg border border-[#B9D0DC] bg-white px-4 py-1.5 text-[11px] font-semibold text-slate-600 shadow-sm transition hover:bg-slate-100"
+                className="rounded-lg border border-[#B9D0DC] bg-white px-4 py-1.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-100"
               >
                 Close
               </button>

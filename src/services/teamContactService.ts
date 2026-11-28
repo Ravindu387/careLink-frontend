@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface TeamMember {
   id: string;
   name: string;
@@ -214,7 +215,7 @@ export const teamContactService = {
 
       const qs = params.toString();
       const url = qs ? `${ENDPOINT}?${qs}` : ENDPOINT;
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         headers: { Accept: "application/json" },
       });
 
@@ -272,7 +273,7 @@ export const teamContactService = {
 
   async getMetrics(): Promise<{ data: TeamContactsMetrics; isLive: boolean }> {
     try {
-      const res = await fetch(`${ENDPOINT}/metrics`, {
+      const res = await authFetch(`${ENDPOINT}/metrics`, {
         headers: { Accept: "application/json" },
       });
 
@@ -290,7 +291,7 @@ export const teamContactService = {
 
   async getById(id: string): Promise<TeamMember | null> {
     try {
-      const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
         headers: { Accept: "application/json" },
       });
 
@@ -307,7 +308,7 @@ export const teamContactService = {
 
   async create(payload: CreateTeamMemberPayload): Promise<{ data: TeamMember; isLive: boolean }> {
     try {
-      const res = await fetch(ENDPOINT, {
+      const res = await authFetch(ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -349,7 +350,7 @@ export const teamContactService = {
 
   async update(id: string, payload: UpdateTeamMemberPayload): Promise<{ data: TeamMember; isLive: boolean }> {
     try {
-      const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -391,7 +392,7 @@ export const teamContactService = {
 
   async updateStatus(id: string, status: string): Promise<{ data: TeamMember; isLive: boolean }> {
     try {
-      const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}/status`, {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -423,7 +424,7 @@ export const teamContactService = {
 
   async delete(id: string): Promise<boolean> {
     try {
-      const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
         method: "DELETE",
       });
 
@@ -443,7 +444,7 @@ export const teamContactService = {
 
   async reset(): Promise<boolean> {
     try {
-      await fetch(`${ENDPOINT}/reset`, {
+      await authFetch(`${ENDPOINT}/reset`, {
         method: "POST",
       });
       saveCache(initialTeamMembers);

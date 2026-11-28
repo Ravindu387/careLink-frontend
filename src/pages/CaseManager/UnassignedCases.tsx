@@ -334,7 +334,7 @@ const UnassignedCases: React.FC = () => {
 
           <div className="flex items-center gap-3">
             <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -348,7 +348,7 @@ const UnassignedCases: React.FC = () => {
               onClick={handleRefresh}
               disabled={isRefreshing}
               title="Refresh queue"
-              className="flex items-center gap-1.5 rounded-lg border border-[#d5e2eb] bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#d5e2eb] bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
             >
               <RefreshCw
                 size={13}
@@ -376,7 +376,7 @@ const UnassignedCases: React.FC = () => {
             {selectedCases.length > 0 && (
               <button
                 onClick={() => setShowBulkClaimModal(true)}
-                className="flex items-center gap-2 rounded-lg bg-[#173e5b] px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#205175]"
+                className="flex items-center gap-2 rounded-lg bg-[#173e5b] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#205175]"
               >
                 <UserCheck size={16} />
                 <span>Claim Selected ({selectedCases.length})</span>
@@ -385,7 +385,7 @@ const UnassignedCases: React.FC = () => {
 
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-xs font-medium text-[#287da8] transition hover:bg-sky-50 shadow-sm"
+              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 shadow-sm"
             >
               <Download size={16} />
               <span>Export CSV</span>
@@ -405,7 +405,7 @@ const UnassignedCases: React.FC = () => {
               <Clock size={16} className="text-[#287da8]" />
             </div>
             <p className="mt-2 text-2xl font-bold text-[#173e5b]">{stats.totalCases}</p>
-            <p className="mt-0.5 text-[11px] text-slate-400">Awaiting case manager claim</p>
+            <p className="mt-0.5 text-[13px] text-slate-400">Awaiting case manager claim</p>
           </div>
 
           <div className="rounded-xl border border-red-200 bg-red-50/50 p-4 shadow-sm">
@@ -416,7 +416,7 @@ const UnassignedCases: React.FC = () => {
               <ShieldAlert size={16} className="text-red-600" />
             </div>
             <p className="mt-2 text-2xl font-bold text-red-700">{stats.criticalCount}</p>
-            <p className="mt-0.5 text-[11px] text-red-600 font-medium">Requires immediate triage</p>
+            <p className="mt-0.5 text-sm text-red-600 font-medium">Requires immediate triage</p>
           </div>
 
           <div className="rounded-xl border border-[#d5e2eb] bg-white p-4 shadow-sm">
@@ -427,7 +427,7 @@ const UnassignedCases: React.FC = () => {
               <AlertTriangle size={16} className="text-orange-500" />
             </div>
             <p className="mt-2 text-2xl font-bold text-[#173e5b]">{stats.dueSoonCount}</p>
-            <p className="mt-0.5 text-[11px] text-slate-400">Under 60 min or High urgency</p>
+            <p className="mt-0.5 text-[13px] text-slate-400">Under 60 min or High urgency</p>
           </div>
 
           <div className="rounded-xl border border-[#d5e2eb] bg-white p-4 shadow-sm">
@@ -438,7 +438,7 @@ const UnassignedCases: React.FC = () => {
               <CheckCircle2 size={16} className="text-amber-500" />
             </div>
             <p className="mt-2 text-2xl font-bold text-[#173e5b]">{stats.pendingInfoCount}</p>
-            <p className="mt-0.5 text-[11px] text-slate-400">Needs applicant contact</p>
+            <p className="mt-0.5 text-[13px] text-slate-400">Needs applicant contact</p>
           </div>
         </div>
 
@@ -453,7 +453,7 @@ const UnassignedCases: React.FC = () => {
                 setActiveTab(tab.label);
                 setCurrentPage(1);
               }}
-              className={`relative flex items-center gap-2 py-3.5 text-xs transition ${
+              className={`relative flex items-center gap-2 py-3.5 text-sm transition ${
                 activeTab === tab.label
                   ? "font-semibold text-[#287da8]"
                   : "text-slate-500 hover:text-sky-700"
@@ -461,7 +461,7 @@ const UnassignedCases: React.FC = () => {
             >
               <span>{tab.label}</span>
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                   activeTab === tab.label
                     ? "bg-sky-100 text-[#287da8]"
                     : "bg-slate-200 text-slate-600"
@@ -491,7 +491,7 @@ const UnassignedCases: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
             {searchTerm && (
               <button onClick={() => setSearchTerm("")}>
@@ -507,7 +507,7 @@ const UnassignedCases: React.FC = () => {
               setEventFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-xs text-slate-700 outline-none shadow-sm"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none shadow-sm"
           >
             <option>All crisis events</option>
             <option>Flood Response</option>
@@ -523,7 +523,7 @@ const UnassignedCases: React.FC = () => {
               setPriorityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-xs text-slate-700 outline-none shadow-sm"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none shadow-sm"
           >
             <option>All priorities</option>
             <option>Critical</option>
@@ -539,7 +539,7 @@ const UnassignedCases: React.FC = () => {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-xs text-slate-700 outline-none shadow-sm"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none shadow-sm"
           >
             <option>All categories</option>
             <option>Food & water</option>
@@ -556,7 +556,7 @@ const UnassignedCases: React.FC = () => {
               setStatusFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-xs text-slate-700 outline-none shadow-sm"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none shadow-sm"
           >
             <option>All statuses</option>
             <option>Submitted</option>
@@ -571,7 +571,7 @@ const UnassignedCases: React.FC = () => {
               setDateRangeFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-xs text-slate-700 outline-none shadow-sm"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none shadow-sm"
           >
             <option>Date range</option>
             <option>Today</option>
@@ -582,7 +582,7 @@ const UnassignedCases: React.FC = () => {
           {/* More Filters Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-semibold shadow-sm transition ${
+            className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold shadow-sm transition ${
               showFilters
                 ? "border-[#287da8] bg-sky-50 text-[#287da8]"
                 : "border-[#b9d0df] bg-white text-[#287da8] hover:bg-sky-50"
@@ -597,10 +597,10 @@ const UnassignedCases: React.FC = () => {
         {showFilters && (
           <div className="mb-4 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm animate-in fade-in">
             <div>
-              <p className="text-xs font-semibold text-slate-700">
+              <p className="text-sm font-semibold text-slate-700">
                 Active Filter Parameters
               </p>
-              <p className="mt-1 text-[11px] text-slate-500">
+              <p className="mt-1 text-[13px] text-slate-500">
                 Showing {activeTab} cases • Priority: {priorityFilter} • Category:{" "}
                 {categoryFilter} • Event: {eventFilter}
               </p>
@@ -608,7 +608,7 @@ const UnassignedCases: React.FC = () => {
 
             <button
               onClick={resetFilters}
-              className="text-xs font-semibold text-[#287da8] hover:underline"
+              className="text-sm font-semibold text-[#287da8] hover:underline"
             >
               Clear all filters
             </button>
@@ -622,7 +622,7 @@ const UnassignedCases: React.FC = () => {
           {/* TABLE TOOLBAR */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#d5e2eb] px-5 py-3.5 bg-slate-50/50">
             <div>
-              <h2 className="text-sm font-semibold text-[#173e5b]">
+              <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">
                 Unassigned Case Queue
               </h2>
               <p className="mt-0.5 text-xs text-slate-400">
@@ -634,7 +634,7 @@ const UnassignedCases: React.FC = () => {
               {selectedCases.length > 0 && (
                 <button
                   onClick={() => setShowBulkClaimModal(true)}
-                  className="rounded-lg bg-[#287da8] px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-[#20668a]"
+                  className="rounded-lg bg-[#287da8] px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-[#20668a]"
                 >
                   Claim {selectedCases.length} Selected
                 </button>
@@ -650,7 +650,7 @@ const UnassignedCases: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1150px] text-left">
               <thead className="bg-[#f7f9fa] border-b border-[#d5e2eb]">
-                <tr className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                <tr className="text-[13px] font-semibold text-slate-500 uppercase tracking-wider">
                   <th className="px-4 py-3.5 w-10">
                     <input
                       type="checkbox"
@@ -678,7 +678,7 @@ const UnassignedCases: React.FC = () => {
               <tbody className="divide-y divide-[#e5edf2]">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={10} className="py-16 text-center text-xs text-slate-400">
+                    <td colSpan={10} className="py-16 text-center text-sm text-slate-400">
                       <RefreshCw size={20} className="mx-auto mb-2 animate-spin text-[#287da8]" />
                       Loading unassigned cases...
                     </td>
@@ -703,37 +703,37 @@ const UnassignedCases: React.FC = () => {
                       </td>
 
                       {/* ID */}
-                      <td className="whitespace-nowrap px-4 py-4 text-xs font-bold text-[#173e5b]">
+                      <td className="whitespace-nowrap px-4 py-4 text-sm font-bold text-[#173e5b]">
                         <button
                           onClick={() => setInspectCase(item)}
                           className="hover:text-[#287da8] hover:underline"
                         >
                           {item.id}
                         </button>
-                        <span className="block text-[10px] font-normal text-slate-400">
+                        <span className="block text-[13px] font-normal text-slate-400">
                           {item.event}
                         </span>
                       </td>
 
                       {/* Category & Applicant */}
                       <td className="px-4 py-4">
-                        <p className="whitespace-nowrap text-xs font-semibold text-[#173e5b]">
+                        <p className="whitespace-nowrap text-sm font-semibold text-[#173e5b]">
                           {item.category}
                         </p>
-                        <p className="mt-0.5 whitespace-nowrap text-[11px] text-slate-500">
+                        <p className="mt-0.5 whitespace-nowrap text-[13px] text-slate-500">
                           {item.applicant}
                         </p>
                       </td>
 
                       {/* Location */}
-                      <td className="whitespace-nowrap px-4 py-4 text-xs text-slate-600">
+                      <td className="whitespace-nowrap px-4 py-4 text-sm text-slate-600">
                         {item.location}
                       </td>
 
                       {/* Reported Priority */}
                       <td className="px-4 py-4">
                         <span
-                          className={`inline-block rounded-md px-2.5 py-1 text-[10px] font-semibold ${priorityStyle(
+                          className={`inline-block rounded-md px-2.5 py-1 text-xs font-semibold ${priorityStyle(
                             item.priority
                           )}`}
                         >
@@ -743,10 +743,10 @@ const UnassignedCases: React.FC = () => {
 
                       {/* AI Priority */}
                       <td className="px-4 py-4">
-                        <p className="text-xs font-semibold text-slate-700">
+                        <p className="text-sm font-semibold text-slate-700">
                           {item.aiPriority}
                         </p>
-                        <p className="mt-0.5 text-[10px] text-slate-400">
+                        <p className="mt-0.5 text-[13px] text-slate-400">
                           {item.confidence}
                         </p>
                       </td>
@@ -754,7 +754,7 @@ const UnassignedCases: React.FC = () => {
                       {/* Verification */}
                       <td className="whitespace-nowrap px-4 py-4">
                         <span
-                          className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-medium ${verificationBadge(
+                          className={`inline-block rounded-md px-2 py-0.5 text-xs font-medium ${verificationBadge(
                             item.verification
                           )}`}
                         >
@@ -763,14 +763,14 @@ const UnassignedCases: React.FC = () => {
                       </td>
 
                       {/* Age */}
-                      <td className="whitespace-nowrap px-4 py-4 text-xs text-slate-600">
+                      <td className="whitespace-nowrap px-4 py-4 text-sm text-slate-600">
                         {item.age}
                       </td>
 
                       {/* Status */}
                       <td className="px-4 py-4">
                         <span
-                          className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[10px] font-semibold ${statusStyle(
+                          className={`whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold ${statusStyle(
                             item.status
                           )}`}
                         >
@@ -784,7 +784,7 @@ const UnassignedCases: React.FC = () => {
                           <button
                             onClick={() => handleClaimSingle(item.id)}
                             disabled={isClaiming}
-                            className="rounded-md bg-[#287da8] px-2.5 py-1 text-[11px] font-medium text-white transition hover:bg-[#20668a]"
+                            className="rounded-md bg-[#287da8] px-2.5 py-1 text-xs font-medium text-white transition hover:bg-[#20668a]"
                           >
                             Claim
                           </button>
@@ -802,7 +802,7 @@ const UnassignedCases: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={10} className="py-16 text-center text-xs text-slate-400">
+                    <td colSpan={10} className="py-16 text-center text-sm text-slate-400">
                       No unassigned cases found matching current filters.
                     </td>
                   </tr>
@@ -826,7 +826,7 @@ const UnassignedCases: React.FC = () => {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3 py-1.5 text-xs text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3 py-1.5 text-sm text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ChevronLeft size={13} />
                 <span>Previous</span>
@@ -836,7 +836,7 @@ const UnassignedCases: React.FC = () => {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`h-8 w-8 rounded-lg border text-xs transition ${
+                  className={`h-8 w-8 rounded-lg border text-sm transition ${
                     currentPage === page
                       ? "border-[#287da8] bg-[#287da8] font-semibold text-white"
                       : "border-[#d5e2eb] bg-white text-slate-600 hover:bg-sky-50"
@@ -849,7 +849,7 @@ const UnassignedCases: React.FC = () => {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3 py-1.5 text-xs font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3 py-1.5 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <span>Next</span>
                 <ChevronRight size={13} />
@@ -871,7 +871,7 @@ const UnassignedCases: React.FC = () => {
                 <span className="text-base font-bold text-[#173e5b]">
                   {inspectCase.id}
                 </span>
-                <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-medium text-slate-700">
+                <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-700">
                   {inspectCase.event}
                 </span>
               </div>
@@ -900,7 +900,7 @@ const UnassignedCases: React.FC = () => {
 
               {/* Applicant Card */}
               <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-2.5">
-                <h4 className="font-semibold text-slate-800 text-xs">Applicant Details</h4>
+                <h4 className="font-semibold text-slate-800 text-sm">Applicant Details</h4>
                 <div className="grid grid-cols-2 gap-3 text-slate-600">
                   <div className="flex items-center gap-2">
                     <Users size={14} className="text-slate-400" />
@@ -923,7 +923,7 @@ const UnassignedCases: React.FC = () => {
 
               {/* Requirement & Description */}
               <div>
-                <h4 className="font-semibold text-slate-800 text-xs mb-1.5">
+                <h4 className="font-semibold text-slate-800 text-sm mb-1.5">
                   Emergency Needs & Assessment
                 </h4>
                 <div className="rounded-lg border border-slate-200 p-3 bg-white text-slate-700 leading-relaxed">
@@ -939,14 +939,14 @@ const UnassignedCases: React.FC = () => {
 
               {/* Assign to Colleague Section */}
               <div className="border-t border-slate-200 pt-4">
-                <h4 className="font-semibold text-slate-800 text-xs mb-2">
+                <h4 className="font-semibold text-slate-800 text-sm mb-2">
                   Direct Assignment
                 </h4>
                 <div className="flex gap-2">
                   <select
                     id="colleagueSelect"
                     defaultValue="Amina Mensah"
-                    className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none"
+                    className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none"
                   >
                     <option>Amina Mensah (Senior Lead)</option>
                     <option>Rohan Silva (Field Operations)</option>
@@ -958,7 +958,7 @@ const UnassignedCases: React.FC = () => {
                       const selectedVal = select.value.split(" ")[0] + " " + select.value.split(" ")[1];
                       handleAssignToColleague(inspectCase.id, selectedVal);
                     }}
-                    className="rounded-lg border border-[#b9d0df] bg-white px-3 py-2 text-xs font-semibold text-[#287da8] transition hover:bg-sky-50"
+                    className="rounded-lg border border-[#b9d0df] bg-white px-3 py-2 text-sm font-semibold text-[#287da8] transition hover:bg-sky-50"
                   >
                     Assign
                   </button>
@@ -970,7 +970,7 @@ const UnassignedCases: React.FC = () => {
             <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4 bg-slate-50">
               <button
                 onClick={() => setInspectCase(null)}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100"
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
               >
                 Close
               </button>
@@ -978,7 +978,7 @@ const UnassignedCases: React.FC = () => {
               <button
                 onClick={() => handleClaimSingle(inspectCase.id)}
                 disabled={isClaiming}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287da8] px-5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#20668a]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287da8] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#20668a]"
               >
                 <UserCheck size={15} />
                 <span>Claim Case to Me</span>
@@ -1003,13 +1003,13 @@ const UnassignedCases: React.FC = () => {
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-sm font-semibold text-slate-700 mb-1">
                   Assign To
                 </label>
                 <select
                   value={bulkAssignee}
                   onChange={(e) => setBulkAssignee(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                 >
                   <option value="You">You (Current Case Manager)</option>
                   <option value="Amina Mensah">Amina Mensah</option>
@@ -1018,7 +1018,7 @@ const UnassignedCases: React.FC = () => {
                 </select>
               </div>
 
-              <div className="rounded-lg bg-sky-50/70 p-3 text-[11px] text-[#173e5b]">
+              <div className="rounded-lg bg-sky-50/70 p-3 text-sm text-[#173e5b]">
                 <p className="font-semibold">Selected Cases:</p>
                 <p className="mt-0.5 text-slate-600 line-clamp-2">
                   {selectedCases.join(", ")}
@@ -1029,7 +1029,7 @@ const UnassignedCases: React.FC = () => {
             <div className="mt-6 flex items-center justify-end gap-3">
               <button
                 onClick={() => setShowBulkClaimModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
               >
                 Cancel
               </button>
@@ -1037,7 +1037,7 @@ const UnassignedCases: React.FC = () => {
               <button
                 onClick={handleBulkClaim}
                 disabled={isClaiming}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287da8] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#20668a] disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287da8] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#20668a] disabled:opacity-50"
               >
                 <Check size={14} />
                 <span>Confirm Claim</span>

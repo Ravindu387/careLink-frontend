@@ -161,7 +161,7 @@ const CaseReportsAnalytics: React.FC = () => {
     <div className="min-h-screen bg-[#eff6f8] text-slate-800">
       <main className="mx-auto max-w-[1600px] px-5 py-5 lg:px-7">
         {/* BREADCRUMB */}
-        <div className="mb-7 flex items-center gap-2 text-[10px] text-slate-400">
+        <div className="mb-7 flex items-center gap-2 text-[13px] text-slate-400">
           <span>Operations</span>
           <ChevronRight size={12} />
           <span>Case Management</span>
@@ -174,10 +174,10 @@ const CaseReportsAnalytics: React.FC = () => {
         {/* PAGE HEADER */}
         <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-medium tracking-tight text-[#173e5b]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-[#173e5b]">
               Case Reports & Analytics
             </h1>
-            <p className="mt-2 text-[11px] text-slate-500">
+            <p className="mt-2 text-[13px] text-slate-500">
               Analyse intake, verification, resolution, SLA performance, and human decisions.
             </p>
           </div>
@@ -187,7 +187,7 @@ const CaseReportsAnalytics: React.FC = () => {
               onClick={() => loadAnalytics(appliedFilters, true)}
               disabled={isRefreshing}
               title="Refresh reports analytics"
-              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-3 text-[11px] font-medium text-[#287da8] transition hover:bg-sky-50 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-3 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 disabled:opacity-50"
             >
               <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
               <span className="hidden sm:inline">Refresh</span>
@@ -195,7 +195,7 @@ const CaseReportsAnalytics: React.FC = () => {
 
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-[11px] font-medium text-[#287da8] transition hover:bg-sky-50 cursor-pointer"
+              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 cursor-pointer"
             >
               <Printer size={15} />
               Print
@@ -204,7 +204,7 @@ const CaseReportsAnalytics: React.FC = () => {
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="flex items-center gap-2 rounded-lg bg-[#287da8] px-4 py-3 text-[11px] font-semibold text-white transition hover:bg-[#17678f] disabled:opacity-60 cursor-pointer"
+              className="flex items-center gap-2 rounded-lg bg-[#287da8] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#17678f] disabled:opacity-60 cursor-pointer"
             >
               <Download size={15} />
               {isExporting ? "Exporting..." : "Export report"}
@@ -251,7 +251,7 @@ const CaseReportsAnalytics: React.FC = () => {
                     : "Demonstration Analytics Mode"}
                 </span>
                 <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold ${
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold ${
                     isLiveBackend
                       ? "bg-emerald-200 text-emerald-800"
                       : "bg-sky-200 text-sky-800"
@@ -260,7 +260,7 @@ const CaseReportsAnalytics: React.FC = () => {
                   {isLiveBackend ? "LIVE" : "DEMO"}
                 </span>
               </div>
-              <p className="mt-0.5 text-[10px] text-slate-500">
+              <p className="mt-0.5 text-[13px] text-slate-500">
                 {isLiveBackend
                   ? `Real-time calculations for ${appliedFilters.operationalArea} · Event: ${appliedFilters.crisisEvent}`
                   : "Serving simulated disaster dataset for the Greater Riverton flood operations."}
@@ -268,7 +268,7 @@ const CaseReportsAnalytics: React.FC = () => {
             </div>
           </div>
 
-          <span className="hidden text-[10px] text-slate-400 sm:block">
+          <span className="hidden text-[13px] text-slate-400 sm:block">
             {reportsData?.generatedAt
               ? `Generated ${new Date(reportsData.generatedAt).toLocaleTimeString()}`
               : "Updated just now"}
@@ -282,13 +282,13 @@ const CaseReportsAnalytics: React.FC = () => {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
             {/* DATE RANGE */}
             <div>
-              <label className="mb-2 block text-[9px] font-medium text-slate-500">
+              <label className="mb-2 block text-sm font-medium text-slate-500">
                 Date range
               </label>
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
-                className="w-full rounded-lg border border-[#d5e2eb] bg-white px-3 py-3 text-[10px] outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-[#d5e2eb] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               >
                 <option value="18–25 June 2025">18–25 June 2025</option>
                 <option value="1–7 June 2025">1–7 June 2025</option>
@@ -302,13 +302,13 @@ const CaseReportsAnalytics: React.FC = () => {
 
             {/* CRISIS EVENT */}
             <div>
-              <label className="mb-2 block text-[9px] font-medium text-slate-500">
+              <label className="mb-2 block text-sm font-medium text-slate-500">
                 Crisis event
               </label>
               <select
                 value={crisisEvent}
                 onChange={(e) => setCrisisEvent(e.target.value)}
-                className="w-full rounded-lg border border-[#d5e2eb] bg-white px-3 py-3 text-[10px] outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-[#d5e2eb] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               >
                 <option value="Monsoon Floods 2025">Monsoon Floods 2025</option>
                 <option value="Coastal Storm 2025">Coastal Storm 2025</option>
@@ -319,13 +319,13 @@ const CaseReportsAnalytics: React.FC = () => {
 
             {/* OPERATIONAL AREA */}
             <div>
-              <label className="mb-2 block text-[9px] font-medium text-slate-500">
+              <label className="mb-2 block text-sm font-medium text-slate-500">
                 Operational area
               </label>
               <select
                 value={operationalArea}
                 onChange={(e) => setOperationalArea(e.target.value)}
-                className="w-full rounded-lg border border-[#d5e2eb] bg-white px-3 py-3 text-[10px] outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-[#d5e2eb] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               >
                 <option value="All areas">All areas</option>
                 <option value="North Ward">North Ward</option>
@@ -339,7 +339,7 @@ const CaseReportsAnalytics: React.FC = () => {
             <div className="flex items-end">
               <button
                 onClick={handleApplyFilters}
-                className="w-full rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-[10px] font-semibold text-[#287da8] transition hover:bg-sky-50 lg:w-auto cursor-pointer"
+                className="w-full rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-sm font-semibold text-[#287da8] transition hover:bg-sky-50 lg:w-auto cursor-pointer"
               >
                 Apply filters
               </button>
@@ -357,13 +357,13 @@ const CaseReportsAnalytics: React.FC = () => {
               <Inbox size={19} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-400">Cases received</p>
+              <p className="text-xs text-slate-400">Cases received</p>
               <h2 className="mt-1 text-xl font-bold text-[#173e5b]">
                 {isLoading && !reportsData
                   ? "..."
                   : reportsData?.analytics.received.toLocaleString()}
               </h2>
-              <p className="mt-1 text-[9px] text-slate-400">
+              <p className="mt-1 text-xs text-slate-400">
                 {reportsData?.analytics.receivedTrend || "+8% today"}
               </p>
             </div>
@@ -375,13 +375,13 @@ const CaseReportsAnalytics: React.FC = () => {
               <Check size={19} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-400">Cases resolved</p>
+              <p className="text-xs text-slate-400">Cases resolved</p>
               <h2 className="mt-1 text-xl font-bold text-[#173e5b]">
                 {isLoading && !reportsData
                   ? "..."
                   : reportsData?.analytics.resolved.toLocaleString()}
               </h2>
-              <p className="mt-1 text-[9px] text-slate-400">
+              <p className="mt-1 text-xs text-slate-400">
                 {reportsData?.analytics.resolutionRate} resolution
               </p>
             </div>
@@ -393,13 +393,13 @@ const CaseReportsAnalytics: React.FC = () => {
               <Clock size={19} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-400">Median response</p>
+              <p className="text-xs text-slate-400">Median response</p>
               <h2 className="mt-1 text-xl font-bold text-[#173e5b]">
                 {isLoading && !reportsData
                   ? "..."
                   : reportsData?.analytics.medianResponse}
               </h2>
-              <p className="mt-1 text-[9px] text-slate-400">
+              <p className="mt-1 text-xs text-slate-400">
                 {reportsData?.analytics.responseTrend || "-18 min this week"}
               </p>
             </div>
@@ -411,13 +411,13 @@ const CaseReportsAnalytics: React.FC = () => {
               <Sparkles size={19} />
             </div>
             <div>
-              <p className="text-[9px] text-slate-400">AI overrides</p>
+              <p className="text-xs text-slate-400">AI overrides</p>
               <h2 className="mt-1 text-xl font-bold text-[#173e5b]">
                 {isLoading && !reportsData
                   ? "..."
                   : reportsData?.analytics.aiOverrides}
               </h2>
-              <p className="mt-1 text-[9px] text-slate-400">
+              <p className="mt-1 text-xs text-slate-400">
                 {reportsData?.analytics.aiOverridesDetails || "126 of 1,498 reviews"}
               </p>
             </div>
@@ -432,15 +432,15 @@ const CaseReportsAnalytics: React.FC = () => {
           <div className="overflow-hidden rounded-xl border border-[#d5e2eb] bg-white shadow-[0_5px_15px_rgba(30,64,90,0.04)]">
             <div className="flex items-center justify-between border-b border-[#d5e2eb] px-4 py-4">
               <div>
-                <h3 className="text-xs font-medium text-[#173e5b]">
+                <h3 className="text-base font-semibold text-[#173e5b]">
                   Resolution performance
                 </h3>
-                <p className="mt-1 text-[9px] text-slate-400">
+                <p className="mt-1 text-xs text-slate-400">
                   Cases received and resolved across {appliedFilters.operationalArea}
                 </p>
               </div>
 
-              <span className="rounded-md bg-emerald-50 px-2 py-1 text-[9px] font-semibold text-emerald-700">
+              <span className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
                 Target 80%
               </span>
             </div>
@@ -500,7 +500,7 @@ const CaseReportsAnalytics: React.FC = () => {
               </div>
 
               {/* X AXIS */}
-              <div className="mt-1 flex justify-between text-[9px] text-slate-400">
+              <div className="mt-1 flex justify-between text-xs text-slate-400">
                 {reportsData?.resolutionTrend.map((item) => (
                   <span key={item.day}>{item.day}</span>
                 ))}
@@ -511,10 +511,10 @@ const CaseReportsAnalytics: React.FC = () => {
           {/* CASES BY CATEGORY */}
           <div className="rounded-xl border border-[#d5e2eb] bg-white shadow-[0_5px_15px_rgba(30,64,90,0.04)]">
             <div className="border-b border-[#d5e2eb] px-4 py-4">
-              <h3 className="text-xs font-medium text-[#173e5b]">
+              <h3 className="text-base font-semibold text-[#173e5b]">
                 Cases by category
               </h3>
-              <p className="mt-1 text-[9px] text-slate-400">
+              <p className="mt-1 text-xs text-slate-400">
                 {reportsData?.analytics.received.toLocaleString() || "0"} received in{" "}
                 {appliedFilters.operationalArea}
               </p>
@@ -523,7 +523,7 @@ const CaseReportsAnalytics: React.FC = () => {
             <div className="space-y-5 px-4 py-5">
               {reportsData?.categories.map((item) => (
                 <div key={item.name} className="flex items-center gap-3">
-                  <span className="w-[85px] shrink-0 text-[9px] text-slate-600">
+                  <span className="w-[85px] shrink-0 text-xs text-slate-600">
                     {item.name}
                   </span>
 
@@ -536,7 +536,7 @@ const CaseReportsAnalytics: React.FC = () => {
                     />
                   </div>
 
-                  <span className="w-8 text-right text-[9px] font-semibold text-[#173e5b]">
+                  <span className="w-8 text-right text-xs font-semibold text-[#173e5b]">
                     {item.value}
                   </span>
                 </div>
@@ -550,11 +550,11 @@ const CaseReportsAnalytics: React.FC = () => {
         ===================================== */}
         <section className="mb-6">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-xs font-medium text-[#173e5b]">Report library</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-[#173e5b]">Report library</h2>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-sky-700 cursor-pointer"
+              className="flex items-center gap-1 text-sm text-slate-400 hover:text-sky-700 cursor-pointer"
             >
               <Filter size={13} />
               {showFilters ? "Hide details" : "Report details"}
@@ -578,12 +578,12 @@ const CaseReportsAnalytics: React.FC = () => {
                     </div>
 
                     <div className="min-w-0">
-                      <p className="truncate text-[10px] font-semibold text-[#173e5b]">
+                      <p className="truncate text-sm font-semibold text-[#173e5b]">
                         {report.title}
                       </p>
 
                       {showFilters && (
-                        <p className="mt-1 text-[9px] text-slate-400">
+                        <p className="mt-1 text-xs text-slate-400">
                           {report.description}
                         </p>
                       )}
@@ -614,10 +614,10 @@ const CaseReportsAnalytics: React.FC = () => {
                 </div>
 
                 <div>
-                  <h2 className="text-base font-semibold text-[#173e5b]">
+                  <h2 className="text-lg sm:text-xl font-semibold text-[#173e5b]">
                     {selectedReport.title}
                   </h2>
-                  <p className="mt-1 text-[10px] text-slate-400">
+                  <p className="mt-1 text-[13px] text-slate-400">
                     CareLink Case Management Reports · {selectedReport.id}
                   </p>
                 </div>
@@ -631,7 +631,7 @@ const CaseReportsAnalytics: React.FC = () => {
               </button>
             </div>
 
-            <p className="text-xs leading-6 text-slate-500">
+            <p className="text-sm leading-6 text-slate-500">
               {selectedReport.description}
             </p>
 
@@ -658,7 +658,7 @@ const CaseReportsAnalytics: React.FC = () => {
                   setSelectedReport(null);
                   handleExport();
                 }}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#287da8] px-4 py-3 text-xs font-semibold text-white hover:bg-[#17678f] cursor-pointer"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#287da8] px-4 py-3 text-sm font-semibold text-white hover:bg-[#17678f] cursor-pointer"
               >
                 <Download size={15} />
                 Export CSV
@@ -669,7 +669,7 @@ const CaseReportsAnalytics: React.FC = () => {
                   setSelectedReport(null);
                   handlePrint();
                 }}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#b9d0df] px-4 py-3 text-xs font-semibold text-[#287da8] hover:bg-sky-50 cursor-pointer"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#b9d0df] px-4 py-3 text-sm font-semibold text-[#287da8] hover:bg-sky-50 cursor-pointer"
               >
                 <Printer size={15} />
                 Print

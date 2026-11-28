@@ -89,7 +89,7 @@ const steps = [
 ];
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none transition focus:border-[#287da6] focus:ring-2 focus:ring-sky-100";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none transition focus:border-[#287da6] focus:ring-2 focus:ring-sky-100";
 
 const DRAFT_KEY = "carelink-help-request-draft";
 
@@ -308,13 +308,13 @@ export default function RequestHelpPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
+                <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight">
                   Request Help
                 </h1>
 
                 {/* API Status Badge */}
                 <div
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium shadow-sm ${
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium shadow-sm ${
                     isOnline
                       ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
                       : "border border-amber-200 bg-amber-50 text-amber-700"
@@ -351,7 +351,7 @@ export default function RequestHelpPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate("/citizen/my-requests")}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-[#173d5b] shadow-sm hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-[#173d5b] shadow-sm hover:bg-slate-50"
               >
                 <ClipboardList size={14} className="text-[#287da6]" />
                 View My Requests
@@ -395,10 +395,10 @@ export default function RequestHelpPage() {
           <div className="flex items-center gap-3 rounded-xl border border-[#cce4ed] border-l-4 border-l-[#287da6] bg-[#edf8fb] p-3.5 shadow-sm">
             <ShieldCheck size={22} className="text-[#287da6] shrink-0" />
             <div>
-              <p className="text-xs font-bold text-[#173d5b]">
+              <p className="text-sm font-bold text-[#173d5b]">
                 Your information is protected and confidential
               </p>
-              <p className="mt-0.5 text-[11px] text-slate-600">
+              <p className="mt-0.5 text-sm text-slate-600">
                 Only authorised municipal dispatchers, certified healthcare teams, and verified relief drivers can access your details to fulfill this request.
               </p>
             </div>
@@ -422,7 +422,7 @@ export default function RequestHelpPage() {
 
               {/* Reference ID Card */}
               <div className="mx-auto my-6 max-w-sm rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Request Reference Number
                 </p>
                 <div className="mt-1 flex items-center justify-center gap-2">
@@ -441,7 +441,7 @@ export default function RequestHelpPage() {
                     )}
                   </button>
                 </div>
-                <p className="mt-1 text-[10px] text-slate-400">
+                <p className="mt-1 text-[13px] text-slate-400">
                   Quote this code if contacting support helpline 112.
                 </p>
               </div>
@@ -450,31 +450,31 @@ export default function RequestHelpPage() {
               <div className="mx-auto max-w-lg rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex flex-col items-center">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white text-[11px] font-bold">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white text-sm font-bold">
                       ✓
                     </div>
-                    <span className="mt-1 text-[10px] font-semibold text-emerald-700">Sent</span>
+                    <span className="mt-1 text-sm font-semibold text-emerald-700">Sent</span>
                   </div>
                   <div className="h-0.5 flex-1 bg-emerald-300 mx-2" />
                   <div className="flex flex-col items-center">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#287da6] text-white text-[11px] font-bold">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#287da6] text-white text-sm font-bold">
                       2
                     </div>
-                    <span className="mt-1 text-[10px] font-semibold text-[#287da6]">Under Review</span>
+                    <span className="mt-1 text-sm font-semibold text-[#287da6]">Under Review</span>
                   </div>
                   <div className="h-0.5 flex-1 bg-slate-200 mx-2" />
                   <div className="flex flex-col items-center">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-400 text-[11px] font-bold">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-400 text-[13px] font-bold">
                       3
                     </div>
-                    <span className="mt-1 text-[10px] text-slate-400">Dispatching</span>
+                    <span className="mt-1 text-[13px] text-slate-400">Dispatching</span>
                   </div>
                   <div className="h-0.5 flex-1 bg-slate-200 mx-2" />
                   <div className="flex flex-col items-center">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-400 text-[11px] font-bold">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-400 text-[13px] font-bold">
                       4
                     </div>
-                    <span className="mt-1 text-[10px] text-slate-400">Completed</span>
+                    <span className="mt-1 text-[13px] text-slate-400">Completed</span>
                   </div>
                 </div>
               </div>
@@ -483,7 +483,7 @@ export default function RequestHelpPage() {
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <button
                   onClick={() => navigate("/citizen/my-requests")}
-                  className="flex items-center gap-2 rounded-xl bg-[#287da6] px-6 py-3 text-xs font-semibold text-white shadow-md hover:bg-[#1f6486] transition"
+                  className="flex items-center gap-2 rounded-xl bg-[#287da6] px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-[#1f6486] transition"
                 >
                   <ClipboardList size={16} />
                   Track in My Requests
@@ -496,7 +496,7 @@ export default function RequestHelpPage() {
                     setAdditionalInfo("");
                     setImmediateThreat(false);
                   }}
-                  className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-xs font-semibold text-[#173d5b] hover:bg-slate-50 transition"
+                  className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-[#173d5b] hover:bg-slate-50 transition"
                 >
                   Create another request
                 </button>
@@ -507,7 +507,7 @@ export default function RequestHelpPage() {
             <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[220px_minmax(0,1fr)]">
               {/* STEP NAVIGATION RAIL */}
               <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-                <div className="px-2 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="px-2 py-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                   Request Steps
                 </div>
                 <div className="space-y-1">
@@ -540,7 +540,7 @@ export default function RequestHelpPage() {
                 <div className="mt-6 border-t border-slate-100 p-2">
                   <button
                     onClick={handleSaveDraft}
-                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 py-2 text-[11px] font-medium text-[#287da6] hover:bg-sky-50 transition"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 py-2 text-sm font-medium text-[#287da6] hover:bg-sky-50 transition"
                   >
                     {saved ? <Check size={13} className="text-emerald-600" /> : <Save size={13} />}
                     <span>{saved ? "Draft Saved!" : "Save Draft"}</span>
@@ -553,10 +553,10 @@ export default function RequestHelpPage() {
                 {/* Step Subheader */}
                 <div className="mb-5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#65b9aa]">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#65b9aa]">
                       Step {step} of 4
                     </span>
-                    <span className="text-[11px] text-slate-400 font-medium">
+                    <span className="text-[13px] text-slate-400 font-medium">
                       {Math.round((step / 4) * 100)}% Complete
                     </span>
                   </div>
@@ -616,10 +616,10 @@ export default function RequestHelpPage() {
                             </div>
 
                             <div className="mt-4">
-                              <h3 className="text-xs font-bold text-[#173d5b]">
+                              <h3 className="text-base font-bold text-[#173d5b]">
                                 {type.name}
                               </h3>
-                              <p className="mt-1 text-[11px] text-slate-500 leading-snug">
+                              <p className="mt-1 text-[13px] text-slate-500 leading-snug">
                                 {type.desc}
                               </p>
                             </div>
@@ -645,11 +645,11 @@ export default function RequestHelpPage() {
                         />
 
                         <div>
-                          <p className="text-xs font-bold text-red-700 flex items-center gap-1.5">
+                          <p className="text-sm font-bold text-red-700 flex items-center gap-1.5">
                             <TriangleAlert size={15} />
                             This is an immediate, life-threatening emergency
                           </p>
-                          <p className="mt-1 text-[11px] text-slate-600">
+                          <p className="mt-1 text-sm text-slate-600">
                             Rising flood water inside home, medical crisis, or severe trapping. Elevates priority to Urgent for emergency boat dispatch.
                           </p>
                         </div>
@@ -673,7 +673,7 @@ export default function RequestHelpPage() {
                 {step === 2 && (
                   <div className="pt-5 space-y-5">
                     <div>
-                      <label className="mb-1.5 block text-[11px] font-semibold text-[#173d5b]">
+                      <label className="mb-1.5 block text-sm font-semibold text-[#173d5b]">
                         Describe your current situation & needs *
                       </label>
                       <textarea
@@ -687,7 +687,7 @@ export default function RequestHelpPage() {
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-1.5 block text-[11px] font-semibold text-[#173d5b]">
+                        <label className="mb-1.5 block text-sm font-semibold text-[#173d5b]">
                           Number of people needing assistance
                         </label>
                         <div className="flex items-center gap-3">
@@ -712,7 +712,7 @@ export default function RequestHelpPage() {
                       </div>
 
                       <div>
-                        <label className="mb-1.5 block text-[11px] font-semibold text-[#173d5b]">
+                        <label className="mb-1.5 block text-sm font-semibold text-[#173d5b]">
                           Special medical / dietary requirements (optional)
                         </label>
                         <input
@@ -725,7 +725,7 @@ export default function RequestHelpPage() {
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-[11px] text-slate-600 flex items-center gap-2">
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 flex items-center gap-2">
                       <ShieldCheck size={18} className="text-[#287da6] shrink-0" />
                       <span>
                         Your situation summary will be matched against nearby active warehouses and shelters to speed up dispatch.
@@ -739,10 +739,10 @@ export default function RequestHelpPage() {
                   <div className="pt-5 space-y-5">
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-[11px] font-semibold text-[#173d5b]">
+                        <label className="text-sm font-semibold text-[#173d5b]">
                           Your current location / residential address *
                         </label>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-[13px] text-slate-400">
                           Include street or nearest prominent landmark
                         </span>
                       </div>
@@ -762,7 +762,7 @@ export default function RequestHelpPage() {
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                       <div>
-                        <label className="mb-1.5 block text-[11px] font-semibold text-[#173d5b]">
+                        <label className="mb-1.5 block text-sm font-semibold text-[#173d5b]">
                           District / Ward *
                         </label>
                         <input
@@ -774,7 +774,7 @@ export default function RequestHelpPage() {
                       </div>
 
                       <div>
-                        <label className="mb-1.5 block text-[11px] font-semibold text-[#173d5b]">
+                        <label className="mb-1.5 block text-sm font-semibold text-[#173d5b]">
                           Primary Contact Name *
                         </label>
                         <div className="relative">
@@ -792,7 +792,7 @@ export default function RequestHelpPage() {
                       </div>
 
                       <div>
-                        <label className="mb-1.5 block text-[11px] font-semibold text-[#173d5b]">
+                        <label className="mb-1.5 block text-sm font-semibold text-[#173d5b]">
                           Contact Phone Number *
                         </label>
                         <div className="relative">
@@ -811,7 +811,7 @@ export default function RequestHelpPage() {
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-slate-200 bg-sky-50/60 p-4 text-[11px] text-sky-800">
+                    <div className="rounded-xl border border-slate-200 bg-sky-50/60 p-4 text-sm text-sky-800">
                       <strong>Dispatcher Note:</strong> You may receive an SMS or phone call from a verified CareLink officer (+94 ...) to confirm safe delivery access before driver dispatch.
                     </div>
                   </div>
@@ -823,7 +823,7 @@ export default function RequestHelpPage() {
                     {/* Summary Tiles */}
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                           Selected Help Category
                         </span>
                         <p className="mt-1 text-sm font-bold text-[#173d5b]">
@@ -831,7 +831,7 @@ export default function RequestHelpPage() {
                         </p>
                         <div className="mt-2 flex items-center gap-2">
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                               immediateThreat
                                 ? "bg-red-100 text-red-700"
                                 : "bg-sky-100 text-sky-800"
@@ -839,35 +839,35 @@ export default function RequestHelpPage() {
                           >
                             {immediateThreat ? "Urgent Priority" : "Normal Priority"}
                           </span>
-                          <span className="text-[10px] text-slate-500">
+                          <span className="text-[13px] text-slate-500">
                             {peopleCount} {peopleCount === 1 ? "person" : "people"}
                           </span>
                         </div>
                       </div>
 
                       <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                           Contact & Destination
                         </span>
-                        <p className="mt-1 text-xs font-bold text-[#173d5b]">
+                        <p className="mt-1 text-sm font-bold text-[#173d5b]">
                           {contactName} ({phone})
                         </p>
-                        <p className="mt-1 text-xs text-slate-600 truncate">
+                        <p className="mt-1 text-sm text-slate-600 truncate">
                           {address}
                         </p>
-                        <p className="text-[10px] text-slate-400">{district}</p>
+                        <p className="text-[13px] text-slate-400">{district}</p>
                       </div>
                     </div>
 
                     <div className="rounded-xl border border-slate-200 p-4">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Situation Details
                       </span>
-                      <p className="mt-1 whitespace-pre-wrap text-xs text-[#173d5b] leading-relaxed">
+                      <p className="mt-1 whitespace-pre-wrap text-sm text-[#173d5b] leading-relaxed">
                         {situation}
                       </p>
                       {additionalInfo && (
-                        <p className="mt-2 border-t border-slate-100 pt-2 text-[11px] text-slate-500">
+                        <p className="mt-2 border-t border-slate-100 pt-2 text-[13px] text-slate-500">
                           <strong>Special instructions:</strong> {additionalInfo}
                         </p>
                       )}
@@ -880,7 +880,7 @@ export default function RequestHelpPage() {
                       </div>
                     )}
 
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[13px] text-slate-400">
                       By submitting, you confirm that this assistance request is accurate and required for current flood relief operations.
                     </p>
                   </div>
@@ -893,7 +893,7 @@ export default function RequestHelpPage() {
                       <button
                         type="button"
                         onClick={() => setStep((current) => current - 1)}
-                        className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                        className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
                       >
                         <ArrowLeft size={14} />
                         Back
@@ -915,7 +915,7 @@ export default function RequestHelpPage() {
                       <button
                         type="button"
                         onClick={handleContinue}
-                        className="flex items-center gap-2 rounded-xl bg-[#287da6] px-6 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-[#1f6486] transition"
+                        className="flex items-center gap-2 rounded-xl bg-[#287da6] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1f6486] transition"
                       >
                         <span>Continue</span>
                         <ArrowRight size={15} />
@@ -925,7 +925,7 @@ export default function RequestHelpPage() {
                         type="button"
                         onClick={handleSubmit}
                         disabled={submitting}
-                        className="flex items-center gap-2 rounded-xl bg-[#287da6] px-7 py-3 text-xs font-bold text-white shadow-md hover:bg-[#1f6486] transition disabled:opacity-60"
+                        className="flex items-center gap-2 rounded-xl bg-[#287da6] px-7 py-3 text-sm font-bold text-white shadow-md hover:bg-[#1f6486] transition disabled:opacity-60"
                       >
                         {submitting ? (
                           <RefreshCw size={15} className="animate-spin" />

@@ -34,12 +34,12 @@ import type {
 } from "../../types/volunteerDashboard";
 
 const quickActions = [
-  { title: "Create Task", icon: Plus, path: "/volunteer/tasks" },
-  { title: "Find Volunteers", icon: Users, path: "/volunteer/directory" },
-  { title: "Review Verification", icon: ShieldCheck, path: "/volunteer/verification" },
-  { title: "AI Match", icon: Sparkles, path: "/volunteer/ai-matching" },
-  { title: "Send Update", icon: MessageSquare, path: "/volunteer/communications" },
-  { title: "Generate Report", icon: BarChart3, path: "/volunteer/reports" },
+  { title: "Create Task", icon: Plus, path: "/volunteer-coordinator/tasks" },
+  { title: "Find Volunteers", icon: Users, path: "/volunteer-coordinator/directory" },
+  { title: "Review Verification", icon: ShieldCheck, path: "/volunteer-coordinator/verification" },
+  { title: "AI Match", icon: Sparkles, path: "/volunteer-coordinator/ai-matching" },
+  { title: "Send Update", icon: MessageSquare, path: "/volunteer-coordinator/communications" },
+  { title: "Generate Report", icon: BarChart3, path: "/volunteer-coordinator/reports" },
 ];
 
 export default function VolunteerCoordinationDashboard() {
@@ -219,7 +219,7 @@ export default function VolunteerCoordinationDashboard() {
       <main className="max-w-[1600px] mx-auto px-5 md:px-[38px] pt-7 pb-12">
         {/* BREADCRUMB & BACKEND CONNECTION STATUS */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
-          <div className="flex items-center gap-2 text-[11px]">
+          <div className="flex items-center gap-2 text-sm">
             <span className="text-[#8296aa]">Operations</span>
             <ChevronRight size={13} className="text-[#8296aa]" />
             <span className="text-[#8296aa]">Volunteer Coordination</span>
@@ -229,7 +229,7 @@ export default function VolunteerCoordinationDashboard() {
 
           <div className="flex items-center gap-2.5">
             <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition-colors ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -243,7 +243,7 @@ export default function VolunteerCoordinationDashboard() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               title="Refresh dashboard"
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-[10px] text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-xs text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
             >
               <RefreshCw
                 size={12}
@@ -257,7 +257,7 @@ export default function VolunteerCoordinationDashboard() {
         {/* PAGE HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
           <div>
-            <h1 className="text-[32px] md:text-[34px] font-normal tracking-tight">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight">
               Volunteer Coordination Dashboard
             </h1>
             <p className="text-[14px] text-[#718ba0] mt-1.5">
@@ -268,7 +268,7 @@ export default function VolunteerCoordinationDashboard() {
           <div className="flex items-center gap-2.5">
             <button
               onClick={exportSummary}
-              className="h-[46px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-[12px] flex items-center gap-2 text-[#287fa9] hover:bg-[#f5fafc] transition-colors"
+              className="h-[46px] px-4 bg-white border border-[#b9d0dc] rounded-lg text-sm flex items-center gap-2 text-[#287fa9] hover:bg-[#f5fafc] transition-colors"
             >
               <Download size={16} />
               <span>Export summary</span>
@@ -276,7 +276,7 @@ export default function VolunteerCoordinationDashboard() {
 
             <button
               onClick={() => navigate("/volunteer/tasks")}
-              className="h-[46px] px-4 bg-[#287fa9] text-white rounded-lg text-[12px] font-semibold flex items-center gap-2 hover:bg-[#17678e] transition-colors shadow-xs"
+              className="h-[46px] px-4 bg-[#287fa9] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#17678e] transition-colors shadow-xs"
             >
               <Plus size={17} />
               <span>Create task</span>
@@ -291,11 +291,11 @@ export default function VolunteerCoordinationDashboard() {
             <p className="text-[12px] font-semibold text-[#23896f]">
               Demonstration operations data
             </p>
-            <p className="text-[11px] text-[#4c947e] mt-0.5">
+            <p className="text-sm text-[#4c947e] mt-0.5">
               {operationsAlert}
             </p>
           </div>
-          <span className="text-[10px] text-[#8296aa] shrink-0">
+          <span className="text-[13px] text-[#8296aa] shrink-0">
             {isLiveBackend ? "Live API synced" : "Offline cached"}
           </span>
         </div>
@@ -324,11 +324,11 @@ export default function VolunteerCoordinationDashboard() {
                   </div>
 
                   <div className="min-w-0">
-                    <p className="text-[11px] text-[#8296aa] truncate">{stat.title}</p>
+                    <p className="text-[13px] text-[#8296aa] truncate">{stat.title}</p>
                     <h2 className="text-[22px] font-bold leading-tight text-[#123c5b] mt-0.5">
                       {stat.value}
                     </h2>
-                    <p className="text-[10px] text-[#8296aa] mt-0.5 truncate">{stat.subtitle}</p>
+                    <p className="text-[13px] text-[#8296aa] mt-0.5 truncate">{stat.subtitle}</p>
                   </div>
                 </div>
               );
@@ -342,13 +342,13 @@ export default function VolunteerCoordinationDashboard() {
           <div className="bg-white border border-[#d5e3e9] rounded-xl overflow-hidden shadow-xs">
             <div className="px-5 py-4 border-b border-[#d5e3e9] flex justify-between items-center">
               <div>
-                <h2 className="text-[15px] font-semibold text-[#123c5b]">Volunteer availability</h2>
-                <p className="text-[11px] text-[#8296aa] mt-0.5">Available volunteers by skill group</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">Volunteer availability</h2>
+                <p className="text-[13px] text-[#8296aa] mt-0.5">Available volunteers by skill group</p>
               </div>
 
               <button
                 onClick={() => navigate("/volunteer/skills")}
-                className="text-[11px] text-[#287fa9] hover:underline flex items-center gap-0.5 font-medium"
+                className="text-sm text-[#287fa9] hover:underline flex items-center gap-0.5 font-medium"
               >
                 <span>View skills</span>
                 <ChevronRight size={14} />
@@ -360,7 +360,7 @@ export default function VolunteerCoordinationDashboard() {
                 <div key={skill.name}>
                   <div className="flex items-center justify-between mb-1.5">
                     <p className="text-[12px] font-medium text-[#123c5b]">{skill.name}</p>
-                    <span className="text-[11px] text-[#8296aa]">
+                    <span className="text-[13px] text-[#8296aa]">
                       {skill.available} available ({skill.percentage}%)
                     </span>
                   </div>
@@ -380,11 +380,11 @@ export default function VolunteerCoordinationDashboard() {
           <div className="bg-white border border-[#d5e3e9] rounded-xl overflow-hidden shadow-xs">
             <div className="px-5 py-4 border-b border-[#d5e3e9] flex justify-between items-center">
               <div>
-                <h2 className="text-[15px] font-semibold text-[#123c5b]">Tasks this week</h2>
-                <p className="text-[11px] text-[#8296aa] mt-0.5">Created vs completed tasks</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">Tasks this week</h2>
+                <p className="text-[13px] text-[#8296aa] mt-0.5">Created vs completed tasks</p>
               </div>
 
-              <span className="bg-[#e5f5ef] text-[#299879] rounded px-2 py-1 text-[10px] font-semibold">
+              <span className="bg-[#e5f5ef] text-[#299879] rounded px-2 py-1 text-xs font-semibold">
                 89.4% completion
               </span>
             </div>
@@ -414,7 +414,7 @@ export default function VolunteerCoordinationDashboard() {
                           title={`${item.completed} tasks completed`}
                         />
                       </div>
-                      <span className="text-[10px] text-[#8296aa] mt-2 font-medium">{item.day}</span>
+                      <span className="text-[13px] text-[#8296aa] mt-2 font-medium">{item.day}</span>
                     </div>
                   ))}
                 </div>
@@ -423,11 +423,11 @@ export default function VolunteerCoordinationDashboard() {
               <div className="flex justify-center gap-6 mt-3">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-xs bg-[#287fa9]" />
-                  <span className="text-[11px] text-[#8296aa]">Created</span>
+                  <span className="text-[13px] text-[#8296aa]">Created</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-xs bg-[#62b9a0]" />
-                  <span className="text-[11px] text-[#8296aa]">Completed</span>
+                  <span className="text-[13px] text-[#8296aa]">Completed</span>
                 </div>
               </div>
             </div>
@@ -440,13 +440,13 @@ export default function VolunteerCoordinationDashboard() {
           <div className="bg-white border border-[#d5e3e9] rounded-xl overflow-hidden shadow-xs">
             <div className="px-5 py-4 border-b border-[#d5e3e9] flex items-center justify-between">
               <div>
-                <h2 className="text-[15px] font-semibold text-[#123c5b]">Urgent open tasks</h2>
-                <p className="text-[11px] text-[#8296aa] mt-0.5">Require volunteers or coordinator action</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">Urgent open tasks</h2>
+                <p className="text-[13px] text-[#8296aa] mt-0.5">Require volunteers or coordinator action</p>
               </div>
 
               <button
                 onClick={() => navigate("/volunteer/tasks")}
-                className="text-[11px] text-[#287fa9] hover:underline flex items-center gap-0.5 font-medium"
+                className="text-sm text-[#287fa9] hover:underline flex items-center gap-0.5 font-medium"
               >
                 <span>View all</span>
                 <ChevronRight size={14} />
@@ -456,7 +456,7 @@ export default function VolunteerCoordinationDashboard() {
             <div className="overflow-x-auto">
               <table className="w-full text-left min-w-[700px]">
                 <thead className="bg-[#f5f8f9] border-b border-[#e1eaf0]">
-                  <tr className="text-[10px] text-[#8296aa]">
+                  <tr className="text-sm text-[#8296aa]">
                     <th className="px-3.5 py-3 font-medium">Task</th>
                     <th className="px-3.5 py-3 font-medium">Title</th>
                     <th className="px-3.5 py-3 font-medium">Location</th>
@@ -476,36 +476,36 @@ export default function VolunteerCoordinationDashboard() {
                       onClick={() => setSelectedTask(task)}
                       className="border-b border-[#e1eaf0] hover:bg-[#f5fafc] cursor-pointer transition-colors"
                     >
-                      <td className="px-3.5 py-3.5 text-[10px] font-semibold text-[#17648e] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm font-semibold text-[#17648e] whitespace-nowrap">
                         {task.id}
                       </td>
-                      <td className="px-3.5 py-3.5 text-[10px] font-medium text-[#123c5b] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm font-medium text-[#123c5b] whitespace-nowrap">
                         {task.title}
                       </td>
-                      <td className="px-3.5 py-3.5 text-[10px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                         {task.location}
                       </td>
-                      <td className="px-3.5 py-3.5 text-[10px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                         {task.skills}
                       </td>
                       <td className="px-3.5 py-3.5">
                         <span
-                          className={`px-2 py-0.5 rounded text-[9px] font-semibold ${priorityStyle(
+                          className={`px-2 py-0.5 rounded text-xs font-semibold ${priorityStyle(
                             task.priority
                           )}`}
                         >
                           {task.priority}
                         </span>
                       </td>
-                      <td className="px-3.5 py-3.5 text-[10px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm text-[#557086] whitespace-nowrap">
                         {task.schedule}
                       </td>
-                      <td className="px-3.5 py-3.5 text-[10px] font-semibold text-[#123c5b] whitespace-nowrap">
+                      <td className="px-3.5 py-3.5 text-sm font-semibold text-[#123c5b] whitespace-nowrap">
                         {task.filled}
                       </td>
                       <td className="px-3.5 py-3.5">
                         <span
-                          className={`px-2 py-0.5 rounded text-[9px] font-semibold whitespace-nowrap ${statusStyle(
+                          className={`px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap ${statusStyle(
                             task.status
                           )}`}
                         >
@@ -520,7 +520,7 @@ export default function VolunteerCoordinationDashboard() {
 
                   {filteredTasks.length === 0 && (
                     <tr>
-                      <td colSpan={9} className="text-center py-8 text-xs text-gray-400">
+                      <td colSpan={9} className="text-center py-8 text-sm text-gray-400">
                         No urgent open tasks currently found.
                       </td>
                     </tr>
@@ -534,11 +534,11 @@ export default function VolunteerCoordinationDashboard() {
           <div className="bg-white border border-[#d5e3e9] rounded-xl overflow-hidden shadow-xs">
             <div className="px-5 py-4 border-b border-[#d5e3e9] flex justify-between items-center">
               <div>
-                <h2 className="text-[15px] font-semibold text-[#123c5b]">Live coordination activity</h2>
-                <p className="text-[11px] text-[#8296aa] mt-0.5">Across all volunteer response teams</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">Live coordination activity</h2>
+                <p className="text-[13px] text-[#8296aa] mt-0.5">Across all volunteer response teams</p>
               </div>
 
-              <span className="bg-[#e5f5ef] text-[#299879] rounded px-2 py-1 text-[10px] font-semibold flex items-center gap-1">
+              <span className="bg-[#e5f5ef] text-[#299879] rounded px-2 py-1 text-xs font-semibold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#299879] animate-pulse" />
                 <span>Live</span>
               </span>
@@ -561,11 +561,11 @@ export default function VolunteerCoordinationDashboard() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-semibold text-[#123c5b] truncate">{item.title}</p>
-                      <p className="text-[10px] text-[#8296aa] mt-0.5 truncate">{item.description}</p>
+                      <p className="text-sm font-semibold text-[#123c5b] truncate">{item.title}</p>
+                      <p className="text-[13px] text-[#8296aa] mt-0.5 truncate">{item.description}</p>
                     </div>
 
-                    <span className="text-[9px] text-[#8296aa] whitespace-nowrap">{item.time}</span>
+                    <span className="text-xs text-[#8296aa] whitespace-nowrap">{item.time}</span>
                   </div>
                 );
               })}
@@ -575,7 +575,7 @@ export default function VolunteerCoordinationDashboard() {
 
         {/* QUICK ACTIONS */}
         <section>
-          <h2 className="text-[15px] font-semibold text-[#123c5b] mb-3">Quick actions</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b] mb-3">Quick actions</h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {quickActions.map((action) => {
@@ -591,7 +591,7 @@ export default function VolunteerCoordinationDashboard() {
                     <Icon size={16} className="text-[#42a58c]" />
                   </div>
 
-                  <span className="text-[11px] font-semibold text-[#123c5b] flex-1">
+                  <span className="text-sm font-semibold text-[#123c5b] flex-1">
                     {action.title}
                   </span>
 
@@ -609,10 +609,10 @@ export default function VolunteerCoordinationDashboard() {
           <div className="bg-white rounded-xl w-full max-w-[440px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#e1eaf0] flex justify-between items-center">
               <div>
-                <span className="text-[10px] font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
+                <span className="text-xs font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
                   {selectedTask.id}
                 </span>
-                <h2 className="text-[16px] font-semibold text-[#123c5b] mt-1">Task details</h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b] mt-1">Task details</h2>
               </div>
 
               <button
@@ -643,7 +643,7 @@ export default function VolunteerCoordinationDashboard() {
 
               <div className="flex items-center justify-between pt-2">
                 <span
-                  className={`px-2.5 py-1 rounded text-[10px] font-semibold ${priorityStyle(
+                  className={`px-2.5 py-1 rounded text-xs font-semibold ${priorityStyle(
                     selectedTask.priority
                   )}`}
                 >
@@ -651,7 +651,7 @@ export default function VolunteerCoordinationDashboard() {
                 </span>
 
                 <span
-                  className={`px-2.5 py-1 rounded text-[10px] font-semibold ${statusStyle(
+                  className={`px-2.5 py-1 rounded text-xs font-semibold ${statusStyle(
                     selectedTask.status
                   )}`}
                 >
@@ -660,7 +660,7 @@ export default function VolunteerCoordinationDashboard() {
               </div>
 
               <div className="bg-[#f3f7f9] p-3.5 rounded-lg border border-[#e1eaf0]">
-                <p className="text-[11px] text-gray-500 font-medium">Volunteer Allocation</p>
+                <p className="text-[13px] text-gray-500 font-medium">Volunteer Allocation</p>
                 <p className="text-[20px] font-bold text-[#123c5b] mt-0.5">{selectedTask.filled}</p>
               </div>
             </div>
@@ -671,14 +671,14 @@ export default function VolunteerCoordinationDashboard() {
                   setSelectedTask(null);
                   navigate("/volunteer/tasks");
                 }}
-                className="text-xs text-[#287fa9] hover:underline font-semibold"
+                className="text-sm text-[#287fa9] hover:underline font-semibold"
               >
                 Open in Tasks page →
               </button>
 
               <button
                 onClick={() => setSelectedTask(null)}
-                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-xs font-semibold"
+                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold"
               >
                 Close
               </button>

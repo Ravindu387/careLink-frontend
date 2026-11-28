@@ -1,128 +1,173 @@
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Globe,
   CircleHelp,
   Bell,
-  ChevronRight,
+  ChevronDown,
   Menu,
+  User,
+  Settings,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { TOPBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
 
 interface AdminTopbarProps {
   onMenuClick: () => void;
 }
 
-export default function AdminTopbar({
-  onMenuClick,
-}: AdminTopbarProps) {
+export default function AdminTopbar({ onMenuClick }: AdminTopbarProps) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const displayName = user?.fullName || "Sanjana A.";
+  const displayEmail = user?.email || "shelteradmin@carelink.org";
+  const initials = getUserInitials(displayName, "SA");
+
   return (
-    <header className="z-30 flex h-[56px] w-full shrink-0 items-center justify-between gap-3 border-b border-[#d6e4e9] bg-white px-4 sm:px-5">
-
+    <header className={TOPBAR_THEME.header}>
       {/* LEFT SIDE */}
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-
+      <div className={TOPBAR_THEME.leftSection}>
         {/* MOBILE MENU */}
         <button
           type="button"
           onClick={onMenuClick}
-          className="rounded-md p-1.5 text-[#17496b] hover:bg-slate-100 lg:hidden"
+          className={TOPBAR_THEME.mobileMenuBtn}
           aria-label="Open sidebar"
         >
-          <Menu size={21} />
+          <Menu size={19} />
         </button>
 
         {/* SEARCH */}
-        <div className="relative w-full max-w-[355px]">
-          <Search
-            size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-          />
+        <div className={TOPBAR_THEME.searchContainer}>
+          <Search size={16} className="shrink-0 text-[#8296AA]" />
 
           <input
             type="text"
             placeholder="Search residents, shelters, requests..."
-            className="h-[37px] w-full rounded-lg border border-[#d7e4e9] bg-[#f7fafb] pl-9 pr-12 text-[11px] text-[#153f5e] outline-none focus:border-[#2782a8] focus:ring-2 focus:ring-blue-100"
+            className={TOPBAR_THEME.searchInput}
           />
 
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 rounded border border-[#d7e4e9] bg-white px-1.5 py-1 text-[9px] text-slate-500">
-            ⌘ K
-          </span>
+          <span className={TOPBAR_THEME.searchShortcut}>⌘ K</span>
         </div>
       </div>
 
       {/* RIGHT SIDE */}
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-
+      <div className={TOPBAR_THEME.rightSection}>
         {/* OPERATIONAL AREA */}
-        <div className="hidden items-center gap-2 border-r border-[#d7e4e9] pr-4 md:flex">
+        <div className={TOPBAR_THEME.contextBlock}>
           <div>
-            <p className="text-[8px] uppercase tracking-wide text-slate-400">
-              Operational Area
-            </p>
-
-            <p className="text-[10px] font-bold text-[#153f5e]">
-              Greater Riverton
-            </p>
+            <p className={TOPBAR_THEME.contextLabel}>OPERATIONAL AREA</p>
+            <p className={TOPBAR_THEME.contextValue}>Greater Riverton</p>
           </div>
-
-          <ChevronRight
-            size={14}
-            className="ml-2 text-[#153f5e]"
-          />
         </div>
 
         {/* LANGUAGE */}
         <button
           type="button"
           aria-label="Select language"
-          className="flex h-[35px] items-center gap-1.5 rounded-lg border border-[#d7e4e9] px-2 text-[10px] text-[#153f5e] hover:bg-slate-50"
+          className={TOPBAR_THEME.actionBtn}
         >
           <Globe size={15} />
-          EN
+          <span>EN</span>
         </button>
 
         {/* HELP */}
         <button
           type="button"
           aria-label="Help"
-          className="flex h-[35px] w-[35px] items-center justify-center rounded-lg border border-[#d7e4e9] text-[#496d85] hover:bg-slate-50"
+          className={`hidden sm:flex ${TOPBAR_THEME.iconBtn}`}
         >
-          <CircleHelp size={16} />
+          <CircleHelp size={17} />
         </button>
 
         {/* NOTIFICATIONS */}
         <button
           type="button"
           aria-label="Notifications"
-          className="relative flex h-[35px] w-[35px] items-center justify-center rounded-lg border border-[#d7e4e9] text-[#496d85] hover:bg-slate-50"
+          onClick={() => navigate("/shelter-admin/notifications")}
+          className={TOPBAR_THEME.iconBtn}
         >
           <Bell size={17} />
-
-          <span className="absolute -right-1 -top-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-red-500 px-1 text-[8px] font-bold text-white">
-            8
-          </span>
+          <span className={TOPBAR_THEME.notifBadge}>8</span>
         </button>
 
         {/* USER PROFILE */}
-        <div className="flex items-center gap-2 border-l border-[#d7e4e9] pl-3">
-          <div className="flex h-[31px] w-[31px] items-center justify-center rounded-full bg-[#236b92] text-[10px] font-bold text-white">
-            SA
-          </div>
+        <div className={TOPBAR_THEME.profileDivider}>
+          <button
+            type="button"
+            onClick={() => setProfileOpen((p) => !p)}
+            className={TOPBAR_THEME.profileTrigger}
+          >
+            <div className={TOPBAR_THEME.avatar}>{initials}</div>
 
-          <div className="hidden sm:block">
-            <p className="text-[10px] font-bold text-[#153f5e]">
-              Sanjana A.
-            </p>
+            <div className="hidden sm:block">
+              <p className={TOPBAR_THEME.userName}>{displayName}</p>
+              <p className={TOPBAR_THEME.userRole}>Shelter Administrator</p>
+            </div>
 
-            <p className="text-[8px] text-slate-400">
-              Administrator
-            </p>
-          </div>
+            <ChevronDown
+              size={14}
+              className="hidden text-[#8296AA] sm:block"
+            />
+          </button>
 
-          <ChevronRight
-            size={15}
-            className="ml-1 text-[#496d85]"
-          />
+          {profileOpen && (
+            <div className={TOPBAR_THEME.dropdownMenu}>
+              <div className={TOPBAR_THEME.dropdownHeader}>
+                <p className="truncate text-sm font-bold text-[#153E5D]">
+                  {displayName}
+                </p>
+                <p className="truncate text-[13px] text-[#8296AA]">
+                  {displayEmail}
+                </p>
+              </div>
+
+              <div className="py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    navigate("/shelter-admin/settings");
+                  }}
+                  className={TOPBAR_THEME.dropdownItem}
+                >
+                  <User size={15} />
+                  <span>My Profile</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    navigate("/shelter-admin/settings");
+                  }}
+                  className={TOPBAR_THEME.dropdownItem}
+                >
+                  <Settings size={15} />
+                  <span>Shelter Settings</span>
+                </button>
+              </div>
+
+              <div className="my-1 border-t border-slate-100" />
+
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileOpen(false);
+                  logout();
+                  navigate("/login", { replace: true });
+                }}
+                className={TOPBAR_THEME.dropdownSignOut}
+              >
+                <LogOut size={15} />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

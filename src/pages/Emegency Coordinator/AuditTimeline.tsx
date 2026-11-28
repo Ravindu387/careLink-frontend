@@ -279,16 +279,16 @@ export default function AuditTimeline() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-medium text-[#153f5e]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
               Audit Timeline
             </h1>
             {isLiveConnected ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold text-emerald-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Backend Live
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
                 Connecting...
               </span>
             )}
@@ -303,7 +303,7 @@ export default function AuditTimeline() {
           <button
             onClick={handleManualRefresh}
             disabled={loading}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
             title="Refresh audit log"
           >
             <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
@@ -312,7 +312,7 @@ export default function AuditTimeline() {
 
           <button
             onClick={handleResetData}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
             title="Reset to default seed dataset"
           >
             <RotateCcw size={13} />
@@ -322,7 +322,7 @@ export default function AuditTimeline() {
           <button
             onClick={handleVerifyIntegrity}
             disabled={verifying}
-            className="flex items-center gap-1.5 rounded-lg border border-emerald-600 bg-white px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 shadow-sm disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-emerald-600 bg-white px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 shadow-sm disabled:opacity-50"
           >
             {verifying ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={14} />}
             Verify Integrity
@@ -330,14 +330,14 @@ export default function AuditTimeline() {
 
           <button
             onClick={() => setShowRetention(true)}
-            className="rounded-lg border border-[#c4d7e1] bg-white px-3.5 py-2 text-xs font-medium text-[#175477] hover:bg-sky-50 shadow-sm"
+            className="rounded-lg border border-[#c4d7e1] bg-white px-3.5 py-2 text-sm font-medium text-[#175477] hover:bg-sky-50 shadow-sm"
           >
             Retention policy
           </button>
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#216789] shadow-sm"
+            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#216789] shadow-sm"
           >
             <Download size={14} />
             Export
@@ -354,7 +354,7 @@ export default function AuditTimeline() {
           </div>
           <button
             onClick={handleManualRefresh}
-            className="rounded bg-red-600 px-2.5 py-1 text-[10px] font-semibold text-white hover:bg-red-700"
+            className="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
           >
             Retry Connection
           </button>
@@ -369,21 +369,21 @@ export default function AuditTimeline() {
             className="shrink-0 text-[#287da5]"
           />
           <div>
-            <p className="text-xs font-semibold text-[#153f5e]">
+            <p className="text-sm font-semibold text-[#153f5e]">
               Read-only accountability & cryptographic chain
             </p>
-            <p className="mt-0.5 text-[10px] text-slate-500">
+            <p className="mt-0.5 text-[13px] text-slate-500">
               Operational audit events cannot be modified or deleted. Each record is sealed with an immutable SHA-256 hash.
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold text-emerald-800">
+          <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
             <CheckCircle size={11} />
             {metrics ? `${metrics.integrityScore}% Tamper-Proof` : "100% Tamper-Proof"}
           </span>
-          <span className="text-[10px] font-medium text-slate-500">
+          <span className="text-[13px] font-medium text-slate-500">
             Retention: {metrics ? metrics.retentionPeriod : "7 Years"}
           </span>
         </div>
@@ -401,7 +401,7 @@ export default function AuditTimeline() {
               setPage(1);
             }}
             placeholder="Search event, user, record, or rationale..."
-            className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+            className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
           />
           {search && (
             <button onClick={() => setSearch("")}>
@@ -417,7 +417,7 @@ export default function AuditTimeline() {
             setActionFilter(e.target.value);
             setPage(1);
           }}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All action types</option>
           <option>approved</option>
@@ -436,7 +436,7 @@ export default function AuditTimeline() {
             setUserFilter(e.target.value);
             setPage(1);
           }}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All users</option>
           {uniqueActors.map((actor) => (
@@ -451,7 +451,7 @@ export default function AuditTimeline() {
             setTypeFilter(e.target.value);
             setPage(1);
           }}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All record types</option>
           {recordTypes.map((type) => (
@@ -463,7 +463,7 @@ export default function AuditTimeline() {
         <select
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>Date range</option>
           <option>Today</option>
@@ -476,7 +476,7 @@ export default function AuditTimeline() {
       <div className="mb-3 flex justify-end">
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] bg-white px-4 py-2 text-xs font-medium text-[#175477] hover:bg-sky-50"
+          className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] bg-white px-4 py-2 text-sm font-medium text-[#175477] hover:bg-sky-50"
         >
           <Filter size={13} />
           More filters
@@ -493,7 +493,7 @@ export default function AuditTimeline() {
 
           <button
             onClick={resetFilters}
-            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
           >
             Clear all filters
           </button>
@@ -518,7 +518,7 @@ export default function AuditTimeline() {
                 ].map((heading) => (
                   <th
                     key={heading}
-                    className="px-3 py-3 text-[10px] font-semibold text-[#49647a]"
+                    className="px-3 py-3 text-[13px] font-semibold text-[#49647a]"
                   >
                     {heading}
                   </th>
@@ -541,40 +541,40 @@ export default function AuditTimeline() {
                     onClick={() => setSelectedEvent(event)}
                     className="cursor-pointer border-b border-[#e6edf1] transition hover:bg-[#f0f6f8]"
                   >
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[10px] font-bold text-[#153f5e]">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm font-bold text-[#153f5e]">
                       {event.id}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[10px] text-[#49647a]">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-[#49647a]">
                       {event.action}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[10px] text-[#49647a]">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-[#49647a]">
                       {event.actor}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[10px] text-[#49647a]">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-[#49647a]">
                       {event.timestamp}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[10px] text-[#49647a]">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-[#49647a]">
                       <span className="font-semibold text-sky-900">{event.record}</span>
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
                       <div className="flex items-center gap-1.5">
-                        <span className={`rounded-md px-2 py-1 text-[9px] font-semibold ${badgeStyle(event.previous)}`}>
+                        <span className={`rounded-md px-2 py-1 text-xs font-semibold ${badgeStyle(event.previous)}`}>
                           {event.previous}
                         </span>
                         <span className="text-slate-400">→</span>
-                        <span className={`rounded-md px-2 py-1 text-[9px] font-semibold ${badgeStyle(event.current)}`}>
+                        <span className={`rounded-md px-2 py-1 text-xs font-semibold ${badgeStyle(event.current)}`}>
                           {event.current}
                         </span>
                       </div>
                     </td>
 
                     <td className="px-3 py-3.5">
-                      <span className="inline-block max-w-[200px] truncate rounded-md bg-[#e8f2f8] px-2 py-1 text-[9px] font-medium text-[#286d91]">
+                      <span className="inline-block max-w-[200px] truncate rounded-md bg-[#e8f2f8] px-2 py-1 text-xs font-medium text-[#286d91]">
                         {event.rationale}
                       </span>
                     </td>
@@ -611,7 +611,7 @@ export default function AuditTimeline() {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e6edf1] px-4 py-3">
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[13px] text-slate-500">
             Showing {filteredEvents.length === 0 ? 0 : (page - 1) * pageSize + 1}
             –{Math.min(page * pageSize, filteredEvents.length)} of {filteredEvents.length.toLocaleString()} records
           </p>
@@ -620,7 +620,7 @@ export default function AuditTimeline() {
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#d5e2e9] px-3 py-1.5 text-[10px] text-[#287da5] disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50"
+              className="rounded-lg border border-[#d5e2e9] px-3 py-1.5 text-sm text-[#287da5] disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50"
             >
               Previous
             </button>
@@ -629,7 +629,7 @@ export default function AuditTimeline() {
               <button
                 key={number}
                 onClick={() => setPage(number)}
-                className={`h-7 w-7 rounded-md border text-[10px] ${
+                className={`h-7 w-7 rounded-md border text-sm ${
                   page === number
                     ? "border-[#287da5] bg-[#287da5] font-semibold text-white"
                     : "border-[#d5e2e9] bg-white text-[#175477] hover:bg-slate-50"
@@ -642,7 +642,7 @@ export default function AuditTimeline() {
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#d5e2e9] px-3 py-1.5 text-[10px] text-[#287da5] disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50"
+              className="rounded-lg border border-[#d5e2e9] px-3 py-1.5 text-sm text-[#287da5] disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50"
             >
               Next
             </button>
@@ -664,7 +664,7 @@ export default function AuditTimeline() {
                   Verified audit record
                 </span>
               </div>
-              <span className="rounded bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold text-emerald-800">
+              <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
                 Tamper-Evident SHA-256
               </span>
             </div>
@@ -673,7 +673,7 @@ export default function AuditTimeline() {
               {selectedEvent.id}
             </h3>
 
-            <p className="mt-0.5 text-xs text-slate-600">
+            <p className="mt-0.5 text-sm text-slate-600">
               {selectedEvent.action}
             </p>
           </div>
@@ -690,8 +690,8 @@ export default function AuditTimeline() {
               <Detail label="Source IP" value={selectedEvent.ipAddress} />
             )}
             <div className="border-b border-slate-100 pb-2">
-              <span className="text-[10px] text-slate-400 block mb-1">Cryptographic Checksum (SHA-256)</span>
-              <span className="font-mono text-[9px] text-slate-600 break-all bg-slate-50 p-2 rounded block border border-slate-200">
+              <span className="text-[13px] text-slate-400 block mb-1">Cryptographic Checksum (SHA-256)</span>
+              <span className="font-mono text-xs text-slate-600 break-all bg-slate-50 p-2 rounded block border border-slate-200">
                 {selectedEvent.checksum}
               </span>
             </div>
@@ -699,7 +699,7 @@ export default function AuditTimeline() {
 
           <div className="mt-4 flex items-center gap-2 rounded-lg border border-[#d5e2e9] bg-[#f6f9fa] p-3">
             <Lock size={15} className="text-[#54778b] shrink-0" />
-            <p className="text-[10px] text-slate-500">
+            <p className="text-[13px] text-slate-500">
               This audit record is sealed, read-only, and part of the immutable emergency log.
             </p>
           </div>
@@ -754,7 +754,7 @@ export default function AuditTimeline() {
 
           <div className="mt-4 flex items-center gap-2 rounded-lg bg-emerald-50 p-3 border border-emerald-200">
             <KeyRound size={16} className="text-emerald-700 shrink-0" />
-            <p className="text-[10px] text-emerald-800">
+            <p className="text-sm text-emerald-800">
               All records are cryptographically verified for authenticity and non-repudiation.
             </p>
           </div>
@@ -786,7 +786,7 @@ function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-5 shadow-2xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-[#153f5e]">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#153f5e]">
             {title}
           </h2>
 

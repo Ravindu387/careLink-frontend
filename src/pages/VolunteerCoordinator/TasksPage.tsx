@@ -394,7 +394,7 @@ export default function TasksPage() {
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
         {/* BREADCRUMB & BACKEND CONNECTION STATUS */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div className="flex items-center gap-2 text-[10px]">
+          <div className="flex items-center gap-2 text-sm">
             <span className="text-[#8296aa]">Operations</span>
             <ChevronRight size={12} className="text-[#8296aa]" />
             <span className="text-[#8296aa]">Volunteer Coordination</span>
@@ -404,7 +404,7 @@ export default function TasksPage() {
 
           <div className="flex items-center gap-2.5">
             <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition-colors ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -418,7 +418,7 @@ export default function TasksPage() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               title="Refresh tasks"
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-[10px] text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-1 text-xs text-slate-700 hover:bg-[#f5fafc] disabled:opacity-50"
             >
               <RefreshCw
                 size={12}
@@ -432,7 +432,7 @@ export default function TasksPage() {
         {/* PAGE HEADER */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7">
           <div>
-            <h1 className="text-[27px] md:text-[29px] font-normal">Tasks</h1>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">Tasks</h1>
             <p className="text-[12px] text-[#718ba0] mt-1.5">
               Create response tasks, define requirements, and monitor fulfilment in real-time.
             </p>
@@ -441,7 +441,7 @@ export default function TasksPage() {
           <div className="flex gap-2">
             <button
               onClick={handleExport}
-              className="h-[40px] px-4 bg-white border border-[#b9d0dc] rounded-lg flex items-center gap-2 text-[10px] text-[#17648e] hover:bg-[#f5fafc] transition-colors"
+              className="h-[40px] px-4 bg-white border border-[#b9d0dc] rounded-lg flex items-center gap-2 text-sm text-[#17648e] hover:bg-[#f5fafc] transition-colors"
             >
               <Download size={15} />
               Export
@@ -449,7 +449,7 @@ export default function TasksPage() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[10px] font-semibold transition-colors shadow-xs"
+              className="h-[40px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-sm font-semibold transition-colors shadow-xs"
             >
               <Plus size={16} />
               Create task
@@ -466,7 +466,7 @@ export default function TasksPage() {
                 setActiveTab(tab.label);
                 setCurrentPage(1);
               }}
-              className={`flex items-center gap-1.5 whitespace-nowrap pb-3 text-[10px] border-b-2 transition-colors ${
+              className={`flex items-center gap-1.5 whitespace-nowrap pb-3 text-sm border-b-2 transition-colors ${
                 activeTab === tab.label
                   ? "border-[#287fa9] text-[#287fa9] font-semibold"
                   : "border-transparent text-[#8296aa] hover:text-[#287fa9]"
@@ -474,7 +474,7 @@ export default function TasksPage() {
             >
               <span>{tab.label}</span>
               <span
-                className={`rounded-full px-1.5 py-0.5 text-[8px] font-semibold ${
+                className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${
                   activeTab === tab.label
                     ? "bg-[#287fa9] text-white"
                     : "bg-[#e8f1f6] text-[#718ba0]"
@@ -498,7 +498,7 @@ export default function TasksPage() {
                 setCurrentPage(1);
               }}
               placeholder="Search task ID or title..."
-              className="w-full outline-none text-[10px] placeholder:text-[#a1b1c0]"
+              className="w-full outline-none text-sm sm:text-[15px] placeholder:text-[#a1b1c0]"
             />
             {search && (
               <button
@@ -520,7 +520,7 @@ export default function TasksPage() {
               setPriorityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[10px] outline-none cursor-pointer"
+            className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>All priorities</option>
             <option>Critical</option>
@@ -536,7 +536,7 @@ export default function TasksPage() {
               setLocationFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[10px] outline-none cursor-pointer"
+            className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>All locations</option>
             {locations.map((loc) => (
@@ -553,7 +553,7 @@ export default function TasksPage() {
               setSkillFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[10px] outline-none cursor-pointer"
+            className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>All skill groups</option>
             {skillGroups.map((sk) => (
@@ -570,7 +570,7 @@ export default function TasksPage() {
               setScheduleFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[10px] outline-none cursor-pointer"
+            className="h-[40px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>Any schedule</option>
             <option>Today</option>
@@ -580,7 +580,7 @@ export default function TasksPage() {
           {/* MORE FILTERS TOGGLE */}
           <button
             onClick={() => setShowMoreFilters(!showMoreFilters)}
-            className="h-[40px] bg-white border border-[#b9d0dc] rounded-lg flex items-center justify-center gap-1.5 text-[10px] text-[#17648e] hover:bg-[#f5fafc]"
+            className="h-[40px] bg-white border border-[#b9d0dc] rounded-lg flex items-center justify-center gap-1.5 text-sm text-[#17648e] hover:bg-[#f5fafc]"
           >
             <SlidersHorizontal size={13} />
             <span>Filters</span>
@@ -591,14 +591,14 @@ export default function TasksPage() {
         {showMoreFilters && (
           <div className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-4 flex flex-wrap justify-between items-center gap-3 shadow-xs">
             <div>
-              <h3 className="text-xs font-semibold text-[#123c5b]">Active Filter Controls</h3>
-              <p className="text-[10px] text-gray-400 mt-0.5">
+              <h3 className="text-base font-semibold text-[#123c5b]">Active Filter Controls</h3>
+              <p className="text-[13px] text-gray-400 mt-0.5">
                 Quickly clear all filters or reset search terms to view all backend tasks.
               </p>
             </div>
             <button
               onClick={resetFilters}
-              className="text-[10px] text-[#287fa9] hover:underline font-semibold"
+              className="text-sm text-[#287fa9] hover:underline font-semibold"
             >
               Reset all filters
             </button>
@@ -611,7 +611,7 @@ export default function TasksPage() {
             <table className="w-full min-w-[1000px] text-left">
               {/* TABLE HEADER */}
               <thead className="bg-[#f5f8f9] border-b border-[#d5e3e9]">
-                <tr className="text-[9px] text-[#718ba0]">
+                <tr className="text-sm text-[#718ba0]">
                   <th className="px-3.5 py-3 font-medium">Task ID</th>
                   <th className="px-3.5 py-3 font-medium">Task Title</th>
                   <th className="px-3.5 py-3 font-medium">Location</th>
@@ -637,13 +637,13 @@ export default function TasksPage() {
                   </tr>
                 ) : tasks.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="text-center py-14 text-xs text-gray-400">
+                    <td colSpan={9} className="text-center py-14 text-sm text-gray-400">
                       <div className="flex flex-col items-center gap-2">
                         <AlertTriangle size={24} className="text-amber-500" />
                         <p>No volunteer tasks found matching your criteria.</p>
                         <button
                           onClick={resetFilters}
-                          className="mt-1 text-[11px] font-semibold text-[#287fa9] hover:underline"
+                          className="mt-1 text-sm font-semibold text-[#287fa9] hover:underline"
                         >
                           Clear all filters
                         </button>
@@ -657,19 +657,19 @@ export default function TasksPage() {
                       onClick={() => setSelectedTask(task)}
                       className="border-b border-[#e1eaf0] hover:bg-[#f5fafc] cursor-pointer transition-colors"
                     >
-                      <td className="px-3.5 py-[13px] text-[9px] font-semibold text-[#17648e] whitespace-nowrap">
+                      <td className="px-3.5 py-[13px] text-sm font-semibold text-[#17648e] whitespace-nowrap">
                         {task.id}
                       </td>
 
-                      <td className="px-3.5 py-[13px] text-[9px] font-medium text-[#123c5b] whitespace-nowrap">
+                      <td className="px-3.5 py-[13px] text-sm font-medium text-[#123c5b] whitespace-nowrap">
                         {task.title}
                       </td>
 
-                      <td className="px-3.5 py-[13px] text-[9px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-[13px] text-sm text-[#557086] whitespace-nowrap">
                         {task.location}
                       </td>
 
-                      <td className="px-3.5 py-[13px] text-[9px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-[13px] text-sm text-[#557086] whitespace-nowrap">
                         {task.skills && task.skills.length > 0
                           ? task.skills.join(" · ")
                           : "General"}
@@ -677,7 +677,7 @@ export default function TasksPage() {
 
                       <td className="px-3.5 py-[13px]">
                         <span
-                          className={`inline-flex px-2 py-1 rounded-md text-[8px] font-semibold ${getPriorityStyle(
+                          className={`inline-flex px-2 py-1 rounded-md text-xs font-semibold ${getPriorityStyle(
                             task.priority
                           )}`}
                         >
@@ -685,17 +685,17 @@ export default function TasksPage() {
                         </span>
                       </td>
 
-                      <td className="px-3.5 py-[13px] text-[9px] text-[#557086] whitespace-nowrap">
+                      <td className="px-3.5 py-[13px] text-sm text-[#557086] whitespace-nowrap">
                         {task.schedule}
                       </td>
 
-                      <td className="px-3.5 py-[13px] text-[9px] font-medium text-[#123c5b] whitespace-nowrap">
+                      <td className="px-3.5 py-[13px] text-sm font-medium text-[#123c5b] whitespace-nowrap">
                         {task.volunteers}
                       </td>
 
                       <td className="px-3.5 py-[13px]">
                         <span
-                          className={`inline-flex px-2 py-1 rounded-md text-[8px] font-semibold whitespace-nowrap ${getStatusStyle(
+                          className={`inline-flex px-2 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${getStatusStyle(
                             task.status
                           )}`}
                         >
@@ -715,7 +715,7 @@ export default function TasksPage() {
 
           {/* PAGINATION */}
           <div className="px-4 py-3 border-t border-[#d5e3e9] flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#fafcfd]">
-            <p className="text-[10px] text-[#8296aa]">
+            <p className="text-[13px] text-[#8296aa]">
               Showing {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
               {Math.min(currentPage * pageSize, totalCount)} of {totalCount} tasks
             </p>
@@ -724,7 +724,7 @@ export default function TasksPage() {
               <button
                 disabled={currentPage <= 1 || isLoading}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="border border-[#d5e2e9] bg-white rounded-lg px-3 py-1.5 text-[9px] text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0f7fa]"
+                className="border border-[#d5e2e9] bg-white rounded-lg px-3 py-1.5 text-sm text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0f7fa]"
               >
                 Previous
               </button>
@@ -743,11 +743,11 @@ export default function TasksPage() {
                   return (
                     <div key={page} className="flex items-center gap-1">
                       {showEllipsis && (
-                        <span className="text-[10px] text-slate-400 px-1">...</span>
+                        <span className="text-[13px] text-slate-400 px-1">...</span>
                       )}
                       <button
                         onClick={() => setCurrentPage(page)}
-                        className={`w-[28px] h-[28px] rounded-lg text-[9px] font-medium border ${
+                        className={`w-[28px] h-[28px] rounded-lg text-sm font-medium border ${
                           currentPage === page
                             ? "bg-[#287fa9] border-[#287fa9] text-white shadow-xs"
                             : "border-[#d5e2e9] bg-white text-[#123c5b] hover:bg-[#f0f7fa]"
@@ -762,7 +762,7 @@ export default function TasksPage() {
               <button
                 disabled={currentPage >= totalPages || isLoading}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="border border-[#d5e2e9] bg-white rounded-lg px-3 py-1.5 text-[9px] text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0f7fa]"
+                className="border border-[#d5e2e9] bg-white rounded-lg px-3 py-1.5 text-sm text-[#287fa9] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#f0f7fa]"
               >
                 Next
               </button>
@@ -777,8 +777,8 @@ export default function TasksPage() {
           <div className="bg-white w-full max-w-[500px] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#e1eaf0] flex items-center justify-between">
               <div>
-                <h2 className="text-[16px] font-semibold text-[#123c5b]">Create new task</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">Create new task</h2>
+                <p className="text-[13px] text-gray-400 mt-0.5">
                   Define requirements and schedule for relief response.
                 </p>
               </div>
@@ -793,7 +793,7 @@ export default function TasksPage() {
             <form onSubmit={handleCreateTask} className="p-5 space-y-3.5">
               {/* TITLE */}
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Task title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -801,13 +801,13 @@ export default function TasksPage() {
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
                   placeholder="e.g. Evacuation transport support"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               {/* LOCATION */}
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Location <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -815,13 +815,13 @@ export default function TasksPage() {
                   value={newTask.location}
                   onChange={(e) => setNewTask({ ...newTask, location: e.target.value })}
                   placeholder="e.g. North Ward or Central Clinic"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
               </div>
 
               {/* SKILLS */}
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Required skills <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -829,20 +829,20 @@ export default function TasksPage() {
                   value={newTask.skills}
                   onChange={(e) => setNewTask({ ...newTask, skills: e.target.value })}
                   placeholder="Driving, Rescue, First Aid"
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none focus:border-[#287fa9]"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none focus:border-[#287fa9]"
                 />
-                <p className="text-[9px] text-gray-400 mt-1">Separate multiple skills with commas.</p>
+                <p className="text-xs text-gray-400 mt-1">Separate multiple skills with commas.</p>
               </div>
 
               {/* PRIORITY */}
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">Priority</label>
+                <label className="text-sm font-semibold text-[#123c5b]">Priority</label>
                 <select
                   value={newTask.priority}
                   onChange={(e) =>
                     setNewTask({ ...newTask, priority: e.target.value as Priority })
                   }
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none cursor-pointer"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none cursor-pointer"
                 >
                   <option>Critical</option>
                   <option>High</option>
@@ -854,7 +854,7 @@ export default function TasksPage() {
               {/* DATE AND TIME */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-[#123c5b]">
+                  <label className="text-sm font-semibold text-[#123c5b]">
                     Schedule date
                   </label>
                   <input
@@ -862,26 +862,26 @@ export default function TasksPage() {
                     value={newTask.date}
                     onChange={(e) => setNewTask({ ...newTask, date: e.target.value })}
                     min={new Date().toISOString().split("T")[0]}
-                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2 text-xs outline-none"
+                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2 text-sm sm:text-[15px] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-semibold text-[#123c5b]">
+                  <label className="text-sm font-semibold text-[#123c5b]">
                     Schedule time
                   </label>
                   <input
                     type="time"
                     value={newTask.time}
                     onChange={(e) => setNewTask({ ...newTask, time: e.target.value })}
-                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2 text-xs outline-none"
+                    className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2 text-sm sm:text-[15px] outline-none"
                   />
                 </div>
               </div>
 
               {/* VOLUNTEERS */}
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b]">
+                <label className="text-sm font-semibold text-[#123c5b]">
                   Required volunteers
                 </label>
                 <input
@@ -891,7 +891,7 @@ export default function TasksPage() {
                   required
                   value={newTask.volunteers}
                   onChange={(e) => setNewTask({ ...newTask, volunteers: e.target.value })}
-                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-xs outline-none"
+                  className="w-full mt-1.5 border border-[#d5e3e9] rounded-lg p-2.5 text-sm sm:text-[15px] outline-none"
                 />
               </div>
 
@@ -901,14 +901,14 @@ export default function TasksPage() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => setShowCreateModal(false)}
-                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-xs hover:bg-[#f0f7fa]"
+                  className="border border-[#d5e3e9] rounded-lg px-4 py-2 text-sm hover:bg-[#f0f7fa]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50"
+                  className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {isSubmitting && <Loader2 size={13} className="animate-spin" />}
                   <span>{isSubmitting ? "Creating..." : "Create task"}</span>
@@ -927,18 +927,18 @@ export default function TasksPage() {
             <div className="p-5 border-b border-[#e1eaf0] flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
+                  <span className="text-xs font-bold text-[#17648e] bg-[#e8f1f6] px-2 py-0.5 rounded">
                     {selectedTask.id}
                   </span>
                   <span
-                    className={`px-2 py-0.5 rounded text-[9px] font-semibold ${getStatusStyle(
+                    className={`px-2 py-0.5 rounded text-xs font-semibold ${getStatusStyle(
                       selectedTask.status
                     )}`}
                   >
                     {selectedTask.status}
                   </span>
                 </div>
-                <h2 className="text-[16px] font-semibold text-[#123c5b] mt-1.5">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b] mt-1.5">
                   {selectedTask.title}
                 </h2>
               </div>
@@ -954,7 +954,7 @@ export default function TasksPage() {
             <div className="p-5 space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3 bg-[#f8fbfe] p-3 rounded-lg border border-[#e1eaf0]">
                 <div>
-                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <div className="text-[13px] text-gray-400 flex items-center gap-1">
                     <MapPin size={12} className="text-[#287fa9]" /> Location
                   </div>
                   <div className="font-semibold text-[#123c5b] mt-0.5">
@@ -963,7 +963,7 @@ export default function TasksPage() {
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <div className="text-[13px] text-gray-400 flex items-center gap-1">
                     <CalendarDays size={12} className="text-[#287fa9]" /> Schedule
                   </div>
                   <div className="font-semibold text-[#123c5b] mt-0.5">
@@ -972,11 +972,11 @@ export default function TasksPage() {
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <div className="text-[13px] text-gray-400 flex items-center gap-1">
                     <AlertTriangle size={12} className="text-[#287fa9]" /> Priority
                   </div>
                   <span
-                    className={`inline-flex px-2 py-0.5 rounded mt-1 text-[9px] font-semibold ${getPriorityStyle(
+                    className={`inline-flex px-2 py-0.5 rounded mt-1 text-xs font-semibold ${getPriorityStyle(
                       selectedTask.priority
                     )}`}
                   >
@@ -985,7 +985,7 @@ export default function TasksPage() {
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <div className="text-[13px] text-gray-400 flex items-center gap-1">
                     <Clock size={12} className="text-[#287fa9]" /> Volunteers
                   </div>
                   <div className="font-semibold text-[#123c5b] mt-0.5">
@@ -996,7 +996,7 @@ export default function TasksPage() {
 
               {/* SKILLS */}
               <div>
-                <label className="text-[11px] font-semibold text-[#123c5b] flex items-center gap-1 mb-1">
+                <label className="text-sm font-semibold text-[#123c5b] flex items-center gap-1 mb-1">
                   <Users size={13} className="text-[#287fa9]" /> Required Skills:
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -1004,26 +1004,26 @@ export default function TasksPage() {
                     selectedTask.skills.map((skill) => (
                       <span
                         key={skill}
-                        className="bg-[#e8f1f6] text-[#287fa9] px-2 py-0.5 rounded-full text-[10px] font-medium"
+                        className="bg-[#e8f1f6] text-[#287fa9] px-2 py-0.5 rounded-full text-xs font-medium"
                       >
                         {skill}
                       </span>
                     ))
                   ) : (
-                    <span className="text-gray-400 text-[10px]">General Support</span>
+                    <span className="text-gray-400 text-[13px]">General Support</span>
                   )}
                 </div>
               </div>
 
               {/* VOLUNTEER ASSIGNMENT ADJUSTMENT */}
               <div className="pt-2 border-t border-[#e1eaf0]">
-                <label className="text-[11px] font-semibold text-[#123c5b] block mb-2">
+                <label className="text-sm font-semibold text-[#123c5b] block mb-2">
                   Volunteer Capacity & Allocation:
                 </label>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleAdjustVolunteers(selectedTask.id, 1)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#e8f5ec] text-[#239879] hover:bg-[#d8eedf] rounded-lg text-[10px] font-semibold transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#e8f5ec] text-[#239879] hover:bg-[#d8eedf] rounded-lg text-sm font-semibold transition-colors"
                   >
                     <UserPlus size={13} />
                     <span>+1 Assigned</span>
@@ -1031,7 +1031,7 @@ export default function TasksPage() {
 
                   <button
                     onClick={() => handleAdjustVolunteers(selectedTask.id, -1)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fdebec] text-[#dc3545] hover:bg-[#fbdade] rounded-lg text-[10px] font-semibold transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fdebec] text-[#dc3545] hover:bg-[#fbdade] rounded-lg text-sm font-semibold transition-colors"
                   >
                     <UserMinus size={13} />
                     <span>-1 Assigned</span>
@@ -1041,7 +1041,7 @@ export default function TasksPage() {
 
               {/* QUICK STATUS UPDATE */}
               <div className="pt-2 border-t border-[#e1eaf0]">
-                <label className="text-[11px] font-semibold text-[#123c5b] block mb-2">
+                <label className="text-sm font-semibold text-[#123c5b] block mb-2">
                   Change Task Status:
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -1052,7 +1052,7 @@ export default function TasksPage() {
                       key={st}
                       disabled={isUpdatingStatus || selectedTask.status === st}
                       onClick={() => handleStatusChange(selectedTask.id, st)}
-                      className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors ${
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                         selectedTask.status === st
                           ? "bg-[#287fa9] text-white"
                           : "border border-[#d5e2e9] bg-white text-[#123c5b] hover:bg-[#f0f7fa]"
@@ -1067,20 +1067,20 @@ export default function TasksPage() {
               {/* DELETE TASK CONFIRMATION */}
               {confirmDeleteId === selectedTask.id ? (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700">
-                  <p className="text-[11px] font-semibold">Delete this task permanently?</p>
-                  <p className="text-[10px] text-red-600 mt-0.5">
+                  <p className="text-sm font-semibold">Delete this task permanently?</p>
+                  <p className="text-sm text-red-600 mt-0.5">
                     This will remove {selectedTask.id} from active deployments.
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       onClick={() => handleDeleteTask(selectedTask.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded text-[10px] font-semibold hover:bg-red-700"
+                      className="px-3 py-1 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700"
                     >
                       Yes, delete
                     </button>
                     <button
                       onClick={() => setConfirmDeleteId(null)}
-                      className="px-3 py-1 bg-white border border-gray-300 rounded text-[10px] text-gray-700 hover:bg-gray-50"
+                      className="px-3 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700 hover:bg-gray-50"
                     >
                       Cancel
                     </button>
@@ -1093,7 +1093,7 @@ export default function TasksPage() {
             <div className="border-t border-[#e1eaf0] p-4 flex items-center justify-between bg-[#fafcfd]">
               <button
                 onClick={() => setConfirmDeleteId(selectedTask.id)}
-                className="text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
+                className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
               >
                 <Trash2 size={13} />
                 <span>Delete</span>
@@ -1101,7 +1101,7 @@ export default function TasksPage() {
 
               <button
                 onClick={() => setSelectedTask(null)}
-                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-4 py-2 text-xs font-semibold"
+                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-4 py-2 text-sm font-semibold"
               >
                 Done
               </button>

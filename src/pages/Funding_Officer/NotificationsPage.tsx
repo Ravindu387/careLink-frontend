@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -178,6 +179,27 @@ export default function NotificationsPage() {
 
   const [toast, setToast] = useState("");
 
+  useEffect(() => {
+    apiClient.get<any>("/notifications").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setNotifications(
+          items.map((n: any, idx: number) => ({
+            id: Number(n.id) || idx + 1,
+            title: n.title || "Notification",
+            description: n.description || n.message || "",
+            time: n.time || "Recently",
+            category: (n.category as NotificationCategory) || "Verification",
+            icon: (n.icon as NotificationItem["icon"]) || "check",
+            unread: n.unread !== undefined ? Boolean(n.unread) : !n.isRead,
+            reference: n.reference || `REF-${idx + 1}`,
+            details: n.details || n.description || "",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   const rowsPerPage = 6;
 
   const notify = (message: string) => {
@@ -285,7 +307,7 @@ export default function NotificationsPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-8">
+        <div className="flex items-center gap-2 text-xs mb-8">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={11} />
           <span className="text-slate-500">
@@ -302,11 +324,11 @@ export default function NotificationsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
 
           <div>
-            <h1 className="text-[24px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Notifications
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[13px] text-slate-500 mt-1">
               Review funding alerts, verification updates, approvals, and reporting deadlines.
             </p>
           </div>
@@ -315,14 +337,14 @@ export default function NotificationsPage() {
 
             <button
               onClick={markAllAsRead}
-              className="h-[37px] px-3 bg-white border border-[#b9cfda] rounded-lg text-[9px] hover:bg-[#f5fafc]"
+              className="h-[37px] px-3 bg-white border border-[#b9cfda] rounded-lg text-sm hover:bg-[#f5fafc]"
             >
               Mark all as read
             </button>
 
             <button
               onClick={() => setShowPreferences(true)}
-              className="h-[37px] px-4 bg-[#287ba5] text-white rounded-lg text-[9px] font-semibold hover:bg-[#1e6388]"
+              className="h-[37px] px-4 bg-[#287ba5] text-white rounded-lg text-sm font-semibold hover:bg-[#1e6388]"
             >
               Preferences
             </button>
@@ -341,7 +363,7 @@ export default function NotificationsPage() {
                 setActiveTab(tab.label);
                 setPage(1);
               }}
-              className={`h-[39px] flex items-center gap-1.5 text-[9px] whitespace-nowrap border-b-2 transition-colors ${
+              className={`h-[39px] flex items-center gap-1.5 text-sm whitespace-nowrap border-b-2 transition-colors ${
                 activeTab === tab.label
                   ? "border-[#23749e] text-[#23749e] font-semibold"
                   : "border-transparent text-slate-500 hover:text-[#23749e]"
@@ -350,7 +372,7 @@ export default function NotificationsPage() {
               {tab.label}
 
               {tab.count !== undefined && (
-                <span className="bg-[#e8f1f6] text-[#23749e] rounded-full px-1.5 py-0.5 text-[8px]">
+                <span className="bg-[#e8f1f6] text-[#23749e] rounded-full px-1.5 py-0.5 text-xs">
                   {tab.label === "Unread"
                     ? unreadCount
                     : tab.count}
@@ -392,15 +414,15 @@ export default function NotificationsPage() {
 
                 <div className="flex-1 min-w-0">
 
-                  <p className="text-[9px] font-semibold text-[#123e60]">
+                  <p className="text-xs font-semibold text-[#123e60]">
                     {notification.title}
                   </p>
 
-                  <p className="text-[8px] text-slate-500 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     {notification.description}
                   </p>
 
-                  <p className="text-[8px] text-slate-400 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     {notification.time}
                   </p>
 
@@ -435,7 +457,7 @@ export default function NotificationsPage() {
                 No notifications found
               </p>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 There are no notifications matching your selection.
               </p>
 
@@ -446,7 +468,7 @@ export default function NotificationsPage() {
 
           <div className="px-3.5 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing{" "}
               {filteredNotifications.length === 0
                 ? 0
@@ -464,7 +486,7 @@ export default function NotificationsPage() {
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="h-[29px] px-3 border border-[#d5e3e9] rounded-lg text-[9px] disabled:opacity-40"
+                className="h-[29px] px-3 border border-[#d5e3e9] rounded-lg text-sm disabled:opacity-40"
               >
                 Previous
               </button>
@@ -476,7 +498,7 @@ export default function NotificationsPage() {
                 <button
                   key={number}
                   onClick={() => setPage(number)}
-                  className={`w-[28px] h-[29px] rounded-lg text-[9px] border ${
+                  className={`w-[28px] h-[29px] rounded-lg text-sm border ${
                     page === number
                       ? "bg-[#287ba5] text-white border-[#287ba5]"
                       : "bg-white border-[#d5e3e9]"
@@ -489,7 +511,7 @@ export default function NotificationsPage() {
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="h-[29px] px-3 border border-[#d5e3e9] rounded-lg text-[9px] disabled:opacity-40"
+                className="h-[29px] px-3 border border-[#d5e3e9] rounded-lg text-sm disabled:opacity-40"
               >
                 Next
               </button>
@@ -510,25 +532,25 @@ export default function NotificationsPage() {
             <Bell size={19} className="text-[#23749e]" />
           </div>
 
-          <p className="text-[8px] font-semibold text-[#23749e]">
+          <p className="text-xs font-semibold text-[#23749e]">
             {selectedNotification.category}
           </p>
 
-          <h2 className="text-[16px] font-semibold mt-1">
+          <h2 className="text-lg sm:text-xl font-semibold mt-1">
             {selectedNotification.title}
           </h2>
 
-          <p className="text-[9px] text-slate-400 mt-2">
+          <p className="text-xs text-slate-400 mt-2">
             {selectedNotification.time}
           </p>
 
           <div className="bg-[#f5f9fa] rounded-lg p-4 mt-5">
 
-            <p className="text-[9px] font-semibold mb-2">
+            <p className="text-xs font-semibold mb-2">
               Notification details
             </p>
 
-            <p className="text-[9px] text-slate-500 leading-relaxed">
+            <p className="text-sm text-slate-500 leading-relaxed">
               {selectedNotification.details}
             </p>
 
@@ -536,11 +558,11 @@ export default function NotificationsPage() {
 
           <div className="mt-4 flex justify-between items-center">
 
-            <span className="text-[9px] text-slate-400">
+            <span className="text-xs text-slate-400">
               Reference: {selectedNotification.reference}
             </span>
 
-            <span className="text-[8px] text-[#078c70] flex items-center gap-1">
+            <span className="text-xs text-[#078c70] flex items-center gap-1">
               <CheckCircle2 size={12} />
               Read
             </span>
@@ -549,7 +571,7 @@ export default function NotificationsPage() {
 
           <button
             onClick={() => setSelectedNotification(null)}
-            className="w-full mt-6 h-10 bg-[#287ba5] text-white rounded-lg text-[10px] font-semibold"
+            className="w-full mt-6 h-10 bg-[#287ba5] text-white rounded-lg text-sm font-semibold"
           >
             Close
           </button>
@@ -566,11 +588,11 @@ export default function NotificationsPage() {
             <Settings size={20} className="text-[#23749e]" />
           </div>
 
-          <h2 className="text-[16px] font-semibold">
+          <h2 className="text-lg sm:text-xl font-semibold">
             Notification preferences
           </h2>
 
-          <p className="text-[9px] text-slate-400 mt-1 mb-5">
+          <p className="text-xs text-slate-400 mt-1 mb-5">
             Manage how you receive funding and donation updates.
           </p>
 
@@ -677,7 +699,7 @@ export default function NotificationsPage() {
               setShowPreferences(false);
               notify("Notification preferences saved.");
             }}
-            className="w-full mt-6 h-10 bg-[#287ba5] text-white rounded-lg text-[10px] font-semibold"
+            className="w-full mt-6 h-10 bg-[#287ba5] text-white rounded-lg text-sm font-semibold"
           >
             Save preferences
           </button>
@@ -688,7 +710,7 @@ export default function NotificationsPage() {
       {/* TOAST */}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[100] bg-[#143d5c] text-white rounded-lg px-4 py-3 shadow-xl flex items-center gap-3 text-[10px]">
+        <div className="fixed bottom-5 right-5 z-[100] bg-[#143d5c] text-white rounded-lg px-4 py-3 shadow-xl flex items-center gap-3 text-sm">
           <CheckCircle2 size={15} />
           {toast}
 
@@ -749,7 +771,7 @@ function PreferenceSection({
 }) {
   return (
     <div>
-      <h3 className="text-[10px] font-semibold mb-3">
+      <h3 className="text-base font-semibold mb-3">
         {title}
       </h3>
 
@@ -779,11 +801,11 @@ function PreferenceToggle({
     <div className="flex items-center justify-between gap-3">
 
       <div>
-        <p className="text-[9px] font-medium">
+        <p className="text-xs font-medium">
           {label}
         </p>
 
-        <p className="text-[8px] text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-400 mt-0.5">
           {description}
         </p>
       </div>

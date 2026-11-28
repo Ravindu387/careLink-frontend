@@ -1,8 +1,19 @@
-export type UserStatus = "Active" | "Pending" | "Disabled";
-export type Verification = "Verified" | "Pending Approval" | "Email Verified";
+export type UserStatus =
+  | "Active"
+  | "PendingPasswordSetup"
+  | "PendingApproval"
+  | "Rejected"
+  | "Disabled";
+
+export type Verification =
+  | "Verified"
+  | "Pending Approval"
+  | "Rejected"
+  | "Setup Pending";
 
 export interface UserDetails {
   id: string;
+  userName?: string;
   fullName: string;
   email: string;
   phoneNumber?: string | null;
@@ -13,7 +24,21 @@ export interface UserDetails {
   role: string;
   organizationId?: string | null;
   organizationName?: string | null;
+  organizationType?: string | null;
+  registrationNumber?: string | null;
   isActive: boolean;
+  accountStatus?: UserStatus | string;
+  rejectionReason?: string | null;
+  approvedAt?: string | null;
+  approvedBy?: string | null;
+  skills?: string | null;
+  availability?: string | null;
+  preferredLocation?: string | null;
+  requiresPasswordSetup?: boolean;
+  emailSent?: boolean;
+  emailDeliveryStatus?: string | null;
+  emailFailureCategory?: string | null;
+  emailFailureDetail?: string | null;
   emailConfirmed: boolean;
   createdAt: string;
   lastLoginAt?: string | null;
@@ -24,6 +49,8 @@ export interface UserStats {
   totalUsers: number;
   activeUsers: number;
   pendingUsers: number;
+  pendingSetupUsers?: number;
+  rejectedUsers?: number;
   disabledUsers: number;
   privilegedUsers: number;
 }
@@ -47,6 +74,10 @@ export interface CreateUserRequest {
   address?: string;
   role: string;
   organizationId?: string;
+  organizationName?: string;
+  skills?: string;
+  availability?: string;
+  preferredLocation?: string;
   isActive?: boolean;
 }
 
@@ -57,7 +88,12 @@ export interface UpdateUserRequest {
   address?: string;
   role?: string;
   organizationId?: string;
+  organizationName?: string;
   isActive?: boolean;
+  accountStatus?: string;
+  skills?: string;
+  availability?: string;
+  preferredLocation?: string;
 }
 
 export interface UserListQuery {

@@ -1,4 +1,3 @@
-
 import {
   Heart,
   LayoutDashboard,
@@ -12,6 +11,8 @@ import {
   Settings,
   Globe,
   ChevronRight,
+  ChevronDown,
+  ChevronLeft,
   X,
   Check,
   ChartNoAxesCombined,
@@ -31,6 +32,8 @@ import { aiRecommendationService } from "../../services/aiRecommendationService"
 import { verificationService } from "../../services/verificationService";
 import { securityEventService } from "../../services/securityEventService";
 import { notificationService } from "../../services/notificationService";
+import { SIDEBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
+import { CareLinkLogo } from "../../components/common/CareLinkLogo";
 
 const groups = [
   {
@@ -147,6 +150,12 @@ export default function AdminSidebar({ open, onClose }: Props) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const [collapsed, setCollapsed] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
+    ADMINISTRATION: true,
+    "OPERATIONS & LOGISTICS": true,
+  });
+
   const [aiReviewCount, setAiReviewCount] = useState<number>(8);
   const [verificationCount, setVerificationCount] = useState<number>(14);
   const [securityCount, setSecurityCount] = useState<number>(3);
@@ -156,12 +165,13 @@ export default function AdminSidebar({ open, onClose }: Props) {
     let isCancelled = false;
     const fetchBadges = async () => {
       try {
-        const [aiMetrics, verStats, secStats, notifStats] = await Promise.allSettled([
-          aiRecommendationService.getMetrics(),
-          verificationService.getStats(),
-          securityEventService.getStats(),
-          notificationService.getStats(),
-        ]);
+        const [aiMetrics, verStats, secStats, notifStats] =
+          await Promise.allSettled([
+            aiRecommendationService.getMetrics(),
+            verificationService.getStats(),
+            securityEventService.getStats(),
+            notificationService.getStats(),
+          ]);
 
         if (isCancelled) return;
 
@@ -190,70 +200,81 @@ export default function AdminSidebar({ open, onClose }: Props) {
     };
   }, []);
 
-  const getBadgeValue = (path: string, defaultBadge?: number): number | undefined => {
-    if (path === "/admin/ai-review" || path === "/admin/ai-recommendations") return aiReviewCount;
+  const getBadgeValue = (
+    path: string,
+    defaultBadge?: number
+  ): number | undefined => {
+    if (path === "/admin/ai-review" || path === "/admin/ai-recommendations")
+      return aiReviewCount;
     if (path === "/admin/verification") return verificationCount;
     if (path === "/admin/security-events") return securityCount;
     if (path === "/admin/notifications") return notificationCount;
     return defaultBadge;
   };
 
-  const handleSignOut = () => {
-    logout();
-    navigate("/login");
+  const toggleGroup = (title: string) => {
+    setExpandedGroups((prev) => ({ ...prev, [title]: !(prev[title] ?? true) }));
   };
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
+  const handleSignOut = () => {
+    logout();
+    navigate("/login", { replace: true });
   };
+
+  const displayName = user?.fullName || "System Administrator";
 
   return (
     <>
-      {/* MOBILE OVERLAY */}
       {open && (
         <button
           aria-label="Close sidebar"
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          className={SIDEBAR_THEME.overlay}
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[250px] flex-col overflow-hidden bg-[#153E5D] text-white transition-transform duration-300 lg:static lg:h-full lg:shrink-0 lg:translate-x-0 ${
+        className={`${SIDEBAR_THEME.asideBase} ${
+          collapsed ? SIDEBAR_THEME.widthCollapsed : SIDEBAR_THEME.widthExpanded
+        } lg:static lg:h-screen lg:shrink-0 lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* LOGO */}
-        <div className="flex h-[73px] shrink-0 items-center gap-3 border-b border-white/10 px-4">
+        {/* BRAND HEADER */}
+        <div className={SIDEBAR_THEME.header}>
           <NavLink
             to="/admin/dashboard"
             onClick={onClose}
-            className="flex items-center gap-3 transition hover:opacity-90"
+            className="flex min-w-0 items-center gap-3 transition hover:opacity-90"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#63BDA6] text-[#123B5C]">
-              <Heart size={22} />
-            </div>
+            <CareLinkLogo size={collapsed ? "compact" : "sidebar"} />
 
-            <div>
-              <h2 className="text-sm font-bold leading-5">
-                Humanitarian Aid Platform
-              </h2>
-
-              <p className="mt-1 text-[10px] text-slate-300">
-                Secure response network
-              </p>
-            </div>
+            {!collapsed && (
+              <div className="min-w-0">
+                <h2 className={SIDEBAR_THEME.brandTitle}>
+                  CareLink
+                </h2>
+                <p className={SIDEBAR_THEME.brandSubtitle}>
+                  Connecting Help. Saving Lives.
+                </p>
+              </div>
+            )}
           </NavLink>
 
           <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            className={SIDEBAR_THEME.collapseBtn}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          </button>
+
+          <button
+            type="button"
             onClick={onClose}
-            className="ml-auto lg:hidden"
+            className={SIDEBAR_THEME.mobileCloseBtn}
             aria-label="Close sidebar"
           >
             <X size={18} />
@@ -261,137 +282,154 @@ export default function AdminSidebar({ open, onClose }: Props) {
         </div>
 
         {/* ACTIVE RESPONSE */}
-        <div className="shrink-0 px-3 pt-3">
-          <NavLink
-            to="/admin/crises"
-            onClick={onClose}
-            className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.07] px-3 py-3 transition hover:bg-white/15"
-          >
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-red-400" />
-
-              <div>
-                <p className="text-[9px] font-bold text-red-300">
-                  ACTIVE RESPONSE
-                </p>
-
-                <p className="mt-1 text-[11px] font-semibold">
-                  Monsoon Floods 2025
+        {!collapsed && (
+          <div className={SIDEBAR_THEME.statusCardWrapper}>
+            <NavLink
+              to="/admin/crises"
+              onClick={onClose}
+              className={`flex items-center justify-between ${SIDEBAR_THEME.statusCard}`}
+            >
+              <div className="min-w-0">
+                <div className={SIDEBAR_THEME.statusIndicatorRow}>
+                  <div className="flex items-center gap-2">
+                    <span className={SIDEBAR_THEME.statusDot} />
+                    <span className={SIDEBAR_THEME.statusLabel}>
+                      ACTIVE RESPONSE
+                    </span>
+                  </div>
+                </div>
+                <p className={SIDEBAR_THEME.statusTitle}>Monsoon Floods 2025</p>
+                <p className={SIDEBAR_THEME.statusSubtitle}>
+                  Greater Riverton · Level 4
                 </p>
               </div>
-            </div>
-
-            <ChevronRight size={15} />
-          </NavLink>
-        </div>
+              <ChevronRight size={15} className="shrink-0 text-[#A9C8DD]" />
+            </NavLink>
+          </div>
+        )}
 
         {/* NAVIGATION */}
-        <div 
-          className="flex-1 overflow-y-auto px-2 py-4 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
+        <nav className={SIDEBAR_THEME.navScroll}>
+          {groups.map((group) => {
+            const isGroupExpanded = expandedGroups[group.title] ?? true;
 
-          {groups.map((group) => (
-            <div key={group.title} className="mb-4">
+            return (
+              <div key={group.title} className="mb-4 last:mb-0">
+                {!collapsed && (
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(group.title)}
+                    className={SIDEBAR_THEME.sectionHeadingBtn}
+                  >
+                    <span>{group.title}</span>
+                    <ChevronDown
+                      size={12}
+                      className={`transition-transform ${
+                        isGroupExpanded ? "rotate-0" : "-rotate-90"
+                      }`}
+                    />
+                  </button>
+                )}
 
-              <h3 className="mb-3 px-3 text-[9px] font-bold tracking-widest text-[#8BAFC5]">
-                {group.title}
-              </h3>
+                {(isGroupExpanded || collapsed) && (
+                  <div className={SIDEBAR_THEME.menuList}>
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      const badgeVal = getBadgeValue(item.path, item.badge);
 
-              <div className="space-y-1">
-
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-
-                  return (
-                    <NavLink
-                      key={item.path}
-                      to={item.path}
-                      end
-                      onClick={onClose}
-                      className={({ isActive }) =>
-                        `relative flex min-h-[49px] items-center gap-3 rounded-[9px] px-3 text-[11px] transition-all duration-200 ${
-                          isActive
-                            ? "bg-[#287FA8] font-semibold text-white shadow-sm before:absolute before:bottom-2 before:left-0 before:top-2 before:w-[3px] before:rounded-r-full before:bg-[#63BDA6]"
-                            : "font-medium text-slate-200 hover:bg-white/10 hover:text-white"
-                        }`
-                      }
-                    >
-                      {({ isActive }) => (
-                        <>
-                          <Icon
-                            size={18}
-                            strokeWidth={1.9}
-                            className={
+                      return (
+                        <NavLink
+                          key={item.path}
+                          to={item.path}
+                          end
+                          onClick={onClose}
+                          title={collapsed ? item.name : undefined}
+                          className={({ isActive }) =>
+                            `${SIDEBAR_THEME.menuItemBase} ${
                               isActive
-                                ? "shrink-0 text-white"
-                                : "shrink-0 text-[#B8D0DF]"
-                            }
-                          />
+                                ? SIDEBAR_THEME.menuItemActive
+                                : SIDEBAR_THEME.menuItemInactive
+                            } ${collapsed ? "justify-center px-0" : ""}`
+                          }
+                        >
+                          {({ isActive }) => (
+                            <>
+                              <div className="flex min-w-0 items-center gap-3">
+                                <Icon
+                                  size={17}
+                                  strokeWidth={1.8}
+                                  className={
+                                    isActive
+                                      ? SIDEBAR_THEME.iconActive
+                                      : SIDEBAR_THEME.iconInactive
+                                  }
+                                />
+                                {!collapsed && (
+                                  <span className="truncate">{item.name}</span>
+                                )}
+                              </div>
 
-                          <span className="flex-1 truncate">
-                            {item.name}
-                          </span>
-
-                          {(() => {
-                            const badgeVal = getBadgeValue(item.path, item.badge);
-                            return badgeVal !== undefined && badgeVal > 0 ? (
-                              <span className="flex h-[19px] min-w-[23px] items-center justify-center rounded-full bg-[#E64D5A] px-1.5 text-[9px] font-bold text-white">
-                                {badgeVal > 99 ? "99+" : badgeVal}
-                              </span>
-                            ) : null;
-                          })()}
-
-                        </>
-                      )}
-                    </NavLink>
-                  );
-                })}
-
+                              {!collapsed &&
+                                badgeVal !== undefined &&
+                                badgeVal > 0 && (
+                                  <span className={SIDEBAR_THEME.badge}>
+                                    {badgeVal > 99 ? "99+" : badgeVal}
+                                  </span>
+                                )}
+                            </>
+                          )}
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
-        </div>
+            );
+          })}
+        </nav>
 
-        {/* USER PROFILE */}
-        <div className="shrink-0 border-t border-white/10 px-4 py-4">
+        {/* USER PROFILE FOOTER */}
+        <div className={SIDEBAR_THEME.footer}>
+          {!collapsed && (
+            <NavLink
+              to="/"
+              onClick={onClose}
+              className="mb-2.5 flex items-center gap-2 rounded-lg px-2 py-1 text-xs font-semibold text-[#D1E1EC] transition hover:bg-white/10 hover:text-white"
+            >
+              <Globe size={15} />
+              <span>Citizen portal</span>
+            </NavLink>
+          )}
 
-          <NavLink
-            to="/"
-            onClick={onClose}
-            className="mb-4 flex items-center gap-2 text-[11px] font-semibold text-slate-200 transition hover:text-white"
+          <div
+            className={`${SIDEBAR_THEME.profileRow} ${
+              collapsed ? "justify-center" : ""
+            }`}
           >
-            <Globe size={15} />
-            Citizen portal
-          </NavLink>
-
-          <div className="mb-3 flex items-center gap-2">
-
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2785B2] text-[10px] font-bold">
-              {getInitials(user?.fullName)}
+            <div className={SIDEBAR_THEME.avatar}>
+              {getUserInitials(displayName, "SA")}
             </div>
 
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[10px] font-semibold">
-                {user?.fullName || "Authenticated User"}
-              </p>
-
-              <p className="truncate text-[9px] text-slate-300">
-                {user?.roles?.[0] || "Authorized Officer"}
-              </p>
-            </div>
-
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className={SIDEBAR_THEME.userName}>{displayName}</p>
+                <p className={SIDEBAR_THEME.userRole}>
+                  {user?.roles?.[0] || "System Administrator"}
+                </p>
+              </div>
+            )}
           </div>
 
           <button
+            type="button"
             onClick={handleSignOut}
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-white/5 py-1.5 text-[10px] font-medium text-red-200 transition hover:bg-red-500/20 hover:text-red-100"
+            title="Sign out"
+            className={SIDEBAR_THEME.signOutBtn}
           >
-            <LogOut size={13} />
-            Sign out
+            <LogOut size={14} />
+            {!collapsed && <span>Sign out</span>}
           </button>
         </div>
-
       </aside>
     </>
   );

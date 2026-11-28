@@ -1,237 +1,221 @@
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Globe,
   HelpCircle,
   Bell,
-  ChevronRight,
   ChevronDown,
   User,
   Settings,
   LogOut,
+  Menu,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { TOPBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
 
-export default function CaseManagerTopbar() {
+interface CaseManagerTopbarProps {
+  onMenuClick?: () => void;
+}
+
+export default function CaseManagerTopbar({
+  onMenuClick,
+}: CaseManagerTopbarProps) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-
   const [showNotifications, setShowNotifications] = useState(false);
-
   const [showProfile, setShowProfile] = useState(false);
 
+  const displayName = user?.fullName || "Amina M.";
+  const displayEmail = user?.email || "casemanager@carelink.org";
+  const initials = getUserInitials(displayName, "AM");
+
   return (
+    <header className={TOPBAR_THEME.header}>
+      {/* LEFT SECTION - MOBILE MENU & SEARCH BAR */}
+      <div className={TOPBAR_THEME.leftSection}>
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className={TOPBAR_THEME.mobileMenuBtn}
+          aria-label="Open navigation"
+        >
+          <Menu size={19} />
+        </button>
 
-    <header className="sticky top-0 z-30 flex h-[75px] w-full items-center justify-between gap-4 border-b border-[#d5e3e9] bg-white px-5 md:px-7">
+        <div className={TOPBAR_THEME.searchContainer}>
+          <Search size={16} className="shrink-0 text-[#8296AA]" />
 
-      {/* SEARCH BAR */}
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search case ID, applicant, location..."
+            className={TOPBAR_THEME.searchInput}
+          />
 
-      <div className="flex h-[43px] w-full max-w-[485px] items-center gap-3 rounded-lg border border-[#d5e3e9] bg-[#f8fafb] px-3">
-
-        <Search
-          size={17}
-          className="shrink-0 text-[#8296aa]"
-        />
-
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search case ID, applicant, location..."
-          className="w-full bg-transparent text-[12px] text-[#123c5b] outline-none placeholder:text-[#a0b1c0]"
-        />
-
-        <div className="flex h-[30px] w-[29px] shrink-0 items-center justify-center rounded-md border border-[#d5e3e9] text-[10px] text-[#8296aa]">
-          ⌘
+          <span className={TOPBAR_THEME.searchShortcut}>⌘ K</span>
         </div>
-
       </div>
 
       {/* RIGHT NAVIGATION */}
-
-      <div className="hidden items-center gap-3 md:flex">
-
-    
-
-        <button className="flex items-center gap-3 border-r border-[#d5e3e9] pr-4">
-
-          <div className="text-right">
-
-            <p className="text-[9px] font-medium uppercase tracking-wide text-[#8296aa]">
-              OPERATIONAL AREA
-            </p>
-
-            <p className="mt-0.5 text-[11px] font-bold text-[#123c5b]">
-              Greater Riverton
-            </p>
-
+      <div className={TOPBAR_THEME.rightSection}>
+        <div className={TOPBAR_THEME.contextBlock}>
+          <div>
+            <p className={TOPBAR_THEME.contextLabel}>OPERATIONAL AREA</p>
+            <p className={TOPBAR_THEME.contextValue}>Greater Riverton</p>
           </div>
-
-          <ChevronRight size={14} className="text-[#8296aa]" />
-
-        </button>
+        </div>
 
         {/* LANGUAGE */}
-
-        <button className="flex h-[41px] items-center gap-2 rounded-lg border border-[#d5e3e9] px-3 text-[11px] text-[#45647d] hover:bg-[#f5f9fb]">
-
-          <Globe size={17} />
-
-          EN
-
+        <button type="button" className={TOPBAR_THEME.actionBtn}>
+          <Globe size={15} />
+          <span>EN</span>
         </button>
 
         {/* HELP */}
-
         <button
-          className="flex h-[41px] w-[41px] items-center justify-center rounded-lg border border-[#d5e3e9] text-[#45647d] hover:bg-[#f5f9fb]"
+          type="button"
+          className={`hidden sm:flex ${TOPBAR_THEME.iconBtn}`}
           title="Help"
         >
-          <HelpCircle size={19} />
+          <HelpCircle size={17} />
         </button>
 
         {/* NOTIFICATIONS */}
-
         <div className="relative">
-
           <button
+            type="button"
             onClick={() => {
               setShowNotifications(!showNotifications);
               setShowProfile(false);
             }}
-            className="relative flex h-[41px] w-[41px] items-center justify-center rounded-lg border border-[#d5e3e9] text-[#45647d] hover:bg-[#f5f9fb]"
+            className={TOPBAR_THEME.iconBtn}
+            title="Notifications"
           >
-
-            <Bell size={19} />
-
-            <span className="absolute -right-1 -top-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[#e53945] px-1 text-[9px] font-bold text-white">
-              11
-            </span>
-
+            <Bell size={17} />
+            <span className={TOPBAR_THEME.notifBadge}>11</span>
           </button>
 
           {showNotifications && (
-
-            <div className="absolute right-0 top-12 z-50 w-[280px] rounded-xl border border-[#d5e3e9] bg-white p-4 shadow-xl">
-
-              <h3 className="text-[14px] font-semibold text-[#123c5b]">
+            <div className="absolute right-0 top-12 z-50 w-[280px] rounded-xl border border-[#D5E3E9] bg-white p-4 shadow-xl">
+              <h3 className="text-base font-bold text-[#153E5D]">
                 Notifications
               </h3>
 
-              <div className="mt-4 space-y-3">
-
-                <div className="border-b border-[#edf1f3] pb-3">
-
-                  <p className="text-[12px] font-medium">
+              <div className="mt-3 space-y-3">
+                <div className="border-b border-slate-100 pb-2.5">
+                  <p className="text-sm font-semibold text-[#153E5D]">
                     New assistance request
                   </p>
-
-                  <p className="mt-1 text-[10px] text-[#8296aa]">
+                  <p className="mt-0.5 text-[13px] text-[#8296AA]">
                     A new case requires verification.
                   </p>
-
                 </div>
 
-                <div className="border-b border-[#edf1f3] pb-3">
-
-                  <p className="text-[12px] font-medium">
+                <div className="border-b border-slate-100 pb-2.5">
+                  <p className="text-sm font-semibold text-[#153E5D]">
                     Critical case escalated
                   </p>
-
-                  <p className="mt-1 text-[10px] text-[#8296aa]">
+                  <p className="mt-0.5 text-[13px] text-[#8296AA]">
                     A case needs immediate attention.
                   </p>
-
                 </div>
-
               </div>
 
               <button
-                onClick={() => setShowNotifications(false)}
-                className="mt-3 w-full text-center text-[11px] text-[#287fa9]"
+                type="button"
+                onClick={() => {
+                  setShowNotifications(false);
+                  navigate("/case-manager/notifications");
+                }}
+                className="mt-3 w-full text-center text-sm font-semibold text-[#287DA6] hover:underline"
               >
-                Close
+                View all notifications
               </button>
-
             </div>
-
           )}
-
         </div>
 
         {/* USER PROFILE */}
-
-        <div className="relative border-l border-[#d5e3e9] pl-3">
-
+        <div className={TOPBAR_THEME.profileDivider}>
           <button
+            type="button"
             onClick={() => {
               setShowProfile(!showProfile);
               setShowNotifications(false);
             }}
-            className="flex items-center gap-2.5"
+            className={TOPBAR_THEME.profileTrigger}
           >
+            <div className={TOPBAR_THEME.avatar}>{initials}</div>
 
-            <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#287fa9] text-[12px] font-bold text-white">
-              AM
-            </div>
-
-            <div className="text-left">
-
-              <p className="text-[11px] font-semibold text-[#123c5b]">
-                Amina M.
-              </p>
-
-              <p className="text-[9px] text-[#8296aa]">
-                Case Manager
-              </p>
-
+            <div className="hidden sm:block">
+              <p className={TOPBAR_THEME.userName}>{displayName}</p>
+              <p className={TOPBAR_THEME.userRole}>Case Manager</p>
             </div>
 
             <ChevronDown
               size={14}
-              className="text-[#8296aa]"
+              className="hidden text-[#8296AA] sm:block"
             />
-
           </button>
 
           {showProfile && (
+            <div className={TOPBAR_THEME.dropdownMenu}>
+              <div className={TOPBAR_THEME.dropdownHeader}>
+                <p className="truncate text-sm font-bold text-[#153E5D]">
+                  {displayName}
+                </p>
+                <p className="truncate text-[13px] text-[#8296AA]">
+                  {displayEmail}
+                </p>
+              </div>
 
-            <div className="absolute right-0 top-12 z-50 w-[190px] rounded-xl border border-[#d5e3e9] bg-white p-2 shadow-xl">
+              <div className="py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProfile(false);
+                    navigate("/case-manager/settings");
+                  }}
+                  className={TOPBAR_THEME.dropdownItem}
+                >
+                  <User size={15} />
+                  <span>My Profile</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProfile(false);
+                    navigate("/case-manager/settings");
+                  }}
+                  className={TOPBAR_THEME.dropdownItem}
+                >
+                  <Settings size={15} />
+                  <span>Account Settings</span>
+                </button>
+              </div>
+
+              <div className="my-1 border-t border-slate-100" />
 
               <button
-                onClick={() => setShowProfile(false)}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[12px] hover:bg-[#f1f6f8]"
-              >
-                <User size={15} />
-                My Profile
-              </button>
-
-              <button
-                onClick={() => setShowProfile(false)}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[12px] hover:bg-[#f1f6f8]"
-              >
-                <Settings size={15} />
-                Account Settings
-              </button>
-
-              <div className="my-1 border-t border-[#e5edf1]" />
-
-              <button
-                onClick={() => setShowProfile(false)}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[12px] text-red-500 hover:bg-red-50"
+                type="button"
+                onClick={() => {
+                  setShowProfile(false);
+                  logout();
+                  navigate("/login", { replace: true });
+                }}
+                className={TOPBAR_THEME.dropdownSignOut}
               >
                 <LogOut size={15} />
-                Sign Out
+                <span>Sign Out</span>
               </button>
-
             </div>
-
           )}
-
         </div>
-
       </div>
-
     </header>
-
   );
 }

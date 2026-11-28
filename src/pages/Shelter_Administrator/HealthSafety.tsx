@@ -1,6 +1,7 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -154,6 +155,28 @@ export default function HealthSafetyPage() {
     useState<Incident | null>(null);
 
   const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    apiClient.get<any>("/health-safety").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setIncidents(
+          items.map((item: any) => ({
+            id: item.id || item.incidentCode || "HI-200",
+            type: item.type || "Medical assistance",
+            location: item.location || "Shelter",
+            reportedBy: item.reportedBy || "Staff",
+            date: item.date || "Today",
+            time: item.time || "12:00",
+            severity: (item.severity as Severity) || "Medium",
+            assignedStaff: item.assignedStaff || "Nurse M. Rao",
+            status: (item.status as IncidentStatus) || "Action Required",
+            description: item.description || "",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
 
   const [newIncident, setNewIncident] = useState({
     type: "Medical assistance",
@@ -322,7 +345,7 @@ export default function HealthSafetyPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="text-slate-400">
@@ -337,18 +360,18 @@ export default function HealthSafetyPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
 
           <div>
-            <h1 className="text-[23px] md:text-[25px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Health & Safety
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-2">
+            <p className="text-[13px] text-slate-500 mt-2">
               Monitor health incidents, safety inspections, sanitation, and evacuation readiness.
             </p>
           </div>
 
           <button
             onClick={() => setShowRegisterModal(true)}
-            className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
+            className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
           >
             <Plus size={14} />
             Register incident
@@ -402,7 +425,7 @@ export default function HealthSafetyPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search health incidents..."
-              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-[10px] outline-none focus:border-[#45b99b]"
+              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
             />
           </div>
 
@@ -438,7 +461,7 @@ export default function HealthSafetyPage() {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`h-9 px-3 bg-white border rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 whitespace-nowrap ${
+              className={`h-9 px-3 bg-white border rounded-lg text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap ${
                 showFilters
                   ? "border-[#2785b7] text-[#2785b7]"
                   : "border-[#aac4d2]"
@@ -456,13 +479,13 @@ export default function HealthSafetyPage() {
           <section className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3">
 
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold">
+              <h3 className="text-base font-semibold">
                 Advanced incident filters
               </h3>
 
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#267ca6] font-semibold"
+                className="text-sm text-[#267ca6] font-semibold"
               >
                 Clear filters
               </button>
@@ -500,16 +523,16 @@ export default function HealthSafetyPage() {
           <div className="px-3.5 py-3.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 
             <div>
-              <h2 className="text-xs font-semibold">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Health & safety incidents
               </h2>
 
-              <p className="text-[8px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Sensitive information restricted to authorised staff
               </p>
             </div>
 
-            <span className="px-2 py-1 rounded-md bg-[#eaf3f8] text-[#287da7] text-[8px] font-semibold w-fit">
+            <span className="px-2 py-1 rounded-md bg-[#eaf3f8] text-[#287da7] text-xs font-semibold w-fit">
               Authorised access
             </span>
           </div>
@@ -521,7 +544,7 @@ export default function HealthSafetyPage() {
             <table className="w-full min-w-[950px] text-left">
 
               <thead className="bg-[#f5f9fa] border-b border-slate-200">
-                <tr className="text-[8px] text-slate-500">
+                <tr className="text-sm text-slate-500">
 
                   <th className="px-3 py-3 font-medium">Incident ID</th>
                   <th className="px-3 py-3 font-medium">Incident Type</th>
@@ -540,7 +563,7 @@ export default function HealthSafetyPage() {
                   <tr
                     key={incident.id}
                     onClick={() => setSelectedIncident(incident)}
-                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
+                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-sm transition"
                   >
 
                     <td className="px-3 py-3.5 font-semibold whitespace-nowrap">
@@ -588,7 +611,7 @@ export default function HealthSafetyPage() {
                   <tr>
                     <td
                       colSpan={9}
-                      className="text-center py-12 text-xs text-slate-400"
+                      className="text-center py-12 text-sm text-slate-400"
                     >
                       No incidents found. Try changing your filters.
                     </td>
@@ -602,7 +625,7 @@ export default function HealthSafetyPage() {
 
           <div className="px-3.5 py-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing {filteredIncidents.length} records
             </p>
 
@@ -610,7 +633,7 @@ export default function HealthSafetyPage() {
 
               <button
                 disabled
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] opacity-40"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm opacity-40"
               >
                 Previous
               </button>
@@ -619,7 +642,7 @@ export default function HealthSafetyPage() {
                 <button
                   key={page}
                   disabled={page !== 1}
-                  className={`w-7 h-8 rounded-lg border text-[9px] ${
+                  className={`w-7 h-8 rounded-lg border text-sm ${
                     page === 1
                       ? "bg-[#1c638a] text-white border-[#1c638a]"
                       : "border-slate-200 opacity-40"
@@ -631,7 +654,7 @@ export default function HealthSafetyPage() {
 
               <button
                 disabled
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] opacity-40"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm opacity-40"
               >
                 Next
               </button>
@@ -740,7 +763,7 @@ export default function HealthSafetyPage() {
             />
 
             <div>
-              <label className="block text-xs font-medium mb-1.5">
+              <label className="block text-sm font-medium mb-1.5">
                 Incident description
               </label>
 
@@ -755,7 +778,7 @@ export default function HealthSafetyPage() {
                   })
                 }
                 placeholder="Describe the incident and any immediate action taken..."
-                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b] resize-none"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] resize-none"
               />
             </div>
 
@@ -832,18 +855,18 @@ export default function HealthSafetyPage() {
             </div>
 
             <div className="mt-7">
-              <h3 className="text-xs font-semibold mb-2">
+              <h3 className="text-base font-semibold mb-2">
                 Incident description
               </h3>
 
-              <p className="bg-[#f5f9fa] rounded-lg p-3 text-xs text-slate-600 leading-relaxed">
+              <p className="bg-[#f5f9fa] rounded-lg p-3 text-sm text-slate-600 leading-relaxed">
                 {selectedIncident.description}
               </p>
             </div>
 
             <div className="mt-7 space-y-4">
 
-              <h3 className="text-xs font-semibold">
+              <h3 className="text-base font-semibold">
                 Update incident
               </h3>
 
@@ -891,7 +914,7 @@ export default function HealthSafetyPage() {
 
               <button
                 onClick={() => setSelectedIncident(null)}
-                className="w-full bg-[#1c638a] text-white py-3 rounded-lg text-xs font-semibold hover:bg-[#144665]"
+                className="w-full bg-[#1c638a] text-white py-3 rounded-lg text-sm font-semibold hover:bg-[#144665]"
               >
                 Done
               </button>
@@ -907,7 +930,7 @@ export default function HealthSafetyPage() {
 
           <CheckCircle2 size={17} className="shrink-0" />
 
-          <p className="text-xs">{successMessage}</p>
+          <p className="text-sm">{successMessage}</p>
 
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
@@ -946,8 +969,8 @@ function SafetyCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[9px] font-semibold">{title}</p>
-        <p className="text-[8px] text-slate-400 mt-1">
+        <p className="text-xs font-semibold">{title}</p>
+        <p className="text-xs text-slate-400 mt-1">
           {description}
         </p>
       </div>
@@ -969,7 +992,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full xl:w-[120px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full xl:w-[120px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -997,7 +1020,7 @@ function SeverityBadge({
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[severity]}`}>
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-xs font-semibold ${styles[severity]}`}>
       {severity}
     </span>
   );
@@ -1015,7 +1038,7 @@ function IncidentStatusBadge({
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-xs font-semibold ${styles[status]}`}>
       {status}
     </span>
   );
@@ -1044,7 +1067,7 @@ function SummaryCard({
         {icon}
       </div>
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <p className="text-lg font-bold">{value}</p>
       </div>
     </div>
@@ -1066,7 +1089,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1076,7 +1099,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );
@@ -1095,14 +1118,14 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -1133,7 +1156,7 @@ function Modal({
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[13px] text-slate-400 mt-1">
               {subtitle}
             </p>
           </div>
@@ -1166,14 +1189,14 @@ function ModalActions({
       <button
         type="button"
         onClick={onCancel}
-        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50"
+        className="flex-1 border border-slate-200 rounded-lg py-3 text-sm font-semibold hover:bg-slate-50"
       >
         Cancel
       </button>
 
       <button
         type="submit"
-        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#144665]"
       >
         {submitLabel}
       </button>
@@ -1196,8 +1219,8 @@ function DetailRow({
       <div className="text-[#2785b7]">{icon}</div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-sm font-semibold mt-1 break-words">
           {value}
         </p>
       </div>

@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   VolunteerTaskItem,
   VolunteerTaskQuery,
@@ -527,7 +527,7 @@ export const volunteerTasksService = {
       if (query.skill) params.append("skill", query.skill);
       if (query.schedule) params.append("schedule", query.schedule);
 
-      const res = await fetch(`${API_BASE_URL}/volunteer/tasks/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer/tasks/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }

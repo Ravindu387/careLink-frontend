@@ -1,8 +1,20 @@
 /**
  * Settings Service
- * Connects the Emergency Coordinator and Partner Officer Settings pages
- * to the CareLink .NET backend API.
+ * Connects Admin, Resource Manager, Emergency Coordinator, and Partner Officer settings
+ * to the CareLink .NET backend API with robust fallbacks.
  */
+
+import { request, authFetch } from "./api";
+import type {
+  SystemSettings,
+  ResourceManagerSettings,
+  UpdateSettingsPayload,
+  ProfileSettings,
+  InventoryRulesSettings,
+  DispatchPreferencesSettings,
+  NotificationPreferencesSettings,
+  SecuritySettings,
+} from "../types/settings";
 
 export interface CoordinatorProfile {
   fullName: string;
@@ -124,7 +136,7 @@ export interface PartnerSettingsState {
   updatedAt?: string;
 }
 
-const DEFAULT_COORDINATOR_STATE: CoordinatorSettingsState = {
+export const DEFAULT_COORDINATOR_STATE: CoordinatorSettingsState = {
   profile: {
     fullName: "Amina Mensah",
     email: "amina@response.org",
@@ -176,19 +188,10 @@ const DEFAULT_COORDINATOR_STATE: CoordinatorSettingsState = {
       ipAddress: "172.56.21.8",
       current: false,
     },
-    {
-      id: "sess-003",
-      title: "Field HQ Terminal",
-      description: "Emergency command center workstation",
-      deviceType: "desktop",
-      time: "Last active 1 day ago",
-      ipAddress: "192.168.1.145",
-      current: false,
-    },
   ],
 };
 
-const DEFAULT_PARTNER_STATE: PartnerSettingsState = {
+export const DEFAULT_PARTNER_STATE: PartnerSettingsState = {
   profile: {
     fullName: "Sara Khan",
     email: "sara@globalrelief.org",
@@ -232,336 +235,53 @@ const DEFAULT_PARTNER_STATE: PartnerSettingsState = {
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
 export const settingsService = {
-  // ================= Coordinator Settings =================
-
-  async getCoordinatorSettings(): Promise<CoordinatorSettingsState> {
+  // Admin & Resource Manager unified getSettings
+  async getSettings(): Promise<any> {
     try {
-      const response = await fetch(`${API_BASE}/api/settings`, {
-        headers: { Accept: "application/json" },
+      const res = await request<any>("/settings", {
+        method: "GET",
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
-      return await response.json();
+      return res.data;
     } catch {
-      return DEFAULT_COORDINATOR_STATE;
-    }
-  },
-
-  async updateCoordinatorProfile(profile: CoordinatorProfile): Promise<CoordinatorProfile> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(profile),
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || `Failed to update profile (${response.status})`);
-      }
-      return await response.json();
-    } catch (err: any) {
-      if (err.message && !err.message.includes("Failed to fetch")) {
-        throw err;
-      }
-      return profile;
-    }
-  },
-
-  async updateCoordinatorOperational(
-    operational: CoordinatorOperational
-  ): Promise<CoordinatorOperational> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/operational`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(operational),
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to update operational settings (${response.status})`);
-      }
-      return await response.json();
-    } catch {
-      return operational;
-    }
-  },
-
-  async updateCoordinatorNotifications(
-    notifications: CoordinatorNotifications
-  ): Promise<CoordinatorNotifications> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/notifications`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(notifications),
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to update notification settings (${response.status})`);
-      }
-      return await response.json();
-    } catch {
-      return notifications;
-    }
-  },
-
-  async changeCoordinatorPassword(payload: ChangePasswordPayload): Promise<ChangePasswordResult> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/security/change-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data?.message || data?.errors?.NewPassword?.[0] || "Failed to update password.",
-        };
-      }
       return {
-        success: true,
-        message: data?.message || "Password updated successfully.",
-      };
-    } catch (err: any) {
-      return {
-        success: false,
-        message: err.message || "Network error while changing password.",
+        platformName: "CareLink Crisis Response",
+        contactEmail: "admin@carelink.org",
+        enablePublicRegistration: true,
+        sessionTimeoutMinutes: 60,
+        mfaRequired: false,
+        theme: "light",
+        language: "en",
+        logRetentionDays: 90,
       };
     }
   },
 
-  async getCoordinatorSessions(): Promise<UserSession[]> {
+  async updateSettings(settingsOrPayload: any): Promise<any> {
     try {
-      const response = await fetch(`${API_BASE}/api/settings/sessions`, {
-        headers: { Accept: "application/json" },
-      });
-      if (!response.ok) throw new Error("Failed to load sessions");
-      return await response.json();
-    } catch {
-      return DEFAULT_COORDINATOR_STATE.sessions;
-    }
-  },
+      const body =
+        "settings" in settingsOrPayload
+          ? settingsOrPayload
+          : { settings: settingsOrPayload };
 
-  async revokeCoordinatorSession(sessionId: string): Promise<boolean> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/sessions/${encodeURIComponent(sessionId)}`, {
-        method: "DELETE",
-        headers: { Accept: "application/json" },
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  },
-
-  async resetCoordinatorSettings(): Promise<CoordinatorSettingsState> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/reset`, {
-        method: "POST",
-        headers: { Accept: "application/json" },
-      });
-      if (!response.ok) throw new Error("Failed to reset settings");
-      return await response.json();
-    } catch {
-      return DEFAULT_COORDINATOR_STATE;
-    }
-  },
-
-  // ================= Partner Officer Settings =================
-
-  async getPartnerSettings(): Promise<PartnerSettingsState> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/partner`, {
-        headers: { Accept: "application/json" },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
-      return await response.json();
-    } catch {
-      return DEFAULT_PARTNER_STATE;
-    }
-  },
-
-  async updatePartnerProfile(profile: PartnerProfile): Promise<PartnerProfile> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/partner/profile`, {
+      const res = await request<any>("/settings", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(profile),
+        body: JSON.stringify(body),
       });
-      if (!response.ok) {
-        throw new Error("Failed to update partner profile");
-      }
-      return await response.json();
+      return res.data;
     } catch {
-      return profile;
+      return settingsOrPayload;
     }
   },
 
-  async updatePartnerOrganisation(organisation: PartnerOrganisation): Promise<PartnerOrganisation> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/partner/organisation`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(organisation),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update organisation defaults");
-      }
-      return await response.json();
-    } catch {
-      return organisation;
-    }
-  },
-
-  async updatePartnerSharing(sharing: PartnerSharing): Promise<PartnerSharing> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/partner/sharing`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(sharing),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update data sharing preferences");
-      }
-      return await response.json();
-    } catch {
-      return sharing;
-    }
-  },
-
-  async updatePartnerNotifications(notifications: PartnerNotifications): Promise<PartnerNotifications> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/partner/notifications`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(notifications),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update partner notifications");
-      }
-      return await response.json();
-    } catch {
-      return notifications;
-    }
-  },
-
-  async updatePartnerSecurity(security: PartnerSecurity): Promise<PartnerSecurity> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/partner/security`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(security),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update partner security settings");
-      }
-      return await response.json();
-    } catch {
-      return security;
-    }
-  },
-
-  async changePartnerPassword(payload: ChangePasswordPayload): Promise<ChangePasswordResult> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/partner/change-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        return {
-          success: false,
-          message: data?.message || data?.errors?.NewPassword?.[0] || "Failed to update password.",
-        };
-      }
-      return {
-        success: true,
-        message: data?.message || "Password updated successfully.",
-      };
-    } catch (err: any) {
-      return {
-        success: false,
-        message: err.message || "Network error while changing password.",
-      };
-    }
-  },
-
-  async resetPartnerSettings(): Promise<PartnerSettingsState> {
-    try {
-      const response = await fetch(`${API_BASE}/api/settings/partner/reset`, {
-        method: "POST",
-        headers: { Accept: "application/json" },
-      });
-      if (!response.ok) throw new Error("Failed to reset partner settings");
-      return await response.json();
-    } catch {
-      return DEFAULT_PARTNER_STATE;
-    }
-import { request } from "./api";
-import type {
-  ResourceManagerSettings,
-  UpdateSettingsPayload,
-  ProfileSettings,
-  InventoryRulesSettings,
-  DispatchPreferencesSettings,
-  NotificationPreferencesSettings,
-  SecuritySettings,
-} from "../types/settings";
-
-export const settingsService = {
-  async getSettings(): Promise<ResourceManagerSettings> {
-    const response = await request<ResourceManagerSettings>("/settings", {
-      method: "GET",
-    });
-    return response.data;
-  },
-
-  async updateSettings(payload: UpdateSettingsPayload): Promise<ResourceManagerSettings> {
-    const response = await request<ResourceManagerSettings>("/settings", {
-      method: "PUT",
-      body: JSON.stringify(payload),
-    });
-    return response.data;
-  },
-
-  async resetSettings(): Promise<ResourceManagerSettings> {
-    const response = await request<ResourceManagerSettings>("/settings/reset", {
+  async resetDefaults(): Promise<any> {
+    const res = await request<any>("/settings/reset", {
       method: "POST",
     });
-    return response.data;
+    return res.data;
+  },
+
+  async resetSettings(): Promise<any> {
+    return this.resetDefaults();
   },
 
   async updateProfile(profile: ProfileSettings): Promise<ProfileSettings> {
@@ -604,28 +324,303 @@ export const settingsService = {
       body: JSON.stringify(security),
     });
     return response.data;
-import type { SystemSettings } from "../types/settings";
-
-export const settingsService = {
-  async getSettings(): Promise<SystemSettings> {
-    const res = await request<SystemSettings>("/settings", {
-      method: "GET",
-    });
-    return res.data;
   },
 
-  async updateSettings(settings: Partial<SystemSettings>): Promise<SystemSettings> {
-    const res = await request<SystemSettings>("/settings", {
-      method: "PUT",
-      body: JSON.stringify({ settings }),
-    });
-    return res.data;
+  // ================= Coordinator Settings =================
+  async getCoordinatorSettings(): Promise<CoordinatorSettingsState> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings`, {
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+      return await response.json();
+    } catch {
+      return DEFAULT_COORDINATOR_STATE;
+    }
   },
 
-  async resetDefaults(): Promise<SystemSettings> {
-    const res = await request<SystemSettings>("/settings/reset", {
-      method: "POST",
-    });
-    return res.data;
+  async updateCoordinatorProfile(profile: CoordinatorProfile): Promise<CoordinatorProfile> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(profile),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || `Failed to update profile (${response.status})`);
+      }
+      return await response.json();
+    } catch (err: any) {
+      if (err.message && !err.message.includes("Failed to fetch")) {
+        throw err;
+      }
+      return profile;
+    }
+  },
+
+  async updateCoordinatorOperational(
+    operational: CoordinatorOperational
+  ): Promise<CoordinatorOperational> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/operational`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(operational),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to update operational settings (${response.status})`);
+      }
+      return await response.json();
+    } catch {
+      return operational;
+    }
+  },
+
+  async updateCoordinatorNotifications(
+    notifications: CoordinatorNotifications
+  ): Promise<CoordinatorNotifications> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/notifications`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(notifications),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to update notification settings (${response.status})`);
+      }
+      return await response.json();
+    } catch {
+      return notifications;
+    }
+  },
+
+  async changeCoordinatorPassword(payload: ChangePasswordPayload): Promise<ChangePasswordResult> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/security/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data?.message || data?.errors?.NewPassword?.[0] || "Failed to update password.",
+        };
+      }
+      return {
+        success: true,
+        message: data?.message || "Password updated successfully.",
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err.message || "Network error while changing password.",
+      };
+    }
+  },
+
+  async getCoordinatorSessions(): Promise<UserSession[]> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/sessions`, {
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error("Failed to load sessions");
+      return await response.json();
+    } catch {
+      return DEFAULT_COORDINATOR_STATE.sessions;
+    }
+  },
+
+  async revokeCoordinatorSession(sessionId: string): Promise<boolean> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/sessions/${encodeURIComponent(sessionId)}`, {
+        method: "DELETE",
+        headers: { Accept: "application/json" },
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  },
+
+  async resetCoordinatorSettings(): Promise<CoordinatorSettingsState> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/reset`, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error("Failed to reset settings");
+      return await response.json();
+    } catch {
+      return DEFAULT_COORDINATOR_STATE;
+    }
+  },
+
+  // ================= Partner Officer Settings =================
+  async getPartnerSettings(): Promise<PartnerSettingsState> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/partner`, {
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+      return await response.json();
+    } catch {
+      return DEFAULT_PARTNER_STATE;
+    }
+  },
+
+  async updatePartnerProfile(profile: PartnerProfile): Promise<PartnerProfile> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/partner/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(profile),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update partner profile");
+      }
+      return await response.json();
+    } catch {
+      return profile;
+    }
+  },
+
+  async updatePartnerOrganisation(organisation: PartnerOrganisation): Promise<PartnerOrganisation> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/partner/organisation`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(organisation),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update organisation defaults");
+      }
+      return await response.json();
+    } catch {
+      return organisation;
+    }
+  },
+
+  async updatePartnerSharing(sharing: PartnerSharing): Promise<PartnerSharing> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/partner/sharing`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(sharing),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update data sharing preferences");
+      }
+      return await response.json();
+    } catch {
+      return sharing;
+    }
+  },
+
+  async updatePartnerNotifications(notifications: PartnerNotifications): Promise<PartnerNotifications> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/partner/notifications`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(notifications),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update partner notifications");
+      }
+      return await response.json();
+    } catch {
+      return notifications;
+    }
+  },
+
+  async updatePartnerSecurity(security: PartnerSecurity): Promise<PartnerSecurity> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/partner/security`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(security),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update partner security settings");
+      }
+      return await response.json();
+    } catch {
+      return security;
+    }
+  },
+
+  async changePartnerPassword(payload: ChangePasswordPayload): Promise<ChangePasswordResult> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/partner/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data?.message || data?.errors?.NewPassword?.[0] || "Failed to update password.",
+        };
+      }
+      return {
+        success: true,
+        message: data?.message || "Password updated successfully.",
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err.message || "Network error while changing password.",
+      };
+    }
+  },
+
+  async resetPartnerSettings(): Promise<PartnerSettingsState> {
+    try {
+      const response = await authFetch(`${API_BASE}/api/settings/partner/reset`, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error("Failed to reset partner settings");
+      return await response.json();
+    } catch {
+      return DEFAULT_PARTNER_STATE;
+    }
   },
 };

@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ElementType } from "react";
+import { volunteerNotificationsService } from "../../services/volunteerNotificationsService";
 
 import {
   Search,
@@ -232,6 +233,39 @@ export default function NotificationsPage() {
     urgentOnly: false,
   });
 
+  useEffect(() => {
+    const iconMap: Record<string, ElementType> = {
+      AlertTriangle,
+      ShieldCheck,
+      Sparkles,
+      Check,
+      Award,
+      MessageSquare,
+      Users,
+    };
+    volunteerNotificationsService.getNotifications({ pageNumber: 1, pageSize: 50 }).then((res) => {
+      if (res?.data?.items?.length) {
+        setNotifications(
+          res.data.items.map((n) => ({
+            id: n.id,
+            title: n.title,
+            description: n.description,
+            time: n.time,
+            category: (n.category as NotificationCategory) || "Assignments",
+            icon: iconMap[n.iconName || ""] || Bell,
+            color: n.color || "bg-[#e8f1f6] text-[#287fa9]",
+            unread: n.unread,
+            urgent: n.urgent,
+            details: n.details,
+          }))
+        );
+      }
+    }).catch(() => {});
+    volunteerNotificationsService.getPreferences().then((prefs) => {
+      if (prefs) setPreferences(prefs);
+    }).catch(() => {});
+  }, []);
+
   const itemsPerPage = 6;
 
   // ==============================
@@ -320,6 +354,7 @@ export default function NotificationsPage() {
           : item
       )
     );
+    volunteerNotificationsService.markAsRead(id).catch(() => {});
   };
 
   // ==============================
@@ -333,6 +368,7 @@ export default function NotificationsPage() {
         unread: false,
       }))
     );
+    volunteerNotificationsService.markAllAsRead().catch(() => {});
 
     notify("All notifications marked as read!");
   };
@@ -358,6 +394,7 @@ export default function NotificationsPage() {
     setNotifications((previous) =>
       previous.filter((item) => item.id !== id)
     );
+    volunteerNotificationsService.deleteNotification(id).catch(() => {});
 
     setSelectedNotification(null);
 
@@ -378,10 +415,12 @@ export default function NotificationsPage() {
   // ==============================
 
   const savePreferences = () => {
-    localStorage.setItem(
-      "carelink_notification_preferences",
-      JSON.stringify(preferences)
-    );
+    volunteerNotificationsService.updatePreferences(preferences).catch(() => {
+      localStorage.setItem(
+        "carelink_notification_preferences",
+        JSON.stringify(preferences)
+      );
+    });
 
     setShowPreferences(false);
 
@@ -400,11 +439,11 @@ export default function NotificationsPage() {
     value: number;
   }) => (
     <div className="flex items-center justify-between mb-4">
-      <span className="text-[9px] text-[#55728b]">
+      <span className="text-xs text-[#55728b]">
         {label}
       </span>
 
-      <span className="text-[9px] font-semibold text-[#123c5b]">
+      <span className="text-xs font-semibold text-[#123c5b]">
         {value}
       </span>
     </div>
@@ -427,11 +466,11 @@ export default function NotificationsPage() {
   }) => (
     <div className="flex items-center justify-between gap-4 py-3 border-b border-[#e5edf1]">
       <div>
-        <p className="text-[11px] font-medium">
+        <p className="text-sm font-medium">
           {label}
         </p>
 
-        <p className="text-[9px] text-[#8296aa] mt-1">
+        <p className="text-xs text-[#8296aa] mt-1">
           {description}
         </p>
       </div>
@@ -468,7 +507,7 @@ export default function NotificationsPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
 
           <span className="text-[#8296aa]">
             Operations
@@ -494,11 +533,11 @@ export default function NotificationsPage() {
 
           <div>
 
-            <h1 className="text-[24px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Notifications
             </h1>
 
-            <p className="text-[11px] text-[#718ba0] mt-2">
+            <p className="text-sm text-[#718ba0] mt-2">
               Review coordination alerts, volunteer responses, and system updates.
             </p>
 
@@ -509,7 +548,7 @@ export default function NotificationsPage() {
             <button
               onClick={markAllAsRead}
               disabled={unreadCount === 0}
-              className="h-[36px] px-3 bg-white border border-[#b9d0dc] rounded-lg text-[9px] text-[#17648e] hover:bg-[#f5fafc] disabled:opacity-50 flex items-center gap-2"
+              className="h-[36px] px-3 bg-white border border-[#b9d0dc] rounded-lg text-sm text-[#17648e] hover:bg-[#f5fafc] disabled:opacity-50 flex items-center gap-2"
             >
               <CheckCheck size={13} />
               Mark all as read
@@ -517,7 +556,7 @@ export default function NotificationsPage() {
 
             <button
               onClick={() => setShowPreferences(true)}
-              className="h-[36px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-[9px] font-semibold"
+              className="h-[36px] px-4 bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg flex items-center gap-2 text-sm font-semibold"
             >
               <Settings size={13} />
               Preferences
@@ -550,14 +589,14 @@ export default function NotificationsPage() {
               <button
                 key={tab}
                 onClick={() => changeTab(tab)}
-                className={`relative py-3 text-[9px] whitespace-nowrap flex items-center gap-1.5 transition-colors ${active
+                className={`relative py-3 text-sm whitespace-nowrap flex items-center gap-1.5 transition-colors ${active
                   ? "text-[#17648e] font-semibold"
                   : "text-[#8296aa] hover:text-[#17648e]"
                   }`}
               >
                 {tab}
 
-                <span className="bg-[#e8f1f6] text-[#287fa9] rounded-full px-1.5 py-0.5 text-[8px]">
+                <span className="bg-[#e8f1f6] text-[#287fa9] rounded-full px-1.5 py-0.5 text-xs">
                   {count}
                 </span>
 
@@ -608,15 +647,15 @@ export default function NotificationsPage() {
                       onClick={() => openNotification(item)}
                       className="flex-1 min-w-0 text-left"
                     >
-                      <p className="text-[9px] font-semibold text-[#123c5b] truncate">
+                      <p className="text-xs font-semibold text-[#123c5b] truncate">
                         {item.title}
                       </p>
 
-                      <p className="text-[8px] text-[#8296aa] mt-1 truncate">
+                      <p className="text-xs text-[#8296aa] mt-1 truncate">
                         {item.description}
                       </p>
 
-                      <p className="text-[8px] text-[#8296aa] mt-1">
+                      <p className="text-xs text-[#8296aa] mt-1">
                         {item.time}
                       </p>
                     </button>
@@ -662,7 +701,7 @@ export default function NotificationsPage() {
                     No notifications found
                   </p>
 
-                  <p className="text-[9px] text-[#8296aa] mt-1">
+                  <p className="text-xs text-[#8296aa] mt-1">
                     There are no notifications in this category.
                   </p>
 
@@ -675,7 +714,7 @@ export default function NotificationsPage() {
 
             <div className="px-3 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
 
-              <p className="text-[8px] text-[#8296aa]">
+              <p className="text-xs text-[#8296aa]">
 
                 Showing{" "}
 
@@ -701,7 +740,7 @@ export default function NotificationsPage() {
                   onClick={() =>
                     setCurrentPage((page) => page - 1)
                   }
-                  className="h-[30px] px-3 border border-[#d5e3e9] rounded-lg text-[8px] text-[#718ba0] disabled:opacity-40"
+                  className="h-[30px] px-3 border border-[#d5e3e9] rounded-lg text-sm text-[#718ba0] disabled:opacity-40"
                 >
                   Previous
                 </button>
@@ -713,7 +752,7 @@ export default function NotificationsPage() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`w-[28px] h-[28px] rounded-md border text-[9px] ${currentPage === page
+                    className={`w-[28px] h-[28px] rounded-md border text-sm ${currentPage === page
                       ? "bg-[#287fa9] text-white border-[#287fa9]"
                       : "bg-white border-[#d5e3e9] hover:bg-[#f1f8fc]"
                       }`}
@@ -727,7 +766,7 @@ export default function NotificationsPage() {
                   onClick={() =>
                     setCurrentPage((page) => page + 1)
                   }
-                  className="h-[30px] px-3 border border-[#b9d0dc] rounded-lg text-[8px] text-[#17648e] disabled:opacity-40"
+                  className="h-[30px] px-3 border border-[#b9d0dc] rounded-lg text-sm text-[#17648e] disabled:opacity-40"
                 >
                   Next
                 </button>
@@ -742,7 +781,7 @@ export default function NotificationsPage() {
 
           <aside className="bg-white border border-[#d5e3e9] rounded-xl shadow-[0_5px_15px_rgba(30,70,90,0.05)] p-4">
 
-            <h2 className="text-[11px] font-medium mb-4">
+            <h2 className="text-base sm:text-lg font-semibold mb-4">
               Notification summary
             </h2>
 
@@ -770,7 +809,7 @@ export default function NotificationsPage() {
 
             <div className="border-t border-[#d5e3e9] pt-3">
 
-              <h3 className="text-[10px] font-medium mb-3">
+              <h3 className="text-base font-semibold mb-3">
                 Delivery services
               </h3>
 
@@ -782,7 +821,7 @@ export default function NotificationsPage() {
                     className="text-[#239879]"
                   />
 
-                  <span className="text-[8px] text-[#718ba0]">
+                  <span className="text-xs text-[#718ba0]">
                     In-app operational
                   </span>
                 </div>
@@ -793,7 +832,7 @@ export default function NotificationsPage() {
                     className="text-[#239879]"
                   />
 
-                  <span className="text-[8px] text-[#718ba0]">
+                  <span className="text-xs text-[#718ba0]">
                     Email operational
                   </span>
                 </div>
@@ -804,7 +843,7 @@ export default function NotificationsPage() {
                     className="text-[#d18a18]"
                   />
 
-                  <span className="text-[8px] text-[#718ba0]">
+                  <span className="text-xs text-[#718ba0]">
                     SMS provider degraded
                   </span>
                 </div>
@@ -845,11 +884,11 @@ export default function NotificationsPage() {
                 </div>
 
                 <div>
-                  <h2 className="text-[14px] font-semibold">
+                  <h2 className="text-base sm:text-lg font-semibold">
                     Notification details
                   </h2>
 
-                  <p className="text-[9px] text-[#8296aa] mt-1">
+                  <p className="text-xs text-[#8296aa] mt-1">
                     {selectedNotification.category}
                   </p>
                 </div>
@@ -870,21 +909,21 @@ export default function NotificationsPage() {
             <div className="p-5 space-y-4">
 
               <div>
-                <p className="text-[9px] text-[#8296aa] mb-1">
+                <p className="text-xs text-[#8296aa] mb-1">
                   NOTIFICATION TITLE
                 </p>
 
-                <h3 className="text-[13px] font-semibold">
+                <h3 className="text-base font-semibold">
                   {selectedNotification.title}
                 </h3>
               </div>
 
               <div>
-                <p className="text-[9px] text-[#8296aa] mb-1">
+                <p className="text-xs text-[#8296aa] mb-1">
                   DESCRIPTION
                 </p>
 
-                <p className="text-[11px] leading-5 text-[#55728b]">
+                <p className="text-sm leading-5 text-[#55728b]">
                   {selectedNotification.details}
                 </p>
               </div>
@@ -892,31 +931,31 @@ export default function NotificationsPage() {
               <div className="bg-[#f5f9fb] rounded-lg p-4 space-y-3">
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[9px] text-[#8296aa]">
+                  <span className="text-xs text-[#8296aa]">
                     Category
                   </span>
 
-                  <span className="text-[9px] font-semibold">
+                  <span className="text-xs font-semibold">
                     {selectedNotification.category}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[9px] text-[#8296aa]">
+                  <span className="text-xs text-[#8296aa]">
                     Received
                   </span>
 
-                  <span className="text-[9px] font-semibold">
+                  <span className="text-xs font-semibold">
                     {selectedNotification.time}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[9px] text-[#8296aa]">
+                  <span className="text-xs text-[#8296aa]">
                     Read status
                   </span>
 
-                  <span className="text-[9px] text-[#239879] font-semibold">
+                  <span className="text-xs text-[#239879] font-semibold">
                     Read
                   </span>
                 </div>
@@ -931,7 +970,7 @@ export default function NotificationsPage() {
                     className="text-[#b87813] shrink-0"
                   />
 
-                  <p className="text-[9px] text-[#986617] leading-4">
+                  <p className="text-xs text-[#986617] leading-4">
                     This notification requires urgent coordinator attention.
                   </p>
 
@@ -948,7 +987,7 @@ export default function NotificationsPage() {
                 onClick={() =>
                   deleteNotification(selectedNotification.id)
                 }
-                className="text-[#dc3545] hover:bg-[#fdebec] rounded-lg px-3 py-2 text-[10px] flex items-center gap-2"
+                className="text-[#dc3545] hover:bg-[#fdebec] rounded-lg px-3 py-2 text-sm flex items-center gap-2"
               >
                 <Trash2 size={13} />
                 Delete
@@ -956,7 +995,7 @@ export default function NotificationsPage() {
 
               <button
                 onClick={() => setSelectedNotification(null)}
-                className="bg-[#287fa9] text-white px-5 py-2.5 rounded-lg text-[10px]"
+                className="bg-[#287fa9] text-white px-5 py-2.5 rounded-lg text-sm"
               >
                 Close
               </button>
@@ -984,11 +1023,11 @@ export default function NotificationsPage() {
             <div className="p-5 border-b border-[#d5e3e9] flex items-center justify-between">
 
               <div>
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Notification preferences
                 </h2>
 
-                <p className="text-[9px] text-[#8296aa] mt-1">
+                <p className="text-xs text-[#8296aa] mt-1">
                   Manage which notifications you receive.
                 </p>
               </div>
@@ -1006,7 +1045,7 @@ export default function NotificationsPage() {
 
               {/* CATEGORIES */}
 
-              <h3 className="text-[10px] font-semibold mb-2">
+              <h3 className="text-base font-semibold mb-2">
                 Notification categories
               </h3>
 
@@ -1060,7 +1099,7 @@ export default function NotificationsPage() {
 
               {/* CHANNELS */}
 
-              <h3 className="text-[10px] font-semibold mt-5 mb-2">
+              <h3 className="text-base font-semibold mt-5 mb-2">
                 Delivery channels
               </h3>
 
@@ -1102,7 +1141,7 @@ export default function NotificationsPage() {
 
               {/* ADDITIONAL SETTINGS */}
 
-              <h3 className="text-[10px] font-semibold mt-5 mb-2">
+              <h3 className="text-base font-semibold mt-5 mb-2">
                 Additional settings
               </h3>
 
@@ -1126,14 +1165,14 @@ export default function NotificationsPage() {
 
               <button
                 onClick={() => setShowPreferences(false)}
-                className="border border-[#d5e3e9] rounded-lg px-4 py-2.5 text-[10px]"
+                className="border border-[#d5e3e9] rounded-lg px-4 py-2.5 text-sm"
               >
                 Cancel
               </button>
 
               <button
                 onClick={savePreferences}
-                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2.5 text-[10px] font-semibold"
+                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2.5 text-sm font-semibold"
               >
                 Save preferences
               </button>

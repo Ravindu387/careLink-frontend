@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   ReportsFilterDto,
   ReportsAnalyticsResponse,
@@ -234,7 +234,7 @@ export const caseReportsService = {
       const headers: Record<string, string> = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(`${API_BASE_URL}/casereports/export?${params.toString()}`, { headers });
+      const res = await authFetch(`${API_BASE_URL}/casereports/export?${params.toString()}`, { headers });
       if (res.ok) {
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);

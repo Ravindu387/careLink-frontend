@@ -1,7 +1,5 @@
-
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-
 import PartnerOfficerSidebar from "../pages/PartnerOfficer/PartnerOfficerSidebar";
 import PartnerOfficerTopbar from "../pages/PartnerOfficer/PartnerOfficerTopbar";
 
@@ -9,18 +7,16 @@ const PartnerOfficerLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#eff5f7]">
+    <div className="flex h-screen w-full overflow-hidden bg-[#EFF6F7]">
       <PartnerOfficerSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="min-h-screen min-w-0 lg:ml-[264px]">
-        <PartnerOfficerTopbar
-          onMenuClick={() => setSidebarOpen(true)}
-        />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <PartnerOfficerTopbar onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="min-h-[calc(100vh-66px)] min-w-0 bg-[#eff5f7]">
+        <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-[#EFF6F7]">
           <Outlet />
         </main>
       </div>

@@ -358,13 +358,13 @@ const AssistanceReferrals = () => {
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold text-[#153e5b]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">
               Assistance Referrals
             </h1>
 
             {/* Live Backend Connection Indicator */}
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
                 isLive
                   ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
                   : "border border-amber-200 bg-amber-50 text-amber-700"
@@ -388,7 +388,7 @@ const AssistanceReferrals = () => {
           <button
             onClick={handleSync}
             disabled={isSyncing}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
             title="Refresh referrals from server"
           >
             <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
@@ -397,7 +397,7 @@ const AssistanceReferrals = () => {
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
           >
             <Download size={15} />
             Export
@@ -405,7 +405,7 @@ const AssistanceReferrals = () => {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Plus size={16} />
             Create Referral
@@ -456,11 +456,11 @@ const AssistanceReferrals = () => {
         />
 
         <div>
-          <p className="text-[11px] font-semibold text-[#153e5b]">
+          <p className="text-sm font-semibold text-[#153e5b]">
             Data is shared for authorised response only
           </p>
 
-          <p className="mt-1 text-[10px] text-[#52778c]">
+          <p className="mt-1 text-sm text-[#52778c]">
             Accept only referrals your organisation can support. Personal details remain restricted to assigned personnel.
           </p>
         </div>
@@ -477,7 +477,7 @@ const AssistanceReferrals = () => {
                 setActiveTab(tab);
                 setCurrentPage(1);
               }}
-              className={`relative whitespace-nowrap pb-4 text-xs ${
+              className={`relative whitespace-nowrap pb-4 text-sm ${
                 activeTab === tab
                   ? "font-semibold text-[#267ba4]"
                   : "text-slate-500 hover:text-[#267ba4]"
@@ -485,7 +485,7 @@ const AssistanceReferrals = () => {
             >
               {tab}
               {count > 0 && (
-                <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px] font-medium text-slate-700">
+                <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-xs font-medium text-slate-700">
                   {count}
                 </span>
               )}
@@ -512,7 +512,7 @@ const AssistanceReferrals = () => {
               setCurrentPage(1);
             }}
             placeholder="Search assistance referrals by ID, assistance, location, team..."
-            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
+            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
           />
         </div>
 
@@ -522,7 +522,7 @@ const AssistanceReferrals = () => {
             setCrisisFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All crisis events</option>
           <option>Monsoon Floods 2025</option>
@@ -536,7 +536,7 @@ const AssistanceReferrals = () => {
             setPriorityFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All priorities</option>
           <option>Critical</option>
@@ -551,7 +551,7 @@ const AssistanceReferrals = () => {
             setSectorFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All sectors</option>
           <option>Shelter</option>
@@ -566,7 +566,7 @@ const AssistanceReferrals = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All statuses</option>
           <option>Awaiting Acceptance</option>
@@ -578,7 +578,7 @@ const AssistanceReferrals = () => {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
         >
           <Filter size={15} />
           More filters
@@ -589,10 +589,10 @@ const AssistanceReferrals = () => {
       {showFilters && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d3e1e8] bg-white p-4">
           <div>
-            <p className="text-xs font-semibold text-[#153e5b]">
+            <p className="text-sm font-semibold text-[#153e5b]">
               Additional options
             </p>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Refine the referral list, clear active filters, or reset seed records.
             </p>
           </div>
@@ -600,14 +600,14 @@ const AssistanceReferrals = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={handleResetDefaults}
-              className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-800"
+              className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-800"
             >
               <RotateCcw size={13} />
               Reset Defaults
             </button>
             <button
               onClick={resetFilters}
-              className="text-xs font-semibold text-[#267ba4] hover:underline"
+              className="text-sm font-semibold text-[#267ba4] hover:underline"
             >
               Clear all filters
             </button>
@@ -620,7 +620,7 @@ const AssistanceReferrals = () => {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1050px] text-left">
             <thead className="bg-[#f5f8fa]">
-              <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
+              <tr className="border-b border-[#d7e5eb] text-sm text-slate-500">
                 {[
                   "Referral",
                   "Assistance",
@@ -644,7 +644,7 @@ const AssistanceReferrals = () => {
                 <tr
                   key={item.id}
                   onClick={() => setSelectedReferral(item)}
-                  className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
+                  className="cursor-pointer border-b border-[#e2ebef] text-sm text-slate-600 transition hover:bg-[#f5fafc]"
                 >
                   <td className="whitespace-nowrap px-3 py-4 font-semibold text-[#153e5b]">
                     {item.id}
@@ -691,7 +691,7 @@ const AssistanceReferrals = () => {
                 <tr>
                   <td
                     colSpan={9}
-                    className="py-12 text-center text-xs text-slate-400"
+                    className="py-12 text-center text-sm text-slate-400"
                   >
                     No assistance referrals found matching current filters.
                   </td>
@@ -703,7 +703,7 @@ const AssistanceReferrals = () => {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[13px] text-slate-400">
             Showing{" "}
             {filteredReferrals.length === 0
               ? 0
@@ -722,7 +722,7 @@ const AssistanceReferrals = () => {
               onClick={() =>
                 setCurrentPage((p) => Math.max(1, p - 1))
               }
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
@@ -734,7 +734,7 @@ const AssistanceReferrals = () => {
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
-                className={`h-8 w-8 rounded-lg border text-[10px] ${
+                className={`h-8 w-8 rounded-lg border text-sm ${
                   currentPage === number
                     ? "border-[#267ba4] bg-[#267ba4] text-white"
                     : "border-[#d3e1e8] text-slate-600 hover:bg-slate-50"
@@ -749,7 +749,7 @@ const AssistanceReferrals = () => {
               onClick={() =>
                 setCurrentPage((p) => Math.min(totalPages, p + 1))
               }
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
@@ -809,9 +809,9 @@ function StatCard({
       </div>
 
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <p className="text-2xl font-bold text-[#153e5b]">{value}</p>
-        <p className="text-[9px] text-slate-400">{subtitle}</p>
+        <p className="text-xs text-slate-400">{subtitle}</p>
       </div>
     </div>
   );
@@ -828,7 +828,7 @@ function PriorityBadge({ priority }: { priority: string }) {
 
   return (
     <span
-      className={`rounded-md px-2 py-1 text-[9px] font-semibold ${styles[priority] || "bg-slate-100 text-slate-500"}`}
+      className={`rounded-md px-2 py-1 text-xs font-semibold ${styles[priority] || "bg-slate-100 text-slate-500"}`}
     >
       {priority}
     </span>
@@ -847,7 +847,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`rounded-md px-2 py-1 text-[9px] font-medium ${styles[status] || "bg-slate-100 text-slate-500"}`}
+      className={`rounded-md px-2 py-1 text-xs font-medium ${styles[status] || "bg-slate-100 text-slate-500"}`}
     >
       {status}
     </span>
@@ -858,8 +858,8 @@ function StatusBadge({ status }: { status: string }) {
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] text-slate-400">{label}</p>
-      <p className="mt-1 text-xs font-medium text-[#153e5b] break-words">{value || "—"}</p>
+      <p className="text-[13px] text-slate-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-[#153e5b] break-words">{value || "—"}</p>
     </div>
   );
 }
@@ -915,7 +915,7 @@ function ReferralDetailsModal({
         <div className="mb-5 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-xs font-semibold text-[#267ba4]">
+              <p className="text-sm font-semibold text-[#267ba4]">
                 {referral.id}
               </p>
               <PriorityBadge priority={referral.priority} />
@@ -933,10 +933,10 @@ function ReferralDetailsModal({
         <div className="mb-4 rounded-lg bg-[#f5f8fa] p-4">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold text-[#153e5b]">
+              <p className="text-sm font-semibold text-[#153e5b]">
                 {referral.assistance}
               </p>
-              <p className="mt-1 text-[11px] text-slate-500">
+              <p className="mt-1 text-[13px] text-slate-500">
                 {referral.location} · {referral.crisis}
               </p>
             </div>
@@ -957,14 +957,14 @@ function ReferralDetailsModal({
 
         {referral.description && (
           <div className="mt-4 rounded-lg bg-slate-50 p-3">
-            <p className="text-[10px] font-medium text-slate-400">Description & Case Notes</p>
-            <p className="mt-1 text-xs text-slate-600">{referral.description}</p>
+            <p className="text-[13px] font-medium text-slate-400">Description & Case Notes</p>
+            <p className="mt-1 text-sm text-slate-600">{referral.description}</p>
           </div>
         )}
 
         {/* Team Assignment quick selector */}
         <div className="mt-4 rounded-lg border border-slate-200 p-3">
-          <label className="mb-1 block text-[10px] font-semibold uppercase text-slate-400">
+          <label className="mb-1 block text-sm font-semibold uppercase text-slate-400">
             Assign Response Team
           </label>
           <div className="flex items-center gap-2">
@@ -972,7 +972,7 @@ function ReferralDetailsModal({
               disabled={updating}
               value={teamSelection}
               onChange={(e) => handleTeamChange(e.target.value)}
-              className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs outline-none"
+              className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-[15px] outline-none"
             >
               <option value="Case Support Team">Case Support Team</option>
               <option value="Food Distribution Team">Food Distribution Team</option>
@@ -986,7 +986,7 @@ function ReferralDetailsModal({
 
         {/* Quick Actions */}
         <div className="mt-5 border-t border-slate-100 pt-4">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
             Workflow Actions
           </p>
 
@@ -995,7 +995,7 @@ function ReferralDetailsModal({
               <button
                 disabled={updating}
                 onClick={() => handleUpdateStatus("Accepted")}
-                className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
               >
                 <Check size={13} />
                 Accept Referral
@@ -1006,7 +1006,7 @@ function ReferralDetailsModal({
               <button
                 disabled={updating}
                 onClick={() => handleUpdateStatus("In Progress")}
-                className="flex items-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
               >
                 <ArrowRight size={13} />
                 Start / In Progress
@@ -1017,7 +1017,7 @@ function ReferralDetailsModal({
               <button
                 disabled={updating}
                 onClick={() => handleUpdateStatus("Completed")}
-                className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
               >
                 <CheckCircle2 size={13} />
                 Mark Completed
@@ -1028,7 +1028,7 @@ function ReferralDetailsModal({
               <button
                 disabled={updating}
                 onClick={() => handleUpdateStatus("Archived")}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50"
               >
                 <Archive size={13} />
                 Archive
@@ -1037,7 +1037,7 @@ function ReferralDetailsModal({
               <button
                 disabled={updating}
                 onClick={() => handleUpdateStatus("Awaiting Acceptance")}
-                className="flex items-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
               >
                 <RotateCcw size={13} />
                 Reopen
@@ -1047,7 +1047,7 @@ function ReferralDetailsModal({
             <button
               disabled={updating}
               onClick={handleDelete}
-              className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-100 disabled:opacity-50 ml-auto"
+              className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100 disabled:opacity-50 ml-auto"
             >
               <Trash2 size={13} />
               Remove
@@ -1057,7 +1057,7 @@ function ReferralDetailsModal({
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-[#267ba4] py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+          className="mt-6 w-full rounded-lg bg-[#267ba4] py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
         >
           Close
         </button>
@@ -1114,7 +1114,7 @@ function CreateReferralModal({
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Create Referral
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Create a new assistance referral and sync across coordinating agencies.
             </p>
           </div>
@@ -1126,7 +1126,7 @@ function CreateReferralModal({
 
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Assistance Required *
             </label>
             <input
@@ -1134,12 +1134,12 @@ function CreateReferralModal({
               value={assistance}
               onChange={(e) => setAssistance(e.target.value)}
               placeholder="e.g. Emergency shelter kits"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Location *
             </label>
             <input
@@ -1147,13 +1147,13 @@ function CreateReferralModal({
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g. Riverside - North Ward"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Affected People *
               </label>
               <input
@@ -1162,18 +1162,18 @@ function CreateReferralModal({
                 min="1"
                 value={affected}
                 onChange={(e) => setAffected(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Priority
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>Critical</option>
                 <option>High</option>
@@ -1185,13 +1185,13 @@ function CreateReferralModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Crisis Event
               </label>
               <select
                 value={crisis}
                 onChange={(e) => setCrisis(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>Monsoon Floods 2025</option>
                 <option>Dengue Outbreak</option>
@@ -1200,13 +1200,13 @@ function CreateReferralModal({
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Assistance Sector
               </label>
               <select
                 value={sector}
                 onChange={(e) => setSector(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>Shelter</option>
                 <option>Food</option>
@@ -1217,7 +1217,7 @@ function CreateReferralModal({
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Description & Specific Needs
             </label>
             <textarea
@@ -1225,7 +1225,7 @@ function CreateReferralModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide urgency context, family breakdown, access conditions..."
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
         </div>
@@ -1235,7 +1235,7 @@ function CreateReferralModal({
             type="button"
             disabled={isSubmitting}
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
@@ -1243,7 +1243,7 @@ function CreateReferralModal({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
           >
             {isSubmitting && <RefreshCw size={13} className="animate-spin" />}
             Create Referral

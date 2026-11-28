@@ -112,7 +112,7 @@ const statIconMap: Record<string, any> = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-600 outline-none focus:border-sky-500";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none focus:border-sky-500";
 
 export default function ResourceDashboard() {
   const navigate = useNavigate();
@@ -279,29 +279,29 @@ export default function ResourceDashboard() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">
               Resource Management
             </p>
           </div>
         </div>
 
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
 
-          <p className="mt-2 text-xs font-bold">
+          <p className="mt-2 text-sm font-bold">
             Monsoon Floods 2025
           </p>
 
-          <p className="mt-1 text-[10px] text-sky-200">
+          <p className="mt-1 text-sm text-sky-200">
             Greater Riverton · Level 4
           </p>
         </div>
 
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -316,7 +316,7 @@ export default function ResourceDashboard() {
                   setSidebarOpen(false);
                   navigate(item.path);
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -326,7 +326,7 @@ export default function ResourceDashboard() {
                 <span className="flex-1">{item.label}</span>
 
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px]">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs">
                     {item.count}
                   </span>
                 )}
@@ -341,8 +341,8 @@ export default function ResourceDashboard() {
           </div>
 
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">
               Resource Manager
             </p>
           </div>
@@ -363,89 +363,110 @@ export default function ResourceDashboard() {
       <main className="min-h-screen lg:ml-[280px]">
 
         {/* HEADER */}
-        <header className="sticky top-0 z-20 flex h-[74px] items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 lg:px-7">
+        <header className="sticky top-0 z-30 flex h-[68px] w-full shrink-0 items-center justify-between gap-4 border-b border-[#D5E3E9] bg-white px-4 sm:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#D5E3E9] text-[#153E5D] transition hover:bg-[#F5F9FB] lg:hidden"
+              aria-label="Open navigation"
+            >
+              <Menu size={19} />
+            </button>
 
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden"
-            aria-label="Open navigation"
-          >
-            <Menu size={22} />
-          </button>
+            <div className="relative flex h-[40px] w-full max-w-[460px] items-center gap-2.5 rounded-lg border border-[#D5E3E9] bg-[#F8FAFB] px-3 transition-all focus-within:border-[#287DA6] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#287DA6]/15">
+              <Search size={16} className="shrink-0 text-[#8296AA]" />
 
-          <div className="flex max-w-[480px] flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
-            <Search size={16} className="text-slate-400" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search resources, requests, dispatches..."
+                className="w-full min-w-0 bg-transparent text-sm sm:text-[15px] text-[#153E5D] outline-none placeholder:text-[#8296AA]"
+              />
 
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search resources, requests, dispatches..."
-              className="w-full bg-transparent text-xs outline-none"
-            />
-
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
-              ⌘ K
-            </span>
+              <span className="hidden shrink-0 rounded border border-[#D5E3E9] bg-white px-1.5 py-0.5 font-mono text-xs text-[#8296AA] sm:block">
+                ⌘ K
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
             {/* Connection Badge */}
             <div className="flex items-center gap-2">
               {isBackendConnected === true && (
-                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
+                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   API Connected
                 </span>
               )}
               {isBackendConnected === false && (
-                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-700 border border-amber-200">
+                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 border border-amber-200">
                   <WifiOff size={11} />
                   Offline Mode
                 </span>
               )}
 
               <button
+                type="button"
                 onClick={loadDashboard}
                 disabled={loading}
                 title="Refresh dashboard metrics"
-                className="flex items-center gap-1 rounded-lg border border-slate-200 p-2 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-[#D5E3E9] bg-white text-[#45647D] transition hover:bg-[#F5F9FB] hover:text-[#153E5D] disabled:opacity-50"
               >
-                <RefreshCw size={14} className={loading ? "animate-spin text-sky-600" : ""} />
+                <RefreshCw size={15} className={loading ? "animate-spin text-[#287DA6]" : ""} />
               </button>
             </div>
 
-            <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">
-                Primary Hub
-              </p>
-              <p className="text-[10px] font-bold">
-                Central Logistics Hub
-              </p>
+            <div className="hidden items-center gap-2 border-r border-[#D5E3E9] pr-3.5 text-right md:flex">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[#8296AA]">
+                  PRIMARY HUB
+                </p>
+                <p className="mt-0.5 text-sm font-bold text-[#153E5D]">
+                  Central Logistics Hub
+                </p>
+              </div>
             </div>
 
-            <button className="hidden rounded-lg border p-2.5 sm:block">
-              <ShieldCheck size={18} />
+            <button
+              type="button"
+              onClick={() => navigate("/resource-manager/audit-log")}
+              className="relative hidden h-9 w-9 items-center justify-center rounded-lg border border-[#D5E3E9] bg-white text-[#45647D] transition hover:bg-[#F5F9FB] hover:text-[#153E5D] sm:flex"
+            >
+              <ShieldCheck size={17} />
             </button>
 
-            <button className="relative rounded-lg border p-2.5">
-              <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+            <button
+              type="button"
+              onClick={() => navigate("/resource-manager/alerts")}
+              className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-[#D5E3E9] bg-white text-[#45647D] transition hover:bg-[#F5F9FB] hover:text-[#153E5D]"
+            >
+              <Bell size={17} />
+              <span className="absolute -right-1 -top-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[#E64D5A] px-1 text-xs font-bold text-white shadow-xs">
                 9
               </span>
             </button>
 
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#287ba5] text-xs font-bold text-white">
-              DP
-            </div>
+            <div className="relative border-l border-[#D5E3E9] pl-2.5 sm:pl-3">
+              <button
+                type="button"
+                onClick={() => navigate("/resource-manager/settings")}
+                className="flex items-center gap-2.5 rounded-lg p-1 text-left transition hover:bg-[#F5F9FB]"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#287DA6] text-sm font-bold text-white shadow-xs">
+                  DP
+                </div>
 
-            <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">
-                Resource Manager
-              </p>
-            </div>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-bold leading-tight text-[#153E5D]">Daniel P.</p>
+                  <p className="mt-0.5 text-xs font-medium text-[#8296AA]">
+                    Resource Manager
+                  </p>
+                </div>
 
-            <ChevronRight size={17} className="hidden sm:block" />
+                <ChevronRight size={14} className="hidden text-[#8296AA] sm:block" />
+              </button>
+            </div>
           </div>
         </header>
 
@@ -476,7 +497,7 @@ export default function ResourceDashboard() {
         <div className="space-y-5 p-4 sm:p-6 lg:p-7">
 
           {/* BREADCRUMB */}
-          <div className="text-[10px] text-slate-400">
+          <div className="text-[13px] text-slate-400">
             Resource Operations
             <ChevronRight size={12} className="mx-1 inline" />
             <span className="font-semibold text-[#163d5c]">
@@ -499,7 +520,7 @@ export default function ResourceDashboard() {
               <div className="relative">
                 <button
                   onClick={() => setShowExportMenu(!showExportMenu)}
-                  className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition"
+                  className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition"
                 >
                   <Download size={14} />
                   Export snapshot
@@ -509,14 +530,14 @@ export default function ResourceDashboard() {
                   <div className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl z-30">
                     <button
                       onClick={() => handleExport("csv")}
-                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 text-left font-medium"
+                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 text-left font-medium"
                     >
                       <FileSpreadsheet size={15} className="text-emerald-600" />
                       Snapshot CSV
                     </button>
                     <button
                       onClick={() => handleExport("pdf")}
-                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 text-left font-medium border-t border-slate-100"
+                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 text-left font-medium border-t border-slate-100"
                     >
                       <FileText size={15} className="text-rose-600" />
                       Snapshot PDF Document
@@ -527,7 +548,7 @@ export default function ResourceDashboard() {
 
               <button
                 onClick={() => setShowReceiptModal(true)}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
               >
                 <Plus size={15} />
                 Record receipt
@@ -542,20 +563,20 @@ export default function ResourceDashboard() {
                 <AlertTriangle size={22} />
               </div>
               <div>
-                <span className="rounded bg-red-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-red-700">
+                <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-red-700">
                   {criticalAlert.title}
                 </span>
-                <p className="mt-1 text-xs font-bold text-slate-800">
+                <p className="mt-1 text-sm font-bold text-slate-800">
                   {criticalAlert.description}
                 </p>
-                <p className="mt-0.5 text-[10px] text-slate-500">
+                <p className="mt-0.5 text-[13px] text-slate-500">
                   {criticalAlert.pendingRequestsCount} resource requests are awaiting approval across {criticalAlert.districtsCount} districts.
                 </p>
               </div>
             </div>
             <button
               onClick={() => navigate("/resource-manager/alerts")}
-              className="rounded-lg border border-red-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-red-50 shadow-sm transition"
+              className="rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-red-50 shadow-sm transition"
             >
               Review alerts
             </button>
@@ -576,9 +597,9 @@ export default function ResourceDashboard() {
                       <IconComponent size={20} />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] text-slate-400 font-medium">{stat.title}</p>
+                      <p className="text-[13px] text-slate-400 font-medium">{stat.title}</p>
                       <h3 className="text-2xl font-bold text-slate-800">{stat.value}</h3>
-                      <p className="text-[9px] text-slate-400">{stat.note}</p>
+                      <p className="text-xs text-slate-400">{stat.note}</p>
                     </div>
                   </div>
                 </div>
@@ -593,10 +614,10 @@ export default function ResourceDashboard() {
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                 <div>
-                  <h3 className="text-xs font-semibold">Stock movement</h3>
-                  <p className="mt-0.5 text-[10px] text-slate-400">Received and issued over the last 7 days</p>
+                  <h3 className="text-base font-semibold">Stock movement</h3>
+                  <p className="mt-0.5 text-[13px] text-slate-400">Received and issued over the last 7 days</p>
                 </div>
-                <div className="flex gap-3 text-[10px]">
+                <div className="flex gap-3 text-sm">
                   <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#287ba5]" />Received</span>
                   <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#62b7a8]" />Issued</span>
                 </div>
@@ -622,7 +643,7 @@ export default function ResourceDashboard() {
                           style={{ height: `${Math.min(100, Math.max(8, item.issued))}%` }}
                         />
                       </div>
-                      <span className="mt-2 text-[9px] font-medium text-slate-500">
+                      <span className="mt-2 text-xs font-medium text-slate-500">
                         {item.day}
                       </span>
                     </div>
@@ -635,12 +656,12 @@ export default function ResourceDashboard() {
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                 <div>
-                  <h3 className="text-xs font-semibold">Stock health by category</h3>
-                  <p className="mt-0.5 text-[10px] text-slate-400">Availability against operational thresholds</p>
+                  <h3 className="text-base font-semibold">Stock health by category</h3>
+                  <p className="mt-0.5 text-[13px] text-slate-400">Availability against operational thresholds</p>
                 </div>
                 <button
                   onClick={() => navigate("/resource-manager/inventory")}
-                  className="flex items-center gap-1 text-xs font-medium text-sky-700 hover:underline"
+                  className="flex items-center gap-1 text-sm font-medium text-sky-700 hover:underline"
                 >
                   View inventory <ChevronRight size={13} />
                 </button>
@@ -649,8 +670,8 @@ export default function ResourceDashboard() {
               <div className="space-y-4 p-5">
                 {stockHealth.map((item) => (
                   <div key={item.name} className="grid grid-cols-[115px_45px_1fr] items-center gap-2">
-                    <span className="text-[11px] font-semibold text-slate-700">{item.name}</span>
-                    <span className="text-right text-[10px] font-medium text-slate-400">{item.value}%</span>
+                    <span className="text-sm font-semibold text-slate-700">{item.name}</span>
+                    <span className="text-right text-[13px] font-medium text-slate-400">{item.value}%</span>
                     <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                       <div className={`h-full rounded-full transition-all duration-500 ${item.color}`} style={{ width: `${item.value}%` }} />
                     </div>
@@ -667,15 +688,15 @@ export default function ResourceDashboard() {
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
                 <div>
-                  <h3 className="text-xs font-semibold">Priority resource requests</h3>
-                  <p className="mt-0.5 text-[10px] text-slate-400">Awaiting review or active fulfilment</p>
+                  <h3 className="text-base font-semibold">Priority resource requests</h3>
+                  <p className="mt-0.5 text-[13px] text-slate-400">Awaiting review or active fulfilment</p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <select
                     value={priorityFilter}
                     onChange={e => setPriorityFilter(e.target.value)}
-                    className="rounded-lg border border-slate-200 px-2 py-1 text-[11px] text-slate-600 outline-none"
+                    className="rounded-lg border border-slate-200 px-2 py-1 text-sm sm:text-[15px] text-slate-600 outline-none"
                   >
                     <option>All priorities</option>
                     <option>Critical</option>
@@ -685,7 +706,7 @@ export default function ResourceDashboard() {
 
                   <button
                     onClick={() => navigate("/resource-manager/requests")}
-                    className="flex items-center gap-0.5 text-xs font-semibold text-sky-700 hover:underline ml-2"
+                    className="flex items-center gap-0.5 text-sm font-semibold text-sky-700 hover:underline ml-2"
                   >
                     View all <ChevronRight size={13} />
                   </button>
@@ -694,7 +715,7 @@ export default function ResourceDashboard() {
 
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-left">
-                  <thead className="bg-slate-50 text-[10px] text-slate-500 font-semibold">
+                  <thead className="bg-slate-50 text-[13px] text-slate-500 font-semibold">
                     <tr>
                       <th className="px-4 py-3">Request</th>
                       <th className="px-4 py-3">Requesting Unit</th>
@@ -709,20 +730,20 @@ export default function ResourceDashboard() {
                   </thead>
                   <tbody>
                     {filteredRequests.map((request) => (
-                      <tr key={request.id} className="border-t border-slate-100 text-[11px] hover:bg-slate-50 transition">
+                      <tr key={request.id} className="border-t border-slate-100 text-sm hover:bg-slate-50 transition">
                         <td className="px-4 py-3.5 font-bold text-slate-800">{request.id}</td>
                         <td className="px-4 py-3.5 font-medium text-slate-700">{request.unit}</td>
                         <td className="px-4 py-3.5 text-slate-600">{request.resource}</td>
                         <td className="px-4 py-3.5 font-medium">{request.quantity}</td>
                         <td className="px-4 py-3.5">
-                          <span className={`rounded px-2 py-0.5 text-[9px] font-semibold ${priorityStyle[request.priority] || "bg-slate-100 text-slate-600"}`}>
+                          <span className={`rounded px-2 py-0.5 text-xs font-semibold ${priorityStyle[request.priority] || "bg-slate-100 text-slate-600"}`}>
                             {request.priority}
                           </span>
                         </td>
                         <td className="px-4 py-3.5 text-slate-500">{request.source}</td>
                         <td className="px-4 py-3.5 text-slate-400">{request.age}</td>
                         <td className="px-4 py-3.5">
-                          <span className={`whitespace-nowrap rounded px-2 py-0.5 text-[9px] font-semibold ${statusStyle[request.status] || "bg-slate-100 text-slate-600"}`}>
+                          <span className={`whitespace-nowrap rounded px-2 py-0.5 text-xs font-semibold ${statusStyle[request.status] || "bg-slate-100 text-slate-600"}`}>
                             {request.status}
                           </span>
                         </td>
@@ -750,10 +771,10 @@ export default function ResourceDashboard() {
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                 <div>
-                  <h3 className="text-xs font-semibold">Live logistics activity</h3>
-                  <p className="mt-0.5 text-[10px] text-slate-400">Latest movements and decisions</p>
+                  <h3 className="text-base font-semibold">Live logistics activity</h3>
+                  <p className="mt-0.5 text-[13px] text-slate-400">Latest movements and decisions</p>
                 </div>
-                <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
+                <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 border border-emerald-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Live
                 </span>
@@ -773,10 +794,10 @@ export default function ResourceDashboard() {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[11px] font-bold text-slate-800">{activity.title}</p>
-                      <p className="text-[10px] text-slate-400">{activity.detail}</p>
+                      <p className="text-sm font-bold text-slate-800">{activity.title}</p>
+                      <p className="text-[13px] text-slate-400">{activity.detail}</p>
                     </div>
-                    <span className="shrink-0 text-[9px] font-medium text-slate-400">{activity.time}</span>
+                    <span className="shrink-0 text-xs font-medium text-slate-400">{activity.time}</span>
                   </div>
                 ))}
               </div>
@@ -785,7 +806,7 @@ export default function ResourceDashboard() {
 
           {/* QUICK ACTIONS */}
           <section>
-            <h3 className="mb-3 text-xs font-semibold text-slate-700">Quick actions</h3>
+            <h3 className="mb-3 text-base font-semibold text-slate-700">Quick actions</h3>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {[
                 { icon: Plus, label: "Record Receipt", action: () => setShowReceiptModal(true) },
@@ -814,7 +835,7 @@ export default function ResourceDashboard() {
             </div>
           </section>
 
-          <footer className="py-4 text-center text-[10px] text-slate-400 border-t border-slate-200/60">
+          <footer className="py-4 text-center text-[13px] text-slate-400 border-t border-slate-200/60">
             CareLink Humanitarian Operations Platform · Central Logistics Command
           </footer>
 
@@ -847,7 +868,7 @@ export default function ResourceDashboard() {
               </button>
             </div>
 
-            <label className="block text-xs font-semibold text-slate-700">
+            <label className="block text-sm font-semibold text-slate-700">
               Resource Name
               <input
                 required
@@ -859,7 +880,7 @@ export default function ResourceDashboard() {
             </label>
 
             <div className="grid grid-cols-2 gap-3">
-              <label className="block text-xs font-semibold text-slate-700">
+              <label className="block text-sm font-semibold text-slate-700">
                 Category
                 <select
                   value={receiptForm.category}
@@ -875,7 +896,7 @@ export default function ResourceDashboard() {
                 </select>
               </label>
 
-              <label className="block text-xs font-semibold text-slate-700">
+              <label className="block text-sm font-semibold text-slate-700">
                 Quantity (Units)
                 <input
                   required
@@ -889,7 +910,7 @@ export default function ResourceDashboard() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <label className="block text-xs font-semibold text-slate-700">
+              <label className="block text-sm font-semibold text-slate-700">
                 Destination Warehouse
                 <select
                   value={receiptForm.warehouse}
@@ -903,7 +924,7 @@ export default function ResourceDashboard() {
                 </select>
               </label>
 
-              <label className="block text-xs font-semibold text-slate-700">
+              <label className="block text-sm font-semibold text-slate-700">
                 Supplier (Optional)
                 <input
                   placeholder="e.g. Apex Health Logistics"
@@ -914,7 +935,7 @@ export default function ResourceDashboard() {
               </label>
             </div>
 
-            <label className="block text-xs font-semibold text-slate-700">
+            <label className="block text-sm font-semibold text-slate-700">
               Notes / Delivery Reference
               <input
                 placeholder="e.g. Delivery TR-0489 batch #104"
@@ -928,7 +949,7 @@ export default function ResourceDashboard() {
               <button
                 type="button"
                 onClick={() => setShowReceiptModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -936,7 +957,7 @@ export default function ResourceDashboard() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50 shadow-sm"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50 shadow-sm"
               >
                 {isSubmitting ? (
                   <>
@@ -972,7 +993,7 @@ export default function ResourceDashboard() {
             </div>
 
             <div className="mb-4 rounded-xl bg-sky-50 p-4 border border-sky-100">
-              <p className="text-xs font-bold text-sky-800">{selectedRequest.id}</p>
+              <p className="text-sm font-bold text-sky-800">{selectedRequest.id}</p>
               <h4 className="mt-1 text-base font-bold text-slate-800">{selectedRequest.resource}</h4>
               <p className="mt-0.5 text-xs text-slate-500">{selectedRequest.unit}</p>
             </div>
@@ -998,13 +1019,13 @@ export default function ResourceDashboard() {
                   setSelectedRequest(null);
                   navigate("/resource-manager/allocations");
                 }}
-                className="flex-1 rounded-lg bg-[#287ba5] py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition text-center"
+                className="flex-1 rounded-lg bg-[#287ba5] py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition text-center"
               >
                 Allocate Resource
               </button>
               <button
                 onClick={() => setSelectedRequest(null)}
-                className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Close
               </button>

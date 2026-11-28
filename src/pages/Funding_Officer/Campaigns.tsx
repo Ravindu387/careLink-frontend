@@ -321,7 +321,7 @@ export default function Campaigns() {
       {/* MAIN CONTENT */}
       <main className="w-full max-w-[1600px] mx-auto px-4 sm:px-5 lg:px-8 py-4 pb-8">
         {/* BREADCRUMB */}
-        <div className="flex items-center gap-2 text-[8px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={10} />
           <span className="text-slate-500">Funding & Donations</span>
@@ -348,8 +348,8 @@ export default function Campaigns() {
         {/* PAGE TITLE */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
           <div>
-            <h1 className="text-[21px] font-medium">Campaigns</h1>
-            <p className="text-[9px] text-slate-500 mt-1">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">Campaigns</h1>
+            <p className="text-xs text-slate-500 mt-1">
               Manage humanitarian appeals, targets, material needs, allocation, and public reporting.
             </p>
           </div>
@@ -362,7 +362,7 @@ export default function Campaigns() {
               }}
               disabled={loading}
               title="Refresh campaigns"
-              className="h-[31px] px-2.5 bg-white border border-[#b5cbd8] rounded-lg text-[9px] text-[#23749e] flex items-center gap-1.5 hover:bg-slate-50 disabled:opacity-50 transition"
+              className="h-[31px] px-2.5 bg-white border border-[#b5cbd8] rounded-lg text-sm text-[#23749e] flex items-center gap-1.5 hover:bg-slate-50 disabled:opacity-50 transition"
             >
               <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
               <span className="hidden sm:inline">Refresh</span>
@@ -370,7 +370,7 @@ export default function Campaigns() {
 
             <button
               onClick={() => setShowArchived(!showArchived)}
-              className={`h-[31px] px-3 border rounded-lg text-[9px] flex items-center gap-2 transition ${
+              className={`h-[31px] px-3 border rounded-lg text-sm flex items-center gap-2 transition ${
                 showArchived
                   ? "bg-[#e4f0f5] border-[#23749e] text-[#23749e]"
                   : "bg-white border-[#b5cbd8] text-[#23749e] hover:bg-slate-50"
@@ -382,7 +382,7 @@ export default function Campaigns() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-[31px] px-3 bg-[#23749e] text-white rounded-lg text-[9px] font-semibold flex items-center gap-2 hover:bg-[#175c80] transition"
+              className="h-[31px] px-3 bg-[#23749e] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#175c80] transition"
             >
               <Plus size={13} />
               Create campaign
@@ -440,7 +440,7 @@ export default function Campaigns() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search campaign title or ID..."
-              className="w-full h-[31px] bg-white border border-[#d5e3e9] rounded-lg pl-8 pr-3 text-[8px] outline-none focus:border-[#39ae90]"
+              className="w-full h-[31px] bg-white border border-[#d5e3e9] rounded-lg pl-8 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
             />
           </div>
 
@@ -481,7 +481,7 @@ export default function Campaigns() {
 
             <button
               onClick={() => setShowMoreFilters(!showMoreFilters)}
-              className={`h-[31px] px-3 bg-white border rounded-lg text-[8px] flex items-center justify-center gap-1.5 hover:bg-slate-50 whitespace-nowrap transition ${
+              className={`h-[31px] px-3 bg-white border rounded-lg text-sm flex items-center justify-center gap-1.5 hover:bg-slate-50 whitespace-nowrap transition ${
                 showMoreFilters ? "border-[#23749e] text-[#23749e]" : "border-[#b5cbd8]"
               }`}
             >
@@ -495,7 +495,7 @@ export default function Campaigns() {
         {showMoreFilters && (
           <div className="bg-white border border-[#d5e3e9] rounded-lg p-3 mb-3 flex flex-wrap gap-4 items-end animate-in fade-in">
             <div>
-              <label className="block text-[8px] text-slate-500 mb-1">
+              <label className="block text-sm text-slate-500 mb-1">
                 Minimum target ($)
               </label>
               <input
@@ -503,12 +503,12 @@ export default function Campaigns() {
                 value={minTargetInput}
                 onChange={(e) => setMinTargetInput(e.target.value)}
                 placeholder="Minimum amount"
-                className="h-[30px] border border-[#d5e3e9] rounded-md px-2 text-[9px] outline-none focus:border-[#39ae90]"
+                className="h-[30px] border border-[#d5e3e9] rounded-md px-2 text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
               />
             </div>
 
             <div>
-              <label className="block text-[8px] text-slate-500 mb-1">
+              <label className="block text-sm text-slate-500 mb-1">
                 Maximum target ($)
               </label>
               <input
@@ -516,7 +516,7 @@ export default function Campaigns() {
                 value={maxTargetInput}
                 onChange={(e) => setMaxTargetInput(e.target.value)}
                 placeholder="Maximum amount"
-                className="h-[30px] border border-[#d5e3e9] rounded-md px-2 text-[9px] outline-none focus:border-[#39ae90]"
+                className="h-[30px] border border-[#d5e3e9] rounded-md px-2 text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
               />
             </div>
 
@@ -527,7 +527,7 @@ export default function Campaigns() {
                   setAppliedMaxTarget(maxTargetInput ? Number(maxTargetInput) : undefined);
                   notify("Target filters applied.");
                 }}
-                className="bg-[#23749e] hover:bg-[#175c80] text-white rounded-md px-4 py-2 text-[9px] transition"
+                className="bg-[#23749e] hover:bg-[#175c80] text-white rounded-md px-4 py-2 text-sm transition"
               >
                 Apply filters
               </button>
@@ -540,7 +540,7 @@ export default function Campaigns() {
                   setAppliedMaxTarget(undefined);
                   notify("Target filters reset.");
                 }}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md px-3 py-2 text-[9px] transition"
+                className="bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md px-3 py-2 text-sm transition"
               >
                 Reset
               </button>
@@ -573,7 +573,7 @@ export default function Campaigns() {
                   {/* CARD TOP */}
                   <div className="flex items-center justify-between mb-2.5">
                     <span
-                      className={`px-2 py-1 rounded text-[7px] font-semibold ${
+                      className={`px-2 py-1 rounded text-xs font-semibold ${
                         campaign.status === "Active"
                           ? "bg-[#e4f6f0] text-[#159b79]"
                           : campaign.status === "Completed"
@@ -584,22 +584,22 @@ export default function Campaigns() {
                       {campaign.status}
                     </span>
 
-                    <span className="text-[7px] text-slate-400">
+                    <span className="text-xs text-slate-400">
                       {campaign.id}
                     </span>
                   </div>
 
                   {/* CAMPAIGN DETAILS */}
-                  <h2 className="text-[11px] font-medium mb-1">
+                  <h2 className="text-base sm:text-lg font-semibold mb-1">
                     {campaign.name}
                   </h2>
 
-                  <p className="text-[8px] text-slate-400 mb-3">
+                  <p className="text-xs text-slate-400 mb-3">
                     {campaign.event} · {campaign.period}
                   </p>
 
                   {/* AMOUNT AND TARGET */}
-                  <div className="flex items-center justify-between text-[8px] mb-2">
+                  <div className="flex items-center justify-between text-xs mb-2">
                     <span>
                       <strong>{formatMoney(campaign.raised)}</strong>
                       <span className="text-slate-500 ml-1">raised</span>
@@ -622,7 +622,7 @@ export default function Campaigns() {
 
                   {/* CARD BOTTOM */}
                   <div className="flex items-center justify-between mt-2.5">
-                    <span className="text-[8px] font-semibold">
+                    <span className="text-xs font-semibold">
                       {percentage.toFixed(1)}% funded
                     </span>
 
@@ -630,14 +630,14 @@ export default function Campaigns() {
                       {campaign.status === "Archived" ? (
                         <button
                           onClick={() => restoreCampaign(campaign.id)}
-                          className="text-[8px] text-[#159b79] hover:underline"
+                          className="text-sm text-[#159b79] hover:underline"
                         >
                           Restore
                         </button>
                       ) : (
                         <button
                           onClick={() => archiveCampaign(campaign.id)}
-                          className="text-[8px] text-slate-400 hover:text-amber-600 transition"
+                          className="text-sm text-slate-400 hover:text-amber-600 transition"
                         >
                           Archive
                         </button>
@@ -645,7 +645,7 @@ export default function Campaigns() {
 
                       <button
                         onClick={() => viewCampaign(campaign)}
-                        className="text-[8px] text-[#23749e] flex items-center gap-1 hover:underline"
+                        className="text-sm text-[#23749e] flex items-center gap-1 hover:underline"
                       >
                         View campaign
                         <ChevronRight size={12} />
@@ -662,8 +662,8 @@ export default function Campaigns() {
         {!loading && filteredCampaigns.length === 0 && (
           <div className="bg-white border border-[#d5e3e9] rounded-lg py-16 text-center mt-3">
             <Search size={25} className="mx-auto text-slate-300 mb-3" />
-            <h3 className="text-[12px] font-medium">No campaigns found</h3>
-            <p className="text-[9px] text-slate-400 mt-1">
+            <h3 className="text-base font-semibold">No campaigns found</h3>
+            <p className="text-xs text-slate-400 mt-1">
               Try changing your search or filter settings.
             </p>
             <button
@@ -678,7 +678,7 @@ export default function Campaigns() {
                 setMinTargetInput("");
                 setMaxTargetInput("");
               }}
-              className="text-[#23749e] text-[9px] mt-3 hover:underline"
+              className="text-[#23749e] text-sm mt-3 hover:underline"
             >
               Clear filters
             </button>
@@ -695,8 +695,8 @@ export default function Campaigns() {
           >
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-[16px] font-semibold">Create campaign</h2>
-                <p className="text-[9px] text-slate-400 mt-1">
+                <h2 className="text-lg sm:text-xl font-semibold">Create campaign</h2>
+                <p className="text-xs text-slate-400 mt-1">
                   Create a new humanitarian fundraising appeal.
                 </p>
               </div>
@@ -722,7 +722,7 @@ export default function Campaigns() {
                     })
                   }
                   placeholder="Enter campaign name"
-                  className="w-full h-8 px-2.5 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
+                  className="w-full h-8 px-2.5 border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
                 />
               </FormField>
 
@@ -735,7 +735,7 @@ export default function Campaigns() {
                       event: e.target.value,
                     })
                   }
-                  className="w-full h-8 px-2 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
+                  className="w-full h-8 px-2 border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
                 >
                   <option>Monsoon Floods 2025</option>
                   <option>Other Emergencies</option>
@@ -755,7 +755,7 @@ export default function Campaigns() {
                     })
                   }
                   placeholder="e.g. 500000"
-                  className="w-full h-8 px-2.5 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
+                  className="w-full h-8 px-2.5 border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
                 />
               </FormField>
 
@@ -771,7 +771,7 @@ export default function Campaigns() {
                         startDate: e.target.value,
                       })
                     }
-                    className="w-full h-8 px-2 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
+                    className="w-full h-8 px-2 border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
                   />
                 </FormField>
 
@@ -787,7 +787,7 @@ export default function Campaigns() {
                         endDate: e.target.value,
                       })
                     }
-                    className="w-full h-8 px-2 border border-[#d5e3e9] rounded-lg text-[10px] outline-none focus:border-[#39ae90]"
+                    className="w-full h-8 px-2 border border-[#d5e3e9] rounded-lg text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
                   />
                 </FormField>
               </div>
@@ -798,7 +798,7 @@ export default function Campaigns() {
                 type="button"
                 disabled={isSubmitting}
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px] hover:bg-slate-50 transition"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 transition"
               >
                 Cancel
               </button>
@@ -806,7 +806,7 @@ export default function Campaigns() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-[#23749e] hover:bg-[#175c80] text-white rounded-lg text-[10px] font-semibold flex items-center gap-1.5 transition disabled:opacity-60"
+                className="px-4 py-2 bg-[#23749e] hover:bg-[#175c80] text-white rounded-lg text-sm font-semibold flex items-center gap-1.5 transition disabled:opacity-60"
               >
                 {isSubmitting ? (
                   <>
@@ -828,10 +828,10 @@ export default function Campaigns() {
           <div className="bg-white rounded-xl shadow-xl w-full max-w-[430px] p-5 animate-in zoom-in-95">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-[8px] text-[#23749e] font-semibold">
+                <span className="text-xs text-[#23749e] font-semibold">
                   {selectedCampaign.id}
                 </span>
-                <h2 className="text-[17px] font-semibold mt-1">
+                <h2 className="text-lg sm:text-xl font-semibold mt-1">
                   {selectedCampaign.name}
                 </h2>
               </div>
@@ -871,7 +871,7 @@ export default function Campaigns() {
             </div>
 
             <div className="mt-5">
-              <div className="flex justify-between text-[9px] mb-2">
+              <div className="flex justify-between text-xs mb-2">
                 <span>Funding progress</span>
                 <strong>
                   {(
@@ -900,14 +900,14 @@ export default function Campaigns() {
               {selectedCampaign.status === "Archived" ? (
                 <button
                   onClick={() => restoreCampaign(selectedCampaign.id)}
-                  className="px-4 py-2 bg-[#e4f6f0] hover:bg-[#d5f0e7] text-[#159b79] rounded-lg text-[9px] font-semibold transition"
+                  className="px-4 py-2 bg-[#e4f6f0] hover:bg-[#d5f0e7] text-[#159b79] rounded-lg text-sm font-semibold transition"
                 >
                   Restore campaign
                 </button>
               ) : (
                 <button
                   onClick={() => archiveCampaign(selectedCampaign.id)}
-                  className="px-4 py-2 bg-[#fff3dd] hover:bg-[#ffe9c2] text-[#bd7b17] rounded-lg text-[9px] font-semibold transition"
+                  className="px-4 py-2 bg-[#fff3dd] hover:bg-[#ffe9c2] text-[#bd7b17] rounded-lg text-sm font-semibold transition"
                 >
                   Archive campaign
                 </button>
@@ -915,7 +915,7 @@ export default function Campaigns() {
 
               <button
                 onClick={() => setSelectedCampaign(null)}
-                className="px-4 py-2 bg-[#23749e] hover:bg-[#175c80] text-white rounded-lg text-[9px] font-semibold transition"
+                className="px-4 py-2 bg-[#23749e] hover:bg-[#175c80] text-white rounded-lg text-sm font-semibold transition"
               >
                 Close
               </button>
@@ -926,7 +926,7 @@ export default function Campaigns() {
 
       {/* TOAST */}
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-[10px] flex items-center gap-3 animate-in fade-in">
+        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-sm flex items-center gap-3 animate-in fade-in">
           <CheckCircle2 size={14} className="text-[#62b9a0]" />
           <span>{toast}</span>
           <button onClick={() => setToast("")}>
@@ -970,9 +970,9 @@ function StatCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[7px] text-slate-400">{title}</p>
+        <p className="text-xs text-slate-400">{title}</p>
         <h3 className="text-[18px] font-bold leading-5">{value}</h3>
-        <p className="text-[7px] text-slate-400 mt-0.5">{subtitle}</p>
+        <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
       </div>
     </div>
   );
@@ -996,7 +996,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none w-full lg:w-[105px] h-[31px] bg-white border border-[#d5e3e9] rounded-lg pl-2 pr-6 text-[8px] outline-none focus:border-[#39ae90] cursor-pointer"
+        className="appearance-none w-full lg:w-[105px] h-[31px] bg-white border border-[#d5e3e9] rounded-lg pl-2 pr-6 text-sm sm:text-[15px] outline-none focus:border-[#39ae90] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option} value={option}>{option}</option>
@@ -1024,7 +1024,7 @@ function FormField({
 }) {
   return (
     <label className="block">
-      <span className="block text-[9px] font-medium mb-1.5">{label}</span>
+      <span className="block text-xs font-medium mb-1.5">{label}</span>
       {children}
     </label>
   );
@@ -1047,10 +1047,10 @@ function DetailItem({
     <div className="bg-[#f5f8f9] rounded-lg p-3">
       <div className="flex items-center gap-2 text-[#23749e] mb-2">
         {icon}
-        <span className="text-[8px] text-slate-500">{label}</span>
+        <span className="text-xs text-slate-500">{label}</span>
       </div>
 
-      <p className="text-[10px] font-semibold break-words">{value}</p>
+      <p className="text-sm font-semibold break-words">{value}</p>
     </div>
   );
 }

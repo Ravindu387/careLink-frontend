@@ -1,6 +1,26 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
-import type { User, LoginPayload, RegisterPayload, AuthResponse } from "../types/auth";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
+import type {
+  User,
+  LoginPayload,
+  RegisterPayload,
+  AuthResponse,
+  RegisterResponse,
+} from "../types/auth";
 import { authService } from "../services/authService";
+import {
+  type AppRole,
+  getDashboardPathForRoles,
+  normalizeAppRole,
+  normalizeUserRoles,
+  resolvePrimaryRole,
+} from "../constants/roles";
 
 interface AuthContextType {
   user: User | null;
@@ -8,27 +28,65 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   roles: string[];
+  normalizedRoles: AppRole[];
+  primaryRole: AppRole | null;
+  dashboardPath: string | null;
   permissions: string[];
   hasRole: (role: string) => boolean;
   hasAnyRole: (roles: string[]) => boolean;
   hasPermission: (permission: string) => boolean;
   hasAnyPermission: (permissions: string[]) => boolean;
   hasAllPermissions: (permissions: string[]) => boolean;
+  getDashboardPath: () => string;
   login: (payload: LoginPayload) => Promise<AuthResponse>;
-  register: (payload: RegisterPayload) => Promise<AuthResponse>;
+  register: (payload: RegisterPayload) => Promise<RegisterResponse>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(authService.getStoredUser());
-  const [token, setToken] = useState<string | null>(authService.getToken());
+function isJwtExpired(token: string | null): boolean {
+  if (!token) return true;
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return false; // Non-JWT mock token in tests
+    const payloadJson = atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"));
+    const payload = JSON.parse(payloadJson);
+    if (typeof payload.exp === "number") {
+      return payload.exp * 1000 < Date.now();
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User | null>(() => {
+    const storedToken = authService.getToken();
+    if (storedToken && isJwtExpired(storedToken)) {
+      authService.logout();
+      return null;
+    }
+    return authService.getStoredUser();
+  });
+  const [token, setToken] = useState<string | null>(() => {
+    const storedToken = authService.getToken();
+    if (storedToken && isJwtExpired(storedToken)) {
+      authService.logout();
+      return null;
+    }
+    return storedToken;
+  });
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const refreshUser = useCallback(async () => {
-    if (!authService.isAuthenticated()) {
+    const currentToken = authService.getToken();
+    if (!currentToken || isJwtExpired(currentToken)) {
+      authService.logout();
       setUser(null);
       setToken(null);
       setIsLoading(false);
@@ -40,7 +98,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(currentUser);
       setToken(authService.getToken());
     } catch {
-      // If token expired or invalid, log out cleanly
       authService.logout();
       setUser(null);
       setToken(null);
@@ -60,83 +117,121 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return authData;
   };
 
-  const register = async (payload: RegisterPayload): Promise<AuthResponse> => {
-    const authData = await authService.register(payload);
-    setUser(authData.user);
-    setToken(authData.token);
-    return authData;
+  const register = async (
+    payload: RegisterPayload
+  ): Promise<RegisterResponse> => {
+    const regData = await authService.register(payload);
+    if (regData.token && regData.user && !regData.requiresAdminApproval) {
+      setUser(regData.user);
+      setToken(regData.token);
+    }
+    return regData;
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     authService.logout();
     setUser(null);
     setToken(null);
-  };
+  }, []);
 
   const roles = useMemo(() => user?.roles || [], [user]);
+  const normalizedRoles = useMemo(() => normalizeUserRoles(roles), [roles]);
+  const primaryRole = useMemo(() => resolvePrimaryRole(roles), [roles]);
+  const dashboardPath = useMemo(() => getDashboardPathForRoles(roles), [roles]);
   const permissions = useMemo(() => user?.permissions || [], [user]);
 
-  const hasRole = useCallback((targetRole: string): boolean => {
-    if (!roles || roles.length === 0) return false;
-    const lower = targetRole.toLowerCase();
-
-    // Check direct match
-    if (roles.some((r) => r.toLowerCase() === lower)) return true;
-
-    // Check alias: "admin" matches "admin" or "systemadmin"
-    if (lower === "admin" || lower === "systemadmin") {
-      return roles.some((r) => {
-        const rLower = r.toLowerCase();
-        return rLower === "admin" || rLower === "systemadmin";
-      });
-    }
-
-    return false;
-  }, [roles]);
-
-  const hasAnyRole = useCallback((targetRoles: string[]): boolean => {
-    if (!targetRoles || targetRoles.length === 0) return true;
-    return targetRoles.some((r) => hasRole(r));
-  }, [hasRole]);
-
-  const hasPermission = useCallback((permission: string): boolean => {
+  const isAccountActive = useMemo(() => {
     if (!user) return false;
-
-    // Admins have access to everything
-    if (hasRole("Admin") || hasRole("SystemAdmin")) {
-      return true;
+    if (user.isActive === false) return false;
+    if (user.requiresPasswordSetup) return false;
+    if (
+      user.accountStatus &&
+      user.accountStatus !== "Active"
+    ) {
+      return false;
     }
+    return true;
+  }, [user]);
 
-    if (!permissions || permissions.length === 0) return false;
-    return permissions.some((p) => p.toLowerCase() === permission.toLowerCase());
-  }, [user, hasRole, permissions]);
+  const hasRole = useCallback(
+    (targetRole: string): boolean => {
+      if (!isAccountActive || !roles || roles.length === 0) return false;
 
-  const hasAnyPermission = useCallback((perms: string[]): boolean => {
-    if (!perms || perms.length === 0) return true;
-    if (hasRole("Admin") || hasRole("SystemAdmin")) return true;
-    return perms.some((p) => hasPermission(p));
-  }, [hasRole, hasPermission]);
+      const canonicalTarget = normalizeAppRole(targetRole);
+      if (canonicalTarget) {
+        return normalizedRoles.includes(canonicalTarget);
+      }
 
-  const hasAllPermissions = useCallback((perms: string[]): boolean => {
-    if (!perms || perms.length === 0) return true;
-    if (hasRole("Admin") || hasRole("SystemAdmin")) return true;
-    return perms.every((p) => hasPermission(p));
-  }, [hasRole, hasPermission]);
+      const lower = targetRole.trim().toLowerCase();
+      return roles.some((r) => r.trim().toLowerCase() === lower);
+    },
+    [isAccountActive, roles, normalizedRoles]
+  );
+
+  const hasAnyRole = useCallback(
+    (targetRoles: string[]): boolean => {
+      if (!targetRoles || targetRoles.length === 0) return isAccountActive;
+      return targetRoles.some((r) => hasRole(r));
+    },
+    [isAccountActive, hasRole]
+  );
+
+  const hasPermission = useCallback(
+    (permission: string): boolean => {
+      if (!user || !isAccountActive) return false;
+
+      if (hasRole("Admin")) {
+        return true;
+      }
+
+      if (!permissions || permissions.length === 0) return false;
+      return permissions.some(
+        (p) => p.toLowerCase() === permission.toLowerCase()
+      );
+    },
+    [user, isAccountActive, hasRole, permissions]
+  );
+
+  const hasAnyPermission = useCallback(
+    (perms: string[]): boolean => {
+      if (!perms || perms.length === 0) return isAccountActive;
+      if (hasRole("Admin")) return true;
+      return perms.some((p) => hasPermission(p));
+    },
+    [isAccountActive, hasRole, hasPermission]
+  );
+
+  const hasAllPermissions = useCallback(
+    (perms: string[]): boolean => {
+      if (!perms || perms.length === 0) return isAccountActive;
+      if (hasRole("Admin")) return true;
+      return perms.every((p) => hasPermission(p));
+    },
+    [isAccountActive, hasRole, hasPermission]
+  );
+
+  const getDashboardPath = useCallback((): string => {
+    return dashboardPath || "/login";
+  }, [dashboardPath]);
 
   return (
     <AuthContext.Provider
       value={{
         user,
         token,
-        isAuthenticated: !!token && !!user,
+        isAuthenticated: !!token && !!user && !isJwtExpired(token),
         isLoading,
         roles,
+        normalizedRoles,
+        primaryRole,
+        dashboardPath,
         permissions,
         hasRole,
         hasAnyRole,
         hasPermission,
         hasAnyPermission,
         hasAllPermissions,
+        getDashboardPath,
         login,
         register,
         logout,

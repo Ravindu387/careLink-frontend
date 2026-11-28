@@ -1,6 +1,7 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -100,6 +101,26 @@ export default function FundAllocations() {
   const [page, setPage] = useState(1);
   const [toast, setToast] = useState("");
 
+  useEffect(() => {
+    apiClient.get<any>("/fund-allocations").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setAllocations(
+          items.map((a: any) => ({
+            id: a.id || a.reference || "ALL-4400",
+            amount: Number(a.amount ?? 0),
+            source: a.source || a.campaign || "Flood Response 2025",
+            purpose: a.purpose || "Emergency Relief",
+            recipient: a.recipient || "CareLink",
+            date: a.date || "Today",
+            approval: (a.approval as Allocation["approval"]) || "Approved",
+            disbursement: (a.disbursement as Allocation["disbursement"]) || "Disbursed",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   const [newAllocation, setNewAllocation] = useState({
     amount: "",
     source: "Flood Response 2025",
@@ -173,6 +194,14 @@ export default function FundAllocations() {
       notify("Please enter valid allocation details.");
       return;
     }
+
+    apiClient.post("/fund-allocations", {
+      amount,
+      source: newAllocation.source,
+      purpose: newAllocation.purpose,
+      recipient: newAllocation.recipient,
+      date: newAllocation.date,
+    }).catch(() => {});
 
     const allocation: Allocation = {
       id: `ALL-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -423,7 +452,7 @@ export default function FundAllocations() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-8">
+        <div className="flex items-center gap-2 text-xs mb-8">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={11} />
           <span className="text-slate-500">
@@ -438,11 +467,11 @@ export default function FundAllocations() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
 
           <div>
-            <h1 className="text-[23px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Fund Allocations
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[13px] text-slate-500 mt-1">
               Allocate verified funds to approved humanitarian
               needs with accountable rationale.
             </p>
@@ -452,7 +481,7 @@ export default function FundAllocations() {
 
             <button
               onClick={exportCSV}
-              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-[10px] text-[#23749e] flex items-center gap-2 hover:bg-[#f5fafc]"
+              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-sm text-[#23749e] flex items-center gap-2 hover:bg-[#f5fafc]"
             >
               <Download size={15} />
               Export
@@ -460,7 +489,7 @@ export default function FundAllocations() {
 
             <button
               onClick={() => setShowModal(true)}
-              className="h-[40px] px-4 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-[#175c80]"
+              className="h-[40px] px-4 bg-[#23749e] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#175c80]"
             >
               <Plus size={16} />
               Allocate funds
@@ -486,7 +515,7 @@ export default function FundAllocations() {
                 setPage(1);
               }}
               placeholder="Search allocation ID, recipient, or purpose..."
-              className="w-full h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-10 pr-3 text-[10px] outline-none focus:border-[#35b995]"
+              className="w-full h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-10 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#35b995]"
             />
           </div>
 
@@ -548,7 +577,7 @@ export default function FundAllocations() {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-[10px] text-[#23749e] flex items-center justify-center gap-2 whitespace-nowrap hover:bg-[#f5fafc]"
+              className="h-[40px] px-4 bg-white border border-[#b9cfda] rounded-lg text-sm text-[#23749e] flex items-center justify-center gap-2 whitespace-nowrap hover:bg-[#f5fafc]"
             >
               <Filter size={14} />
               More filters
@@ -562,37 +591,37 @@ export default function FundAllocations() {
           <div className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-4 flex flex-wrap items-end gap-4">
 
             <div>
-              <label className="block text-[9px] text-slate-500 mb-1.5">
+              <label className="block text-sm text-slate-500 mb-1.5">
                 Recipient
               </label>
 
               <input
                 placeholder="Search recipient"
-                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-[10px]"
+                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px]"
               />
             </div>
 
             <div>
-              <label className="block text-[9px] text-slate-500 mb-1.5">
+              <label className="block text-sm text-slate-500 mb-1.5">
                 Minimum amount
               </label>
 
               <input
                 type="number"
                 placeholder="Minimum USD"
-                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-[10px]"
+                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px]"
               />
             </div>
 
             <div>
-              <label className="block text-[9px] text-slate-500 mb-1.5">
+              <label className="block text-sm text-slate-500 mb-1.5">
                 Maximum amount
               </label>
 
               <input
                 type="number"
                 placeholder="Maximum USD"
-                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-[10px]"
+                className="h-[35px] border border-[#d5e3e9] rounded-lg px-3 text-sm sm:text-[15px]"
               />
             </div>
 
@@ -601,14 +630,14 @@ export default function FundAllocations() {
                 setShowFilters(false);
                 notify("Additional filters applied.");
               }}
-              className="h-[35px] px-4 bg-[#23749e] text-white rounded-lg text-[10px]"
+              className="h-[35px] px-4 bg-[#23749e] text-white rounded-lg text-sm"
             >
               Apply filters
             </button>
 
             <button
               onClick={clearFilters}
-              className="h-[35px] px-3 text-[#23749e] text-[10px]"
+              className="h-[35px] px-3 text-[#23749e] text-sm"
             >
               Clear filters
             </button>
@@ -624,18 +653,18 @@ export default function FundAllocations() {
           <div className="px-4 py-4 flex items-center justify-between border-b border-[#d7e4e9]">
 
             <div>
-              <h2 className="text-[13px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Fund Allocations
               </h2>
 
-              <p className="text-[9px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 {filteredAllocations.length} demonstration records
               </p>
             </div>
 
             <button
               onClick={bulkApprove}
-              className="h-[40px] px-4 border border-[#b9cfda] rounded-lg text-[9px] text-[#23749e] hover:bg-[#f5fafc]"
+              className="h-[40px] px-4 border border-[#b9cfda] rounded-lg text-sm text-[#23749e] hover:bg-[#f5fafc]"
             >
               Bulk actions
               {selectedRows.length > 0 &&
@@ -678,7 +707,7 @@ export default function FundAllocations() {
                   ].map((heading) => (
                     <th
                       key={heading}
-                      className="px-3 py-3 text-[9px] font-medium text-slate-500 whitespace-nowrap"
+                      className="px-3 py-3 text-[13px] font-medium text-slate-500 whitespace-nowrap"
                     >
                       {heading}
                     </th>
@@ -705,33 +734,33 @@ export default function FundAllocations() {
                       />
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] font-semibold whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm font-semibold whitespace-nowrap">
                       {item.id}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {formatCurrency(item.amount)}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {item.source}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {item.purpose}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {item.recipient}
                     </td>
 
-                    <td className="px-3 py-4 text-[10px] whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {item.date}
                     </td>
 
                     <td className="px-3 py-4">
                       <span
-                        className={`inline-flex px-2.5 py-1.5 rounded-md text-[9px] font-semibold whitespace-nowrap ${getApprovalStyle(
+                        className={`inline-flex px-2.5 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap ${getApprovalStyle(
                           item.approval
                         )}`}
                       >
@@ -741,7 +770,7 @@ export default function FundAllocations() {
 
                     <td className="px-3 py-4">
                       <span
-                        className={`inline-flex px-2.5 py-1.5 rounded-md text-[9px] font-semibold whitespace-nowrap ${getDisbursementStyle(
+                        className={`inline-flex px-2.5 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap ${getDisbursementStyle(
                           item.disbursement
                         )}`}
                       >
@@ -772,7 +801,7 @@ export default function FundAllocations() {
                               setSelectedAllocation(item);
                               setActiveMenu(null);
                             }}
-                            className="w-full text-left px-3 py-2 text-[10px] hover:bg-[#f1f6f8]"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-[#f1f6f8]"
                           >
                             View allocation details
                           </button>
@@ -783,7 +812,7 @@ export default function FundAllocations() {
                                 onClick={() =>
                                   approveAllocation(item.id)
                                 }
-                                className="w-full text-left px-3 py-2 text-[10px] text-[#159b79] hover:bg-[#f1f6f8]"
+                                className="w-full text-left px-3 py-2 text-sm text-[#159b79] hover:bg-[#f1f6f8]"
                               >
                                 Approve allocation
                               </button>
@@ -792,7 +821,7 @@ export default function FundAllocations() {
                                 onClick={() =>
                                   rejectAllocation(item.id)
                                 }
-                                className="w-full text-left px-3 py-2 text-[10px] text-red-500 hover:bg-[#f1f6f8]"
+                                className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-[#f1f6f8]"
                               >
                                 Reject allocation
                               </button>
@@ -805,7 +834,7 @@ export default function FundAllocations() {
                                 onClick={() =>
                                   disburseAllocation(item.id)
                                 }
-                                className="w-full text-left px-3 py-2 text-[10px] text-[#23749e] hover:bg-[#f1f6f8]"
+                                className="w-full text-left px-3 py-2 text-sm text-[#23749e] hover:bg-[#f1f6f8]"
                               >
                                 Mark as disbursed
                               </button>
@@ -829,17 +858,17 @@ export default function FundAllocations() {
                         className="mx-auto text-slate-300 mb-3"
                       />
 
-                      <p className="text-[11px] font-medium">
+                      <p className="text-sm font-medium">
                         No fund allocations found
                       </p>
 
-                      <p className="text-[9px] text-slate-400 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         Try changing your search or filters.
                       </p>
 
                       <button
                         onClick={clearFilters}
-                        className="text-[#23749e] text-[9px] mt-3"
+                        className="text-[#23749e] text-sm mt-3"
                       >
                         Clear filters
                       </button>
@@ -855,7 +884,7 @@ export default function FundAllocations() {
 
           <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing 1–{filteredAllocations.length} of{" "}
               {filteredAllocations.length === allocations.length
                 ? "1,842"
@@ -869,7 +898,7 @@ export default function FundAllocations() {
                 onClick={() =>
                   setPage((previous) => Math.max(1, previous - 1))
                 }
-                className="h-[34px] px-4 border border-[#d5e3e9] rounded-lg text-[9px] disabled:opacity-40"
+                className="h-[34px] px-4 border border-[#d5e3e9] rounded-lg text-sm disabled:opacity-40"
               >
                 Previous
               </button>
@@ -878,7 +907,7 @@ export default function FundAllocations() {
                 <button
                   key={number}
                   onClick={() => setPage(number)}
-                  className={`w-[34px] h-[34px] border rounded-lg text-[9px] ${
+                  className={`w-[34px] h-[34px] border rounded-lg text-sm ${
                     page === number
                       ? "bg-[#23749e] text-white border-[#23749e]"
                       : "bg-white border-[#d5e3e9]"
@@ -890,7 +919,7 @@ export default function FundAllocations() {
 
               <button
                 onClick={() => setPage((previous) => previous + 1)}
-                className="h-[34px] px-4 border border-[#b9cfda] rounded-lg text-[9px] text-[#23749e]"
+                className="h-[34px] px-4 border border-[#b9cfda] rounded-lg text-sm text-[#23749e]"
               >
                 Next
               </button>
@@ -913,11 +942,11 @@ export default function FundAllocations() {
             <div className="flex justify-between items-start mb-5">
 
               <div>
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Allocate funds
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Assign funds to an approved humanitarian need.
                 </p>
               </div>
@@ -1019,7 +1048,7 @@ export default function FundAllocations() {
                   className="text-[#23749e] shrink-0"
                 />
 
-                <p className="text-[9px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   New allocations will be submitted with
                   <strong> Under Review </strong>
                   status and require approval before funds
@@ -1033,14 +1062,14 @@ export default function FundAllocations() {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px]"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold hover:bg-[#175c80]"
+                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-sm font-semibold hover:bg-[#175c80]"
               >
                 Create allocation
               </button>
@@ -1060,11 +1089,11 @@ export default function FundAllocations() {
             <div className="flex items-start justify-between mb-5">
 
               <div>
-                <p className="text-[9px] text-[#23749e] font-semibold">
+                <p className="text-xs text-[#23749e] font-semibold">
                   {selectedAllocation.id}
                 </p>
 
-                <h2 className="text-[16px] font-semibold mt-1">
+                <h2 className="text-lg sm:text-xl font-semibold mt-1">
                   Allocation details
                 </h2>
               </div>
@@ -1077,7 +1106,7 @@ export default function FundAllocations() {
             </div>
 
             <div className="bg-[#eef5f7] rounded-lg p-4 mb-4">
-              <p className="text-[9px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 Allocation amount
               </p>
 
@@ -1100,11 +1129,11 @@ export default function FundAllocations() {
                   key={label}
                   className="flex justify-between gap-3 border-b border-slate-100 pb-2"
                 >
-                  <span className="text-[9px] text-slate-400">
+                  <span className="text-xs text-slate-400">
                     {label}
                   </span>
 
-                  <span className="text-[9px] font-medium text-right">
+                  <span className="text-xs font-medium text-right">
                     {value}
                   </span>
                 </div>
@@ -1120,7 +1149,7 @@ export default function FundAllocations() {
                     onClick={() =>
                       rejectAllocation(selectedAllocation.id)
                     }
-                    className="px-3 py-2 bg-[#fde9e9] text-red-600 rounded-lg text-[9px]"
+                    className="px-3 py-2 bg-[#fde9e9] text-red-600 rounded-lg text-sm"
                   >
                     Reject
                   </button>
@@ -1129,7 +1158,7 @@ export default function FundAllocations() {
                     onClick={() =>
                       approveAllocation(selectedAllocation.id)
                     }
-                    className="px-3 py-2 bg-[#e4f6f0] text-[#159b79] rounded-lg text-[9px]"
+                    className="px-3 py-2 bg-[#e4f6f0] text-[#159b79] rounded-lg text-sm"
                   >
                     Approve
                   </button>
@@ -1142,7 +1171,7 @@ export default function FundAllocations() {
                     onClick={() =>
                       disburseAllocation(selectedAllocation.id)
                     }
-                    className="px-3 py-2 bg-[#23749e] text-white rounded-lg text-[9px]"
+                    className="px-3 py-2 bg-[#23749e] text-white rounded-lg text-sm"
                   >
                     Mark disbursed
                   </button>
@@ -1150,7 +1179,7 @@ export default function FundAllocations() {
 
               <button
                 onClick={() => setSelectedAllocation(null)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[9px]"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm"
               >
                 Close
               </button>
@@ -1163,7 +1192,7 @@ export default function FundAllocations() {
       {/* TOAST */}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 text-[10px]">
+        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 text-sm">
 
           <CheckCircle2 size={15} />
 
@@ -1198,7 +1227,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none w-full lg:w-[150px] h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#35b995] cursor-pointer"
+        className="appearance-none w-full lg:w-[150px] h-[40px] bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-sm sm:text-[15px] outline-none focus:border-[#35b995] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -1230,7 +1259,7 @@ function FormField({
   return (
     <label className="block">
 
-      <span className="block text-[9px] font-medium mb-1.5">
+      <span className="block text-xs font-medium mb-1.5">
         {label}
       </span>
 

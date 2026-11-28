@@ -268,9 +268,9 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-[#153f5e]">Situation Reports</h1>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">Situation Reports</h1>
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
                 isLiveConnected ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
               }`}
             >
@@ -290,7 +290,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleRefresh}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
             title="Refresh reports"
           >
             <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
@@ -299,7 +299,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
 
           <button
             onClick={handleResetData}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors"
             title="Reset to default seed fixtures"
           >
             <RotateCcw size={13} />
@@ -308,7 +308,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
 
           <button
             onClick={() => setShowTemplates(true)}
-            className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] bg-white px-4 py-2 text-xs font-medium text-[#175477] hover:bg-sky-50 transition-colors"
+            className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] bg-white px-4 py-2 text-sm font-medium text-[#175477] hover:bg-sky-50 transition-colors"
           >
             <LayoutTemplate size={15} />
             <span>Templates</span>
@@ -316,7 +316,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
 
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#153f5e] transition-colors"
+            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-[#153f5e] transition-colors"
           >
             <Plus size={16} />
             <span>Create Report</span>
@@ -327,14 +327,14 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
       {/* Latest Approved Report Card */}
       {latestReport && (
         <div className="mb-4 rounded-xl border border-[#d5e2e9] bg-white p-4 shadow-xs">
-          <div className="mb-2 inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-700">
+          <div className="mb-2 inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-700">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             LATEST APPROVED SITREP
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex-1 min-w-[280px]">
-              <h2 className="text-base font-bold text-[#153f5e]">
+              <h2 className="text-lg sm:text-xl font-bold text-[#153f5e]">
                 {latestReport.id} · {latestReport.title}
               </h2>
 
@@ -344,28 +344,28 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
 
               <div className="mt-3.5 flex flex-wrap gap-x-8 gap-y-2">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     Prepared by
                   </p>
-                  <p className="mt-0.5 text-xs font-semibold text-[#153f5e]">
+                  <p className="mt-0.5 text-sm font-semibold text-[#153f5e]">
                     {latestReport.preparedBy}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     Approved by
                   </p>
-                  <p className="mt-0.5 text-xs font-semibold text-[#153f5e]">
+                  <p className="mt-0.5 text-sm font-semibold text-[#153f5e]">
                     {latestReport.approvedBy}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     Distribution
                   </p>
-                  <p className="mt-0.5 text-xs font-semibold text-[#153f5e]">
+                  <p className="mt-0.5 text-sm font-semibold text-[#153f5e]">
                     {latestReport.recipients} partner organisations
                   </p>
                 </div>
@@ -375,7 +375,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
             <div className="flex gap-2">
               <button
                 onClick={() => setSelectedReport(latestReport)}
-                className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] px-3.5 py-2 text-xs font-medium text-[#175477] hover:bg-sky-50 transition-colors"
+                className="flex items-center gap-2 rounded-lg border border-[#c4d7e1] px-3.5 py-2 text-sm font-medium text-[#175477] hover:bg-sky-50 transition-colors"
               >
                 <Eye size={14} />
                 <span>Preview</span>
@@ -383,7 +383,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
 
               <button
                 onClick={() => downloadReport(latestReport)}
-                className="flex items-center gap-2 rounded-lg bg-[#287da5] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#153f5e] transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-[#287da5] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#153f5e] transition-colors"
               >
                 <Download size={14} />
                 <span>Download PDF</span>
@@ -436,7 +436,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search report ID, title, or disaster..."
-            className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+            className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
           />
           {search && (
             <button onClick={() => setSearch("")} className="text-slate-400 hover:text-slate-600">
@@ -448,7 +448,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
         <select
           value={eventFilter}
           onChange={(e) => setEventFilter(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-xs text-slate-700 outline-none shadow-2xs"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none shadow-2xs"
         >
           <option>All crisis events</option>
           <option>Monsoon Floods 2025</option>
@@ -458,7 +458,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-xs text-slate-700 outline-none shadow-2xs"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none shadow-2xs"
         >
           <option>All report states</option>
           <option>Approved</option>
@@ -469,7 +469,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
         <select
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-xs text-slate-700 outline-none shadow-2xs"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-700 outline-none shadow-2xs"
         >
           <option>Date range</option>
           <option>Last 7 days</option>
@@ -497,10 +497,10 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
                   </div>
 
                   <div className="min-w-0">
-                    <h3 className="text-xs font-bold text-[#153f5e] truncate">
+                    <h3 className="text-base font-bold text-[#153f5e] truncate">
                       {report.id} · {report.title}
                     </h3>
-                    <p className="mt-0.5 text-[10px] text-slate-400 truncate">
+                    <p className="mt-0.5 text-[13px] text-slate-400 truncate">
                       {report.period} · {report.recipients} recipients
                     </p>
                   </div>
@@ -508,7 +508,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
 
                 <div className="flex items-center gap-2 shrink-0">
                   <span
-                    className={`rounded-md px-2.5 py-1 text-[10px] font-bold ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-bold ${
                       statusStyles[report.status] ?? "bg-slate-100 text-slate-600"
                     }`}
                   >
@@ -526,7 +526,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
               </div>
 
               <div className="p-4">
-                <h3 className="text-sm font-bold text-[#153f5e] leading-snug">
+                <h3 className="text-base font-bold text-[#153f5e] leading-snug">
                   {report.id} · {report.title}
                 </h3>
 
@@ -535,7 +535,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
                 </p>
 
                 {report.executiveSummary && (
-                  <p className="mt-2 text-xs text-slate-600 line-clamp-2 bg-[#f8fafb] rounded-md p-2">
+                  <p className="mt-2 text-sm text-slate-600 line-clamp-2 bg-[#f8fafb] rounded-md p-2">
                     {report.executiveSummary}
                   </p>
                 )}
@@ -543,28 +543,28 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
                 <div className="mt-4 flex flex-wrap items-end justify-between gap-4 border-t border-slate-100 pt-3">
                   <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs">
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Prepared by
                       </p>
-                      <p className="mt-0.5 text-[11px] font-semibold text-[#153f5e]">
+                      <p className="mt-0.5 text-sm font-semibold text-[#153f5e]">
                         {report.preparedBy}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Approved by
                       </p>
-                      <p className="mt-0.5 text-[11px] font-semibold text-[#153f5e]">
+                      <p className="mt-0.5 text-sm font-semibold text-[#153f5e]">
                         {report.approvedBy}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Recipients
                       </p>
-                      <p className="mt-0.5 text-[11px] font-semibold text-[#153f5e]">
+                      <p className="mt-0.5 text-sm font-semibold text-[#153f5e]">
                         {report.recipients} orgs
                       </p>
                     </div>
@@ -574,7 +574,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
                     {report.status === "Draft" ? (
                       <button
                         onClick={() => handleTransitionStatus(report.id, "Approved")}
-                        className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-700 transition-colors"
+                        className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors"
                       >
                         <CheckCircle2 size={12} />
                         <span>Approve</span>
@@ -582,7 +582,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
                     ) : report.status === "Approved" ? (
                       <button
                         onClick={() => handleTransitionStatus(report.id, "Published")}
-                        className="flex items-center gap-1 rounded-lg bg-[#287da5] px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-[#153f5e] transition-colors"
+                        className="flex items-center gap-1 rounded-lg bg-[#287da5] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#153f5e] transition-colors"
                       >
                         <Send size={12} />
                         <span>Publish</span>
@@ -591,7 +591,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
 
                     <button
                       onClick={() => setSelectedReport(report)}
-                      className="flex items-center gap-1 rounded-lg border border-[#c4d7e1] px-3 py-1.5 text-[11px] font-medium text-[#175477] hover:bg-sky-50 transition-colors"
+                      className="flex items-center gap-1 rounded-lg border border-[#c4d7e1] px-3 py-1.5 text-sm font-medium text-[#175477] hover:bg-sky-50 transition-colors"
                     >
                       <Eye size={12} />
                       <span>Preview</span>
@@ -599,7 +599,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
 
                     <button
                       onClick={() => downloadReport(report)}
-                      className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                      className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                     >
                       <Download size={12} />
                       <span>PDF</span>
@@ -627,21 +627,21 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
         <Modal title="Create Situation Report Draft" onClose={() => setShowCreate(false)}>
           <div className="space-y-3.5">
             <div>
-              <label className="text-xs font-bold text-slate-700">Report Title</label>
+              <label className="text-sm font-bold text-slate-700">Report Title</label>
               <input
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="e.g. Greater Riverton Lowland Evacuation Assessment"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#287da5]"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-700">Crisis Event</label>
+              <label className="text-sm font-bold text-slate-700">Crisis Event</label>
               <select
                 value={newEvent}
                 onChange={(e) => setNewEvent(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#287da5]"
               >
                 <option>Monsoon Floods 2025</option>
                 <option>North Ridge Landslide</option>
@@ -651,20 +651,20 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-700">Executive Summary</label>
+              <label className="text-sm font-bold text-slate-700">Executive Summary</label>
               <textarea
                 rows={3}
                 value={newSummary}
                 onChange={(e) => setNewSummary(e.target.value)}
                 placeholder="Key operational updates, sector casualties, and priority actions..."
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#287da5]"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#287da5]"
               />
             </div>
 
             <button
               disabled={isSubmitting}
               onClick={createReport}
-              className="mt-2 w-full rounded-lg bg-[#287da5] py-2.5 text-xs font-semibold text-white hover:bg-[#153f5e] transition-colors"
+              className="mt-2 w-full rounded-lg bg-[#287da5] py-2.5 text-sm font-semibold text-white hover:bg-[#153f5e] transition-colors"
             >
               {isSubmitting ? "Creating Draft..." : "Create Draft Report"}
             </button>
@@ -677,17 +677,17 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
         <Modal title="Situation Report Preview" onClose={() => setSelectedReport(null)}>
           <div className="mb-4 rounded-xl bg-emerald-50 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-emerald-700 tracking-wider">
+              <span className="text-xs font-bold text-emerald-700 tracking-wider">
                 {selectedReport.status.toUpperCase()} SITREP
               </span>
-              <span className="text-[10px] font-mono text-emerald-800">
+              <span className="text-sm font-mono text-emerald-800">
                 {selectedReport.id}
               </span>
             </div>
             <h3 className="mt-1 text-base font-bold text-[#153f5e]">
               {selectedReport.title}
             </h3>
-            <p className="text-xs text-slate-600 mt-0.5">
+            <p className="text-sm text-slate-600 mt-0.5">
               Event: {selectedReport.event} · Period: {selectedReport.period}
             </p>
           </div>
@@ -700,10 +700,10 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
             <Detail label="Partner Recipients" value={`${selectedReport.recipients} organisations`} />
             {selectedReport.executiveSummary && (
               <div className="pt-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Executive Summary
                 </span>
-                <p className="mt-1 text-xs text-slate-700 bg-slate-50 p-3 rounded-lg leading-relaxed">
+                <p className="mt-1 text-sm text-slate-700 bg-slate-50 p-3 rounded-lg leading-relaxed">
                   {selectedReport.executiveSummary}
                 </p>
               </div>
@@ -714,7 +714,7 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
             {selectedReport.status === "Draft" && (
               <button
                 onClick={() => handleTransitionStatus(selectedReport.id, "Approved")}
-                className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 transition-colors"
+                className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors"
               >
                 Approve SITREP
               </button>
@@ -722,14 +722,14 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
             {selectedReport.status === "Approved" && (
               <button
                 onClick={() => handleTransitionStatus(selectedReport.id, "Published")}
-                className="flex-1 rounded-lg bg-[#287da5] py-2.5 text-xs font-semibold text-white hover:bg-[#153f5e] transition-colors"
+                className="flex-1 rounded-lg bg-[#287da5] py-2.5 text-sm font-semibold text-white hover:bg-[#153f5e] transition-colors"
               >
                 Publish & Distribute
               </button>
             )}
             <button
               onClick={() => downloadReport(selectedReport)}
-              className="flex items-center justify-center gap-1.5 flex-1 rounded-lg border border-slate-300 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+              className="flex items-center justify-center gap-1.5 flex-1 rounded-lg border border-slate-300 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
             >
               <Printer size={15} />
               <span>Print / Save PDF</span>
@@ -774,8 +774,8 @@ HUMANITARIAN CRISIS MANAGEMENT PLATFORM · RELIEFOS TELEMETRY
                     <FilePlus size={16} />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-[#153f5e]">{tmpl.title}</h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5">{tmpl.desc}</p>
+                    <h4 className="text-sm font-bold text-[#153f5e]">{tmpl.title}</h4>
+                    <p className="text-[13px] text-slate-500 mt-0.5">{tmpl.desc}</p>
                   </div>
                 </div>
                 <ChevronRight size={16} className="text-slate-400 mt-1 shrink-0" />
@@ -815,9 +815,9 @@ function StatCard({
       </div>
 
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{title}</p>
+        <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{title}</p>
         <p className="mt-0.5 text-2xl font-bold text-[#153f5e]">{value}</p>
-        <p className="text-[10px] text-slate-400">{subtitle}</p>
+        <p className="text-[13px] text-slate-400">{subtitle}</p>
       </div>
     </div>
   );
@@ -837,7 +837,7 @@ function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
         <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
-          <h2 className="text-base font-bold text-[#153f5e]">{title}</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-[#153f5e]">{title}</h2>
           <button
             onClick={onClose}
             className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"

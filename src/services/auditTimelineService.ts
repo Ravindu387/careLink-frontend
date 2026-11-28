@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface AuditEvent {
   id: string;
   action: string;
@@ -71,7 +72,7 @@ export const auditTimelineService = {
     }
 
     const query = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${API_BASE}/api/audittimeline${query}`);
+    const response = await authFetch(`${API_BASE}/api/audittimeline${query}`);
     if (!response.ok) {
       throw new Error(`Failed to load audit events: ${response.status} ${response.statusText}`);
     }
@@ -79,7 +80,7 @@ export const auditTimelineService = {
   },
 
   async getMetrics(): Promise<AuditTimelineMetrics> {
-    const response = await fetch(`${API_BASE}/api/audittimeline/metrics`);
+    const response = await authFetch(`${API_BASE}/api/audittimeline/metrics`);
     if (!response.ok) {
       throw new Error(`Failed to load audit metrics: ${response.status}`);
     }
@@ -87,7 +88,7 @@ export const auditTimelineService = {
   },
 
   async getById(id: string): Promise<AuditEvent> {
-    const response = await fetch(`${API_BASE}/api/audittimeline/${encodeURIComponent(id)}`);
+    const response = await authFetch(`${API_BASE}/api/audittimeline/${encodeURIComponent(id)}`);
     if (!response.ok) {
       throw new Error(`Failed to load audit record ${id}: ${response.status}`);
     }
@@ -95,7 +96,7 @@ export const auditTimelineService = {
   },
 
   async logEvent(payload: CreateAuditEventPayload): Promise<AuditEvent> {
-    const response = await fetch(`${API_BASE}/api/audittimeline`, {
+    const response = await authFetch(`${API_BASE}/api/audittimeline`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -111,7 +112,7 @@ export const auditTimelineService = {
   },
 
   async verifyIntegrity(): Promise<VerifyIntegrityResponse> {
-    const response = await fetch(`${API_BASE}/api/audittimeline/verify`, {
+    const response = await authFetch(`${API_BASE}/api/audittimeline/verify`, {
       method: "POST",
     });
 
@@ -122,7 +123,7 @@ export const auditTimelineService = {
   },
 
   async reset(): Promise<{ message: string; metrics: AuditTimelineMetrics }> {
-    const response = await fetch(`${API_BASE}/api/audittimeline/reset`, {
+    const response = await authFetch(`${API_BASE}/api/audittimeline/reset`, {
       method: "POST",
     });
 

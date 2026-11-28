@@ -302,7 +302,7 @@ export default function PendingVerification() {
       {/* MAIN CONTENT */}
       <main className="max-w-[1600px] mx-auto px-5 lg:px-[38px] pt-5 pb-10">
         {/* BREADCRUMB */}
-        <div className="flex items-center gap-2 text-[10px] mb-6">
+        <div className="flex items-center gap-2 text-sm mb-6">
           <span className="text-[#8296aa]">Operations</span>
           <ChevronRight size={13} />
           <span className="text-[#8296aa]">Volunteer Coordination</span>
@@ -314,13 +314,13 @@ export default function PendingVerification() {
         <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-[26px] font-semibold text-[#123c5b]">
+              <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#123c5b]">
                 Pending Verification
               </h1>
 
               {/* LIVE BACKEND STATUS BADGE */}
               <div
-                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wide ${
+                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide ${
                   isLiveBackend
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                     : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -341,7 +341,7 @@ export default function PendingVerification() {
             <button
               onClick={() => loadData(true)}
               disabled={isRefreshing}
-              className="h-[40px] px-3.5 bg-white border border-[#d5e3e9] rounded-lg text-[11px] font-medium text-[#17648e] hover:bg-[#f5fafc] disabled:opacity-50 flex items-center gap-1.5 transition-colors"
+              className="h-[40px] px-3.5 bg-white border border-[#d5e3e9] rounded-lg text-sm font-medium text-[#17648e] hover:bg-[#f5fafc] disabled:opacity-50 flex items-center gap-1.5 transition-colors"
               title="Refresh applications list"
             >
               <RefreshCw size={13} className={isRefreshing ? "animate-spin" : ""} />
@@ -351,7 +351,7 @@ export default function PendingVerification() {
             {/* EXPORT CSV */}
             <button
               onClick={handleExportCsv}
-              className="h-[40px] px-3.5 bg-white border border-[#d5e3e9] rounded-lg text-[11px] font-medium text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-1.5 transition-colors"
+              className="h-[40px] px-3.5 bg-white border border-[#d5e3e9] rounded-lg text-sm font-medium text-[#17648e] hover:bg-[#f5fafc] flex items-center gap-1.5 transition-colors"
             >
               <Download size={13} />
               <span>Export CSV</span>
@@ -362,7 +362,7 @@ export default function PendingVerification() {
               onClick={() =>
                 showNotification("Verification Standard: Level 4 Background Checks & Active Certifications required.")
               }
-              className="h-[40px] px-4 bg-white border border-[#b9d0dc] hover:bg-[#f5fafc] rounded-lg text-[11px] font-medium text-[#17648e] transition-colors"
+              className="h-[40px] px-4 bg-white border border-[#b9d0dc] hover:bg-[#f5fafc] rounded-lg text-sm font-medium text-[#17648e] transition-colors"
             >
               Verification policy
             </button>
@@ -375,17 +375,17 @@ export default function PendingVerification() {
             <ShieldCheck size={24} className="text-[#946000] shrink-0" />
 
             <div className="flex-1">
-              <h3 className="text-[12px] font-bold text-[#825300]">
+              <h3 className="text-base font-bold text-[#825300]">
                 {pendingCount} applications awaiting coordinator review
               </h3>
-              <p className="text-[10px] text-[#946b2d] mt-0.5">
+              <p className="text-sm text-[#946b2d] mt-0.5">
                 {urgentCount} urgent applications include critical response qualifications (Rescue driving, Heavy vehicles, First aid) needed in active operations.
               </p>
             </div>
 
             <div className="bg-[#fff3dc] border border-[#f5dfb8] rounded-lg px-3.5 py-2 w-full md:w-auto shrink-0 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#a46a09]" />
-              <p className="text-[10px] font-semibold text-[#a46a09]">
+              <p className="text-sm font-semibold text-[#a46a09]">
                 Oldest pending: {stats.oldestPendingSubmission}
               </p>
             </div>
@@ -404,7 +404,7 @@ export default function PendingVerification() {
                 setCurrentPage(1);
               }}
               placeholder="Search applicant, skills, or ID..."
-              className="w-full outline-none text-[11px] placeholder:text-[#a1b1c0] bg-transparent"
+              className="w-full outline-none text-sm sm:text-[15px] placeholder:text-[#a1b1c0] bg-transparent"
             />
             {search && (
               <button
@@ -423,7 +423,7 @@ export default function PendingVerification() {
               setPriorityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[11px] outline-none cursor-pointer"
+            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>All priorities</option>
             <option>Standard</option>
@@ -438,7 +438,7 @@ export default function PendingVerification() {
               setSkillFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[11px] outline-none cursor-pointer"
+            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>All skill groups</option>
             <option>First Aid</option>
@@ -457,7 +457,7 @@ export default function PendingVerification() {
               setDocumentFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[11px] outline-none cursor-pointer"
+            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>All document states</option>
             <option>Complete</option>
@@ -471,7 +471,7 @@ export default function PendingVerification() {
               setDateFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-[11px] outline-none cursor-pointer"
+            className="h-[42px] bg-white border border-[#d3e2e9] rounded-lg px-3 text-sm sm:text-[15px] outline-none cursor-pointer"
           >
             <option>Date submitted</option>
             <option>Today</option>
@@ -481,7 +481,7 @@ export default function PendingVerification() {
           {/* MORE / ADVANCED FILTERS */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="h-[42px] bg-white border border-[#b9d0dc] rounded-lg flex items-center justify-center gap-1.5 text-[11px] font-medium text-[#17648e] hover:bg-[#f5fafc] transition-colors cursor-pointer"
+            className="h-[42px] bg-white border border-[#b9d0dc] rounded-lg flex items-center justify-center gap-1.5 text-sm font-medium text-[#17648e] hover:bg-[#f5fafc] transition-colors cursor-pointer"
           >
             <SlidersHorizontal size={13} />
             <span>Filters</span>
@@ -492,15 +492,15 @@ export default function PendingVerification() {
         {showFilters && (
           <div className="bg-white border border-[#d3e2e9] rounded-lg p-4 mb-4 flex items-center justify-between shadow-xs">
             <div>
-              <p className="text-xs font-semibold text-[#123c5b]">Filter Configuration</p>
-              <p className="text-[10px] text-gray-500 mt-0.5">
+              <p className="text-sm font-semibold text-[#123c5b]">Filter Configuration</p>
+              <p className="text-[13px] text-gray-500 mt-0.5">
                 {filteredApplications.length} records match current criteria out of {applications.length} total applications.
               </p>
             </div>
 
             <button
               onClick={resetFilters}
-              className="text-xs text-[#287fa9] hover:underline font-semibold cursor-pointer"
+              className="text-sm text-[#287fa9] hover:underline font-semibold cursor-pointer"
             >
               Reset all filters
             </button>
@@ -511,10 +511,10 @@ export default function PendingVerification() {
         <section className="bg-white border border-[#d5e3e9] rounded-xl shadow-[0_8px_20px_rgba(30,70,90,0.05)] overflow-hidden">
           {/* TABLE HEADER BAR */}
           <div className="bg-[#f5f8f9] border-b border-[#d5e3e9] px-4 py-3 flex items-center justify-between">
-            <h2 className="text-[12px] font-semibold text-[#315c79]">
+            <h2 className="text-base sm:text-lg font-semibold text-[#315c79]">
               Verification Applications Queue
             </h2>
-            <span className="text-[10px] text-[#8296aa] bg-slate-100 px-2 py-0.5 rounded font-medium">
+            <span className="text-xs text-[#8296aa] bg-slate-100 px-2 py-0.5 rounded font-medium">
               {filteredApplications.length} pending
             </span>
           </div>
@@ -523,7 +523,7 @@ export default function PendingVerification() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px] text-left">
               <thead className="bg-[#f5f8f9] border-b border-[#d5e3e9]">
-                <tr className="text-[10px] text-[#718ba0] uppercase tracking-wider">
+                <tr className="text-[13px] text-[#718ba0] uppercase tracking-wider">
                   <th className="px-4 py-3 font-semibold">Verification ID</th>
                   <th className="px-4 py-3 font-semibold">Applicant</th>
                   <th className="px-4 py-3 font-semibold">Declared Skills</th>
@@ -552,25 +552,25 @@ export default function PendingVerification() {
                       onClick={() => setSelectedApplication(application)}
                       className="border-b border-[#e1eaf0] hover:bg-[#f5fafc] cursor-pointer transition-colors group"
                     >
-                      <td className="px-4 py-3.5 text-[11px] font-semibold text-[#17648e] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-sm font-semibold text-[#17648e] whitespace-nowrap">
                         {application.id}
                       </td>
 
-                      <td className="px-4 py-3.5 text-[11px] font-medium text-[#123c5b] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-sm font-medium text-[#123c5b] whitespace-nowrap">
                         {application.applicant}
                       </td>
 
-                      <td className="px-4 py-3.5 text-[10px] text-[#527d96] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-sm text-[#527d96] whitespace-nowrap">
                         {application.skills.join(" · ")}
                       </td>
 
-                      <td className="px-4 py-3.5 text-[10px] text-[#718ba0] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-sm text-[#718ba0] whitespace-nowrap">
                         {application.location}
                       </td>
 
-                      <td className="px-4 py-3.5 text-[10px] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-sm whitespace-nowrap">
                         <span
-                          className={`px-2 py-0.5 rounded text-[9px] font-medium ${
+                          className={`px-2 py-0.5 rounded text-xs font-medium ${
                             application.documentState === "Complete"
                               ? "bg-emerald-50 text-emerald-700"
                               : "bg-amber-50 text-amber-700"
@@ -580,13 +580,13 @@ export default function PendingVerification() {
                         </span>
                       </td>
 
-                      <td className="px-4 py-3.5 text-[10px] text-[#8296aa] whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-sm text-[#8296aa] whitespace-nowrap">
                         {application.submitted}
                       </td>
 
                       <td className="px-4 py-3.5 whitespace-nowrap">
                         <span
-                          className={`inline-flex px-2 py-1 rounded text-[9px] ${priorityStyle(
+                          className={`inline-flex px-2 py-1 rounded text-xs ${priorityStyle(
                             application.priority
                           )}`}
                         >
@@ -604,7 +604,7 @@ export default function PendingVerification() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={8} className="text-center py-12 text-xs text-gray-400">
+                    <td colSpan={8} className="text-center py-12 text-sm text-gray-400">
                       No pending verification applications match current filters.
                     </td>
                   </tr>
@@ -615,7 +615,7 @@ export default function PendingVerification() {
 
           {/* PAGINATION CONTROLS */}
           <div className="px-4 py-3.5 bg-[#fbfdfe] border-t border-[#d5e3e9] flex flex-col sm:flex-row justify-between items-center gap-3">
-            <p className="text-[10px] text-[#8296aa]">
+            <p className="text-[13px] text-[#8296aa]">
               Showing{" "}
               {filteredApplications.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} –{" "}
               {Math.min(currentPage * pageSize, filteredApplications.length)} of{" "}
@@ -626,7 +626,7 @@ export default function PendingVerification() {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
-                className="border border-[#d5e2e9] rounded-lg px-3 py-1.5 text-[10px] font-medium text-[#287fa9] hover:bg-slate-50 disabled:opacity-40 transition-colors"
+                className="border border-[#d5e2e9] rounded-lg px-3 py-1.5 text-sm font-medium text-[#287fa9] hover:bg-slate-50 disabled:opacity-40 transition-colors"
               >
                 Previous
               </button>
@@ -635,7 +635,7 @@ export default function PendingVerification() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-[28px] h-[28px] rounded-lg border text-[10px] font-medium transition-colors ${
+                  className={`w-[28px] h-[28px] rounded-lg border text-sm font-medium transition-colors ${
                     currentPage === page
                       ? "bg-[#287fa9] border-[#287fa9] text-white"
                       : "border-[#d5e2e9] hover:bg-[#f0f7fa] text-[#123c5b]"
@@ -648,7 +648,7 @@ export default function PendingVerification() {
               <button
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
-                className="border border-[#b9d0dc] rounded-lg px-3 py-1.5 text-[10px] font-medium text-[#287fa9] hover:bg-slate-50 disabled:opacity-40 transition-colors"
+                className="border border-[#b9d0dc] rounded-lg px-3 py-1.5 text-sm font-medium text-[#287fa9] hover:bg-slate-50 disabled:opacity-40 transition-colors"
               >
                 Next
               </button>
@@ -664,14 +664,14 @@ export default function PendingVerification() {
             {/* MODAL HEADER */}
             <div className="p-5 border-b border-[#d5e3e9] flex justify-between items-center bg-[#fbfdfe]">
               <div>
-                <h2 className="text-[16px] font-semibold text-[#123c5b]">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#123c5b]">
                   Verification Application Review
                 </h2>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[10px] font-mono text-[#8296aa]">
+                  <span className="text-[13px] font-mono text-[#8296aa]">
                     {selectedApplication.id}
                   </span>
-                  <span className="text-[9px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.2 rounded font-semibold">
+                  <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.2 rounded font-semibold">
                     {selectedApplication.status}
                   </span>
                 </div>
@@ -693,14 +693,14 @@ export default function PendingVerification() {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-sm text-[#123c5b] truncate">
+                  <h3 className="font-semibold text-base text-[#123c5b] truncate">
                     {selectedApplication.applicant}
                   </h3>
-                  <p className="text-[10px] text-gray-400">Volunteer Applicant</p>
+                  <p className="text-[13px] text-gray-400">Volunteer Applicant</p>
                 </div>
 
                 <span
-                  className={`rounded-md px-2.5 py-1 text-[9px] shrink-0 ${priorityStyle(
+                  className={`rounded-md px-2.5 py-1 text-xs shrink-0 ${priorityStyle(
                     selectedApplication.priority
                   )}`}
                 >
@@ -709,31 +709,31 @@ export default function PendingVerification() {
               </div>
 
               {/* DETAILS GRID */}
-              <div className="grid grid-cols-2 gap-3 text-[10px]">
+              <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="bg-[#f5f8fa] p-3 rounded-lg border border-[#e8f0f4]">
-                  <p className="text-gray-400 font-semibold uppercase tracking-wider text-[9px]">Location</p>
-                  <p className="text-xs font-semibold text-[#123c5b] mt-0.5">
+                  <p className="text-gray-400 font-semibold uppercase tracking-wider text-xs">Location</p>
+                  <p className="text-sm font-semibold text-[#123c5b] mt-0.5">
                     {selectedApplication.location}
                   </p>
                 </div>
 
                 <div className="bg-[#f5f8fa] p-3 rounded-lg border border-[#e8f0f4]">
-                  <p className="text-gray-400 font-semibold uppercase tracking-wider text-[9px]">Submitted</p>
-                  <p className="text-xs font-semibold text-[#123c5b] mt-0.5">
+                  <p className="text-gray-400 font-semibold uppercase tracking-wider text-xs">Submitted</p>
+                  <p className="text-sm font-semibold text-[#123c5b] mt-0.5">
                     {selectedApplication.submitted}
                   </p>
                 </div>
 
                 <div className="bg-[#f5f8fa] p-3 rounded-lg border border-[#e8f0f4]">
-                  <p className="text-gray-400 font-semibold uppercase tracking-wider text-[9px]">Email</p>
-                  <p className="text-[11px] font-semibold text-[#123c5b] mt-0.5 break-all">
+                  <p className="text-gray-400 font-semibold uppercase tracking-wider text-xs">Email</p>
+                  <p className="text-sm font-semibold text-[#123c5b] mt-0.5 break-all">
                     {selectedApplication.email}
                   </p>
                 </div>
 
                 <div className="bg-[#f5f8fa] p-3 rounded-lg border border-[#e8f0f4]">
-                  <p className="text-gray-400 font-semibold uppercase tracking-wider text-[9px]">Phone</p>
-                  <p className="text-[11px] font-semibold text-[#123c5b] mt-0.5">
+                  <p className="text-gray-400 font-semibold uppercase tracking-wider text-xs">Phone</p>
+                  <p className="text-sm font-semibold text-[#123c5b] mt-0.5">
                     {selectedApplication.phone}
                   </p>
                 </div>
@@ -741,14 +741,14 @@ export default function PendingVerification() {
 
               {/* SKILLS */}
               <div>
-                <p className="text-[10px] font-bold text-[#123c5b] uppercase tracking-wider mb-2">
+                <p className="text-xs font-bold text-[#123c5b] uppercase tracking-wider mb-2">
                   Declared Skills & Qualifications
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedApplication.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="bg-[#e8f1f6] text-[#287fa9] rounded-md px-2.5 py-1 text-[10px] font-medium"
+                      className="bg-[#e8f1f6] text-[#287fa9] rounded-md px-2.5 py-1 text-xs font-medium"
                     >
                       {skill}
                     </span>
@@ -759,10 +759,10 @@ export default function PendingVerification() {
               {/* DOCUMENTS */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[10px] font-bold text-[#123c5b] uppercase tracking-wider">
+                  <p className="text-xs font-bold text-[#123c5b] uppercase tracking-wider">
                     Uploaded Documents
                   </p>
-                  <span className="text-[9px] font-semibold text-[#159879] bg-emerald-50 px-2 py-0.2 rounded border border-emerald-200">
+                  <span className="text-xs font-semibold text-[#159879] bg-emerald-50 px-2 py-0.2 rounded border border-emerald-200">
                     State: {selectedApplication.documentState}
                   </span>
                 </div>
@@ -775,7 +775,7 @@ export default function PendingVerification() {
                     >
                       <div className="flex items-center gap-2">
                         <FileText size={15} className="text-[#287fa9]" />
-                        <span className="text-[11px] text-[#123c5b] font-medium">{doc}</span>
+                        <span className="text-sm text-[#123c5b] font-medium">{doc}</span>
                       </div>
                       <CheckCircle2 size={15} className="text-[#16a085]" />
                     </div>
@@ -786,7 +786,7 @@ export default function PendingVerification() {
               {/* SAFETY NOTICE */}
               <div className="bg-[#fff8e9] border border-[#f4d18b] rounded-lg p-3 flex gap-2.5">
                 <AlertTriangle size={17} className="text-[#b87813] shrink-0 mt-0.5" />
-                <p className="text-[10px] text-[#946000] leading-4">
+                <p className="text-sm text-[#946000] leading-4">
                   Approval activates this volunteer profile immediately for emergency assignments and field coordination tasks.
                 </p>
               </div>
@@ -797,7 +797,7 @@ export default function PendingVerification() {
               <button
                 disabled={processing}
                 onClick={() => handleReject(selectedApplication.id)}
-                className="border border-red-200 text-red-600 hover:bg-red-50 rounded-lg px-4 py-2 text-[11px] font-medium flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
+                className="border border-red-200 text-red-600 hover:bg-red-50 rounded-lg px-4 py-2 text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
               >
                 <XCircle size={14} />
                 <span>Reject</span>
@@ -806,7 +806,7 @@ export default function PendingVerification() {
               <button
                 disabled={processing}
                 onClick={() => handleApprove(selectedApplication.id)}
-                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-[11px] font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors shadow-xs"
+                className="bg-[#287fa9] hover:bg-[#17678e] text-white rounded-lg px-5 py-2 text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors shadow-xs"
               >
                 <CheckCircle2 size={14} />
                 <span>{processing ? "Updating..." : "Approve application"}</span>

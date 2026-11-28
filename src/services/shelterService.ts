@@ -1,11 +1,21 @@
 /**
  * Shelter Service
- * Connects the Emergency Coordinator Shelter Overview page
- * to the CareLink .NET backend API.
+ * Connects Citizen and Emergency Coordinator shelter management to the CareLink .NET backend.
  */
 
-export interface Shelter {
-  id: number;
+import { request, authFetch } from "./api";
+import type {
+  Shelter,
+  ShelterSummary,
+  ShelterFilterParams,
+  RequestShelterSpacePayload,
+  ShelterBooking,
+} from "../types/shelter";
+
+export type { Shelter };
+
+export interface CoordinatorShelter {
+  id: number | string;
   name: string;
   location: string;
   capacity: number;
@@ -28,16 +38,15 @@ export interface ShelterMetrics {
   acceptingArrivals: number;
   nearCapacityCount: number;
   fullCount: number;
-  totalShelters: number;
   lastUpdated?: string;
 }
 
-export interface ShelterFilters {
-  search?: string;
-  area?: string;
-  status?: string;
-  availability?: string;
-  service?: string;
+export interface PagedShelters {
+  items: any[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }
 
 export interface CreateShelterPayload {
@@ -45,44 +54,12 @@ export interface CreateShelterPayload {
   location: string;
   capacity: number;
   occupied?: number;
-  services: string[];
+  services?: string[];
+  status?: string;
   contactPerson?: string;
   contactPhone?: string;
   notes?: string;
 }
-
-export interface UpdateShelterPayload {
-  name: string;
-  location: string;
-  capacity: number;
-  occupied: number;
-  services: string[];
-  contactPerson?: string;
-  contactPhone?: string;
-  notes?: string;
-}
-
-const DEFAULT_SHELTERS: Shelter[] = [
-  {
-    id: 1,
-    name: "Riverton High School",
-    location: "Central Ward",
-    capacity: 660,
-    occupied: 612,
-    remaining: 48,
-    services: ["Accessible", "Medical"],
-    status: "Near Capacity",
-    contactPerson: "Brenda Silva",
-    contactPhone: "+94 77 412 8041",
-    notes: "Primary central ward emergency reception facility with wheelchair ramps and backup power.",
-import { request } from "./api";
-import type {
-  Shelter,
-  ShelterSummary,
-  ShelterFilterParams,
-  RequestShelterSpacePayload,
-  ShelterBooking,
-} from "../types/shelter";
 
 export const MOCK_SHELTERS: Shelter[] = [
   {
@@ -106,301 +83,6 @@ export const MOCK_SHELTERS: Shelter[] = [
   {
     id: 2,
     name: "North Community Hall",
-    location: "North Ward",
-    capacity: 500,
-    occupied: 284,
-    remaining: 216,
-    services: ["Accessible", "Food"],
-    status: "Operational",
-    contactPerson: "Marcus Vance",
-    contactPhone: "+94 77 412 8022",
-    notes: "Active hot meal kitchen on site. Direct access for transport vans.",
-  },
-  {
-    id: 3,
-    name: "St. Mary's Civic Centre",
-    location: "Eastbank",
-    capacity: 450,
-    occupied: 450,
-    remaining: 0,
-    services: ["Medical", "Childcare"],
-    status: "Full",
-    contactPerson: "Sister Theresa",
-    contactPhone: "+94 77 412 8033",
-    notes: "Currently at 100% capacity. Redirecting newly displaced families to North Community Hall.",
-  },
-  {
-    id: 4,
-    name: "Lakeside Sports Hall",
-    location: "West District",
-    capacity: 400,
-    occupied: 196,
-    remaining: 204,
-    services: ["Food", "Family rooms"],
-    status: "Operational",
-    contactPerson: "David Perera",
-    contactPhone: "+94 77 412 8044",
-    notes: "Equipped with family partitions, laundry, and clean shower blocks.",
-  },
-  {
-    id: 5,
-    name: "Central Ward Stadium Pavilion",
-    location: "Central Ward",
-    capacity: 1200,
-    occupied: 820,
-    remaining: 380,
-    services: ["Accessible", "Food", "Medical", "Family rooms"],
-    status: "Operational",
-    contactPerson: "Capt. Rohan Sen",
-    contactPhone: "+94 77 412 8055",
-    notes: "Main high-capacity staging dome equipped with field medical tent and triage.",
-  },
-  {
-    id: 6,
-    name: "Eastbank Technical College",
-    location: "Eastbank",
-    capacity: 350,
-    occupied: 310,
-    remaining: 40,
-    services: ["Accessible", "Food"],
-    status: "Near Capacity",
-    contactPerson: "Kamal Jayasuriya",
-    contactPhone: "+94 77 412 8066",
-    notes: "High intake rate from Eastbank river overflow zone. Monitoring capacity closely.",
-  },
-  {
-    id: 7,
-    name: "West District Community Shelter",
-    location: "West District",
-    capacity: 300,
-    occupied: 150,
-    remaining: 150,
-    services: ["Food", "Childcare"],
-    status: "Operational",
-    contactPerson: "Nisha Weerasinghe",
-    contactPhone: "+94 77 412 8077",
-    notes: "Dedicated mother-and-child support hub with pediatric supplies.",
-  },
-];
-
-const DEFAULT_METRICS: ShelterMetrics = {
-  operationalShelters: 38,
-  totalCapacity: 11420,
-  totalOccupied: 8642,
-  availableSpaces: 2778,
-  acceptingArrivals: 6,
-  nearCapacityCount: 2,
-  fullCount: 1,
-  totalShelters: 7,
-};
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5277";
-
-export const shelterService = {
-  async getAll(filters?: ShelterFilters): Promise<Shelter[]> {
-    try {
-      const params = new URLSearchParams();
-      if (filters?.search) params.append("search", filters.search);
-      if (filters?.area && filters.area !== "All operational areas" && filters.area !== "All") {
-        params.append("area", filters.area);
-      }
-      if (filters?.status && filters.status !== "All statuses" && filters.status !== "All") {
-        params.append("status", filters.status);
-      }
-      if (filters?.availability && filters.availability !== "Any availability" && filters.availability !== "All") {
-        params.append("availability", filters.availability);
-      }
-      if (filters?.service) params.append("service", filters.service);
-
-      const url = `${API_BASE}/api/shelters${params.toString() ? `?${params.toString()}` : ""}`;
-      const response = await fetch(url, {
-        headers: { Accept: "application/json" },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
-      return await response.json();
-    } catch {
-      // Local filtering fallback
-      let result = [...DEFAULT_SHELTERS];
-      if (filters?.search) {
-        const s = filters.search.toLowerCase();
-        result = result.filter(
-          (sh) =>
-            sh.name.toLowerCase().includes(s) ||
-            sh.location.toLowerCase().includes(s) ||
-            sh.services.some((svc) => svc.toLowerCase().includes(s))
-        );
-      }
-      if (filters?.area && filters.area !== "All operational areas" && filters.area !== "All") {
-        result = result.filter((sh) => sh.location === filters.area);
-      }
-      if (filters?.status && filters.status !== "All statuses" && filters.status !== "All") {
-        result = result.filter((sh) => sh.status === filters.status);
-      }
-      if (filters?.availability && filters.availability !== "Any availability") {
-        if (filters.availability === "Available") {
-          result = result.filter((sh) => sh.remaining > 0);
-        } else if (filters.availability === "Full") {
-          result = result.filter((sh) => sh.remaining <= 0);
-        }
-      }
-      return result;
-    }
-  },
-
-  async getMetrics(): Promise<ShelterMetrics> {
-    try {
-      const response = await fetch(`${API_BASE}/api/shelters/metrics`, {
-        headers: { Accept: "application/json" },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
-      return await response.json();
-    } catch {
-      return DEFAULT_METRICS;
-    }
-  },
-
-  async getById(id: number): Promise<Shelter | null> {
-    try {
-      const response = await fetch(`${API_BASE}/api/shelters/${id}`, {
-        headers: { Accept: "application/json" },
-      });
-      if (!response.ok) return null;
-      return await response.json();
-    } catch {
-      return DEFAULT_SHELTERS.find((s) => s.id === id) || null;
-    }
-  },
-
-  async create(payload: CreateShelterPayload): Promise<Shelter> {
-    try {
-      const response = await fetch(`${API_BASE}/api/shelters`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => null);
-        throw new Error(err?.message || "Failed to create shelter");
-      }
-      return await response.json();
-    } catch (err: any) {
-      if (err.message && !err.message.includes("Failed to fetch")) {
-        throw err;
-      }
-      // Fallback
-      const capacity = Number(payload.capacity);
-      const occupied = Number(payload.occupied || 0);
-      return {
-        id: Date.now(),
-        name: payload.name,
-        location: payload.location,
-        capacity,
-        occupied,
-        remaining: Math.max(0, capacity - occupied),
-        services: payload.services || ["Food", "Medical"],
-        status: occupied >= capacity ? "Full" : occupied >= capacity * 0.85 ? "Near Capacity" : "Operational",
-        contactPerson: payload.contactPerson,
-        contactPhone: payload.contactPhone,
-        notes: payload.notes,
-      };
-    }
-  },
-
-  async update(id: number, payload: UpdateShelterPayload): Promise<Shelter> {
-    try {
-      const response = await fetch(`${API_BASE}/api/shelters/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to update shelter (${response.status})`);
-      }
-      return await response.json();
-    } catch {
-      const capacity = Number(payload.capacity);
-      const occupied = Number(payload.occupied || 0);
-      return {
-        id,
-        name: payload.name,
-        location: payload.location,
-        capacity,
-        occupied,
-        remaining: Math.max(0, capacity - occupied),
-        services: payload.services,
-        status: occupied >= capacity ? "Full" : occupied >= capacity * 0.85 ? "Near Capacity" : "Operational",
-        contactPerson: payload.contactPerson,
-        contactPhone: payload.contactPhone,
-        notes: payload.notes,
-      };
-    }
-  },
-
-  async updateOccupancy(id: number, occupied: number): Promise<Shelter> {
-    try {
-      const response = await fetch(`${API_BASE}/api/shelters/${id}/occupancy`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ occupied }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to update occupancy (${response.status})`);
-      }
-      return await response.json();
-    } catch {
-      const found = DEFAULT_SHELTERS.find((s) => s.id === id);
-      const capacity = found ? found.capacity : 500;
-      return {
-        id,
-        name: found?.name || "Shelter",
-        location: found?.location || "Central Ward",
-        capacity,
-        occupied,
-        remaining: Math.max(0, capacity - occupied),
-        services: found?.services || ["Food"],
-        status: occupied >= capacity ? "Full" : occupied >= capacity * 0.85 ? "Near Capacity" : "Operational",
-      };
-    }
-  },
-
-  async delete(id: number): Promise<boolean> {
-    try {
-      const response = await fetch(`${API_BASE}/api/shelters/${id}`, {
-        method: "DELETE",
-        headers: { Accept: "application/json" },
-      });
-      return response.ok;
-    } catch {
-      return true;
-    }
-  },
-
-  async reset(): Promise<boolean> {
-    try {
-      const response = await fetch(`${API_BASE}/api/shelters/reset`, {
-        method: "POST",
-        headers: { Accept: "application/json" },
-      });
-      return response.ok;
-    } catch {
-      return true;
     area: "North Ward",
     address: "12 Market Road, North Ward, Greater Riverton",
     distance: 2.2,
@@ -454,77 +136,105 @@ export const shelterService = {
   },
 ];
 
+export const DEFAULT_COORDINATOR_SHELTERS: CoordinatorShelter[] = [
+  {
+    id: 1,
+    name: "Central Community Hall Shelter",
+    location: "Central Ward, Riverton",
+    capacity: 660,
+    occupied: 612,
+    remaining: 48,
+    services: ["Accessible", "Medical"],
+    status: "Near Capacity",
+    contactPerson: "Brenda Silva",
+    contactPhone: "+94 77 412 8041",
+    notes: "Primary central ward emergency reception facility with wheelchair ramps and backup power.",
+  },
+  {
+    id: 2,
+    name: "North Ward Secondary School",
+    location: "North Ward, Sector 3",
+    capacity: 400,
+    occupied: 184,
+    remaining: 216,
+    services: ["Food Service", "Families"],
+    status: "Operational",
+    contactPerson: "Kamal Wickrama",
+    contactPhone: "+94 71 884 1002",
+    notes: "Spacious gymnasium and classrooms activated for multi-family temporary sheltering.",
+  },
+  {
+    id: 3,
+    name: "Lakeside Stadium Annex",
+    location: "West District, Riverton",
+    capacity: 350,
+    occupied: 146,
+    remaining: 204,
+    services: ["Medical", "Accessible"],
+    status: "Operational",
+    contactPerson: "Dr. Rohana Dias",
+    contactPhone: "+94 70 339 2145",
+    notes: "Equipped with auxiliary medical triage beds and ambulance access.",
+  },
+  {
+    id: 4,
+    name: "East River Relief Center",
+    location: "Eastbank District",
+    capacity: 150,
+    occupied: 150,
+    remaining: 0,
+    services: ["Childcare", "Food Service"],
+    status: "Full",
+    contactPerson: "Anura Senanayake",
+    contactPhone: "+94 76 991 3004",
+    notes: "At absolute maximum safe holding capacity. Directing new arrivals to West District.",
+  },
+];
+
 let localSheltersStore: Shelter[] = [...MOCK_SHELTERS];
 let localBookingsStore: ShelterBooking[] = [];
+let coordinatorSheltersStore: CoordinatorShelter[] = [...DEFAULT_COORDINATOR_SHELTERS];
+
+const ENDPOINT = "/api/shelters";
 
 export const shelterService = {
+  // Citizen methods
   async getShelters(params?: ShelterFilterParams): Promise<Shelter[]> {
-    try {
-      const query = new URLSearchParams();
-      if (params?.search) query.append("search", params.search);
-      if (params?.area && params.area !== "All" && params.area !== "All areas") {
-        query.append("area", params.area);
-      }
-      if (params?.maxDistance) query.append("maxDistance", params.maxDistance.toString());
-      if (params?.availability && params.availability !== "All statuses") {
-        query.append("availability", params.availability);
-      }
-      if (params?.accessibleOnly) query.append("accessibleOnly", "true");
-      if (params?.service && params.service !== "All services") {
-        query.append("service", params.service);
-      }
+    const query = new URLSearchParams();
+    if (params?.search) query.append("search", params.search);
+    if (params?.area && params.area !== "All") query.append("area", params.area);
+    if (params?.maxDistance) query.append("maxDistance", params.maxDistance.toString());
+    if (params?.availability && params.availability !== "All") {
+      query.append("availability", params.availability);
+    }
+    if (params?.accessibleOnly) query.append("accessibleOnly", "true");
+    if (params?.service && params.service !== "All") query.append("service", params.service);
 
-      const queryString = query.toString() ? `?${query.toString()}` : "";
+    const queryString = query.toString() ? `?${query.toString()}` : "";
+    try {
       const response = await request<Shelter[]>(`/citizen/shelters${queryString}`, {
         method: "GET",
       });
-      if (response.data) {
-        localSheltersStore = response.data;
-        return response.data;
-      }
-      return localSheltersStore;
-    } catch (err) {
-      console.warn("Could not fetch shelters from backend API, utilizing local fallback store:", err);
+      return response.data || localSheltersStore;
+    } catch {
       let filtered = [...localSheltersStore];
-
       if (params?.search) {
-        const q = params.search.toLowerCase();
+        const s = params.search.toLowerCase();
         filtered = filtered.filter(
-          (s) =>
-            s.name.toLowerCase().includes(q) ||
-            s.area.toLowerCase().includes(q) ||
-            s.address.toLowerCase().includes(q)
+          (item) => item.name.toLowerCase().includes(s) || item.address.toLowerCase().includes(s)
         );
       }
-
-      if (params?.area && params.area !== "All" && params.area !== "All areas") {
-        filtered = filtered.filter((s) => s.area.toLowerCase() === params.area?.toLowerCase());
+      if (params?.area && params.area !== "All") {
+        filtered = filtered.filter((item) => item.area === params.area);
       }
-
-      if (params?.maxDistance) {
-        filtered = filtered.filter((s) => s.distance <= params.maxDistance!);
-      }
-
-      if (params?.availability && params.availability !== "All statuses") {
-        filtered = filtered.filter((s) => s.status === params.availability);
-      }
-
       if (params?.accessibleOnly) {
-        filtered = filtered.filter((s) => s.accessible);
+        filtered = filtered.filter((item) => item.accessible);
       }
-
-      if (params?.service && params.service !== "All services") {
-        const sv = params.service.toLowerCase();
-        filtered = filtered.filter((s) =>
-          s.services.some((item) => item.toLowerCase().includes(sv))
-        );
-      }
-
       return filtered;
     }
   },
 
-  async getById(id: string | number): Promise<Shelter> {
+  async getShelterById(id: string | number): Promise<Shelter> {
     try {
       const response = await request<Shelter>(`/citizen/shelters/${id}`, {
         method: "GET",
@@ -533,87 +243,258 @@ export const shelterService = {
     } catch {
       const found = localSheltersStore.find((s) => String(s.id) === String(id));
       if (found) return found;
-      throw new Error(`Shelter '${id}' not found.`);
+      throw new Error(`Shelter ${id} not found.`);
     }
   },
 
-  async getSummary(citizenLocation?: string): Promise<ShelterSummary> {
+  async requestSpace(payload: RequestShelterSpacePayload): Promise<ShelterBooking> {
     try {
-      const query = citizenLocation ? `?citizenLocation=${encodeURIComponent(citizenLocation)}` : "";
-      const response = await request<ShelterSummary>(`/citizen/shelters/summary${query}`, {
+      const response = await request<ShelterBooking>("/citizen/shelters/request-space", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      return response.data;
+    } catch {
+      const shelter = localSheltersStore.find((s) => String(s.id) === String(payload.shelterId));
+      const booking: ShelterBooking = {
+        bookingReference: `SHL-${Math.floor(1000 + Math.random() * 9000)}`,
+        shelterId: payload.shelterId,
+        shelterName: shelter ? shelter.name : "Assigned Shelter",
+        citizenName: payload.citizenName || "Samira Khan",
+        contactPhone: payload.contactPhone || "+94 77 123 4567",
+        numberOfPeople: payload.numberOfPeople,
+        specialNeeds: payload.specialNeeds,
+        status: "Confirmed",
+        bookedAt: new Date().toISOString(),
+        confirmationMessage: `Space reserved for ${payload.numberOfPeople} person(s) at ${
+          shelter ? shelter.name : "Shelter"
+        }. Please arrive within 4 hours.`,
+      };
+      localBookingsStore.push(booking);
+      if (shelter && shelter.availability >= payload.numberOfPeople) {
+        shelter.availability -= payload.numberOfPeople;
+        shelter.occupied += payload.numberOfPeople;
+      }
+      return booking;
+    }
+  },
+
+  async getUserBookings(citizenName?: string): Promise<ShelterBooking[]> {
+    const query = citizenName ? `?citizenName=${encodeURIComponent(citizenName)}` : "";
+    try {
+      const response = await request<ShelterBooking[]>(`/citizen/shelters/bookings${query}`, {
+        method: "GET",
+      });
+      return response.data || localBookingsStore;
+    } catch {
+      return localBookingsStore;
+    }
+  },
+
+  async cancelBooking(bookingId: string): Promise<boolean> {
+    try {
+      const response = await request<boolean>(`/citizen/shelters/bookings/${bookingId}`, {
+        method: "DELETE",
+      });
+      return response.data ?? response.success;
+    } catch {
+      localBookingsStore = localBookingsStore.filter((b) => b.bookingReference !== bookingId);
+      return true;
+    }
+  },
+
+  async getSummary(): Promise<ShelterSummary> {
+    try {
+      const response = await request<ShelterSummary>("/citizen/shelters/summary", {
         method: "GET",
       });
       return response.data;
     } catch {
-      const available = localSheltersStore
-        .filter((s) => s.availability > 0)
-        .sort((a, b) => a.distance - b.distance);
+      const available = localSheltersStore.filter((s) => s.availability > 0);
+      const totalCapacity = localSheltersStore.reduce((sum, s) => sum + s.capacity, 0);
+      const totalOccupied = localSheltersStore.reduce((sum, s) => sum + s.occupied, 0);
+      const totalAvailable = localSheltersStore.reduce((sum, s) => sum + s.availability, 0);
 
       return {
         totalShelters: localSheltersStore.length,
         availableSheltersCount: available.length,
-        fullSheltersCount: localSheltersStore.filter((s) => s.availability <= 0).length,
-        totalCapacity: localSheltersStore.reduce((acc, s) => acc + s.capacity, 0),
-        totalAvailableSpaces: localSheltersStore.reduce((acc, s) => acc + s.availability, 0),
-        totalOccupiedSpaces: localSheltersStore.reduce((acc, s) => acc + s.occupied, 0),
+        fullSheltersCount: localSheltersStore.length - available.length,
+        totalCapacity,
+        totalAvailableSpaces: totalAvailable,
+        totalOccupiedSpaces: totalOccupied,
         accessibleCount: localSheltersStore.filter((s) => s.accessible).length,
         nearestAvailableShelter: available[0] || null,
       };
     }
   },
 
-  async requestSpace(payload: RequestShelterSpacePayload): Promise<ShelterBooking> {
+  // Coordinator methods
+  async getAll(filters?: any): Promise<any[]> {
     try {
-      const response = await request<ShelterBooking>(
-        `/citizen/shelters/${payload.shelterId}/request-space`,
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        }
-      );
-      if (response.data) {
-        localBookingsStore.unshift(response.data);
-        return response.data;
-      }
-    } catch (err) {
-      console.warn("API reservation call failed, creating local reservation confirmation:", err);
+      const res = await authFetch(`${ENDPOINT}`, {
+        headers: { Accept: "application/json" },
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      // fallback
     }
-
-    const shelter = localSheltersStore.find((s) => String(s.id) === String(payload.shelterId));
-    if (shelter) {
-      shelter.availability = Math.max(0, shelter.availability - payload.numberOfPeople);
-      shelter.occupied = Math.min(shelter.capacity, shelter.occupied + payload.numberOfPeople);
-      shelter.status = shelter.availability > 0 ? "Space available" : "Full";
-    }
-
-    const booking: ShelterBooking = {
-      bookingReference: `SH-RES-${Math.floor(1000 + Math.random() * 9000)}`,
-      shelterId: payload.shelterId,
-      shelterName: shelter ? shelter.name : "Evacuation Shelter",
-      citizenName: payload.citizenName || "Samira Khan",
-      contactPhone: payload.contactPhone || "+94 77 123 4567",
-      numberOfPeople: payload.numberOfPeople,
-      specialNeeds: payload.specialNeeds,
-      status: "Confirmed",
-      bookedAt: new Date().toISOString(),
-      confirmationMessage: `Confirmed reservation for ${payload.numberOfPeople} space(s) at ${
-        shelter ? shelter.name : "the shelter"
-      }.`,
-    };
-
-    localBookingsStore.unshift(booking);
-    return booking;
+    return coordinatorSheltersStore;
   },
 
-  async getMyBookings(citizenName?: string): Promise<ShelterBooking[]> {
+  async getPaged(filters?: any): Promise<PagedShelters> {
+    const all = await this.getAll(filters);
+    const page = filters?.page || 1;
+    const pageSize = filters?.pageSize || 10;
+    const totalPages = Math.max(1, Math.ceil(all.length / pageSize));
+    const items = all.slice((page - 1) * pageSize, page * pageSize);
+    return {
+      items,
+      totalCount: all.length,
+      page,
+      pageSize,
+      totalPages,
+    };
+  },
+
+  async getMetrics(): Promise<ShelterMetrics> {
     try {
-      const query = citizenName ? `?citizenName=${encodeURIComponent(citizenName)}` : "";
-      const response = await request<ShelterBooking[]>(`/citizen/shelters/my-bookings${query}`, {
-        method: "GET",
+      const res = await authFetch(`${ENDPOINT}/metrics`, {
+        headers: { Accept: "application/json" },
       });
-      return response.data || [];
+      if (res.ok) return await res.json();
     } catch {
-      return localBookingsStore;
+      // fallback
     }
+    const totalCap = coordinatorSheltersStore.reduce((s, x) => s + x.capacity, 0);
+    const totalOcc = coordinatorSheltersStore.reduce((s, x) => s + x.occupied, 0);
+    return {
+      operationalShelters: coordinatorSheltersStore.length,
+      totalCapacity: totalCap,
+      totalOccupied: totalOcc,
+      availableSpaces: Math.max(0, totalCap - totalOcc),
+      acceptingArrivals: coordinatorSheltersStore.filter((x) => x.status === "Operational").length,
+      nearCapacityCount: coordinatorSheltersStore.filter((x) => x.status === "Near Capacity").length,
+      fullCount: coordinatorSheltersStore.filter((x) => x.status === "Full").length,
+      lastUpdated: new Date().toISOString(),
+    };
+  },
+
+  async getById(id: number | string): Promise<any> {
+    try {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+        headers: { Accept: "application/json" },
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      // fallback
+    }
+    const found = coordinatorSheltersStore.find((x) => String(x.id) === String(id));
+    if (found) return found;
+    throw new Error(`Shelter ${id} not found.`);
+  },
+
+  async create(shelter: CreateShelterPayload): Promise<any> {
+    try {
+      const res = await authFetch(ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(shelter),
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      // fallback
+    }
+    const newShelter: CoordinatorShelter = {
+      id: coordinatorSheltersStore.length + 1,
+      name: shelter.name,
+      location: shelter.location,
+      capacity: shelter.capacity,
+      occupied: shelter.occupied || 0,
+      remaining: Math.max(0, shelter.capacity - (shelter.occupied || 0)),
+      services: shelter.services || ["General"],
+      status: shelter.status || "Operational",
+      contactPerson: shelter.contactPerson || "Shelter Staff",
+      contactPhone: shelter.contactPhone || "+94 11 234 5678",
+      notes: shelter.notes,
+    };
+    coordinatorSheltersStore.push(newShelter);
+    return newShelter;
+  },
+
+  async updateOccupancy(id: number | string, occupied: number): Promise<any> {
+    try {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}/occupancy`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ occupied }),
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      // fallback
+    }
+    const shelter = coordinatorSheltersStore.find((x) => String(x.id) === String(id));
+    if (shelter) {
+      shelter.occupied = occupied;
+      shelter.remaining = Math.max(0, shelter.capacity - occupied);
+      shelter.status = shelter.remaining === 0 ? "Full" : shelter.remaining < 50 ? "Near Capacity" : "Operational";
+      return shelter;
+    }
+    throw new Error(`Shelter ${id} not found.`);
+  },
+
+  async update(id: number | string, patch: Partial<CoordinatorShelter>): Promise<any> {
+    try {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(patch),
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      // fallback
+    }
+    const index = coordinatorSheltersStore.findIndex((x) => String(x.id) === String(id));
+    if (index !== -1) {
+      coordinatorSheltersStore[index] = { ...coordinatorSheltersStore[index], ...patch };
+      return coordinatorSheltersStore[index];
+    }
+    throw new Error(`Shelter ${id} not found.`);
+  },
+
+  async delete(id: number | string): Promise<boolean> {
+    try {
+      const res = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      if (res.ok) return true;
+    } catch {
+      // fallback
+    }
+    coordinatorSheltersStore = coordinatorSheltersStore.filter((x) => String(x.id) !== String(id));
+    return true;
+  },
+
+  async reset(): Promise<boolean> {
+    try {
+      const res = await authFetch(`${ENDPOINT}/reset`, {
+        method: "POST",
+      });
+      if (res.ok) return true;
+    } catch {
+      // fallback
+    }
+    coordinatorSheltersStore = [...DEFAULT_COORDINATOR_SHELTERS];
+    localSheltersStore = [...MOCK_SHELTERS];
+    localBookingsStore = [];
+    return true;
   },
 };

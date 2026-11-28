@@ -1,9 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-inter: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 * {
@@ -11,9 +10,18 @@
   scroll-behavior: smooth;
 }
 
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
+  font-size: 0.9375rem; /* 15px base body text */
+  line-height: 1.6;
+  font-weight: 400;
   color: #173B56;
   background-color: #ffffff;
   -webkit-font-smoothing: antialiased;
@@ -21,8 +29,161 @@ body {
 }
 
 button,
-a {
+a,
+input,
+select,
+textarea {
+  font-family: inherit;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* ==========================================================================
+   CARELINK CENTRALIZED ENTERPRISE TYPOGRAPHY SYSTEM
+   ==========================================================================
+   Scale Reference:
+   - Main page heading (H1):   28–32px | weight 700
+   - Section heading (H2):     22–24px | weight 600
+   - Subsection heading (H3):  18–20px | weight 600
+   - Card heading:             16–18px | weight 600
+   - Body text:                15–16px | weight 400
+   - Table content:            14–15px | weight 400
+   - Form labels:              14–15px | weight 500
+   - Input text:               15–16px | weight 400
+   - Button text:              14–15px | weight 600
+   - Navigation menu:          14–15px | weight 500
+   - Breadcrumbs:              13–14px | weight 400
+   - Helper text:              13–14px | weight 400
+   - Metadata:                 12–13px | weight 400
+   - Badge text:               12–13px | weight 600
+   ========================================================================== */
+
+@layer base {
+  table {
+    font-size: 0.875rem; /* 14px minimum table content */
+    line-height: 1.5;
+  }
+
+  th {
+    font-size: 0.8125rem; /* 13px table header */
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  td {
+    font-size: 0.875rem; /* 14px table body cell */
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: 0.875rem; /* 14px form label */
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 0.9375rem; /* 15px input text */
+    line-height: 1.5;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    font-size: 0.875rem; /* 14px minimum placeholder */
+  }
+}
+
+/* Reusable CareLink Typography Tokens */
+.ty-h1 {
+  font-size: clamp(1.5rem, 2vw + 1rem, 1.875rem); /* 24px mobile -> 30px desktop */
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.ty-h2 {
+  font-size: clamp(1.25rem, 1.2vw + 0.9rem, 1.4375rem); /* 20px mobile -> 23px desktop */
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.ty-h3 {
+  font-size: clamp(1.0625rem, 0.8vw + 0.85rem, 1.1875rem); /* 17px mobile -> 19px desktop */
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ty-card-title {
+  font-size: 1.0625rem; /* 17px */
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ty-body {
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.ty-table-th {
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ty-table-td {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.ty-label {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.ty-input {
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.ty-btn {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ty-nav {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.ty-breadcrumb {
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.ty-helper {
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.ty-meta {
+  font-size: 0.75rem; /* 12px */
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.ty-badge {
+  font-size: 0.75rem; /* 12px */
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 /* Hide scrollbar utility */

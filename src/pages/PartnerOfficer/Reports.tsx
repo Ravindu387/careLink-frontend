@@ -335,7 +335,7 @@ const Reports = () => {
             </p>
 
             <span
-              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                 isLiveBackend
                   ? "bg-[#e5f6f0] text-[#299b7d]"
                   : "bg-[#fff4df] text-[#bd8229]"
@@ -350,7 +350,7 @@ const Reports = () => {
             </span>
           </div>
 
-          <h1 className="text-2xl font-semibold text-[#153e5b]">Reports</h1>
+          <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">Reports</h1>
 
           <p className="mt-2 text-sm text-slate-500">
             Submit partner updates and analyse reach, delivery, referrals, and operational performance.
@@ -362,7 +362,7 @@ const Reports = () => {
             onClick={() => loadData(true)}
             disabled={isRefreshing}
             title="Refresh reports data from API"
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3 py-2 text-sm font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
           >
             <RefreshCw size={13} className={isRefreshing ? "animate-spin" : ""} />
             Sync
@@ -370,7 +370,7 @@ const Reports = () => {
 
           <button
             onClick={() => setShowSchedule(true)}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
           >
             <CalendarDays size={15} />
             Reporting schedule
@@ -378,7 +378,7 @@ const Reports = () => {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Plus size={16} />
             Create report
@@ -394,15 +394,15 @@ const Reports = () => {
           </div>
 
           <div>
-            <span className="rounded bg-[#fff0cd] px-2 py-1 text-[9px] font-semibold text-[#a96a12]">
+            <span className="rounded bg-[#fff0cd] px-2 py-1 text-xs font-semibold text-[#a96a12]">
               {reminder.deadline}
             </span>
 
-            <h3 className="mt-2 text-xs font-semibold text-[#153e5b]">
+            <h3 className="mt-2 text-base font-semibold text-[#153e5b]">
               {reminder.title}
             </h3>
 
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               {reminder.subtitle}
             </p>
           </div>
@@ -410,7 +410,7 @@ const Reports = () => {
 
         <button
           onClick={handleContinueDailyReport}
-          className="rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668a]"
+          className="rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668a]"
         >
           Continue report
         </button>
@@ -457,15 +457,15 @@ const Reports = () => {
         <div className="rounded-xl border border-[#d7e5eb] bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between border-b border-[#d7e5eb] px-4 py-4">
             <div>
-              <h2 className="text-sm font-medium text-[#153e5b]">
+              <h2 className="text-base sm:text-lg font-semibold text-[#153e5b]">
                 People reached by week
               </h2>
-              <p className="mt-1 text-[10px] text-slate-400">
+              <p className="mt-1 text-[13px] text-slate-400">
                 Planned compared with verified reach
               </p>
             </div>
 
-            <div className="flex gap-3 text-[9px] text-slate-500">
+            <div className="flex gap-3 text-xs text-slate-500">
               <span className="flex items-center gap-1">
                 <span className="h-2 w-2 rounded-sm bg-[#287fa8]" />
                 Planned
@@ -520,10 +520,10 @@ const Reports = () => {
         {/* Response Performance Targets */}
         <div className="rounded-xl border border-[#d7e5eb] bg-white shadow-sm">
           <div className="border-b border-[#d7e5eb] px-4 py-4">
-            <h2 className="text-sm font-medium text-[#153e5b]">
+            <h2 className="text-base sm:text-lg font-semibold text-[#153e5b]">
               Response performance
             </h2>
-            <p className="mt-1 text-[10px] text-slate-400">
+            <p className="mt-1 text-[13px] text-slate-400">
               Current operational targets
             </p>
           </div>
@@ -553,14 +553,14 @@ const Reports = () => {
               setActiveTab(tab);
               setCurrentPage(1);
             }}
-            className={`relative whitespace-nowrap pb-4 text-xs ${
+            className={`relative whitespace-nowrap pb-4 text-sm ${
               activeTab === tab
                 ? "font-semibold text-[#267ba4]"
                 : "text-slate-500 hover:text-[#267ba4]"
             }`}
           >
             {tab}
-            <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px] font-medium text-slate-600">
+            <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-xs font-medium text-slate-600">
               {getTabCount(tab)}
             </span>
 
@@ -586,7 +586,7 @@ const Reports = () => {
               setCurrentPage(1);
             }}
             placeholder="Search reports by title, ID, type, or owner..."
-            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
+            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
           />
         </div>
 
@@ -596,7 +596,7 @@ const Reports = () => {
             setTypeFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All report types</option>
           <option>Daily Report</option>
@@ -611,7 +611,7 @@ const Reports = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All statuses</option>
           <option>Submitted</option>
@@ -623,7 +623,7 @@ const Reports = () => {
 
         <button
           onClick={exportCSV}
-          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
         >
           <Download size={15} />
           Export
@@ -635,7 +635,7 @@ const Reports = () => {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-left">
             <thead className="bg-[#f5f8fa]">
-              <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
+              <tr className="border-b border-[#d7e5eb] text-sm text-slate-500">
                 {[
                   "Report ID",
                   "Report",
@@ -657,7 +657,7 @@ const Reports = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-xs text-slate-400">
+                  <td colSpan={9} className="py-12 text-center text-sm text-slate-400">
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw size={15} className="animate-spin text-[#267ba4]" />
                       <span>Loading partner reports...</span>
@@ -668,7 +668,7 @@ const Reports = () => {
                 <tr>
                   <td
                     colSpan={9}
-                    className="py-12 text-center text-xs text-slate-400"
+                    className="py-12 text-center text-sm text-slate-400"
                   >
                     No reports match your filters.
                   </td>
@@ -678,7 +678,7 @@ const Reports = () => {
                   <tr
                     key={report.id}
                     onClick={() => setSelectedReport(report)}
-                    className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
+                    className="cursor-pointer border-b border-[#e2ebef] text-sm text-slate-600 transition hover:bg-[#f5fafc]"
                   >
                     <td className="whitespace-nowrap px-3 py-4 font-semibold text-[#153e5b]">
                       {report.id}
@@ -712,7 +712,7 @@ const Reports = () => {
                             style={{ width: `${report.progress}%` }}
                           />
                         </div>
-                        <span className="text-[10px] text-slate-600">{report.progress}%</span>
+                        <span className="text-sm text-slate-600">{report.progress}%</span>
                       </div>
                     </td>
 
@@ -732,7 +732,7 @@ const Reports = () => {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[13px] text-slate-400">
             Showing{" "}
             {filteredReports.length === 0
               ? 0
@@ -746,7 +746,7 @@ const Reports = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
@@ -755,7 +755,7 @@ const Reports = () => {
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
-                className={`h-8 w-8 rounded-lg border text-[10px] ${
+                className={`h-8 w-8 rounded-lg border text-sm ${
                   currentPage === number
                     ? "border-[#267ba4] bg-[#267ba4] text-white"
                     : "border-[#d3e1e8] text-slate-600 hover:bg-slate-50"
@@ -768,7 +768,7 @@ const Reports = () => {
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
@@ -833,9 +833,9 @@ function StatCard({
         {icon}
       </div>
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <p className="text-2xl font-bold text-[#153e5b]">{value}</p>
-        <p className="text-[9px] text-slate-400">{subtitle}</p>
+        <p className="text-xs text-slate-400">{subtitle}</p>
       </div>
     </div>
   );
@@ -855,10 +855,10 @@ function ProgressItem({
     <div>
       <div className="mb-1 flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-semibold text-[#153e5b]">{title}</p>
-          <p className="text-[9px] text-slate-400">{target}</p>
+          <p className="text-sm font-semibold text-[#153e5b]">{title}</p>
+          <p className="text-xs text-slate-400">{target}</p>
         </div>
-        <span className="text-[10px] font-semibold text-[#153e5b]">
+        <span className="text-sm font-semibold text-[#153e5b]">
           {value}%
         </span>
       </div>
@@ -885,7 +885,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`inline-block rounded-md px-2 py-1 text-[9px] font-medium ${
+      className={`inline-block rounded-md px-2 py-1 text-xs font-medium ${
         styles[status] || "bg-slate-100 text-slate-500"
       }`}
     >
@@ -946,7 +946,7 @@ function CreateReportModal({
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Create Report
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Create a new partner activity or sectoral assessment report.
             </p>
           </div>
@@ -958,7 +958,7 @@ function CreateReportModal({
 
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Report Title *
             </label>
             <input
@@ -966,19 +966,19 @@ function CreateReportModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Daily Partner Activity Report · Flood Response"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Report Type
               </label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>Daily Report</option>
                 <option>Operational Report</option>
@@ -988,13 +988,13 @@ function CreateReportModal({
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Report Owner
               </label>
               <select
                 value={owner}
                 onChange={(e) => setOwner(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>Sara Khan</option>
                 <option>Michael Torres</option>
@@ -1006,7 +1006,7 @@ function CreateReportModal({
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Reporting Period *
               </label>
               <input
@@ -1014,12 +1014,12 @@ function CreateReportModal({
                 type="date"
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Initial Progress ({progress}%)
               </label>
               <input
@@ -1035,7 +1035,7 @@ function CreateReportModal({
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Summary / Notes (Optional)
             </label>
             <textarea
@@ -1043,7 +1043,7 @@ function CreateReportModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Highlight key achievements, field sectors covered, or pending review points..."
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
         </div>
@@ -1052,14 +1052,14 @@ function CreateReportModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Plus size={14} />
             Create Report
@@ -1103,7 +1103,7 @@ function ReportDetailsModal({
           </button>
         </div>
 
-        <h3 className="mb-4 text-sm font-semibold text-[#153e5b]">
+        <h3 className="mb-4 text-base font-semibold text-[#153e5b]">
           {report.title}
         </h3>
 
@@ -1124,14 +1124,14 @@ function ReportDetailsModal({
 
         {/* Status Actions */}
         <div className="mt-6 border-t border-slate-100 pt-4">
-          <p className="mb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+          <p className="mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Quick Actions
           </p>
           <div className="flex flex-wrap gap-2">
             {report.status !== "Submitted" && report.status !== "Approved" && (
               <button
                 onClick={() => onUpdateStatus(report.id, "Submitted")}
-                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-2 text-xs font-medium text-white hover:bg-[#1c668a]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-3 py-2 text-sm font-medium text-white hover:bg-[#1c668a]"
               >
                 <Send size={13} />
                 Submit Report
@@ -1141,7 +1141,7 @@ function ReportDetailsModal({
             {report.status === "Submitted" && (
               <button
                 onClick={() => onUpdateStatus(report.id, "Approved")}
-                className="flex items-center gap-1.5 rounded-lg bg-[#299b7d] px-3 py-2 text-xs font-medium text-white hover:bg-[#208369]"
+                className="flex items-center gap-1.5 rounded-lg bg-[#299b7d] px-3 py-2 text-sm font-medium text-white hover:bg-[#208369]"
               >
                 <Check size={13} />
                 Approve Report
@@ -1151,7 +1151,7 @@ function ReportDetailsModal({
             {report.status !== "Archived" ? (
               <button
                 onClick={() => onUpdateStatus(report.id, "Archived")}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
                 <Archive size={13} />
                 Archive
@@ -1159,7 +1159,7 @@ function ReportDetailsModal({
             ) : (
               <button
                 onClick={() => onUpdateStatus(report.id, "Draft")}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
                 Restore to Draft
               </button>
@@ -1167,7 +1167,7 @@ function ReportDetailsModal({
 
             <button
               onClick={() => onDelete(report.id)}
-              className="ml-auto flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+              className="ml-auto flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
             >
               <Trash2 size={13} />
               Delete
@@ -1177,7 +1177,7 @@ function ReportDetailsModal({
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-slate-100 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
+          className="mt-6 w-full rounded-lg bg-slate-100 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-200"
         >
           Close
         </button>
@@ -1222,7 +1222,7 @@ function ScheduleModal({
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Reporting Schedule
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Required operational reporting deadlines for partner organizations.
             </p>
           </div>
@@ -1239,12 +1239,12 @@ function ScheduleModal({
               className="flex items-center justify-between gap-3 rounded-lg border border-[#d7e5eb] p-4"
             >
               <div>
-                <p className="text-xs font-semibold text-[#153e5b]">{item.name}</p>
-                <p className="mt-1 text-[10px] text-slate-500">{item.deadline}</p>
+                <p className="text-sm font-semibold text-[#153e5b]">{item.name}</p>
+                <p className="mt-1 text-[13px] text-slate-500">{item.deadline}</p>
               </div>
 
               <span
-                className={`whitespace-nowrap rounded-md px-2 py-1 text-[9px] font-medium ${
+                className={`whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium ${
                   item.status === "Due today"
                     ? "bg-[#fff4df] text-[#bd8229]"
                     : "bg-[#e8f2f8] text-[#267ba4]"
@@ -1258,7 +1258,7 @@ function ScheduleModal({
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-[#267ba4] py-3 text-xs font-medium text-white hover:bg-[#1c668a]"
+          className="mt-6 w-full rounded-lg bg-[#267ba4] py-3 text-sm font-medium text-white hover:bg-[#1c668a]"
         >
           Close
         </button>
@@ -1270,8 +1270,8 @@ function ScheduleModal({
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] text-slate-400">{label}</p>
-      <p className="mt-1 text-xs font-medium text-[#153e5b]">{value}</p>
+      <p className="text-[13px] text-slate-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-[#153e5b]">{value}</p>
     </div>
   );
 }

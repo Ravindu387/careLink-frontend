@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   ActivityRecord,
   ActivityType,
@@ -358,7 +358,7 @@ export const activityTrackingService = {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const res = await fetch(`${API_BASE_URL}/activity-tracking/export?${params.toString()}`, {
+      const res = await authFetch(`${API_BASE_URL}/activity-tracking/export?${params.toString()}`, {
         headers,
       });
       if (res.ok) {

@@ -142,7 +142,7 @@ const statusStyles: Record<TransferStatus, string> = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-sky-500";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500";
 
 export default function StockTransferPage() {
   const navigate = useNavigate();
@@ -507,27 +507,27 @@ export default function StockTransferPage() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">Resource Management</p>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">Resource Management</p>
           </div>
         </div>
 
         {/* Active operation */}
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
 
-          <p className="mt-2 text-xs font-bold">Monsoon Floods 2025</p>
+          <p className="mt-2 text-sm font-bold">Monsoon Floods 2025</p>
 
-          <p className="mt-1 text-[10px] text-sky-200">
+          <p className="mt-1 text-sm text-sky-200">
             Greater Riverton · Level 4
           </p>
         </div>
 
         {/* Navigation */}
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -544,7 +544,7 @@ export default function StockTransferPage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -555,7 +555,7 @@ export default function StockTransferPage() {
                 <span className="flex-1">{item.label}</span>
 
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px]">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs">
                     {item.count}
                   </span>
                 )}
@@ -571,8 +571,8 @@ export default function StockTransferPage() {
           </div>
 
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">Resource Manager</p>
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">Resource Manager</p>
           </div>
 
           <ChevronRight size={18} />
@@ -609,18 +609,18 @@ export default function StockTransferPage() {
                 setCurrentPage(1);
               }}
               placeholder="Search resources, requests, dispatches..."
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
 
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+            <span className="hidden rounded border bg-white px-2 py-1 text-xs text-slate-400 sm:block">
               ⌘ K
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">Primary Hub</p>
-              <p className="text-[10px] font-bold">Central Logistics Hub</p>
+              <p className="text-xs uppercase text-slate-400">Primary Hub</p>
+              <p className="text-sm font-bold">Central Logistics Hub</p>
             </div>
 
             <button className="hidden rounded-lg border p-2.5 sm:block" title="Security Status">
@@ -629,7 +629,7 @@ export default function StockTransferPage() {
 
             <button className="relative rounded-lg border p-2.5" title="Alerts">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -639,8 +639,8 @@ export default function StockTransferPage() {
             </div>
 
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">Resource Manager</p>
+              <p className="text-sm font-bold">Daniel P.</p>
+              <p className="text-xs text-slate-400">Resource Manager</p>
             </div>
 
             <ChevronRight size={17} className="hidden sm:block text-slate-400" />
@@ -650,7 +650,7 @@ export default function StockTransferPage() {
         {/* PAGE BODY */}
         <div className="space-y-6 p-4 sm:p-6 lg:p-7">
           {/* BREADCRUMB & API STATUS BADGE */}
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] text-slate-400">
             <div>
               Resource Operations
               <ChevronRight size={12} className="mx-1 inline" />
@@ -661,13 +661,13 @@ export default function StockTransferPage() {
 
             <div className="flex items-center gap-2">
               {isBackendConnected === true && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-medium text-emerald-700 border border-emerald-200">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 border border-emerald-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   API Connected
                 </span>
               )}
               {isBackendConnected === false && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-medium text-amber-700 border border-amber-200">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 border border-amber-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                   Offline Mode
                 </span>
@@ -711,7 +711,7 @@ export default function StockTransferPage() {
               <button
                 type="button"
                 onClick={handleExport}
-                className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-semibold text-sky-700 hover:bg-slate-50"
+                className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-sky-700 hover:bg-slate-50"
               >
                 <Download size={15} />
                 Export
@@ -720,7 +720,7 @@ export default function StockTransferPage() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-3 text-xs font-semibold text-white hover:bg-[#1c668d]"
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-3 text-sm font-semibold text-white hover:bg-[#1c668d]"
               >
                 <Plus size={16} />
                 Create Transfer
@@ -743,7 +743,7 @@ export default function StockTransferPage() {
                   </div>
 
                   <div>
-                    <p className="text-[10px] text-slate-400">
+                    <p className="text-[13px] text-slate-400">
                       {card.title}
                     </p>
 
@@ -751,7 +751,7 @@ export default function StockTransferPage() {
                       {card.value}
                     </h3>
 
-                    <p className="text-[9px] text-slate-400">
+                    <p className="text-xs text-slate-400">
                       {card.note}
                     </p>
                   </div>
@@ -785,7 +785,7 @@ export default function StockTransferPage() {
                       setActiveTab(tab);
                       setCurrentPage(1);
                     }}
-                    className={`relative flex items-center gap-1.5 pb-4 text-[11px] ${
+                    className={`relative flex items-center gap-1.5 pb-4 text-sm ${
                       activeTab === tab
                         ? "font-bold text-sky-700"
                         : "text-slate-500 hover:text-sky-700"
@@ -794,7 +794,7 @@ export default function StockTransferPage() {
                     {tab}
 
                     <span
-                      className={`rounded-full px-1.5 py-0.5 text-[9px] ${
+                      className={`rounded-full px-1.5 py-0.5 text-xs ${
                         activeTab === tab
                           ? "bg-sky-100 text-sky-700"
                           : "bg-slate-100 text-slate-600"
@@ -824,7 +824,7 @@ export default function StockTransferPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search stock transfers..."
-                className="w-full py-3 text-xs outline-none"
+                className="w-full py-3 text-sm sm:text-[15px] outline-none"
               />
             </div>
 
@@ -882,7 +882,7 @@ export default function StockTransferPage() {
             <button
               type="button"
               onClick={resetFilters}
-              className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-xs font-semibold text-sky-700 hover:bg-slate-50"
+              className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-sky-700 hover:bg-slate-50"
             >
               <Filter size={15} />
               Reset Filters
@@ -899,7 +899,7 @@ export default function StockTransferPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[1000px] text-left">
-                  <thead className="bg-slate-50 text-[10px] text-slate-500">
+                  <thead className="bg-slate-50 text-[13px] text-slate-500">
                     <tr>
                       {[
                         "Transfer",
@@ -923,7 +923,7 @@ export default function StockTransferPage() {
                     {displayedTransfers.map(item => (
                       <tr
                         key={item.id}
-                        className="border-t border-slate-100 text-[11px] hover:bg-slate-50"
+                        className="border-t border-slate-100 text-sm hover:bg-slate-50"
                       >
                         <td className="px-3 py-4 font-bold text-slate-800">
                           {item.id}
@@ -955,7 +955,7 @@ export default function StockTransferPage() {
 
                         <td className="px-3 py-4">
                           <span
-                            className={`whitespace-nowrap rounded-md px-2 py-1 text-[10px] font-semibold ${
+                            className={`whitespace-nowrap rounded-md px-2 py-1 text-xs font-semibold ${
                               statusStyles[item.status]
                             }`}
                           >
@@ -991,7 +991,7 @@ export default function StockTransferPage() {
 
             {/* PAGINATION */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">
-              <p className="text-[10px] text-slate-400">
+              <p className="text-[13px] text-slate-400">
                 Showing{" "}
                 {filteredTransfers.length === 0
                   ? 0
@@ -1005,7 +1005,7 @@ export default function StockTransferPage() {
                   type="button"
                   disabled={safePage === 1}
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  className="rounded-lg border px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+                  className="rounded-lg border px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
                 >
                   Previous
                 </button>
@@ -1015,7 +1015,7 @@ export default function StockTransferPage() {
                     key={n}
                     type="button"
                     onClick={() => setCurrentPage(n)}
-                    className={`h-8 min-w-8 rounded-lg border px-2 text-[10px] ${
+                    className={`h-8 min-w-8 rounded-lg border px-2 text-xs ${
                       safePage === n
                         ? "border-sky-700 bg-sky-700 text-white"
                         : "border-slate-200 bg-white text-slate-600"
@@ -1029,7 +1029,7 @@ export default function StockTransferPage() {
                   type="button"
                   disabled={safePage === totalPages}
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  className="rounded-lg border px-3 py-2 text-[10px] text-slate-600 disabled:opacity-40"
+                  className="rounded-lg border px-3 py-2 text-sm text-slate-600 disabled:opacity-40"
                 >
                   Next
                 </button>
@@ -1065,7 +1065,7 @@ export default function StockTransferPage() {
               </button>
             </div>
 
-            <label className="block text-xs font-semibold">
+            <label className="block text-sm font-semibold">
               Source Warehouse
               <select
                 value={formData.source}
@@ -1084,7 +1084,7 @@ export default function StockTransferPage() {
               </select>
             </label>
 
-            <label className="block text-xs font-semibold">
+            <label className="block text-sm font-semibold">
               Destination Warehouse
               <input
                 required
@@ -1100,7 +1100,7 @@ export default function StockTransferPage() {
               />
             </label>
 
-            <label className="block text-xs font-semibold">
+            <label className="block text-sm font-semibold">
               Resource
               <input
                 required
@@ -1116,7 +1116,7 @@ export default function StockTransferPage() {
               />
             </label>
 
-            <label className="block text-xs font-semibold">
+            <label className="block text-sm font-semibold">
               Quantity
               <input
                 required
@@ -1132,7 +1132,7 @@ export default function StockTransferPage() {
               />
             </label>
 
-            <label className="block text-xs font-semibold">
+            <label className="block text-sm font-semibold">
               Requested By
               <input
                 required
@@ -1147,7 +1147,7 @@ export default function StockTransferPage() {
               />
             </label>
 
-            <label className="block text-xs font-semibold">
+            <label className="block text-sm font-semibold">
               Scheduled Date & Time
               <input
                 type="datetime-local"
@@ -1167,7 +1167,7 @@ export default function StockTransferPage() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border px-4 py-2.5 text-xs font-semibold hover:bg-slate-50"
+                className="rounded-lg border px-4 py-2.5 text-sm font-semibold hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -1175,7 +1175,7 @@ export default function StockTransferPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50"
               >
                 {isSubmitting && <Loader2 size={14} className="animate-spin" />}
                 <span>Create Transfer</span>
@@ -1210,7 +1210,7 @@ export default function StockTransferPage() {
 
             <div className="mb-4 rounded-xl bg-sky-50 p-4 flex items-center justify-between">
               <div>
-                <p className="text-xs text-sky-600">Transfer Status</p>
+                <p className="text-sm text-sky-600">Transfer Status</p>
                 <span
                   className={`mt-1 inline-block rounded-md px-3 py-1.5 text-xs font-semibold ${
                     statusStyles[selectedTransfer.status]
@@ -1224,7 +1224,7 @@ export default function StockTransferPage() {
                 type="button"
                 onClick={() => handleDeleteTransfer(selectedTransfer.id)}
                 disabled={isSubmitting}
-                className="flex items-center gap-1 text-xs text-rose-600 hover:text-rose-800 p-1.5 rounded hover:bg-rose-50"
+                className="flex items-center gap-1 text-sm text-rose-600 hover:text-rose-800 p-1.5 rounded hover:bg-rose-50"
                 title="Delete this transfer"
               >
                 <Trash2 size={15} />
@@ -1242,7 +1242,7 @@ export default function StockTransferPage() {
               ["Scheduled", selectedTransfer.scheduled]
             ].map(([label, value]) => (
               <div key={label} className="mb-2 rounded-lg bg-slate-50 p-3">
-                <p className="text-[10px] text-slate-400">{label}</p>
+                <p className="text-[13px] text-slate-400">{label}</p>
                 <p className="mt-1 text-sm font-semibold text-slate-800">
                   {value}
                 </p>
@@ -1251,7 +1251,7 @@ export default function StockTransferPage() {
 
             {/* STATUS TRANSITION ACTIONS */}
             <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
-              <p className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider">
+              <p className="text-xs font-semibold uppercase text-slate-400 tracking-wider">
                 Workflow Actions
               </p>
 
@@ -1261,7 +1261,7 @@ export default function StockTransferPage() {
                     type="button"
                     disabled={isSubmitting}
                     onClick={() => handleStatusChange(selectedTransfer.id, "Approved")}
-                    className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                    className="flex-1 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
                   >
                     Approve Transfer
                   </button>
@@ -1269,7 +1269,7 @@ export default function StockTransferPage() {
                     type="button"
                     disabled={isSubmitting}
                     onClick={() => handleStatusChange(selectedTransfer.id, "Rejected")}
-                    className="flex-1 rounded-lg bg-rose-600 py-2.5 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+                    className="flex-1 rounded-lg bg-rose-600 py-2.5 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
                   >
                     Reject
                   </button>
@@ -1281,7 +1281,7 @@ export default function StockTransferPage() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => handleStatusChange(selectedTransfer.id, "In Transit")}
-                  className="w-full rounded-lg bg-sky-600 py-2.5 text-xs font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+                  className="w-full rounded-lg bg-sky-600 py-2.5 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
                 >
                   Dispatch · Mark In Transit
                 </button>
@@ -1292,14 +1292,14 @@ export default function StockTransferPage() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => handleStatusChange(selectedTransfer.id, "Completed")}
-                  className="w-full rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                  className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
                 >
                   Confirm Receipt · Mark Completed
                 </button>
               )}
 
               {selectedTransfer.status === "Completed" && (
-                <p className="text-center text-xs text-emerald-600 py-1 font-medium">
+                <p className="text-center text-sm text-emerald-600 py-1 font-medium">
                   ✓ Transfer fulfilled &amp; inventory receipt verified.
                 </p>
               )}
@@ -1309,7 +1309,7 @@ export default function StockTransferPage() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => handleStatusChange(selectedTransfer.id, "Pending")}
-                  className="w-full rounded-lg bg-slate-600 py-2.5 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-50"
+                  className="w-full rounded-lg bg-slate-600 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-50"
                 >
                   Reopen for Review
                 </button>
@@ -1318,7 +1318,7 @@ export default function StockTransferPage() {
               <button
                 type="button"
                 onClick={() => setSelectedTransfer(null)}
-                className="mt-2 w-full rounded-lg border border-slate-200 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="mt-2 w-full rounded-lg border border-slate-200 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 Close
               </button>

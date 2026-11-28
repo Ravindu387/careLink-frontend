@@ -336,7 +336,7 @@ const Settings = () => {
             </p>
 
             <span
-              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                 isLiveBackend
                   ? "bg-[#e5f6f0] text-[#299b7d]"
                   : "bg-[#fff4df] text-[#bd8229]"
@@ -351,7 +351,7 @@ const Settings = () => {
             </span>
           </div>
 
-          <h1 className="text-2xl font-semibold text-[#153e5b]">Settings</h1>
+          <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">Settings</h1>
 
           <p className="mt-2 text-sm text-slate-500">
             Manage your profile, organisation defaults, sharing controls, notifications, and security.
@@ -363,7 +363,7 @@ const Settings = () => {
             type="button"
             onClick={handleResetDefaults}
             disabled={isSaving || isLoading}
-            className="flex items-center gap-1.5 rounded-lg border border-[#d7e5eb] bg-white px-3.5 py-2.5 text-xs font-semibold text-[#153e5b] shadow-sm transition hover:bg-slate-50 disabled:opacity-60"
+            className="flex items-center gap-1.5 rounded-lg border border-[#d7e5eb] bg-white px-3.5 py-2.5 text-sm font-semibold text-[#153e5b] shadow-sm transition hover:bg-slate-50 disabled:opacity-60"
             title="Reset to defaults"
           >
             <RotateCcw size={14} className={isSaving ? "animate-spin" : ""} />
@@ -373,7 +373,7 @@ const Settings = () => {
           <button
             onClick={handleSave}
             disabled={isSaving || isLoading}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#1c668a] disabled:opacity-60"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1c668a] disabled:opacity-60"
           >
             {isSaving ? (
               <>
@@ -418,7 +418,7 @@ const Settings = () => {
                 setSavedMessage(null);
                 setErrorMessage(null);
               }}
-              className={`mb-1 flex w-full items-center justify-between rounded-lg px-3 py-3 text-xs transition ${
+              className={`mb-1 flex w-full items-center justify-between rounded-lg px-3 py-3 text-sm transition ${
                 activeTab === tab.name
                   ? "bg-[#e7f0f5] font-semibold text-[#267ba4]"
                   : "text-slate-500 hover:bg-slate-50 hover:text-[#153e5b]"
@@ -439,7 +439,7 @@ const Settings = () => {
           {isLoading ? (
             <div className="flex h-64 flex-col items-center justify-center gap-3 text-slate-400">
               <Loader2 size={28} className="animate-spin text-[#267ba4]" />
-              <p className="text-xs">Loading partner settings...</p>
+              <p className="text-sm">Loading partner settings...</p>
             </div>
           ) : (
             <>
@@ -617,10 +617,10 @@ const Settings = () => {
                     />
 
                     <div>
-                      <p className="text-xs font-semibold text-[#153e5b]">
+                      <p className="text-sm font-semibold text-[#153e5b]">
                         Authorised data sharing
                       </p>
-                      <p className="mt-1 text-[10px] leading-5 text-slate-500">
+                      <p className="mt-1 text-sm leading-5 text-slate-500">
                         Personal and sensitive information must only be shared with authorised users according to your organisation's data-sharing agreements.
                       </p>
                     </div>
@@ -686,7 +686,7 @@ const Settings = () => {
                     description="Choose which updates and alerts you want to receive."
                   />
 
-                  <h3 className="mb-3 text-xs font-semibold text-[#153e5b]">
+                  <h3 className="mb-3 text-base font-semibold text-[#153e5b]">
                     Notification categories
                   </h3>
 
@@ -736,7 +736,7 @@ const Settings = () => {
 
                   <div className="my-5 border-t border-slate-100" />
 
-                  <h3 className="mb-3 text-xs font-semibold text-[#153e5b]">
+                  <h3 className="mb-3 text-base font-semibold text-[#153e5b]">
                     Delivery preferences
                   </h3>
 
@@ -785,7 +785,7 @@ const Settings = () => {
                   </div>
 
                   <div className="mb-6 border-t border-slate-100 pt-5">
-                    <h3 className="mb-3 text-xs font-semibold text-[#153e5b]">
+                    <h3 className="mb-3 text-base font-semibold text-[#153e5b]">
                       Session settings
                     </h3>
 
@@ -808,11 +808,11 @@ const Settings = () => {
                   </div>
 
                   <div className="border-t border-slate-100 pt-5">
-                    <h3 className="mb-1 text-xs font-semibold text-[#153e5b]">
+                    <h3 className="mb-1 text-base font-semibold text-[#153e5b]">
                       Change password
                     </h3>
 
-                    <p className="mb-4 text-[10px] text-slate-500">
+                    <p className="mb-4 text-[13px] text-slate-500">
                       Choose a strong password with at least 6 characters. Default is Partner@123.
                     </p>
 
@@ -859,7 +859,7 @@ const Settings = () => {
 
                     {passwordMessage.text && (
                       <p
-                        className={`mt-3 rounded-lg p-3 text-xs ${
+                        className={`mt-3 rounded-lg p-3 text-sm ${
                           passwordMessage.isError
                             ? "border border-rose-200 bg-rose-50 text-rose-700"
                             : "border border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -872,7 +872,7 @@ const Settings = () => {
                     <button
                       type="button"
                       onClick={handlePasswordChange}
-                      className="mt-4 rounded-lg border border-[#267ba4] px-4 py-2.5 text-xs font-medium text-[#267ba4] transition hover:bg-[#eff7fa]"
+                      className="mt-4 rounded-lg border border-[#267ba4] px-4 py-2.5 text-sm font-medium text-[#267ba4] transition hover:bg-[#eff7fa]"
                     >
                       Update password
                     </button>
@@ -897,11 +897,11 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-5 border-b border-[#d7e5eb] pb-4">
-      <h2 className="text-sm font-semibold text-[#153e5b]">
+      <h2 className="text-base sm:text-lg font-semibold text-[#153e5b]">
         {title}
       </h2>
 
-      <p className="mt-1 text-[10px] text-slate-500">
+      <p className="mt-1 text-[13px] text-slate-500">
         {description}
       </p>
     </div>
@@ -922,7 +922,7 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-[10px] font-medium text-[#153e5b]">
+      <label className="mb-2 block text-sm font-medium text-[#153e5b]">
         {label}
       </label>
 
@@ -930,7 +930,7 @@ function InputField({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs outline-none transition focus:border-[#267ba4] focus:ring-2 focus:ring-[#267ba4]/10"
+        className="w-full rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none transition focus:border-[#267ba4] focus:ring-2 focus:ring-[#267ba4]/10"
       />
     </div>
   );
@@ -950,14 +950,14 @@ function SelectField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-[10px] font-medium text-[#153e5b]">
+      <label className="mb-2 block text-sm font-medium text-[#153e5b]">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs outline-none transition focus:border-[#267ba4] focus:ring-2 focus:ring-[#267ba4]/10"
+        className="w-full rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none transition focus:border-[#267ba4] focus:ring-2 focus:ring-[#267ba4]/10"
       >
         {options.map((opt) => (
           <option key={opt}>{opt}</option>
@@ -991,11 +991,11 @@ function ToggleRow({
         )}
 
         <div>
-          <p className="text-xs font-medium text-[#153e5b]">
+          <p className="text-sm font-medium text-[#153e5b]">
             {title}
           </p>
 
-          <p className="mt-1 text-[10px] text-slate-400">
+          <p className="mt-1 text-[13px] text-slate-400">
             {description}
           </p>
         </div>
@@ -1036,7 +1036,7 @@ function PasswordField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-[10px] font-medium text-[#153e5b]">
+      <label className="mb-2 block text-sm font-medium text-[#153e5b]">
         {label}
       </label>
 
@@ -1045,7 +1045,7 @@ function PasswordField({
           type={show ? "text" : "password"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 pr-10 text-xs outline-none focus:border-[#267ba4] focus:ring-2 focus:ring-[#267ba4]/10"
+          className="w-full rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 pr-10 text-sm sm:text-[15px] outline-none focus:border-[#267ba4] focus:ring-2 focus:ring-[#267ba4]/10"
         />
 
         <button

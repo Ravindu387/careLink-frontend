@@ -124,8 +124,8 @@ export default function ShelterOverview() {
       const availabilityMatch =
         availability === "Any availability" ||
         availability === "All" ||
-        (availability === "Available" && shelter.remaining > 0) ||
-        (availability === "Full" && shelter.remaining === 0);
+        (availability === "Available" && (shelter.remaining ?? shelter.availability ?? 0) > 0) ||
+        (availability === "Full" && (shelter.remaining ?? shelter.availability ?? 0) === 0);
 
       return searchMatch && areaMatch && statusMatch && availabilityMatch;
     });
@@ -146,7 +146,7 @@ export default function ShelterOverview() {
 
   const acceptingCount =
     metrics?.acceptingArrivals ??
-    shelters.filter((s) => s.remaining > 0).length;
+    shelters.filter((s) => (s.remaining ?? s.availability ?? 0) > 0).length;
 
   const nearCapacityCount =
     metrics?.nearCapacityCount ??
@@ -276,7 +276,7 @@ export default function ShelterOverview() {
     }
   };
 
-  const handleDeleteShelter = async (id: number) => {
+  const handleDeleteShelter = async (id: number | string) => {
     if (!window.confirm("Are you sure you want to decommission/remove this shelter?")) {
       return;
     }
@@ -323,7 +323,7 @@ export default function ShelterOverview() {
       {/* Page heading */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-medium text-[#153f5e]">
+          <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
             Shelter Overview
           </h1>
 
@@ -337,7 +337,7 @@ export default function ShelterOverview() {
             type="button"
             onClick={handleResetDefaults}
             disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b8d0df] bg-white px-3.5 py-2.5 text-xs text-[#175477] shadow-sm transition hover:bg-sky-50 disabled:opacity-60"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b8d0df] bg-white px-3.5 py-2.5 text-sm text-[#175477] shadow-sm transition hover:bg-sky-50 disabled:opacity-60"
             title="Reset to default seed data"
           >
             <RotateCcw size={14} className={isLoading ? "animate-spin" : ""} />
@@ -346,7 +346,7 @@ export default function ShelterOverview() {
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b8d0df] bg-white px-4 py-2.5 text-xs text-[#175477] shadow-sm transition hover:bg-sky-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b8d0df] bg-white px-4 py-2.5 text-sm text-[#175477] shadow-sm transition hover:bg-sky-50"
           >
             <Download size={15} />
             Export CSV
@@ -357,7 +357,7 @@ export default function ShelterOverview() {
               setModalMessage("");
               setShowModal(true);
             }}
-            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#216789]"
+            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#216789]"
           >
             <Plus size={15} />
             Coordinate shelter
@@ -391,13 +391,13 @@ export default function ShelterOverview() {
             </div>
 
             <div>
-              <p className="text-[9px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 Operational shelters
               </p>
               <h2 className="text-2xl font-semibold text-[#153f5e]">
                 {operationalCount}
               </h2>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 {acceptingCount} accepting arrivals
               </p>
             </div>
@@ -412,13 +412,13 @@ export default function ShelterOverview() {
             </div>
 
             <div>
-              <p className="text-[9px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 Total capacity
               </p>
               <h2 className="text-2xl font-semibold text-[#153f5e]">
                 {totalCapacity.toLocaleString()}
               </h2>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 {totalOccupied.toLocaleString()} occupied
               </p>
             </div>
@@ -433,13 +433,13 @@ export default function ShelterOverview() {
             </div>
 
             <div>
-              <p className="text-[9px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 Available spaces
               </p>
               <h2 className="text-2xl font-semibold text-[#153f5e]">
                 {availableSpaces.toLocaleString()}
               </h2>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 Across {shelters.length} active facilities
               </p>
             </div>
@@ -454,13 +454,13 @@ export default function ShelterOverview() {
             </div>
 
             <div>
-              <p className="text-[9px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 Near capacity
               </p>
               <h2 className="text-2xl font-semibold text-[#153f5e]">
                 {nearCapacityCount}
               </h2>
-              <p className="text-[9px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 Requires escalation monitoring
               </p>
             </div>
@@ -476,14 +476,14 @@ export default function ShelterOverview() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search shelters by name, area, or service..."
-            className="w-full min-w-0 bg-transparent text-[11px] text-[#153f5e] outline-none placeholder:text-slate-400"
+            className="w-full min-w-0 bg-transparent text-sm sm:text-[15px] text-[#153f5e] outline-none placeholder:text-slate-400"
           />
         </div>
 
         <select
           value={area}
           onChange={(e) => setArea(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[11px] text-slate-600 outline-none shadow-sm focus:border-sky-500"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none shadow-sm focus:border-sky-500"
         >
           <option>All operational areas</option>
           <option>Central Ward</option>
@@ -495,7 +495,7 @@ export default function ShelterOverview() {
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[11px] text-slate-600 outline-none shadow-sm focus:border-sky-500"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none shadow-sm focus:border-sky-500"
         >
           <option>All statuses</option>
           <option>Operational</option>
@@ -506,7 +506,7 @@ export default function ShelterOverview() {
         <select
           value={availability}
           onChange={(e) => setAvailability(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[11px] text-slate-600 outline-none shadow-sm focus:border-sky-500"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none shadow-sm focus:border-sky-500"
         >
           <option>Any availability</option>
           <option>Available</option>
@@ -515,7 +515,7 @@ export default function ShelterOverview() {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-[11px] font-medium transition shadow-sm ${
+          className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition shadow-sm ${
             showFilters
               ? "border-sky-700 bg-sky-50 text-sky-800"
               : "border-sky-600 bg-white text-sky-700 hover:bg-sky-50"
@@ -528,13 +528,13 @@ export default function ShelterOverview() {
 
       {showFilters && (
         <div className="mb-3 flex items-center justify-between rounded-lg border border-[#d5e2e9] bg-white p-3 shadow-sm">
-          <span className="text-[11px] text-slate-500">
+          <span className="text-[13px] text-slate-500">
             Filtering by location, capacity risk, and bed availability.
           </span>
 
           <button
             onClick={clearFilters}
-            className="text-[11px] font-semibold text-sky-700 hover:underline"
+            className="text-sm font-semibold text-sky-700 hover:underline"
           >
             Clear filters
           </button>
@@ -546,7 +546,7 @@ export default function ShelterOverview() {
         {isLoading ? (
           <div className="flex h-64 flex-col items-center justify-center gap-2 text-slate-400">
             <Loader2 size={26} className="animate-spin text-[#287da5]" />
-            <p className="text-xs">Loading shelters...</p>
+            <p className="text-sm">Loading shelters...</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -565,7 +565,7 @@ export default function ShelterOverview() {
                   ].map((heading, index) => (
                     <th
                       key={index}
-                      className="whitespace-nowrap px-3.5 py-3 text-[10px] font-semibold text-slate-500 uppercase tracking-wider"
+                      className="whitespace-nowrap px-3.5 py-3 text-[13px] font-semibold text-slate-500 uppercase tracking-wider"
                     >
                       {heading}
                     </th>
@@ -580,37 +580,37 @@ export default function ShelterOverview() {
                     onClick={() => setSelected(shelter)}
                     className="cursor-pointer border-b border-slate-100 transition hover:bg-[#f0f6f8]"
                   >
-                    <td className="whitespace-nowrap px-3.5 py-3.5 text-xs font-semibold text-[#153f5e]">
+                    <td className="whitespace-nowrap px-3.5 py-3.5 text-sm font-semibold text-[#153f5e]">
                       <div>{shelter.name}</div>
                       {shelter.contactPerson && (
-                        <div className="text-[10px] font-normal text-slate-400">
+                        <div className="text-[13px] font-normal text-slate-400">
                           {shelter.contactPerson}
                         </div>
                       )}
                     </td>
 
-                    <td className="whitespace-nowrap px-3.5 py-3.5 text-xs text-slate-600">
+                    <td className="whitespace-nowrap px-3.5 py-3.5 text-sm text-slate-600">
                       {shelter.location}
                     </td>
 
-                    <td className="px-3.5 py-3.5 text-xs font-medium text-slate-700">
+                    <td className="px-3.5 py-3.5 text-sm font-medium text-slate-700">
                       {shelter.capacity.toLocaleString()}
                     </td>
 
-                    <td className="px-3.5 py-3.5 text-xs font-medium text-slate-700">
+                    <td className="px-3.5 py-3.5 text-sm font-medium text-slate-700">
                       {shelter.occupied.toLocaleString()}
                     </td>
 
-                    <td className="px-3.5 py-3.5 text-xs font-bold text-emerald-600">
-                      {shelter.remaining.toLocaleString()}
+                    <td className="px-3.5 py-3.5 text-sm font-bold text-emerald-600">
+                      {(shelter.remaining ?? shelter.availability ?? 0).toLocaleString()}
                     </td>
 
                     <td className="px-3.5 py-3.5">
                       <div className="flex flex-wrap gap-1">
-                        {shelter.services.map((service) => (
+                        {shelter.services.map((service: string) => (
                           <span
                             key={service}
-                            className="whitespace-nowrap rounded-md bg-sky-100 px-2 py-0.5 text-[9px] font-medium text-sky-700"
+                            className="whitespace-nowrap rounded-md bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700"
                           >
                             {service}
                           </span>
@@ -620,7 +620,7 @@ export default function ShelterOverview() {
 
                     <td className="whitespace-nowrap px-3.5 py-3.5">
                       <span
-                        className={`rounded-md px-2 py-1 text-[9px] font-semibold ${
+                        className={`rounded-md px-2 py-1 text-xs font-semibold ${
                           statusStyles[shelter.status] || "bg-slate-100 text-slate-600"
                         }`}
                       >
@@ -645,10 +645,10 @@ export default function ShelterOverview() {
         )}
 
         <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3">
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[13px] text-slate-500">
             Showing {filteredShelters.length} of {shelters.length} shelters
           </p>
-          <span className="text-[9px] text-slate-400">
+          <span className="text-xs text-slate-400">
             Live occupancy sync active
           </span>
         </div>
@@ -659,7 +659,7 @@ export default function ShelterOverview() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
           <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-2xl animate-fade-in">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[#153f5e]">
+              <h2 className="text-lg sm:text-xl font-semibold text-[#153f5e]">
                 Shelter details
               </h2>
 
@@ -689,7 +689,7 @@ export default function ShelterOverview() {
               </p>
 
               {selected.notes && (
-                <p className="mt-2 text-[11px] leading-relaxed text-slate-600 italic bg-white p-2.5 rounded border border-slate-200">
+                <p className="mt-2 text-sm leading-relaxed text-slate-600 italic bg-white p-2.5 rounded border border-slate-200">
                   "{selected.notes}"
                 </p>
               )}
@@ -715,7 +715,7 @@ export default function ShelterOverview() {
                 <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
                   <span className="text-slate-500">Status</span>
                   <span
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                    className={`rounded px-1.5 py-0.5 text-xs font-semibold ${
                       statusStyles[selected.status]
                     }`}
                   >
@@ -737,7 +737,7 @@ export default function ShelterOverview() {
 
               {/* Occupancy quick update */}
               <div className="mt-4 rounded-lg border border-sky-200 bg-sky-50/50 p-3">
-                <label className="mb-1.5 block text-[10px] font-semibold text-[#153f5e]">
+                <label className="mb-1.5 block text-sm font-semibold text-[#153f5e]">
                   Update live occupancy headcount
                 </label>
                 <div className="flex items-center gap-2">
@@ -747,13 +747,13 @@ export default function ShelterOverview() {
                     max={selected.capacity}
                     value={editOccupied}
                     onChange={(e) => setEditOccupied(e.target.value)}
-                    className="w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:border-sky-500"
+                    className="w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-sm sm:text-[15px] text-slate-800 outline-none focus:border-sky-500"
                   />
                   <button
                     type="button"
                     disabled={isUpdatingOccupancy}
                     onClick={handleUpdateOccupancy}
-                    className="rounded bg-[#287da5] px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#206788] disabled:opacity-50 shrink-0"
+                    className="rounded bg-[#287da5] px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-[#206788] disabled:opacity-50 shrink-0"
                   >
                     {isUpdatingOccupancy ? "Saving..." : "Update"}
                   </button>
@@ -761,15 +761,15 @@ export default function ShelterOverview() {
               </div>
 
               <div className="mt-4 border-t border-slate-200 pt-3">
-                <p className="mb-2 text-[11px] font-medium text-slate-600">
+                <p className="mb-2 text-sm font-medium text-slate-600">
                   Available services
                 </p>
 
                 <div className="flex flex-wrap gap-1.5">
-                  {selected.services.map((service) => (
+                  {selected.services.map((service: string) => (
                     <span
                       key={service}
-                      className="rounded-md bg-sky-100 px-2 py-0.5 text-[10px] text-sky-700"
+                      className="rounded-md bg-sky-100 px-2 py-0.5 text-xs text-sky-700"
                     >
                       {service}
                     </span>
@@ -782,7 +782,7 @@ export default function ShelterOverview() {
               <button
                 type="button"
                 onClick={() => handleDeleteShelter(selected.id)}
-                className="flex items-center gap-1 rounded-lg border border-rose-200 px-3 py-2.5 text-xs font-medium text-rose-600 transition hover:bg-rose-50"
+                className="flex items-center gap-1 rounded-lg border border-rose-200 px-3 py-2.5 text-sm font-medium text-rose-600 transition hover:bg-rose-50"
               >
                 <Trash2 size={14} />
                 <span>Decommission</span>
@@ -790,7 +790,7 @@ export default function ShelterOverview() {
 
               <button
                 onClick={() => setSelected(null)}
-                className="flex-1 rounded-lg bg-[#153f5e] py-2.5 text-xs font-semibold text-white transition hover:bg-[#205879]"
+                className="flex-1 rounded-lg bg-[#153f5e] py-2.5 text-sm font-semibold text-white transition hover:bg-[#205879]"
               >
                 Close details
               </button>
@@ -805,10 +805,10 @@ export default function ShelterOverview() {
           <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold text-[#153f5e]">
+                <h2 className="text-lg sm:text-xl font-semibold text-[#153f5e]">
                   Coordinate emergency shelter
                 </h2>
-                <p className="mt-0.5 text-[10px] text-slate-500">
+                <p className="mt-0.5 text-[13px] text-slate-500">
                   Register a facility into the emergency accommodation network.
                 </p>
               </div>
@@ -823,7 +823,7 @@ export default function ShelterOverview() {
 
             <div className="space-y-3.5">
               <div>
-                <label className="mb-1 block text-[11px] font-medium text-slate-700">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
                   Shelter name *
                 </label>
 
@@ -831,19 +831,19 @@ export default function ShelterOverview() {
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="e.g. West District Sports Complex"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-[#153f5e] outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-[11px] font-medium text-slate-700">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
                   Operational area *
                 </label>
 
                 <select
                   value={newLocation}
                   onChange={(e) => setNewLocation(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-[#153f5e] outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-sky-500"
                 >
                   <option>Central Ward</option>
                   <option>North Ward</option>
@@ -854,7 +854,7 @@ export default function ShelterOverview() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
                     Total capacity *
                   </label>
 
@@ -864,12 +864,12 @@ export default function ShelterOverview() {
                     value={newCapacity}
                     onChange={(e) => setNewCapacity(e.target.value)}
                     placeholder="e.g. 500"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-[#153f5e] outline-none focus:border-sky-500"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-sky-500"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
                     Currently occupied
                   </label>
 
@@ -879,13 +879,13 @@ export default function ShelterOverview() {
                     value={newOccupied}
                     onChange={(e) => setNewOccupied(e.target.value)}
                     placeholder="0"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-[#153f5e] outline-none focus:border-sky-500"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-sky-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-[11px] font-medium text-slate-700">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
                   Available services (comma separated)
                 </label>
 
@@ -893,13 +893,13 @@ export default function ShelterOverview() {
                   value={newServices}
                   onChange={(e) => setNewServices(e.target.value)}
                   placeholder="Food, Medical, Accessible, Childcare"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-[#153f5e] outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-sky-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
                     Contact person
                   </label>
 
@@ -907,12 +907,12 @@ export default function ShelterOverview() {
                     value={newContactPerson}
                     onChange={(e) => setNewContactPerson(e.target.value)}
                     placeholder="e.g. Officer Silva"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-[#153f5e] outline-none focus:border-sky-500"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-sky-500"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
                     Contact phone
                   </label>
 
@@ -920,13 +920,13 @@ export default function ShelterOverview() {
                     value={newContactPhone}
                     onChange={(e) => setNewContactPhone(e.target.value)}
                     placeholder="+94 77 123 4567"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-[#153f5e] outline-none focus:border-sky-500"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-sky-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-[11px] font-medium text-slate-700">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
                   Operational notes
                 </label>
 
@@ -935,12 +935,12 @@ export default function ShelterOverview() {
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
                   placeholder="Access instructions, generator status, water supply..."
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-[#153f5e] outline-none focus:border-sky-500 resize-none"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-sky-500 resize-none"
                 />
               </div>
 
               {modalMessage && (
-                <p className="rounded border border-rose-200 bg-rose-50 p-2 text-xs text-rose-700">
+                <p className="rounded border border-rose-200 bg-rose-50 p-2 text-sm text-rose-700">
                   {modalMessage}
                 </p>
               )}
@@ -948,7 +948,7 @@ export default function ShelterOverview() {
               <button
                 onClick={addShelter}
                 disabled={isSubmitting}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#287da5] py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#206889] disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#287da5] py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#206889] disabled:opacity-60"
               >
                 {isSubmitting ? (
                   <>

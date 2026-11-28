@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { accommodationService } from "../../services/accommodationService";
 import {
   Search,
   Globe,
@@ -184,14 +185,35 @@ export default function AccommodationRequestsPage() {
     priority: "Medium" as Priority,
   });
 
+  useEffect(() => {
+    accommodationService.getRequests({ pageSize: 100 }).then((res) => {
+      const items = (res as any)?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setRequests(
+          items.map((item: any) => ({
+            id: item.id || item.requestId || `AR-${Math.floor(Math.random() * 9000 + 1000)}`,
+            applicant: item.applicant || item.applicantName || "Applicant",
+            familyMembers: Number(item.familyMembers ?? item.familySize ?? 1),
+            currentLocation: item.currentLocation || item.location || "N/A",
+            requestedShelter: item.requestedShelter || item.shelterName || "Riverton Central",
+            shelterId: item.shelterId || "SH-001",
+            priority: (item.priority as Priority) || "Medium",
+            requestDate: item.requestDate || "Today",
+            status: (item.status as RequestStatus) || "Pending",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   /* ================= COUNTS ================= */
 
   const counts = {
-    "All requests": 48,
-    Pending: 12,
-    "Under Review": 8,
-    Approved: 16,
-    Assigned: 9,
+    "All requests": requests.length,
+    Pending: requests.filter((r) => r.status === "Pending").length,
+    "Under Review": requests.filter((r) => r.status === "Under Review").length,
+    Approved: requests.filter((r) => r.status === "Approved").length,
+    Assigned: requests.filter((r) => r.status === "Assigned").length,
   };
 
   const getTabStatus = (tab: TabName): RequestStatus | null => {
@@ -302,7 +324,7 @@ export default function AccommodationRequestsPage() {
 
   /* ================= CREATE REQUEST ================= */
 
-  const handleCreateRequest = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateRequest = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const familyMembers = Number(newRequest.familyMembers);
@@ -313,8 +335,22 @@ export default function AccommodationRequestsPage() {
       (s) => s.id === newRequest.requestedShelter
     );
 
+    let createdId = `AR-${Date.now().toString().slice(-4)}`;
+    try {
+      const apiRes = await accommodationService.createRequest({
+        applicant: newRequest.applicant,
+        familyMembers,
+        currentLocation: newRequest.currentLocation,
+        requestedShelter: newRequest.requestedShelter,
+        priority: newRequest.priority,
+      });
+      if (apiRes?.id) createdId = apiRes.id;
+    } catch {
+      // Fallback to local state update
+    }
+
     const request: AccommodationRequest = {
-      id: `AR-${Date.now().toString().slice(-4)}`,
+      id: createdId,
       applicant: newRequest.applicant,
       familyMembers,
       currentLocation: newRequest.currentLocation,
@@ -350,10 +386,16 @@ export default function AccommodationRequestsPage() {
 
   /* ================= UPDATE REQUEST STATUS ================= */
 
-  const updateRequestStatus = (newStatus: RequestStatus) => {
+  const updateRequestStatus = async (newStatus: RequestStatus) => {
     if (!selectedRequest) return;
 
     const requestId = selectedRequest.id;
+
+    try {
+      await accommodationService.updateRequestStatus(requestId, newStatus);
+    } catch {
+      // Fallback to local state update
+    }
 
     setRequests((prev) =>
       prev.map((request) =>
@@ -383,7 +425,7 @@ export default function AccommodationRequestsPage() {
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-5 pb-10">
 
         {/* BREADCRUMB */}
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="text-slate-400">Shelter Administration</span>
@@ -395,18 +437,18 @@ export default function AccommodationRequestsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 
           <div>
-            <h1 className="text-[23px] md:text-[25px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Accommodation Requests
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-2">
+            <p className="text-[13px] text-slate-500 mt-2">
               Review, approve, and assign displaced households to safe accommodation.
             </p>
           </div>
 
           <button
             onClick={() => setNewRequestOpen(true)}
-            className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
+            className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#144665]"
           >
             <Plus size={14} />
             New request
@@ -421,7 +463,7 @@ export default function AccommodationRequestsPage() {
             <button
               key={tab}
               onClick={() => changeTab(tab)}
-              className={`flex items-center gap-1.5 py-3 text-[9px] whitespace-nowrap border-b-2 transition ${
+              className={`flex items-center gap-1.5 py-3 text-sm whitespace-nowrap border-b-2 transition ${
                 activeTab === tab
                   ? "border-[#21638d] text-[#174f75] font-bold"
                   : "border-transparent text-slate-500 hover:text-[#21638d]"
@@ -429,7 +471,7 @@ export default function AccommodationRequestsPage() {
             >
               {tab}
 
-              <span className={`px-1.5 py-0.5 rounded-full text-[8px] ${
+              <span className={`px-1.5 py-0.5 rounded-full text-xs ${
                 activeTab === tab
                   ? "bg-[#e5eff5] text-[#21638d]"
                   : "bg-[#edf2f5] text-slate-500"
@@ -457,7 +499,7 @@ export default function AccommodationRequestsPage() {
                 setCurrentPage(1);
               }}
               placeholder="Search request ID or applicant..."
-              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-[10px] outline-none focus:border-[#45b99b]"
+              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
             />
           </div>
 
@@ -517,7 +559,7 @@ export default function AccommodationRequestsPage() {
 
             <button
               onClick={() => setMoreFilters(!moreFilters)}
-              className={`h-9 px-3 bg-white border rounded-lg text-[10px] font-semibold whitespace-nowrap flex items-center justify-center gap-2 ${
+              className={`h-9 px-3 bg-white border rounded-lg text-sm font-semibold whitespace-nowrap flex items-center justify-center gap-2 ${
                 moreFilters
                   ? "border-[#2785b7] text-[#2785b7]"
                   : "border-[#aac4d2]"
@@ -534,13 +576,13 @@ export default function AccommodationRequestsPage() {
           <section className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3">
 
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold">
+              <h3 className="text-base font-semibold">
                 Advanced filters
               </h3>
 
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#267ca6] font-semibold"
+                className="text-sm text-[#267ca6] font-semibold"
               >
                 Clear all
               </button>
@@ -593,7 +635,7 @@ export default function AccommodationRequestsPage() {
 
               <thead className="bg-[#f5f9fa] border-b border-slate-200">
 
-                <tr className="text-[8px] text-slate-500">
+                <tr className="text-sm text-slate-500">
                   <th className="px-3 py-3 font-medium">Request ID</th>
                   <th className="px-3 py-3 font-medium">Applicant</th>
                   <th className="px-3 py-3 font-medium">Family Members</th>
@@ -613,7 +655,7 @@ export default function AccommodationRequestsPage() {
                   <tr
                     key={request.id}
                     onClick={() => setSelectedRequest(request)}
-                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
+                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-sm transition"
                   >
 
                     <td className="px-3 py-4 font-semibold text-[#174f75]">
@@ -661,7 +703,7 @@ export default function AccommodationRequestsPage() {
                   <tr>
                     <td
                       colSpan={9}
-                      className="text-center py-12 text-xs text-slate-400"
+                      className="text-center py-12 text-sm text-slate-400"
                     >
                       No accommodation requests found.
                     </td>
@@ -674,7 +716,7 @@ export default function AccommodationRequestsPage() {
           {/* PAGINATION */}
           <div className="px-3.5 py-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing{" "}
               {filteredRequests.length === 0
                 ? 0
@@ -694,7 +736,7 @@ export default function AccommodationRequestsPage() {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Previous
               </button>
@@ -704,7 +746,7 @@ export default function AccommodationRequestsPage() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`w-7 h-8 rounded-lg border text-[9px] ${
+                    className={`w-7 h-8 rounded-lg border text-sm ${
                       currentPage === page
                         ? "bg-[#1c638a] text-white border-[#1c638a]"
                         : "border-slate-200 hover:bg-slate-50"
@@ -718,7 +760,7 @@ export default function AccommodationRequestsPage() {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Next
               </button>
@@ -745,7 +787,7 @@ export default function AccommodationRequestsPage() {
             </div>
 
             <div className="mt-7">
-              <p className="text-xs text-[#2785b7] font-semibold">
+              <p className="text-sm text-[#2785b7] font-semibold">
                 {selectedRequest.id}
               </p>
 
@@ -794,7 +836,7 @@ export default function AccommodationRequestsPage() {
 
             <div className="mt-8 border-t border-slate-100 pt-5">
 
-              <h3 className="text-xs font-semibold mb-3">
+              <h3 className="text-base font-semibold mb-3">
                 Update request status
               </h3>
 
@@ -802,28 +844,28 @@ export default function AccommodationRequestsPage() {
 
                 <button
                   onClick={() => updateRequestStatus("Under Review")}
-                  className="border border-slate-200 rounded-lg py-2.5 text-[10px] font-semibold hover:bg-slate-50"
+                  className="border border-slate-200 rounded-lg py-2.5 text-sm font-semibold hover:bg-slate-50"
                 >
                   Under Review
                 </button>
 
                 <button
                   onClick={() => updateRequestStatus("Approved")}
-                  className="bg-[#e5f8f1] text-[#269a77] rounded-lg py-2.5 text-[10px] font-semibold hover:bg-[#d5f1e7]"
+                  className="bg-[#e5f8f1] text-[#269a77] rounded-lg py-2.5 text-sm font-semibold hover:bg-[#d5f1e7]"
                 >
                   Approve
                 </button>
 
                 <button
                   onClick={() => updateRequestStatus("Assigned")}
-                  className="bg-[#1c638a] text-white rounded-lg py-2.5 text-[10px] font-semibold hover:bg-[#144665]"
+                  className="bg-[#1c638a] text-white rounded-lg py-2.5 text-sm font-semibold hover:bg-[#144665]"
                 >
                   Assign shelter
                 </button>
 
                 <button
                   onClick={() => updateRequestStatus("Pending")}
-                  className="border border-slate-200 rounded-lg py-2.5 text-[10px] font-semibold hover:bg-slate-50"
+                  className="border border-slate-200 rounded-lg py-2.5 text-sm font-semibold hover:bg-slate-50"
                 >
                   Set Pending
                 </button>
@@ -847,7 +889,7 @@ export default function AccommodationRequestsPage() {
                   New accommodation request
                 </h2>
 
-                <p className="text-[10px] text-slate-400 mt-1">
+                <p className="text-[13px] text-slate-400 mt-1">
                   Create a request for a displaced household.
                 </p>
               </div>
@@ -920,14 +962,14 @@ export default function AccommodationRequestsPage() {
                 <button
                   type="button"
                   onClick={() => setNewRequestOpen(false)}
-                  className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold"
+                  className="flex-1 border border-slate-200 rounded-lg py-3 text-sm font-semibold"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+                  className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#144665]"
                 >
                   Create request
                 </button>
@@ -944,7 +986,7 @@ export default function AccommodationRequestsPage() {
 
           <CheckCircle2 size={17} className="shrink-0" />
 
-          <p className="text-xs">{successMessage}</p>
+          <p className="text-sm">{successMessage}</p>
 
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
@@ -971,7 +1013,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full xl:w-[105px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-7 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full xl:w-[105px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-7 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -997,7 +1039,7 @@ function PriorityBadge({ priority }: { priority: Priority }) {
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[priority]}`}>
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-xs font-semibold ${styles[priority]}`}>
       {priority}
     </span>
   );
@@ -1012,7 +1054,7 @@ function StatusBadge({ status }: { status: RequestStatus }) {
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-xs font-semibold ${styles[status]}`}>
       {status}
     </span>
   );
@@ -1033,7 +1075,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1044,7 +1086,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );
@@ -1063,14 +1105,14 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -1096,8 +1138,8 @@ function DetailRow({
       <div className="text-[#2785b7]">{icon}</div>
 
       <div className="flex-1">
-        <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1">{value}</p>
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-sm font-semibold mt-1">{value}</p>
       </div>
     </div>
   );

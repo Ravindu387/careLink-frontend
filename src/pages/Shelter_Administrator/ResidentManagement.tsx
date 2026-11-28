@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -202,6 +203,31 @@ export default function ResidentManagementPage() {
 
   const [successMessage, setSuccessMessage] = useState("");
 
+  useEffect(() => {
+    apiClient.get<any>("/residents").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setResidents(
+          items.map((r: any) => ({
+            id: r.id || r.residentCode || `RES-${Math.floor(Math.random() * 90000 + 10000)}`,
+            name: r.name || r.fullName || "Resident",
+            age: Number(r.age ?? 30),
+            gender: r.gender || "Female",
+            contact: r.contact || r.phone || "077 000 0000",
+            familyGroup: r.familyGroup || "Individual",
+            shelter: r.shelter || r.shelterName || "Riverton Central",
+            shelterId: r.shelterId || "SH-001",
+            room: r.room || "A-01",
+            bed: r.bed || "B-01",
+            checkIn: r.checkIn || "Today",
+            status: (r.status as ResidentStatus) || "Active",
+            assistanceNeeds: r.assistanceNeeds || "None",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   const [newResident, setNewResident] = useState({
     name: "",
     age: "",
@@ -310,6 +336,18 @@ export default function ResidentManagementPage() {
     );
 
     if (!selectedShelter) return;
+
+    apiClient.post("/residents", {
+      name: newResident.name,
+      age: Number(newResident.age),
+      gender: newResident.gender,
+      contact: newResident.contact,
+      familyGroup: newResident.familyGroup || "Individual",
+      shelterId: selectedShelter.id,
+      room: newResident.room,
+      bed: newResident.bed,
+      assistanceNeeds: newResident.assistanceNeeds,
+    }).catch(() => {});
 
     const resident: Resident = {
       id: `RES-${Date.now().toString().slice(-5)}`,
@@ -443,7 +481,7 @@ export default function ResidentManagementPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="text-slate-400">Shelter Administration</span>
@@ -456,11 +494,11 @@ export default function ResidentManagementPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
 
           <div>
-            <h1 className="text-[23px] md:text-[25px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Resident Management
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-2">
+            <p className="text-[13px] text-slate-500 mt-2">
               Manage registrations, accommodation, family groups, and resident support needs.
             </p>
           </div>
@@ -469,7 +507,7 @@ export default function ResidentManagementPage() {
 
             <button
               onClick={handleExport}
-              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-slate-50"
+              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-slate-50"
             >
               <Download size={14} />
               Export
@@ -477,7 +515,7 @@ export default function ResidentManagementPage() {
 
             <button
               onClick={() => setRegisterOpen(true)}
-              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-[#144665]"
+              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#144665]"
             >
               <Plus size={14} />
               Register resident
@@ -540,7 +578,7 @@ export default function ResidentManagementPage() {
                 setCurrentPage(1);
               }}
               placeholder="Search name, resident ID, or family group..."
-              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-[10px] outline-none focus:border-[#45b99b]"
+              className="w-full h-9 border border-[#d5e3e9] bg-white rounded-lg pl-9 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
             />
           </div>
 
@@ -591,7 +629,7 @@ export default function ResidentManagementPage() {
 
             <button
               onClick={() => setMoreFilters(!moreFilters)}
-              className={`h-9 px-3 bg-white border rounded-lg text-[10px] font-semibold whitespace-nowrap flex items-center justify-center gap-2 ${
+              className={`h-9 px-3 bg-white border rounded-lg text-sm font-semibold whitespace-nowrap flex items-center justify-center gap-2 ${
                 moreFilters
                   ? "border-[#2785b7] text-[#2785b7]"
                   : "border-[#aac4d2]"
@@ -609,13 +647,13 @@ export default function ResidentManagementPage() {
           <section className="bg-white border border-[#d5e3e9] rounded-lg p-4 mb-3">
 
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xs font-semibold">
+              <h3 className="text-base font-semibold">
                 Advanced filters
               </h3>
 
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#267ca6] font-semibold"
+                className="text-sm text-[#267ca6] font-semibold"
               >
                 Clear all filters
               </button>
@@ -672,7 +710,7 @@ export default function ResidentManagementPage() {
 
               <thead className="bg-[#f5f9fa] border-b border-slate-200">
 
-                <tr className="text-[8px] text-slate-500">
+                <tr className="text-sm text-slate-500">
                   <th className="px-3 py-3 font-medium">Resident ID</th>
                   <th className="px-3 py-3 font-medium">Full Name</th>
                   <th className="px-3 py-3 font-medium">Age</th>
@@ -694,7 +732,7 @@ export default function ResidentManagementPage() {
                   <tr
                     key={resident.id}
                     onClick={() => setSelectedResident(resident)}
-                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
+                    className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-sm transition"
                   >
 
                     <td className="px-3 py-3.5 font-semibold text-[#174f75]">
@@ -754,7 +792,7 @@ export default function ResidentManagementPage() {
                   <tr>
                     <td
                       colSpan={12}
-                      className="text-center py-12 text-xs text-slate-400"
+                      className="text-center py-12 text-sm text-slate-400"
                     >
                       No residents found. Try changing your filters.
                     </td>
@@ -768,7 +806,7 @@ export default function ResidentManagementPage() {
 
           <div className="px-3.5 py-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
 
-            <p className="text-[9px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing{" "}
               {filteredResidents.length === 0
                 ? 0
@@ -787,7 +825,7 @@ export default function ResidentManagementPage() {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Previous
               </button>
@@ -799,7 +837,7 @@ export default function ResidentManagementPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-7 h-8 rounded-lg border text-[9px] ${
+                  className={`w-7 h-8 rounded-lg border text-sm ${
                     currentPage === page
                       ? "bg-[#1c638a] text-white border-[#1c638a]"
                       : "border-slate-200 hover:bg-slate-50"
@@ -812,7 +850,7 @@ export default function ResidentManagementPage() {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
-                className="h-8 px-3 border border-slate-200 rounded-lg text-[9px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-8 px-3 border border-slate-200 rounded-lg text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Next
               </button>
@@ -905,7 +943,7 @@ export default function ResidentManagementPage() {
             {selectedResident.status !== "Checked Out" && (
               <button
                 onClick={handleCheckout}
-                className="w-full mt-8 bg-[#1c638a] text-white py-3 rounded-lg text-xs font-semibold hover:bg-[#144665]"
+                className="w-full mt-8 bg-[#1c638a] text-white py-3 rounded-lg text-sm font-semibold hover:bg-[#144665]"
               >
                 Check out resident
               </button>
@@ -913,7 +951,7 @@ export default function ResidentManagementPage() {
 
             <button
               onClick={() => setSelectedResident(null)}
-              className="w-full mt-3 border border-slate-200 py-3 rounded-lg text-xs font-semibold hover:bg-slate-50"
+              className="w-full mt-3 border border-slate-200 py-3 rounded-lg text-sm font-semibold hover:bg-slate-50"
             >
               Close details
             </button>
@@ -935,7 +973,7 @@ export default function ResidentManagementPage() {
                   Register new resident
                 </h2>
 
-                <p className="text-[10px] text-slate-400 mt-1">
+                <p className="text-[13px] text-slate-400 mt-1">
                   Add resident and accommodation information.
                 </p>
               </div>
@@ -1056,14 +1094,14 @@ export default function ResidentManagementPage() {
                 <button
                   type="button"
                   onClick={() => setRegisterOpen(false)}
-                  className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold"
+                  className="flex-1 border border-slate-200 rounded-lg py-3 text-sm font-semibold"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+                  className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#144665]"
                 >
                   Register resident
                 </button>
@@ -1080,7 +1118,7 @@ export default function ResidentManagementPage() {
 
           <CheckCircle2 size={17} className="shrink-0" />
 
-          <p className="text-xs">{successMessage}</p>
+          <p className="text-sm">{successMessage}</p>
 
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
@@ -1120,13 +1158,13 @@ function KpiCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
 
         <h3 className="text-[21px] font-bold leading-tight mt-0.5">
           {value}
         </h3>
 
-        <p className="text-[8px] text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-400 mt-0.5">
           {description}
         </p>
       </div>
@@ -1150,7 +1188,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full xl:w-[125px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-7 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full xl:w-[125px] h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-7 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option, index) => (
           <option key={option} value={option}>
@@ -1179,7 +1217,7 @@ function ResidentStatusBadge({
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[status]}`}>
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-xs font-semibold ${styles[status]}`}>
       {status}
     </span>
   );
@@ -1200,7 +1238,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1211,7 +1249,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );
@@ -1230,14 +1268,14 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -1263,8 +1301,8 @@ function DetailRow({
       <div className="text-[#2785b7]">{icon}</div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">{value}</p>
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-sm font-semibold mt-1 break-words">{value}</p>
       </div>
     </div>
   );

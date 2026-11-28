@@ -1,5 +1,6 @@
-
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   Heart,
   Home,
@@ -14,10 +15,15 @@ import {
   Bell,
   HeartHandshake,
   Accessibility,
-  ChevronRight,
+  LogOut,
   Phone,
   X,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
 } from "lucide-react";
+import { SIDEBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
+import { CareLinkLogo } from "../../components/common/CareLinkLogo";
 
 interface SidebarProps {
   activePage?: string;
@@ -42,154 +48,245 @@ const navigationItems = [
 ];
 
 export default function Sidebar({
-  activePage = "Home",
+  activePage,
   onNavigate,
   isOpen = false,
   onClose,
 }: SidebarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, logout } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
+  const [sectionOpen, setSectionOpen] = useState(true);
 
   const citizenRoutes: Record<string, string> = {
-    "Home": "/citizen/home",
+    Home: "/citizen/dashboard",
     "Request Help": "/citizen/request-help",
     "My Requests": "/citizen/my-requests",
     "Nearby Support": "/citizen/nearby-support",
-    "Shelters": "/citizen/shelters",
+    Shelters: "/citizen/shelters",
     "Safety Updates": "/citizen/safety-updates",
     "My Household": "/citizen/my-household",
     "My Documents": "/citizen/my-documents",
-    "Messages": "/citizen/messages",
-    "Notifications": "/citizen/notifications",
-    "Feedback": "/citizen/feedback",
+    Messages: "/citizen/messages",
+    Notifications: "/citizen/notifications",
+    Feedback: "/citizen/feedback",
     "Profile & Settings": "/citizen/profile",
   };
+
+  const displayName = user?.fullName || "Samira Khan";
+  const initials = getUserInitials(displayName, "SK");
+
+  const handleSignOut = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <>
       {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          className={SIDEBAR_THEME.overlay}
           onClick={onClose}
         />
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-[295px] flex-col bg-[#153e5e] text-white transition-transform duration-300 lg:translate-x-0 ${
+        className={`${SIDEBAR_THEME.asideBase} ${
+          collapsed ? SIDEBAR_THEME.widthCollapsed : SIDEBAR_THEME.widthExpanded
+        } h-screen lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Logo */}
-        <div className="flex h-[74px] items-center justify-between border-b border-white/10 px-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#65b9aa] text-[#153e5e]">
-              <Heart size={24} />
-            </div>
+        {/* BRAND HEADER */}
+        <div className={SIDEBAR_THEME.header}>
+          <button
+            type="button"
+            onClick={() => navigate("/citizen/dashboard")}
+            className="flex min-w-0 items-center gap-3 text-left transition hover:opacity-90"
+          >
+            <CareLinkLogo size={collapsed ? "compact" : "sidebar"} />
 
-            <div>
-              <h1 className="text-xl font-bold">ReliefOS</h1>
-              <p className="text-[10px] text-sky-200">
-                Citizen Support
-              </p>
-            </div>
-          </div>
+            {!collapsed && (
+              <div className="min-w-0">
+                <h1 className={SIDEBAR_THEME.brandTitle}>CareLink</h1>
+                <p className={SIDEBAR_THEME.brandSubtitle}>Connecting Help. Saving Lives.</p>
+              </div>
+            )}
+          </button>
 
-          <button onClick={onClose} className="lg:hidden">
-            <X size={20} />
+          <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            className={SIDEBAR_THEME.collapseBtn}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          </button>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className={SIDEBAR_THEME.mobileCloseBtn}
+            aria-label="Close sidebar"
+          >
+            <X size={18} />
           </button>
         </div>
 
-        {/* Active Operation */}
-        <div className="mx-4 mt-4 rounded-xl border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
-            ● Active Local Response
-          </p>
-
-          <h3 className="mt-2 text-xs font-bold">
-            Greater Riverton Floods
-          </h3>
-
-          <p className="mt-1 text-[10px] text-sky-200">
-            Help centres and shelters are open
-          </p>
-        </div>
-
-        {/* Navigation Heading */}
-        <div className="px-5 pb-2 pt-5">
-          <p className="text-[9px] font-bold uppercase tracking-widest text-sky-300">
-            Your Support
-          </p>
-        </div>
-
-        {/* Navigation Links */}
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3">
-          {navigationItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activePage === item.name;
-
-            return (
-              <button
-                key={item.name}
-                onClick={() => {
-                  if (onNavigate) {
-                    onNavigate(item.name);
-                  } else if (citizenRoutes[item.name]) {
-                    navigate(citizenRoutes[item.name]);
-                  }
-                  onClose?.();
-                }}
-                className={`flex w-full items-center gap-3 rounded-lg border-l-[3px] px-3 py-3 text-left text-xs transition-all ${
-                  isActive
-                    ? "border-[#65b9aa] bg-[#287da6] font-semibold text-white"
-                    : "border-transparent text-sky-100 hover:bg-white/10"
-                }`}
-              >
-                <Icon size={18} />
-
-                <span className="flex-1">{item.name}</span>
-
-                {item.count !== undefined && (
-                  <span className="rounded-full bg-red-500 px-2 py-0.5 text-[9px] font-bold text-white">
-                    {item.count}
+        {/* ACTIVE OPERATION */}
+        {!collapsed && (
+          <div className={SIDEBAR_THEME.statusCardWrapper}>
+            <div className={SIDEBAR_THEME.statusCard}>
+              <div className={SIDEBAR_THEME.statusIndicatorRow}>
+                <div className="flex items-center gap-2">
+                  <span className={SIDEBAR_THEME.statusDot} />
+                  <span className={SIDEBAR_THEME.statusLabel}>
+                    ACTIVE LOCAL RESPONSE
                   </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+                </div>
+              </div>
 
-        {/* Emergency Help */}
-        <div className="mx-3 mb-3 rounded-xl bg-white p-3 text-[#153e5e]">
-          <div className="flex items-center gap-3">
-            <Phone size={20} className="text-[#287da6]" />
+              <h3 className={SIDEBAR_THEME.statusTitle}>
+                Greater Riverton Floods
+              </h3>
 
-            <div>
-              <p className="text-[10px] font-semibold">
-                Emergency help line
+              <p className={SIDEBAR_THEME.statusSubtitle}>
+                Help centres and shelters are open
               </p>
-
-              <a
-                href="tel:112"
-                className="text-sm font-bold text-red-600"
-              >
-                Call 112
-              </a>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Citizen Profile */}
-        <div className="flex items-center gap-3 border-t border-white/10 px-5 py-4">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#287da6] text-xs font-bold">
-            SK
+        {/* NAVIGATION LINKS */}
+        <nav className={SIDEBAR_THEME.navScroll}>
+          {!collapsed && (
+            <button
+              type="button"
+              onClick={() => setSectionOpen((prev) => !prev)}
+              className={SIDEBAR_THEME.sectionHeadingBtn}
+            >
+              <span>YOUR SUPPORT</span>
+              <ChevronDown
+                size={12}
+                className={`transition-transform ${
+                  sectionOpen ? "rotate-0" : "-rotate-90"
+                }`}
+              />
+            </button>
+          )}
+
+          {(sectionOpen || collapsed) && (
+            <div className={SIDEBAR_THEME.menuList}>
+              {navigationItems.map((item) => {
+                const Icon = item.icon;
+                const targetPath = citizenRoutes[item.name];
+                const isPathMatch =
+                  location.pathname === targetPath ||
+                  (item.name === "Home" &&
+                    (location.pathname === "/citizen/dashboard" ||
+                      location.pathname === "/citizen/home"));
+                const isActive = activePage
+                  ? activePage === item.name
+                  : isPathMatch;
+
+                return (
+                  <button
+                    key={item.name}
+                    type="button"
+                    title={collapsed ? item.name : undefined}
+                    onClick={() => {
+                      if (onNavigate) {
+                        onNavigate(item.name);
+                      } else if (citizenRoutes[item.name]) {
+                        navigate(citizenRoutes[item.name]);
+                      }
+                      onClose?.();
+                    }}
+                    className={`${SIDEBAR_THEME.menuItemBase} ${
+                      isActive
+                        ? SIDEBAR_THEME.menuItemActive
+                        : SIDEBAR_THEME.menuItemInactive
+                    } ${collapsed ? "justify-center px-0" : ""}`}
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Icon
+                        size={17}
+                        strokeWidth={1.8}
+                        className={
+                          isActive
+                            ? SIDEBAR_THEME.iconActive
+                            : SIDEBAR_THEME.iconInactive
+                        }
+                      />
+
+                      {!collapsed && (
+                        <span className="truncate">{item.name}</span>
+                      )}
+                    </div>
+
+                    {!collapsed && item.count !== undefined && (
+                      <span className={SIDEBAR_THEME.badge}>{item.count}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </nav>
+
+        {/* EMERGENCY HELP LINE */}
+        {!collapsed && (
+          <div className="mx-3.5 mb-2 shrink-0 rounded-xl border border-white/15 bg-white/[0.08] p-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#63BDA6]/20 text-[#63BDA6]">
+                <Phone size={16} />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-[#A9C8DD]">
+                  Emergency help line
+                </p>
+                <a
+                  href="tel:112"
+                  className="text-xs font-bold text-[#63BDA6] hover:underline"
+                >
+                  Call 112
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* CITIZEN PROFILE */}
+        <div className={SIDEBAR_THEME.footer}>
+          <div
+            className={`${SIDEBAR_THEME.profileRow} ${
+              collapsed ? "justify-center" : ""
+            }`}
+          >
+            <div className={SIDEBAR_THEME.avatar}>{initials}</div>
+
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className={SIDEBAR_THEME.userName}>{displayName}</p>
+                <p className={SIDEBAR_THEME.userRole}>Citizen account</p>
+              </div>
+            )}
           </div>
 
-          <div className="flex-1">
-            <p className="text-xs font-bold">Samira Khan</p>
-            <p className="text-[10px] text-sky-200">
-              Citizen account
-            </p>
-          </div>
-
-          <ChevronRight size={18} />
+          <button
+            type="button"
+            onClick={handleSignOut}
+            title="Sign out"
+            className={SIDEBAR_THEME.signOutBtn}
+          >
+            <LogOut size={14} />
+            {!collapsed && <span>Sign out</span>}
+          </button>
         </div>
       </aside>
     </>

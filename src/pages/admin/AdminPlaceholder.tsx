@@ -19,7 +19,7 @@ export default function AdminPlaceholder() {
   return (
     <div className="font-sans text-[#123B5C]">
       {/* Breadcrumb */}
-      <div className="flex h-8 items-center gap-2 border-b border-[#64C9AD] bg-white px-6 text-[10px] text-slate-500">
+      <div className="flex h-8 items-center gap-2 border-b border-[#64C9AD] bg-white px-6 text-[13px] text-slate-500">
         <Link to="/admin/dashboard" className="hover:text-[#123B5C]">Operations</Link>
         <span>/</span>
         <span className="font-semibold text-[#123B5C]">{title}</span>
@@ -30,10 +30,10 @@ export default function AdminPlaceholder() {
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white p-3 text-[#1D5F8A] shadow-sm border border-slate-200">
           <Clock size={28} />
         </div>
-        <span className="inline-block rounded-md bg-white border border-[#B9DED7] px-3 py-1 text-[11px] font-semibold text-[#1D5F8A]">
+        <span className="inline-block rounded-md bg-white border border-[#B9DED7] px-3 py-1 text-sm font-semibold text-[#1D5F8A]">
           ADMIN WORKSPACE
         </span>
-        <h1 className="mt-3 text-2xl font-semibold text-[#123B5C]">{title}</h1>
+        <h1 className="text-2xl sm:text-[28px] lg:text-[30px] mt-3 font-bold text-[#123B5C]">{title}</h1>
         <p className="mt-2 text-xs text-slate-500 max-w-md mx-auto">
           This section is currently under development. You can navigate back to the operational dashboard or view active assistance requests.
         </p>

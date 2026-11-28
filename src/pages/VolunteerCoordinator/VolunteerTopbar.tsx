@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Globe,
@@ -5,113 +7,164 @@ import {
   Bell,
   Menu,
   ChevronDown,
+  User,
+  Settings,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { TOPBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
 
 type Props = {
   onMenuClick: () => void;
 };
 
-export default function VolunteerTopbar({
-  onMenuClick,
-}: Props) {
+export default function VolunteerTopbar({ onMenuClick }: Props) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const displayName = user?.fullName || "Nadia O.";
+  const displayEmail = user?.email || "volunteercoordinator@carelink.org";
+  const initials = getUserInitials(displayName, "NO");
+
   return (
-    <header className="sticky top-0 z-30 flex h-[58px] items-center justify-between gap-3 border-b border-[#D8E6EA] bg-white px-4 md:px-6">
-
+    <header className={TOPBAR_THEME.header}>
       {/* LEFT SIDE */}
-      <div className="flex min-w-0 flex-1 items-center gap-3">
-
+      <div className={TOPBAR_THEME.leftSection}>
         {/* MOBILE MENU */}
         <button
+          type="button"
           onClick={onMenuClick}
-          className="rounded-md p-2 text-[#153F60] hover:bg-slate-100 lg:hidden"
+          className={TOPBAR_THEME.mobileMenuBtn}
+          aria-label="Open navigation"
         >
           <Menu size={19} />
         </button>
 
         {/* SEARCH */}
-        <div className="flex h-9 w-full max-w-[420px] items-center gap-2 rounded-md border border-[#D7E5EA] bg-[#F6F9FA] px-3">
-          <Search
-            size={14}
-            className="shrink-0 text-slate-400"
-          />
+        <div className={TOPBAR_THEME.searchContainer}>
+          <Search size={16} className="shrink-0 text-[#8296AA]" />
 
           <input
             type="text"
             placeholder="Search volunteers, tasks, skills..."
-            className="w-full min-w-0 bg-transparent text-[10px] outline-none placeholder:text-slate-400"
+            className={TOPBAR_THEME.searchInput}
           />
 
-          <span className="hidden rounded border border-[#D7E5EA] px-1.5 py-1 text-[8px] text-slate-400 sm:block">
-            ⌘ K
-          </span>
+          <span className={TOPBAR_THEME.searchShortcut}>⌘ K</span>
         </div>
       </div>
 
       {/* RIGHT SIDE */}
-      <div className="flex shrink-0 items-center gap-2 md:gap-3">
-
+      <div className={TOPBAR_THEME.rightSection}>
         {/* OPERATIONAL AREA */}
-        <div className="hidden items-center gap-2 border-r border-slate-200 pr-3 sm:flex">
-          <div className="text-right">
-            <p className="text-[7px] text-slate-400">
-              OPERATIONAL AREA
-            </p>
-
-            <p className="text-[9px] font-bold text-[#153F60]">
-              Greater Riverton
-            </p>
+        <div className={TOPBAR_THEME.contextBlock}>
+          <div>
+            <p className={TOPBAR_THEME.contextLabel}>OPERATIONAL AREA</p>
+            <p className={TOPBAR_THEME.contextValue}>Greater Riverton</p>
           </div>
-
-          <ChevronDown
-            size={12}
-            className="text-slate-500"
-          />
         </div>
 
         {/* LANGUAGE */}
-        <button className="hidden items-center gap-1 rounded-md border border-[#D7E5EA] px-2 py-2 text-[9px] text-slate-600 sm:flex">
-          <Globe size={13} />
-          EN
+        <button type="button" className={TOPBAR_THEME.actionBtn}>
+          <Globe size={15} />
+          <span>EN</span>
         </button>
 
         {/* HELP */}
-        <button className="hidden rounded-md border border-[#D7E5EA] p-2 text-slate-600 hover:bg-slate-50 sm:block">
-          <HelpCircle size={15} />
+        <button
+          type="button"
+          className={`hidden sm:flex ${TOPBAR_THEME.iconBtn}`}
+          title="Help"
+        >
+          <HelpCircle size={17} />
         </button>
 
         {/* NOTIFICATIONS */}
-        <button className="relative rounded-md border border-[#D7E5EA] p-2 text-slate-600 hover:bg-slate-50">
-          <Bell size={15} />
-
-          <span className="absolute -right-1 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-red-500 px-1 text-[7px] font-bold text-white">
-            5
-          </span>
+        <button
+          type="button"
+          onClick={() => navigate("/volunteer-coordinator/notifications")}
+          className={TOPBAR_THEME.iconBtn}
+          title="Notifications"
+        >
+          <Bell size={17} />
+          <span className={TOPBAR_THEME.notifBadge}>5</span>
         </button>
-
-        {/* DIVIDER */}
-        <div className="hidden h-7 border-l border-slate-200 sm:block" />
 
         {/* USER PROFILE */}
-        <button className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2785B2] text-[9px] font-bold text-white">
-            NO
-          </div>
+        <div className={TOPBAR_THEME.profileDivider}>
+          <button
+            type="button"
+            onClick={() => setProfileOpen((p) => !p)}
+            className={TOPBAR_THEME.profileTrigger}
+          >
+            <div className={TOPBAR_THEME.avatar}>{initials}</div>
 
-          <div className="hidden text-left sm:block">
-            <p className="text-[9px] font-bold text-[#153F60]">
-              Nadia O.
-            </p>
+            <div className="hidden sm:block">
+              <p className={TOPBAR_THEME.userName}>{displayName}</p>
+              <p className={TOPBAR_THEME.userRole}>Volunteer Coordinator</p>
+            </div>
 
-            <p className="text-[8px] text-slate-400">
-              Coordinator
-            </p>
-          </div>
+            <ChevronDown
+              size={14}
+              className="hidden text-[#8296AA] sm:block"
+            />
+          </button>
 
-          <ChevronDown
-            size={12}
-            className="hidden text-slate-400 sm:block"
-          />
-        </button>
+          {profileOpen && (
+            <div className={TOPBAR_THEME.dropdownMenu}>
+              <div className={TOPBAR_THEME.dropdownHeader}>
+                <p className="truncate text-sm font-bold text-[#153E5D]">
+                  {displayName}
+                </p>
+                <p className="truncate text-[13px] text-[#8296AA]">
+                  {displayEmail}
+                </p>
+              </div>
+
+              <div className="py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    navigate("/volunteer-coordinator/settings");
+                  }}
+                  className={TOPBAR_THEME.dropdownItem}
+                >
+                  <User size={15} />
+                  <span>My Profile</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    navigate("/volunteer-coordinator/settings");
+                  }}
+                  className={TOPBAR_THEME.dropdownItem}
+                >
+                  <Settings size={15} />
+                  <span>Coordinator Settings</span>
+                </button>
+              </div>
+
+              <div className="my-1 border-t border-slate-100" />
+
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileOpen(false);
+                  logout();
+                  navigate("/login", { replace: true });
+                }}
+                className={TOPBAR_THEME.dropdownSignOut}
+              >
+                <LogOut size={15} />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

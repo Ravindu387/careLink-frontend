@@ -280,13 +280,13 @@ const EscalatedCases: React.FC = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-600">
+                <label className="block text-sm font-semibold text-slate-600">
                   Action Type *
                 </label>
                 <select
                   value={bulkActionType}
                   onChange={(e) => setBulkActionType(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-none"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:bg-white focus:outline-none"
                 >
                   <option value="Escalate">Mark as Escalated & Critical</option>
                   <option value="De-escalate">De-escalate to Under Review</option>
@@ -296,7 +296,7 @@ const EscalatedCases: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600">
+                <label className="block text-sm font-semibold text-slate-600">
                   Coordinator Action Notes
                 </label>
                 <textarea
@@ -304,7 +304,7 @@ const EscalatedCases: React.FC = () => {
                   placeholder="Record rationale or cross-organisation operational context..."
                   value={bulkNotes}
                   onChange={(e) => setBulkNotes(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white p-2.5 text-xs text-slate-700 focus:border-sky-500 focus:outline-none"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white p-2.5 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:outline-none"
                 />
               </div>
 
@@ -312,7 +312,7 @@ const EscalatedCases: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowBulkModal(false)}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -320,7 +320,7 @@ const EscalatedCases: React.FC = () => {
                   type="button"
                   disabled={isSubmittingBulk}
                   onClick={handleBulkActionSubmit}
-                  className="flex items-center gap-1.5 rounded-lg bg-sky-700 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-sky-800 disabled:opacity-60 cursor-pointer"
+                  className="flex items-center gap-1.5 rounded-lg bg-sky-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-800 disabled:opacity-60 cursor-pointer"
                 >
                   {isSubmittingBulk ? (
                     <>
@@ -367,7 +367,7 @@ const EscalatedCases: React.FC = () => {
               onClick={() => loadData(true)}
               disabled={isRefreshing}
               title="Refresh escalated cases"
-              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-3 text-xs font-medium text-[#287da8] transition hover:bg-sky-50 disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-3.5 py-3 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 disabled:opacity-50 cursor-pointer"
             >
               <RefreshCw size={15} className={isRefreshing ? "animate-spin" : ""} />
               <span className="hidden sm:inline">Refresh</span>
@@ -407,7 +407,7 @@ const EscalatedCases: React.FC = () => {
                     : "Demonstration Escalation Mode"}
                 </span>
                 <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold ${
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold ${
                     isLiveBackend
                       ? "bg-emerald-200 text-emerald-800"
                       : "bg-sky-200 text-sky-800"
@@ -416,7 +416,7 @@ const EscalatedCases: React.FC = () => {
                   {isLiveBackend ? "LIVE" : "DEMO"}
                 </span>
               </div>
-              <p className="mt-0.5 text-[10px] text-slate-500">
+              <p className="mt-0.5 text-[13px] text-slate-500">
                 {isLiveBackend
                   ? "Real-time dispatch coordination and cross-agency assignment active."
                   : "Serving simulated escalated crisis cases for the Greater Riverton flood response."}
@@ -424,7 +424,7 @@ const EscalatedCases: React.FC = () => {
             </div>
           </div>
 
-          <span className="hidden text-[10px] text-slate-400 sm:block">
+          <span className="hidden text-[13px] text-slate-400 sm:block">
             {stats ? `${stats.totalEscalated} total active records` : "Updated just now"}
           </span>
         </div>
@@ -438,14 +438,14 @@ const EscalatedCases: React.FC = () => {
                 setActiveTab(tab.label);
                 setCurrentPage(1);
               }}
-              className={`relative flex items-center gap-2 py-4 text-xs transition cursor-pointer ${
+              className={`relative flex items-center gap-2 py-4 text-sm transition cursor-pointer ${
                 activeTab === tab.label
                   ? "font-semibold text-[#287da8]"
                   : "text-slate-500 hover:text-sky-700"
               }`}
             >
               {tab.label}
-              <span className={`rounded-full px-2 py-0.5 text-[10px] ${
+              <span className={`rounded-full px-2 py-0.5 text-xs ${
                 activeTab === tab.label
                   ? "bg-sky-100 text-sky-800 font-bold"
                   : "bg-slate-200 text-slate-600"
@@ -473,7 +473,7 @@ const EscalatedCases: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
             {searchTerm && (
               <button onClick={() => setSearchTerm("")} className="cursor-pointer">
@@ -489,7 +489,7 @@ const EscalatedCases: React.FC = () => {
               setEventFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none"
           >
             <option value="All crisis events">All crisis events</option>
             <option value="Flood Response">Flood Response</option>
@@ -504,7 +504,7 @@ const EscalatedCases: React.FC = () => {
               setPriorityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none"
           >
             <option value="All priorities">All priorities</option>
             <option value="Critical">Critical</option>
@@ -520,7 +520,7 @@ const EscalatedCases: React.FC = () => {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none"
           >
             <option value="All categories">All categories</option>
             <option value="Emergency shelter">Emergency shelter</option>
@@ -537,7 +537,7 @@ const EscalatedCases: React.FC = () => {
               setStatusFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none"
           >
             <option value="All statuses">All statuses</option>
             <option value="Under Review">Under Review</option>
@@ -554,7 +554,7 @@ const EscalatedCases: React.FC = () => {
               setDateFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none"
           >
             <option value="Date range">Date range</option>
             <option value="Last 1 hour">Last 1 hour</option>
@@ -565,7 +565,7 @@ const EscalatedCases: React.FC = () => {
           {/* MORE FILTERS */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-xs font-semibold text-[#287da8] hover:bg-sky-50 cursor-pointer"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0df] bg-white px-4 py-3 text-sm font-semibold text-[#287da8] hover:bg-sky-50 cursor-pointer"
           >
             <Filter size={15} />
             Filters
@@ -584,7 +584,7 @@ const EscalatedCases: React.FC = () => {
 
             <button
               onClick={resetFilters}
-              className="text-xs font-semibold text-sky-700 hover:underline cursor-pointer"
+              className="text-sm font-semibold text-sky-700 hover:underline cursor-pointer"
             >
               Clear all filters
             </button>
@@ -596,7 +596,7 @@ const EscalatedCases: React.FC = () => {
           {/* TABLE HEADER */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#d5e2eb] px-5 py-4">
             <div>
-              <h2 className="text-base font-medium text-[#173e5b]">
+              <h2 className="text-lg sm:text-xl font-semibold text-[#173e5b]">
                 Escalated Cases Queue
               </h2>
               <p className="mt-1 text-xs text-slate-400">
@@ -612,7 +612,7 @@ const EscalatedCases: React.FC = () => {
                 }
                 setShowBulkModal(true);
               }}
-              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-xs font-semibold text-[#287da8] transition hover:bg-sky-50 cursor-pointer"
+              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-sm font-semibold text-[#287da8] transition hover:bg-sky-50 cursor-pointer"
             >
               Bulk actions {selectedCases.length > 0 && `(${selectedCases.length})`}
             </button>
@@ -622,7 +622,7 @@ const EscalatedCases: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1050px] text-left">
               <thead className="bg-[#f7f9fa]">
-                <tr className="border-b border-[#d5e2eb] text-[11px] font-semibold text-slate-500">
+                <tr className="border-b border-[#d5e2eb] text-sm font-semibold text-slate-500">
                   <th className="px-3 py-4">
                     <input
                       type="checkbox"
@@ -675,29 +675,29 @@ const EscalatedCases: React.FC = () => {
                       </td>
 
                       {/* CASE ID */}
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] font-bold text-[#173e5b]">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm font-bold text-[#173e5b]">
                         {item.id}
                       </td>
 
                       {/* CATEGORY */}
                       <td className="px-3 py-5">
-                        <p className="whitespace-nowrap text-[11px] font-semibold text-[#173e5b]">
+                        <p className="whitespace-nowrap text-sm font-semibold text-[#173e5b]">
                           {item.category}
                         </p>
-                        <p className="mt-1 whitespace-nowrap text-[10px] text-slate-500">
+                        <p className="mt-1 whitespace-nowrap text-[13px] text-slate-500">
                           {item.applicant}
                         </p>
                       </td>
 
                       {/* LOCATION */}
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         {item.location}
                       </td>
 
                       {/* REPORTED PRIORITY */}
                       <td className="px-3 py-5">
                         <span
-                          className={`rounded-md px-2.5 py-1.5 text-[10px] font-semibold ${priorityStyle(
+                          className={`rounded-md px-2.5 py-1.5 text-sm font-semibold ${priorityStyle(
                             item.priority
                           )}`}
                         >
@@ -707,21 +707,21 @@ const EscalatedCases: React.FC = () => {
 
                       {/* AI PRIORITY */}
                       <td className="px-3 py-5">
-                        <p className="text-[11px] font-semibold text-slate-700">
+                        <p className="text-sm font-semibold text-slate-700">
                           {item.aiPriority}
                         </p>
-                        <p className="mt-1 text-[10px] text-slate-400">
+                        <p className="mt-1 text-[13px] text-slate-400">
                           {item.confidence}
                         </p>
                       </td>
 
                       {/* VERIFICATION */}
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         {item.verification}
                       </td>
 
                       {/* ASSIGNED */}
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         {item.assigned === "You" ? (
                           <span className="inline-flex items-center gap-1 font-semibold text-sky-700">
                             <UserCheck size={12} />
@@ -733,14 +733,14 @@ const EscalatedCases: React.FC = () => {
                       </td>
 
                       {/* AGE */}
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         {item.age}
                       </td>
 
                       {/* STATUS */}
                       <td className="px-3 py-5">
                         <span
-                          className={`whitespace-nowrap rounded-md px-2.5 py-1.5 text-[10px] font-semibold ${statusStyle(
+                          className={`whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-semibold ${statusStyle(
                             item.status
                           )}`}
                         >
@@ -789,7 +789,7 @@ const EscalatedCases: React.FC = () => {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-4 py-2 text-xs text-slate-500 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
               >
                 <ChevronLeft size={14} />
                 Previous
@@ -799,7 +799,7 @@ const EscalatedCases: React.FC = () => {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`h-8 w-8 rounded-lg border text-xs transition cursor-pointer ${
+                  className={`h-8 w-8 rounded-lg border text-sm transition cursor-pointer ${
                     currentPage === page
                       ? "border-[#287da8] bg-[#287da8] font-semibold text-white"
                       : "border-[#d5e2eb] bg-white text-slate-600 hover:bg-sky-50"
@@ -812,7 +812,7 @@ const EscalatedCases: React.FC = () => {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-4 py-2 text-xs font-medium text-[#287da8] hover:bg-sky-50 disabled:opacity-40 cursor-pointer"
+                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-4 py-2 text-sm font-medium text-[#287da8] hover:bg-sky-50 disabled:opacity-40 cursor-pointer"
               >
                 Next
                 <ChevronRight size={14} />
@@ -832,7 +832,7 @@ const EscalatedCases: React.FC = () => {
                   <AlertTriangle size={18} />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[#173e5b]">
+                  <h2 className="text-lg sm:text-xl font-bold text-[#173e5b]">
                     Escalation Response Coordination
                   </h2>
                   <p className="text-xs text-slate-400">
@@ -878,10 +878,10 @@ const EscalatedCases: React.FC = () => {
             {/* Escalation Context */}
             {selectedCase.escalationReason && (
               <div className="mt-3.5 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                <p className="text-[11px] font-bold text-amber-900">
+                <p className="text-sm font-bold text-amber-900">
                   Escalation Trigger:
                 </p>
-                <p className="mt-0.5 text-xs text-amber-800">
+                <p className="mt-0.5 text-sm text-amber-800">
                   {selectedCase.escalationReason}
                 </p>
               </div>
@@ -889,7 +889,7 @@ const EscalatedCases: React.FC = () => {
 
             {/* Cross-Org Dispatch Field */}
             <div className="mt-4">
-              <label className="block text-[11px] font-semibold text-slate-600">
+              <label className="block text-sm font-semibold text-slate-600">
                 Designated Partner / Agency Unit
               </label>
               <input
@@ -897,13 +897,13 @@ const EscalatedCases: React.FC = () => {
                 placeholder="e.g. Navy Search & Rescue, Red Cross Logistics, DMC"
                 value={targetOrgInput}
                 onChange={(e) => setTargetOrgInput(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 focus:border-sky-500 focus:outline-none"
+                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:outline-none"
               />
             </div>
 
             {/* Coordinator Notes */}
             <div className="mt-3">
-              <label className="block text-[11px] font-semibold text-slate-600">
+              <label className="block text-sm font-semibold text-slate-600">
                 Coordinator Directive & Audit Notes
               </label>
               <textarea
@@ -911,7 +911,7 @@ const EscalatedCases: React.FC = () => {
                 placeholder="Record situational directive, resource assignment, or resolution rationale..."
                 value={decisionNotes}
                 onChange={(e) => setDecisionNotes(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-200 bg-white p-2.5 text-xs text-slate-700 focus:border-sky-500 focus:outline-none"
+                className="mt-1 w-full rounded-lg border border-slate-200 bg-white p-2.5 text-sm sm:text-[15px] text-slate-700 focus:border-sky-500 focus:outline-none"
               />
             </div>
 
@@ -920,7 +920,7 @@ const EscalatedCases: React.FC = () => {
               <button
                 disabled={isSubmittingDecision}
                 onClick={() => handleCaseDecision("Resolve")}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-2.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-60 cursor-pointer"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60 cursor-pointer"
               >
                 <Check size={14} />
                 Resolve Case
@@ -929,7 +929,7 @@ const EscalatedCases: React.FC = () => {
               <button
                 disabled={isSubmittingDecision}
                 onClick={() => handleCaseDecision("Reassign")}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-sky-700 py-2.5 text-xs font-semibold text-white hover:bg-sky-800 disabled:opacity-60 cursor-pointer"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-sky-700 py-2.5 text-sm font-semibold text-white hover:bg-sky-800 disabled:opacity-60 cursor-pointer"
               >
                 <UserCheck size={14} />
                 Assign to Me
@@ -938,7 +938,7 @@ const EscalatedCases: React.FC = () => {
               <button
                 disabled={isSubmittingDecision}
                 onClick={() => handleCaseDecision("RequestCrossOrg")}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-purple-700 py-2.5 text-xs font-semibold text-white hover:bg-purple-800 disabled:opacity-60 cursor-pointer"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-purple-700 py-2.5 text-sm font-semibold text-white hover:bg-purple-800 disabled:opacity-60 cursor-pointer"
               >
                 <Building2 size={13} />
                 Dispatch Org

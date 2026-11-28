@@ -295,7 +295,7 @@ export default function Settings() {
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-medium text-[#153f5e]">
+          <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
             Settings
           </h1>
 
@@ -309,7 +309,7 @@ export default function Settings() {
             type="button"
             onClick={handleResetDefaults}
             disabled={isSaving || isLoading}
-            className="flex items-center gap-1.5 rounded-lg border border-[#d4e2e9] bg-white px-3.5 py-2.5 text-xs font-semibold text-[#153f5e] shadow-sm transition hover:bg-slate-50 disabled:opacity-60"
+            className="flex items-center gap-1.5 rounded-lg border border-[#d4e2e9] bg-white px-3.5 py-2.5 text-sm font-semibold text-[#153f5e] shadow-sm transition hover:bg-slate-50 disabled:opacity-60"
             title="Reset to default settings"
           >
             <RotateCcw size={14} className={isSaving ? "animate-spin" : ""} />
@@ -319,7 +319,7 @@ export default function Settings() {
           <button
             onClick={handleSave}
             disabled={isSaving || isLoading}
-            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#216789] disabled:opacity-60"
+            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#216789] disabled:opacity-60"
           >
             {isSaving ? (
               <>
@@ -373,7 +373,7 @@ export default function Settings() {
                 }`}
               >
                 <Icon size={18} />
-                <span className="flex-1 text-[11px] font-medium">
+                <span className="flex-1 text-sm font-medium">
                   {tab.label}
                 </span>
                 <ChevronRight
@@ -390,7 +390,7 @@ export default function Settings() {
           {isLoading ? (
             <div className="flex h-64 flex-col items-center justify-center gap-3 text-slate-400">
               <Loader2 size={28} className="animate-spin text-[#287da5]" />
-              <p className="text-xs">Loading settings...</p>
+              <p className="text-sm">Loading settings...</p>
             </div>
           ) : (
             <>
@@ -438,7 +438,7 @@ export default function Settings() {
                     />
 
                     <div>
-                      <label className="mb-2 block text-[11px] font-medium text-[#153f5e]">
+                      <label className="mb-2 block text-sm font-medium text-[#153f5e]">
                         Primary operational area
                       </label>
 
@@ -450,7 +450,7 @@ export default function Settings() {
                             area: e.target.value,
                           })
                         }
-                        className="w-full rounded-lg border border-[#d4e2e9] bg-white px-3 py-3 text-xs text-[#153f5e] outline-none focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
+                        className="w-full rounded-lg border border-[#d4e2e9] bg-white px-3 py-3 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
                       >
                         <option>Greater Riverton</option>
                         <option>Central Ward</option>
@@ -468,11 +468,11 @@ export default function Settings() {
                       </div>
 
                       <div>
-                        <p className="text-xs font-semibold text-[#153f5e]">
+                        <p className="text-sm font-semibold text-[#153f5e]">
                           {profile.fullName || "Amina Mensah"}
                         </p>
 
-                        <p className="mt-0.5 text-[10px] text-slate-500">
+                        <p className="mt-0.5 text-[13px] text-slate-500">
                           {profile.role || "Emergency Coordinator"} · {profile.badgeNumber || "EC-8842"}
                         </p>
                       </div>
@@ -521,7 +521,7 @@ export default function Settings() {
 
                   <div className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-[11px] font-medium text-[#153f5e]">
+                      <label className="mb-2 block text-sm font-medium text-[#153f5e]">
                         Default priority filter
                       </label>
 
@@ -533,7 +533,7 @@ export default function Settings() {
                             defaultPriority: e.target.value,
                           })
                         }
-                        className="w-full rounded-lg border border-[#d4e2e9] bg-white px-3 py-3 text-xs text-[#153f5e] outline-none focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
+                        className="w-full rounded-lg border border-[#d4e2e9] bg-white px-3 py-3 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
                       >
                         <option>Critical</option>
                         <option>High</option>
@@ -543,7 +543,7 @@ export default function Settings() {
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-[11px] font-medium text-[#153f5e]">
+                      <label className="mb-2 block text-sm font-medium text-[#153f5e]">
                         Data refresh interval
                       </label>
 
@@ -555,7 +555,7 @@ export default function Settings() {
                             refreshInterval: e.target.value,
                           })
                         }
-                        className="w-full rounded-lg border border-[#d4e2e9] bg-white px-3 py-3 text-xs text-[#153f5e] outline-none focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
+                        className="w-full rounded-lg border border-[#d4e2e9] bg-white px-3 py-3 text-sm sm:text-[15px] text-[#153f5e] outline-none focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
                       >
                         <option>10 seconds</option>
                         <option>30 seconds</option>
@@ -575,7 +575,7 @@ export default function Settings() {
                     description="Manage the alerts and updates you receive during emergency operations."
                   />
 
-                  <h3 className="mb-3 text-xs font-semibold text-[#153f5e]">
+                  <h3 className="mb-3 text-base font-semibold text-[#153f5e]">
                     Notification categories
                   </h3>
 
@@ -625,7 +625,7 @@ export default function Settings() {
 
                   <div className="my-6 border-t border-[#dce7ec]" />
 
-                  <h3 className="mb-3 text-xs font-semibold text-[#153f5e]">
+                  <h3 className="mb-3 text-base font-semibold text-[#153f5e]">
                     Delivery channels
                   </h3>
 
@@ -675,7 +675,7 @@ export default function Settings() {
                   <div className="mb-6 rounded-lg border border-[#dce7ec] p-4">
                     <div className="mb-4 flex items-center gap-2">
                       <Lock size={17} className="text-[#287da5]" />
-                      <h3 className="text-xs font-semibold text-[#153f5e]">
+                      <h3 className="text-base font-semibold text-[#153f5e]">
                         Change password
                       </h3>
                     </div>
@@ -728,11 +728,11 @@ export default function Settings() {
                   <div className="mb-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Monitor size={17} className="text-[#287da5]" />
-                      <h3 className="text-xs font-semibold text-[#153f5e]">
+                      <h3 className="text-base font-semibold text-[#153f5e]">
                         Active sessions
                       </h3>
                     </div>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[13px] text-slate-400">
                       {sessions.length} active device{sessions.length === 1 ? "" : "s"}
                     </span>
                   </div>
@@ -755,7 +755,7 @@ export default function Settings() {
                       </span>
                     </div>
 
-                    <p className="mt-2 text-[10px] leading-5 text-slate-500">
+                    <p className="mt-2 text-sm leading-5 text-slate-500">
                       Two-factor authentication is active on this account. Always use a strong password and avoid sharing your account credentials with other users.
                     </p>
                   </div>
@@ -780,11 +780,11 @@ function SectionHeading({
 }) {
   return (
     <div className="mb-6 border-b border-[#dce7ec] pb-4">
-      <h2 className="text-sm font-semibold text-[#153f5e]">
+      <h2 className="text-base sm:text-lg font-semibold text-[#153f5e]">
         {title}
       </h2>
 
-      <p className="mt-1 text-[10px] text-slate-500">
+      <p className="mt-1 text-[13px] text-slate-500">
         {description}
       </p>
     </div>
@@ -806,7 +806,7 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-[11px] font-medium text-[#153f5e]">
+      <label className="mb-2 block text-sm font-medium text-[#153f5e]">
         {label}
       </label>
 
@@ -814,7 +814,7 @@ function InputField({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-[#d4e2e9] px-3 py-3 text-xs text-[#153f5e] outline-none transition focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
+        className="w-full rounded-lg border border-[#d4e2e9] px-3 py-3 text-sm sm:text-[15px] text-[#153f5e] outline-none transition focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
       />
     </div>
   );
@@ -836,11 +836,11 @@ function ToggleSetting({
   return (
     <div className="flex items-center justify-between gap-4 border-b border-[#edf2f4] py-4">
       <div className="min-w-0">
-        <p className="text-xs font-medium text-[#153f5e]">
+        <p className="text-sm font-medium text-[#153f5e]">
           {title}
         </p>
 
-        <p className="mt-1 text-[10px] leading-5 text-slate-500">
+        <p className="mt-1 text-sm leading-5 text-slate-500">
           {description}
         </p>
       </div>
@@ -883,7 +883,7 @@ function PasswordField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-[11px] font-medium text-[#153f5e]">
+      <label className="mb-2 block text-sm font-medium text-[#153f5e]">
         {label}
       </label>
 
@@ -893,7 +893,7 @@ function PasswordField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder || "Enter password"}
-          className="w-full rounded-lg border border-[#d4e2e9] px-3 py-3 pr-11 text-xs outline-none focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
+          className="w-full rounded-lg border border-[#d4e2e9] px-3 py-3 pr-11 text-sm sm:text-[15px] outline-none focus:border-[#287da5] focus:ring-2 focus:ring-[#287da5]/10"
         />
 
         <button
@@ -931,17 +931,17 @@ function SessionCard({
 
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-xs font-semibold text-[#153f5e]">
+            <p className="text-sm font-semibold text-[#153f5e]">
               {session.title}
             </p>
             {session.current && (
-              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-medium text-emerald-700">
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
                 Current
               </span>
             )}
           </div>
 
-          <p className="mt-1 text-[10px] text-slate-500">
+          <p className="mt-1 text-[13px] text-slate-500">
             {session.description}
             {session.ipAddress && ` · IP: ${session.ipAddress}`}
           </p>
@@ -949,7 +949,7 @@ function SessionCard({
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-[10px] text-slate-400">
+        <span className="text-[13px] text-slate-400">
           {session.time}
         </span>
 
@@ -957,7 +957,7 @@ function SessionCard({
           <button
             type="button"
             onClick={onRevoke}
-            className="flex items-center gap-1 rounded-md border border-rose-200 px-2 py-1 text-[10px] font-medium text-rose-600 transition hover:bg-rose-50"
+            className="flex items-center gap-1 rounded-md border border-rose-200 px-2 py-1 text-xs font-medium text-rose-600 transition hover:bg-rose-50"
             title="Terminate session"
           >
             <Trash2 size={12} />

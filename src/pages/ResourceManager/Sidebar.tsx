@@ -1,5 +1,6 @@
-
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   Package,
   LayoutDashboard,
@@ -14,161 +15,300 @@ import {
   ChartNoAxesCombined,
   Clock,
   Settings,
+  LogOut,
+  ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  X,
 } from "lucide-react";
+import { SIDEBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
+import { CareLinkLogo } from "../../components/common/CareLinkLogo";
 
 interface SidebarProps {
   activePage?: string;
   onNavigate?: (page: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 const menuItems = [
   {
     section: "LOGISTICS OPERATIONS",
     items: [
-      { name: "Resource Dashboard", icon: LayoutDashboard },
-      { name: "Inventory", icon: Package },
-      { name: "Warehouses", icon: Warehouse },
-      { name: "Resource Requests", icon: ClipboardList, badge: 18 },
-      { name: "Allocations", icon: Network, badge: 7 },
-      { name: "Dispatch & Tracking", icon: Truck, badge: 12 },
-      { name: "Stock Transfers", icon: ArrowLeftRight },
-      { name: "Procurement", icon: ShoppingCart },
-      { name: "Suppliers", icon: Users },
-      { name: "Alerts", icon: TriangleAlert, badge: 9 },
-      { name: "Reports & Analytics", icon: ChartNoAxesCombined },
-      { name: "Audit Log", icon: Clock },
-      { name: "Settings", icon: Settings },
+      {
+        name: "Resource Dashboard",
+        path: "/resource-manager/dashboard",
+        icon: LayoutDashboard,
+      },
+      {
+        name: "Inventory",
+        path: "/resource-manager/inventory",
+        icon: Package,
+      },
+      {
+        name: "Warehouses",
+        path: "/resource-manager/warehouses",
+        icon: Warehouse,
+      },
+      {
+        name: "Resource Requests",
+        path: "/resource-manager/requests",
+        icon: ClipboardList,
+        badge: 18,
+      },
+      {
+        name: "Allocations",
+        path: "/resource-manager/allocations",
+        icon: Network,
+        badge: 7,
+      },
+      {
+        name: "Dispatch & Tracking",
+        path: "/resource-manager/dispatch",
+        icon: Truck,
+        badge: 12,
+      },
+      {
+        name: "Stock Transfers",
+        path: "/resource-manager/transfers",
+        icon: ArrowLeftRight,
+      },
+      {
+        name: "Procurement",
+        path: "/resource-manager/procurement",
+        icon: ShoppingCart,
+      },
+      {
+        name: "Suppliers",
+        path: "/resource-manager/suppliers",
+        icon: Users,
+      },
+      {
+        name: "Alerts",
+        path: "/resource-manager/alerts",
+        icon: TriangleAlert,
+        badge: 9,
+      },
+      {
+        name: "Reports & Analytics",
+        path: "/resource-manager/reports",
+        icon: ChartNoAxesCombined,
+      },
+      {
+        name: "Audit Log",
+        path: "/resource-manager/audit-log",
+        icon: Clock,
+      },
+      {
+        name: "Settings",
+        path: "/resource-manager/settings",
+        icon: Settings,
+      },
     ],
   },
 ];
 
 export default function Sidebar({
-  activePage = "Audit Log",
+  activePage,
   onNavigate,
+  isOpen = false,
+  onClose,
 }: SidebarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, logout } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
+  const [sectionOpen, setSectionOpen] = useState(true);
 
-  const resourceRouteMap: Record<string, string> = {
-    "Resource Dashboard": "/resource-manager/dashboard",
-    "Inventory": "/resource-manager/inventory",
-    "Warehouses": "/resource-manager/warehouses",
-    "Resource Requests": "/resource-manager/requests",
-    "Allocations": "/resource-manager/allocations",
-    "Dispatch & Tracking": "/resource-manager/dispatch",
-    "Stock Transfers": "/resource-manager/transfers",
-    "Procurement": "/resource-manager/procurement",
-    "Suppliers": "/resource-manager/suppliers",
-    "Alerts": "/resource-manager/alerts",
-    "Reports & Analytics": "/resource-manager/reports",
-    "Audit Log": "/resource-manager/audit-log",
-    "Settings": "/resource-manager/settings",
-  };
+  const displayName = user?.fullName || "Daniel Perera";
+  const initials = getUserInitials(displayName, "DP");
+
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[293px] flex-col bg-[#153f5e] text-white">
+    <>
+      {isOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          className={SIDEBAR_THEME.overlay}
+          onClick={onClose}
+        />
+      )}
 
-      {/* Logo */}
-      <div className="mx-4 flex h-[127px] shrink-0 items-center border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="flex h-[43px] w-[43px] items-center justify-center rounded-xl bg-[#65b9aa] text-[#153f5e]">
-            <Package size={25} />
-          </div>
+      <aside
+        className={`${SIDEBAR_THEME.asideBase} ${
+          collapsed ? SIDEBAR_THEME.widthCollapsed : SIDEBAR_THEME.widthExpanded
+        } h-screen lg:translate-x-0 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* BRAND HEADER */}
+        <div className={SIDEBAR_THEME.header}>
+          <button
+            type="button"
+            onClick={() => navigate("/resource-manager/dashboard")}
+            className="flex min-w-0 items-center gap-3 text-left transition hover:opacity-90"
+          >
+            <CareLinkLogo size={collapsed ? "compact" : "sidebar"} />
 
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">
-              ReliefOS
-            </h1>
-            <p className="text-[11px] text-sky-200">
-              Resource Management
-            </p>
-          </div>
+            {!collapsed && (
+              <div className="min-w-0">
+                <h1 className={SIDEBAR_THEME.brandTitle}>CareLink</h1>
+                <p className={SIDEBAR_THEME.brandSubtitle}>
+                  Connecting Help. Saving Lives.
+                </p>
+              </div>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            className={SIDEBAR_THEME.collapseBtn}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          </button>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className={SIDEBAR_THEME.mobileCloseBtn}
+            aria-label="Close sidebar"
+          >
+            <X size={18} />
+          </button>
         </div>
-      </div>
 
-      {/* Active Operation */}
-      <div className="mx-4 mt-4 shrink-0 rounded-xl border border-white/10 bg-white/[0.07] px-3 py-3">
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-[#65b9aa]" />
-          <span className="text-[9px] font-bold tracking-wider text-[#65b9aa]">
-            ACTIVE OPERATION
-          </span>
-        </div>
+        {/* ACTIVE OPERATION */}
+        {!collapsed && (
+          <div className={SIDEBAR_THEME.statusCardWrapper}>
+            <div className={SIDEBAR_THEME.statusCard}>
+              <div className={SIDEBAR_THEME.statusIndicatorRow}>
+                <div className="flex items-center gap-2">
+                  <span className={SIDEBAR_THEME.statusDot} />
+                  <span className={SIDEBAR_THEME.statusLabel}>
+                    ACTIVE OPERATION
+                  </span>
+                </div>
+              </div>
 
-        <h3 className="mt-2 text-xs font-bold">
-          Monsoon Floods 2025
-        </h3>
-
-        <p className="mt-1 text-[10px] text-sky-200">
-          Greater Riverton · Level 4
-        </p>
-      </div>
-
-      {/* Navigation */}
-      <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-3">
-
-        {menuItems.map((section) => (
-          <div key={section.section}>
-            <p className="mb-3 px-3 text-[9px] font-bold tracking-widest text-sky-300">
-              {section.section}
-            </p>
-
-            <div className="space-y-1">
-              {section.items.map((item) => {
-                const Icon = item.icon;
-                const active = activePage === item.name;
-
-                return (
-                  <button
-                    key={item.name}
-                    onClick={() => {
-                      if (onNavigate) {
-                        onNavigate(item.name);
-                      } else if (resourceRouteMap[item.name]) {
-                        navigate(resourceRouteMap[item.name]);
-                      }
-                    }}
-                    className={`flex w-full items-center gap-3 rounded-lg border-l-[3px] px-3 py-[11px] text-left text-[11px] transition-colors ${active
-                        ? "border-[#65b9aa] bg-[#287da6] font-semibold text-white"
-                        : "border-transparent text-sky-100 hover:bg-white/10"
-                      }`}
-                  >
-                    <Icon size={19} strokeWidth={1.8} />
-
-                    <span className="flex-1">
-                      {item.name}
-                    </span>
-
-                    {item.badge !== undefined && (
-                      <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#ed4c5c] px-1 text-[9px] font-bold text-white">
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+              <h3 className={SIDEBAR_THEME.statusTitle}>Monsoon Floods 2025</h3>
+              <p className={SIDEBAR_THEME.statusSubtitle}>
+                Greater Riverton · Level 4
+              </p>
             </div>
           </div>
-        ))}
-      </nav>
+        )}
 
-      {/* User Profile */}
-      <div className="flex h-[70px] shrink-0 items-center gap-3 border-t border-white/10 px-5">
-        <div className="flex h-[39px] w-[39px] items-center justify-center rounded-full bg-[#287da6] text-xs font-bold">
-          DP
+        {/* NAVIGATION */}
+        <nav className={SIDEBAR_THEME.navScroll}>
+          {menuItems.map((section) => (
+            <div key={section.section} className="mb-4 last:mb-0">
+              {!collapsed && (
+                <button
+                  type="button"
+                  onClick={() => setSectionOpen((prev) => !prev)}
+                  className={SIDEBAR_THEME.sectionHeadingBtn}
+                >
+                  <span>{section.section}</span>
+                  <ChevronDown
+                    size={12}
+                    className={`transition-transform ${
+                      sectionOpen ? "rotate-0" : "-rotate-90"
+                    }`}
+                  />
+                </button>
+              )}
+
+              {(sectionOpen || collapsed) && (
+                <div className={SIDEBAR_THEME.menuList}>
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    const active = activePage
+                      ? activePage === item.name
+                      : location.pathname === item.path;
+
+                    return (
+                      <button
+                        key={item.name}
+                        type="button"
+                        title={collapsed ? item.name : undefined}
+                        onClick={() => {
+                          if (onNavigate) {
+                            onNavigate(item.name);
+                          } else {
+                            navigate(item.path);
+                          }
+                          onClose?.();
+                        }}
+                        className={`${SIDEBAR_THEME.menuItemBase} ${
+                          active
+                            ? SIDEBAR_THEME.menuItemActive
+                            : SIDEBAR_THEME.menuItemInactive
+                        } ${collapsed ? "justify-center px-0" : ""}`}
+                      >
+                        <div className="flex min-w-0 items-center gap-3">
+                          <Icon
+                            size={17}
+                            strokeWidth={1.8}
+                            className={
+                              active
+                                ? SIDEBAR_THEME.iconActive
+                                : SIDEBAR_THEME.iconInactive
+                            }
+                          />
+
+                          {!collapsed && (
+                            <span className="truncate">{item.name}</span>
+                          )}
+                        </div>
+
+                        {!collapsed && item.badge !== undefined && (
+                          <span className={SIDEBAR_THEME.badge}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* USER PROFILE & SIGN OUT */}
+        <div className={SIDEBAR_THEME.footer}>
+          <div
+            className={`${SIDEBAR_THEME.profileRow} ${
+              collapsed ? "justify-center" : ""
+            }`}
+          >
+            <div className={SIDEBAR_THEME.avatar}>{initials}</div>
+
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className={SIDEBAR_THEME.userName}>{displayName}</p>
+                <p className={SIDEBAR_THEME.userRole}>Resource Manager</p>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              navigate("/login", { replace: true });
+            }}
+            title="Sign out"
+            className={SIDEBAR_THEME.signOutBtn}
+          >
+            <LogOut size={14} />
+            {!collapsed && <span>Sign out</span>}
+          </button>
         </div>
-
-        <div className="flex-1">
-          <p className="text-[11px] font-bold">
-            Daniel Perera
-          </p>
-          <p className="mt-1 text-[9px] text-sky-200">
-            Resource Manager
-          </p>
-        </div>
-
-        <ChevronRight size={20} />
-      </div>
-
-    </aside>
+      </aside>
+    </>
   );
 }

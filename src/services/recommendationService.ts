@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface Recommendation {
   id: string;
   request: string;
@@ -71,7 +72,7 @@ export const recommendationService = {
     }
 
     const queryString = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${API_BASE}/api/recommendations${queryString}`);
+    const response = await authFetch(`${API_BASE}/api/recommendations${queryString}`);
     if (!response.ok) {
       throw new Error(`Failed to load recommendations: ${response.status} ${response.statusText}`);
     }
@@ -79,7 +80,7 @@ export const recommendationService = {
   },
 
   async getMetrics(): Promise<RecommendationMetrics> {
-    const response = await fetch(`${API_BASE}/api/recommendations/metrics`);
+    const response = await authFetch(`${API_BASE}/api/recommendations/metrics`);
     if (!response.ok) {
       throw new Error(`Failed to fetch metrics: ${response.status} ${response.statusText}`);
     }
@@ -87,7 +88,7 @@ export const recommendationService = {
   },
 
   async getById(id: string): Promise<Recommendation> {
-    const response = await fetch(`${API_BASE}/api/recommendations/${encodeURIComponent(id)}`);
+    const response = await authFetch(`${API_BASE}/api/recommendations/${encodeURIComponent(id)}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch recommendation ${id}: ${response.status}`);
     }
@@ -95,7 +96,7 @@ export const recommendationService = {
   },
 
   async recordDecision(id: string, data: RecordDecisionRequest): Promise<Recommendation> {
-    const response = await fetch(`${API_BASE}/api/recommendations/${encodeURIComponent(id)}/decision`, {
+    const response = await authFetch(`${API_BASE}/api/recommendations/${encodeURIComponent(id)}/decision`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -111,7 +112,7 @@ export const recommendationService = {
   },
 
   async generateRecommendation(data: GenerateRecommendationRequest): Promise<Recommendation> {
-    const response = await fetch(`${API_BASE}/api/recommendations/generate`, {
+    const response = await authFetch(`${API_BASE}/api/recommendations/generate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -127,7 +128,7 @@ export const recommendationService = {
   },
 
   async resetData(): Promise<{ message: string; metrics: RecommendationMetrics }> {
-    const response = await fetch(`${API_BASE}/api/recommendations/reset`, {
+    const response = await authFetch(`${API_BASE}/api/recommendations/reset`, {
       method: "POST",
     });
     if (!response.ok) {

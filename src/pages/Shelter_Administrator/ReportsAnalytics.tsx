@@ -267,7 +267,7 @@ export default function ReportsAnalyticsPage() {
       <main className="max-w-[1600px] mx-auto px-5 md:px-7 pt-4 pb-8">
         {/* BREADCRUMB & API STATUS */}
         <div className="flex items-center justify-between gap-2 mb-6">
-          <div className="flex items-center gap-2 text-[8px]">
+          <div className="flex items-center gap-2 text-xs">
             <span className="text-slate-400">CareLink</span>
             <ChevronRight size={10} className="text-slate-400" />
             <span className="text-slate-400">Shelter Administration</span>
@@ -278,7 +278,7 @@ export default function ReportsAnalyticsPage() {
           {/* BACKEND API STATUS BADGE */}
           <div className="flex items-center gap-2">
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-semibold tracking-wide border shadow-xs ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide border shadow-xs ${
                 isLiveBackend
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                   : "bg-amber-50 text-amber-700 border-amber-200"
@@ -308,8 +308,8 @@ export default function ReportsAnalyticsPage() {
         {/* PAGE HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div>
-            <h1 className="text-[21px] font-normal">Reports & Analytics</h1>
-            <p className="text-[9px] text-slate-500 mt-1.5">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">Reports & Analytics</h1>
+            <p className="text-xs text-slate-500 mt-1.5">
               Create transparent operational reports and analyse shelter performance.
             </p>
           </div>
@@ -317,7 +317,7 @@ export default function ReportsAnalyticsPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={printReport}
-              className="h-[31px] px-3 bg-white border border-[#aac4d2] rounded-md text-[9px] font-semibold hover:bg-slate-50 flex items-center gap-2 transition cursor-pointer"
+              className="h-[31px] px-3 bg-white border border-[#aac4d2] rounded-md text-sm font-semibold hover:bg-slate-50 flex items-center gap-2 transition cursor-pointer"
             >
               <Printer size={12} />
               Print
@@ -326,7 +326,7 @@ export default function ReportsAnalyticsPage() {
             <button
               onClick={() => downloadCSV("Operational Performance Report")}
               disabled={isExporting}
-              className="h-[31px] px-3 bg-[#1c638a] text-white rounded-md text-[9px] font-semibold hover:bg-[#144665] flex items-center gap-2 transition cursor-pointer disabled:opacity-50"
+              className="h-[31px] px-3 bg-[#1c638a] text-white rounded-md text-sm font-semibold hover:bg-[#144665] flex items-center gap-2 transition cursor-pointer disabled:opacity-50"
             >
               <Download size={12} />
               {isExporting ? "Exporting..." : "Export report"}
@@ -361,7 +361,7 @@ export default function ReportsAnalyticsPage() {
             <div className="flex items-end">
               <button
                 onClick={applyFilters}
-                className="w-full h-[30px] px-4 bg-white border border-[#aac4d2] rounded-md text-[9px] font-semibold hover:bg-[#f0f8fa] transition cursor-pointer"
+                className="w-full h-[30px] px-4 bg-white border border-[#aac4d2] rounded-md text-sm font-semibold hover:bg-[#f0f8fa] transition cursor-pointer"
               >
                 Apply filters
               </button>
@@ -409,8 +409,8 @@ export default function ReportsAnalyticsPage() {
           {/* OCCUPANCY TREND */}
           <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-xs overflow-hidden">
             <div className="px-3.5 py-3 border-b border-slate-200">
-              <h2 className="text-[11px] font-semibold">Occupancy trend</h2>
-              <p className="text-[7px] text-slate-400 mt-1">Daily occupied beds</p>
+              <h2 className="text-base sm:text-lg font-semibold">Occupancy trend</h2>
+              <p className="text-xs text-slate-400 mt-1">Daily occupied beds</p>
             </div>
 
             <div className="px-3 pt-3 pb-4">
@@ -421,8 +421,8 @@ export default function ReportsAnalyticsPage() {
           {/* REQUEST OUTCOMES */}
           <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-xs overflow-hidden">
             <div className="px-3.5 py-3 border-b border-slate-200">
-              <h2 className="text-[11px] font-semibold">Request outcomes</h2>
-              <p className="text-[7px] text-slate-400 mt-1">
+              <h2 className="text-base sm:text-lg font-semibold">Request outcomes</h2>
+              <p className="text-xs text-slate-400 mt-1">
                 {metrics.admissions} accommodation requests
               </p>
             </div>
@@ -459,7 +459,7 @@ export default function ReportsAnalyticsPage() {
 
         {/* REPORT LIBRARY */}
         <section className="mb-2">
-          <h2 className="text-[10px] font-semibold mb-2">Report library</h2>
+          <h2 className="text-base sm:text-lg font-semibold mb-2">Report library</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
             {reportsList.map((report) => {
@@ -476,8 +476,8 @@ export default function ReportsAnalyticsPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[8px] font-semibold truncate">{report.title}</p>
-                    <p className="text-[7px] text-slate-400 mt-1 truncate">{report.description}</p>
+                    <p className="text-xs font-semibold truncate">{report.title}</p>
+                    <p className="text-xs text-slate-400 mt-1 truncate">{report.description}</p>
                   </div>
 
                   <ChevronRight size={13} className="text-[#123e60] shrink-0" />
@@ -502,8 +502,8 @@ export default function ReportsAnalyticsPage() {
                 </div>
 
                 <div>
-                  <h2 className="text-sm font-semibold">{selectedReport.title}</h2>
-                  <p className="text-[9px] text-slate-400 mt-1">
+                  <h2 className="text-base sm:text-lg font-semibold">{selectedReport.title}</h2>
+                  <p className="text-xs text-slate-400 mt-1">
                     {selectedReport.category} report
                   </p>
                 </div>
@@ -518,20 +518,20 @@ export default function ReportsAnalyticsPage() {
             </div>
 
             <div className="bg-[#f5f9fa] rounded-lg p-4 mt-5 space-y-3">
-              <p className="text-xs font-semibold">Report information</p>
-              <p className="text-[10px] text-slate-500">{selectedReport.description}</p>
+              <p className="text-sm font-semibold">Report information</p>
+              <p className="text-[13px] text-slate-500">{selectedReport.description}</p>
 
-              <div className="flex justify-between text-[10px]">
+              <div className="flex justify-between text-sm">
                 <span className="text-slate-400">Date range</span>
                 <span className="font-semibold">{appliedFilters.dateRange}</span>
               </div>
 
-              <div className="flex justify-between text-[10px]">
+              <div className="flex justify-between text-sm">
                 <span className="text-slate-400">Shelter</span>
                 <span className="font-semibold">{appliedFilters.shelter}</span>
               </div>
 
-              <div className="flex justify-between text-[10px]">
+              <div className="flex justify-between text-sm">
                 <span className="text-slate-400">District</span>
                 <span className="font-semibold">{appliedFilters.district}</span>
               </div>
@@ -540,14 +540,14 @@ export default function ReportsAnalyticsPage() {
             <div className="flex gap-2 mt-5">
               <button
                 onClick={() => setSelectedReport(null)}
-                className="flex-1 h-10 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-50 transition cursor-pointer"
+                className="flex-1 h-10 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-50 transition cursor-pointer"
               >
                 Cancel
               </button>
 
               <button
                 onClick={() => handleExportReportItem(selectedReport)}
-                className="flex-1 h-10 bg-[#1c638a] hover:bg-[#144665] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer"
+                className="flex-1 h-10 bg-[#1c638a] hover:bg-[#144665] text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition cursor-pointer"
               >
                 <Download size={14} />
                 Export CSV
@@ -561,7 +561,7 @@ export default function ReportsAnalyticsPage() {
       {notification && (
         <div className="fixed bottom-5 right-5 z-[70] max-w-sm bg-[#123e60] text-white rounded-lg shadow-xl px-4 py-3 flex items-center gap-3">
           <Check size={16} />
-          <p className="text-xs">{notification}</p>
+          <p className="text-sm">{notification}</p>
           <button onClick={() => setNotification("")} className="cursor-pointer">
             <X size={14} />
           </button>
@@ -586,13 +586,13 @@ function FilterSelect({
 }) {
   return (
     <div className="min-w-0">
-      <label className="block text-[7px] text-slate-400 mb-1">{label}</label>
+      <label className="block text-sm text-slate-400 mb-1">{label}</label>
 
       <div className="relative">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full h-[30px] appearance-none bg-white border border-[#d5e3e9] rounded-md pl-2.5 pr-7 text-[8px] outline-none focus:border-[#45b99b] cursor-pointer"
+          className="w-full h-[30px] appearance-none bg-white border border-[#d5e3e9] rounded-md pl-2.5 pr-7 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] cursor-pointer"
         >
           {options.map((option) => (
             <option key={option} value={option}>
@@ -639,9 +639,9 @@ function MetricCard({
       </div>
 
       <div className="min-w-0">
-        <p className="text-[7px] text-slate-400">{title}</p>
+        <p className="text-xs text-slate-400">{title}</p>
         <p className="text-[18px] font-bold leading-tight">{value}</p>
-        <p className="text-[7px] text-slate-400 mt-0.5">{subtitle}</p>
+        <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
       </div>
     </div>
   );
@@ -756,7 +756,7 @@ function DonutChart({
       >
         <div className="w-[78px] h-[78px] bg-white rounded-full flex flex-col items-center justify-center">
           <p className="text-[17px] font-bold">{Math.round((approved / total) * 100)}%</p>
-          <p className="text-[7px] text-slate-400">Approved</p>
+          <p className="text-xs text-slate-400">Approved</p>
         </div>
       </div>
     </div>
@@ -775,7 +775,7 @@ function LegendItem({
   value: number;
 }) {
   return (
-    <div className="flex items-center justify-between text-[8px]">
+    <div className="flex items-center justify-between text-xs">
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-sm" style={{ backgroundColor: color }} />
         <span className="text-slate-500">{label}</span>

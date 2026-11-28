@@ -65,8 +65,8 @@ const defaultSettings: SystemSettingsType = {
 };
 
 const fieldClass =
-  "h-11 w-full rounded-lg border border-[#D5E3EA] bg-white px-3 text-[10px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10";
-const labelClass = "mb-2 block text-[9px] font-semibold text-[#173B59]";
+  "h-11 w-full rounded-lg border border-[#D5E3EA] bg-white px-3 text-sm sm:text-[15px] text-[#173B59] outline-none transition focus:border-[#2785B2] focus:ring-2 focus:ring-[#2785B2]/10";
+const labelClass = "mb-2 block text-xs font-semibold text-[#173B59]";
 
 export default function SystemSettings() {
   const [active, setActive] = useState<SectionKey>("General");
@@ -131,7 +131,7 @@ export default function SystemSettings() {
   return (
     <div className="font-sans text-[#123B5C]">
       {/* BREADCRUMB */}
-      <div className="flex h-9 items-center justify-between border-b border-[#64C9AD]/40 bg-white px-6 text-[10px] text-slate-500">
+      <div className="flex h-9 items-center justify-between border-b border-[#64C9AD]/40 bg-white px-6 text-[13px] text-slate-500">
         <div className="flex items-center gap-2">
           <span>Administration</span>
           <ChevronRight size={11} />
@@ -140,11 +140,11 @@ export default function SystemSettings() {
 
         <div className="flex items-center gap-3">
           {saved && (
-            <span className="flex items-center gap-1 text-[9px] font-semibold text-emerald-600">
+            <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600">
               <Check size={12} /> Settings saved & synced
             </span>
           )}
-          <span className="text-[9px] text-slate-400">
+          <span className="text-xs text-slate-400">
             Last updated: {values.lastUpdatedAt ? new Date(values.lastUpdatedAt).toLocaleDateString() : "Just now"}
           </span>
         </div>
@@ -160,10 +160,10 @@ export default function SystemSettings() {
 
         <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
           <div>
-            <h1 className="text-xl font-medium tracking-tight text-[#123B5C] md:text-2xl">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-[#123B5C]">
               System Settings & Configuration
             </h1>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Configure platform parameters, security safeguards, retention rules, and feature controls.
             </p>
           </div>
@@ -172,7 +172,7 @@ export default function SystemSettings() {
             <button
               onClick={handleReset}
               disabled={saving || loading}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-[10px] font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
             >
               <RotateCcw size={12} />
               Reset Defaults
@@ -181,7 +181,7 @@ export default function SystemSettings() {
             <button
               onClick={handleSave}
               disabled={saving || loading}
-              className="flex items-center gap-1.5 rounded-lg bg-[#123B5C] px-4 py-2 text-[10px] font-semibold text-white shadow-sm hover:bg-[#1D5F8A] disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-[#123B5C] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1D5F8A] disabled:opacity-50"
             >
               {saving ? <RefreshCw size={12} className="animate-spin" /> : <Save size={12} />}
               <span>{saving ? "Saving..." : "Save Changes"}</span>
@@ -200,7 +200,7 @@ export default function SystemSettings() {
                 <button
                   key={sec.name}
                   onClick={() => setActive(sec.name)}
-                  className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-xs font-semibold transition ${
+                  className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition ${
                     isSelected
                       ? "bg-[#123B5C] text-white"
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
@@ -223,7 +223,7 @@ export default function SystemSettings() {
               <>
                 {active === "General" && (
                   <div className="space-y-4">
-                    <h2 className="text-sm font-bold text-[#123B5C]">General Platform Configuration</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-[#123B5C]">General Platform Configuration</h2>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div>
                         <label className={labelClass}>Platform Name</label>
@@ -263,7 +263,7 @@ export default function SystemSettings() {
 
                 {active === "Security" && (
                   <div className="space-y-4">
-                    <h2 className="text-sm font-bold text-[#123B5C]">Security Safeguards & Access Rules</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-[#123B5C]">Security Safeguards & Access Rules</h2>
                     <div className="grid grid-cols-1 gap-3">
                       {[
                         { key: "twoFactor", title: "Mandatory Two-Factor Authentication for Admins", desc: "Require 2FA verification for SystemAdmin and EmergencyCoordinator roles." },
@@ -273,8 +273,8 @@ export default function SystemSettings() {
                       ].map((item) => (
                         <div key={item.key} className="flex items-center justify-between rounded-lg border border-slate-100 p-3 hover:bg-slate-50">
                           <div>
-                            <p className="text-xs font-semibold text-slate-800">{item.title}</p>
-                            <p className="text-[10px] text-slate-500">{item.desc}</p>
+                            <p className="text-sm font-semibold text-slate-800">{item.title}</p>
+                            <p className="text-[13px] text-slate-500">{item.desc}</p>
                           </div>
                           <input
                             type="checkbox"
@@ -290,7 +290,7 @@ export default function SystemSettings() {
 
                 {active === "Authentication" && (
                   <div className="space-y-4">
-                    <h2 className="text-sm font-bold text-[#123B5C]">Authentication & Password Rules</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-[#123B5C]">Authentication & Password Rules</h2>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div>
                         <label className={labelClass}>Session Inactivity Timeout (minutes)</label>
@@ -330,7 +330,7 @@ export default function SystemSettings() {
 
                 {active === "Notifications" && (
                   <div className="space-y-4">
-                    <h2 className="text-sm font-bold text-[#123B5C]">Alerts & Broadcast Delivery</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-[#123B5C]">Alerts & Broadcast Delivery</h2>
                     <div className="grid grid-cols-1 gap-3">
                       {[
                         { key: "securityAlerts", title: "High-Severity Security Broadcasts", desc: "Dispatch push alerts on account lockouts or unauthorized API access." },
@@ -340,8 +340,8 @@ export default function SystemSettings() {
                       ].map((item) => (
                         <div key={item.key} className="flex items-center justify-between rounded-lg border border-slate-100 p-3 hover:bg-slate-50">
                           <div>
-                            <p className="text-xs font-semibold text-slate-800">{item.title}</p>
-                            <p className="text-[10px] text-slate-500">{item.desc}</p>
+                            <p className="text-sm font-semibold text-slate-800">{item.title}</p>
+                            <p className="text-[13px] text-slate-500">{item.desc}</p>
                           </div>
                           <input
                             type="checkbox"
@@ -357,7 +357,7 @@ export default function SystemSettings() {
 
                 {active === "Data & Retention" && (
                   <div className="space-y-4">
-                    <h2 className="text-sm font-bold text-[#123B5C]">Data Retention & Archival Policies</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-[#123B5C]">Data Retention & Archival Policies</h2>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div>
                         <label className={labelClass}>Audit Log Retention Period</label>
@@ -397,7 +397,7 @@ export default function SystemSettings() {
 
                 {active === "Feature Controls" && (
                   <div className="space-y-4">
-                    <h2 className="text-sm font-bold text-[#123B5C]">Operational Feature Flags</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-[#123B5C]">Operational Feature Flags</h2>
                     <div className="grid grid-cols-1 gap-3">
                       {[
                         { key: "aiDecision", title: "AI Triage Recommendation Assistance", desc: "Enable automated triage proposals in AI Recommendation Review module." },
@@ -407,8 +407,8 @@ export default function SystemSettings() {
                       ].map((item) => (
                         <div key={item.key} className="flex items-center justify-between rounded-lg border border-slate-100 p-3 hover:bg-slate-50">
                           <div>
-                            <p className="text-xs font-semibold text-slate-800">{item.title}</p>
-                            <p className="text-[10px] text-slate-500">{item.desc}</p>
+                            <p className="text-sm font-semibold text-slate-800">{item.title}</p>
+                            <p className="text-[13px] text-slate-500">{item.desc}</p>
                           </div>
                           <input
                             type="checkbox"

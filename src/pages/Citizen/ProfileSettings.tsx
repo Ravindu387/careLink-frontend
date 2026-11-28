@@ -302,10 +302,10 @@ export default function ProfileSettings() {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none transition focus:border-[#287da6] focus:ring-2 focus:ring-sky-100 disabled:bg-slate-50 disabled:text-slate-500";
+    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none transition focus:border-[#287da6] focus:ring-2 focus:ring-sky-100 disabled:bg-slate-50 disabled:text-slate-500";
 
   const labelClass =
-    "mb-1.5 block text-[11px] font-semibold text-[#173d5b]";
+    "mb-1.5 block text-[13px] font-semibold text-[#173d5b]";
 
   // Calculate profile completeness
   const completenessItems = [
@@ -340,13 +340,13 @@ export default function ProfileSettings() {
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
+                <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight">
                   Profile & Settings
                 </h1>
 
                 {/* API Status Badge */}
                 <div
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium shadow-sm ${
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium shadow-sm ${
                     isOnline
                       ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
                       : "border border-amber-200 bg-amber-50 text-amber-700"
@@ -391,7 +391,7 @@ export default function ProfileSettings() {
               <button
                 onClick={handleSave}
                 disabled={saving || loading}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition ${
+                className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition ${
                   saved
                     ? "bg-emerald-600 hover:bg-emerald-700"
                     : "bg-[#287da6] hover:bg-[#1f6486]"
@@ -445,13 +445,13 @@ export default function ProfileSettings() {
 
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-base font-bold text-[#173d5b] sm:text-lg">
+                    <h2 className="text-lg sm:text-xl font-bold text-[#173d5b]">
                       {profile.fullName || "Citizen User"}
                     </h2>
-                    <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-[10px] font-semibold text-[#287da6]">
+                    <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-semibold text-[#287da6]">
                       Citizen Portal
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
                       <ShieldCheck size={12} /> Verified Identity
                     </span>
                   </div>
@@ -476,7 +476,7 @@ export default function ProfileSettings() {
               {/* Right: Reference pill & Completeness */}
               <div className="flex flex-col items-start gap-2 border-t border-slate-100 pt-4 sm:items-end sm:border-t-0 sm:pt-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-400">Citizen Ref:</span>
+                  <span className="text-[13px] text-slate-400">Citizen Ref:</span>
                   <button
                     onClick={handleCopyRef}
                     className="group inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-mono font-semibold text-[#173d5b] transition hover:bg-slate-100"
@@ -493,7 +493,7 @@ export default function ProfileSettings() {
 
                 {/* Completeness Bar */}
                 <div className="w-full sm:w-48">
-                  <div className="flex justify-between text-[10px] text-slate-500">
+                  <div className="flex justify-between text-[13px] text-slate-500">
                     <span>Profile Completeness</span>
                     <span className="font-semibold text-[#287da6]">{completenessPercent}%</span>
                   </div>
@@ -512,7 +512,7 @@ export default function ProfileSettings() {
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
             {/* SETTINGS SIDE MENU */}
             <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
-              <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                 Settings Sections
               </div>
               <div className="space-y-1">
@@ -527,7 +527,7 @@ export default function ProfileSettings() {
                         setActiveTab(tab.name);
                         setSaved(false);
                       }}
-                      className={`group flex w-full items-center gap-3 rounded-xl px-3 py-3.5 text-left text-xs transition ${
+                      className={`group flex w-full items-center gap-3 rounded-xl px-3 py-3.5 text-left text-sm transition ${
                         active
                           ? "bg-[#e8f2f7] font-semibold text-[#287da6] shadow-sm"
                           : "text-slate-600 hover:bg-slate-50 hover:text-[#173d5b]"
@@ -544,8 +544,8 @@ export default function ProfileSettings() {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <p className="truncate text-xs font-semibold">{tab.name}</p>
-                        <p className="truncate text-[10px] text-slate-400 font-normal">
+                        <p className="truncate text-sm font-semibold">{tab.name}</p>
+                        <p className="truncate text-[13px] text-slate-400 font-normal">
                           {tab.description}
                         </p>
                       </div>
@@ -565,7 +565,7 @@ export default function ProfileSettings() {
               <div className="mt-4 border-t border-slate-100 p-2">
                 <button
                   onClick={handleResetProfile}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-[11px] font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                 >
                   <RotateCcw size={12} />
                   Reset to Demo Values
@@ -585,7 +585,7 @@ export default function ProfileSettings() {
                         Update your official identification names and birth information.
                       </p>
                     </div>
-                    <span className="rounded-lg bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-[#287da6]">
+                    <span className="rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-medium text-[#287da6]">
                       Identity
                     </span>
                   </div>
@@ -647,7 +647,7 @@ export default function ProfileSettings() {
                           {copiedRef ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                         </button>
                       </div>
-                      <p className="mt-1 text-[10px] text-slate-400">
+                      <p className="mt-1 text-[13px] text-slate-400">
                         Assigned by CareLink Registry for relief dispatch and verification.
                       </p>
                     </div>
@@ -690,7 +690,7 @@ export default function ProfileSettings() {
                         Primary communication channels and residential dispatch address.
                       </p>
                     </div>
-                    <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+                    <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
                       Location
                     </span>
                   </div>
@@ -770,11 +770,11 @@ export default function ProfileSettings() {
                       <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-100 text-red-600">
                         <Heart size={14} />
                       </div>
-                      <h4 className="text-xs font-bold text-[#173d5b]">
+                      <h4 className="text-sm font-bold text-[#173d5b]">
                         Designated Emergency Contact
                       </h4>
                     </div>
-                    <p className="mb-4 text-[11px] text-slate-500">
+                    <p className="mb-4 text-[13px] text-slate-500">
                       Authorized person reached during search and rescue or sudden medical evacuations.
                     </p>
 
@@ -824,7 +824,7 @@ export default function ProfileSettings() {
                         Customise typography, high contrast, and spoken text readability options.
                       </p>
                     </div>
-                    <span className="rounded-lg bg-purple-50 px-2.5 py-1 text-[11px] font-medium text-purple-700">
+                    <span className="rounded-lg bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700">
                       Accessibility
                     </span>
                   </div>
@@ -867,8 +867,8 @@ export default function ProfileSettings() {
                             <Sliders size={16} />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold">High contrast palette</p>
-                            <p className="text-[10px] text-slate-500">
+                            <p className="text-sm font-semibold">High contrast palette</p>
+                            <p className="text-[13px] text-slate-500">
                               Increases text distinction for outdoor visibility.
                             </p>
                           </div>
@@ -887,8 +887,8 @@ export default function ProfileSettings() {
                             <EyeIcon size={16} />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold">Large text scaling</p>
-                            <p className="text-[10px] text-slate-500">
+                            <p className="text-sm font-semibold">Large text scaling</p>
+                            <p className="text-[13px] text-slate-500">
                               Enhances button labels and emergency alerts size.
                             </p>
                           </div>
@@ -907,8 +907,8 @@ export default function ProfileSettings() {
                             <Accessibility size={16} />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold">Screen reader optimization</p>
-                            <p className="text-[10px] text-slate-500">
+                            <p className="text-sm font-semibold">Screen reader optimization</p>
+                            <p className="text-[13px] text-slate-500">
                               Provides ARIA landmarks and descriptive image alt-tags.
                             </p>
                           </div>
@@ -927,8 +927,8 @@ export default function ProfileSettings() {
                             <Volume2 size={16} />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold">Audio evacuation cues</p>
-                            <p className="text-[10px] text-slate-500">
+                            <p className="text-sm font-semibold">Audio evacuation cues</p>
+                            <p className="text-[13px] text-slate-500">
                               Audible sirens during severe flood and cyclone bulletins.
                             </p>
                           </div>
@@ -958,13 +958,13 @@ export default function ProfileSettings() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleToggleAllNotifications(true)}
-                        className="rounded-lg border border-slate-200 px-2 py-1 text-[10px] font-semibold text-slate-600 hover:bg-slate-50"
+                        className="rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
                       >
                         Enable All
                       </button>
                       <button
                         onClick={() => handleToggleAllNotifications(false)}
-                        className="rounded-lg border border-slate-200 px-2 py-1 text-[10px] font-semibold text-slate-600 hover:bg-slate-50"
+                        className="rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
                       >
                         Disable All
                       </button>
@@ -1040,12 +1040,12 @@ export default function ProfileSettings() {
                               {item.label}
                             </span>
                             <span
-                              className={`rounded border px-1.5 py-0.5 text-[9px] font-medium ${item.badgeColor}`}
+                              className={`rounded border px-1.5 py-0.5 text-xs font-medium ${item.badgeColor}`}
                             >
                               {item.badge}
                             </span>
                           </div>
-                          <p className="mt-0.5 text-[10px] text-slate-500">
+                          <p className="mt-0.5 text-[13px] text-slate-500">
                             {item.desc}
                           </p>
                         </div>
@@ -1077,7 +1077,7 @@ export default function ProfileSettings() {
                         Governance of personal info, responder location sharing, and export archives.
                       </p>
                     </div>
-                    <span className="rounded-lg bg-teal-50 px-2.5 py-1 text-[11px] font-medium text-teal-700">
+                    <span className="rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-700">
                       Encrypted
                     </span>
                   </div>
@@ -1087,11 +1087,11 @@ export default function ProfileSettings() {
                     <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
                       <div className="flex items-center gap-2">
                         <ShieldCheck size={16} className="text-[#287da6]" />
-                        <h4 className="text-xs font-bold text-[#173d5b]">
+                        <h4 className="text-sm font-bold text-[#173d5b]">
                           Government Disaster Response Protection Policy
                         </h4>
                       </div>
-                      <p className="mt-1 text-[11px] text-slate-600 leading-relaxed">
+                      <p className="mt-1 text-sm text-slate-600 leading-relaxed">
                         {profile.personalInformationPolicy ||
                           "Your personal information is strictly protected under municipal emergency protocols and shared exclusively with verified emergency responders during active crisis operations."}
                       </p>
@@ -1101,10 +1101,10 @@ export default function ProfileSettings() {
                     <div className="space-y-3">
                       <label className="flex items-start justify-between rounded-xl border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition">
                         <div className="pr-4">
-                          <p className="text-xs font-semibold text-[#173d5b]">
+                          <p className="text-sm font-semibold text-[#173d5b]">
                             Share live GPS coordinates with emergency rescue teams
                           </p>
-                          <p className="text-[10px] text-slate-500 mt-0.5">
+                          <p className="text-[13px] text-slate-500 mt-0.5">
                             Allows first responder boats and ambulances to pinpoint your household location directly during high floods.
                           </p>
                         </div>
@@ -1120,10 +1120,10 @@ export default function ProfileSettings() {
 
                       <label className="flex items-start justify-between rounded-xl border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition">
                         <div className="pr-4">
-                          <p className="text-xs font-semibold text-[#173d5b]">
+                          <p className="text-sm font-semibold text-[#173d5b]">
                             Share household medical notes with verified paramedic crews
                           </p>
-                          <p className="text-[10px] text-slate-500 mt-0.5">
+                          <p className="text-[13px] text-slate-500 mt-0.5">
                             Permits on-scene medical personnel to view elder medications or mobility limitations before arrival.
                           </p>
                         </div>
@@ -1139,10 +1139,10 @@ export default function ProfileSettings() {
 
                       <label className="flex items-start justify-between rounded-xl border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition">
                         <div className="pr-4">
-                          <p className="text-xs font-semibold text-[#173d5b]">
+                          <p className="text-sm font-semibold text-[#173d5b]">
                             Allow verified volunteer groups to contact regarding relief supplies
                           </p>
-                          <p className="text-[10px] text-slate-500 mt-0.5">
+                          <p className="text-[13px] text-slate-500 mt-0.5">
                             Authorized grassroots NGOs and Red Cross community teams may coordinate grocery and clean water drop-offs.
                           </p>
                         </div>
@@ -1158,10 +1158,10 @@ export default function ProfileSettings() {
 
                       <label className="flex items-start justify-between rounded-xl border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 transition">
                         <div className="pr-4">
-                          <p className="text-xs font-semibold text-[#173d5b]">
+                          <p className="text-sm font-semibold text-[#173d5b]">
                             Anonymized data analytics for regional disaster mitigation
                           </p>
-                          <p className="text-[10px] text-slate-500 mt-0.5">
+                          <p className="text-[13px] text-slate-500 mt-0.5">
                             Permits aggregate statistics (e.g. ward supply demand) to improve future district flood defences.
                           </p>
                         </div>
@@ -1179,17 +1179,17 @@ export default function ProfileSettings() {
                     {/* Export / Download archive */}
                     <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
                       <div>
-                        <h4 className="text-xs font-bold text-[#173d5b]">
+                        <h4 className="text-sm font-bold text-[#173d5b]">
                           Download personal data record
                         </h4>
-                        <p className="text-[10px] text-slate-500 mt-0.5">
+                        <p className="text-[13px] text-slate-500 mt-0.5">
                           Download a copy of your verified CareLink citizen identity, contact, and settings in JSON format.
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={handleExportData}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-[#173d5b] hover:bg-slate-100 shadow-sm"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-[#173d5b] hover:bg-slate-100 shadow-sm"
                       >
                         <Download size={14} className="text-[#287da6]" />
                         Export Data (JSON)
@@ -1209,7 +1209,7 @@ export default function ProfileSettings() {
                         Manage login credentials, multi-factor verification, and active login sessions.
                       </p>
                     </div>
-                    <span className="rounded-lg bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700">
+                    <span className="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">
                       2FA Active
                     </span>
                   </div>
@@ -1222,10 +1222,10 @@ export default function ProfileSettings() {
                           <Smartphone size={20} />
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-[#173d5b]">
+                          <p className="text-sm font-bold text-[#173d5b]">
                             Two-Factor Authentication (2FA)
                           </p>
-                          <p className="text-[10px] text-slate-500 mt-0.5">
+                          <p className="text-[13px] text-slate-500 mt-0.5">
                             Require SMS OTP code verification when signing in from an unrecognised device.
                           </p>
                         </div>
@@ -1234,7 +1234,7 @@ export default function ProfileSettings() {
                       <button
                         type="button"
                         onClick={handleToggle2FA}
-                        className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                        className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
                           profile.twoFactorEnabled
                             ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
                             : "bg-slate-200 text-slate-700 hover:bg-slate-300"
@@ -1247,11 +1247,11 @@ export default function ProfileSettings() {
 
                   {/* CHANGE PASSWORD FORM */}
                   <div className="mt-6 max-w-xl">
-                    <h4 className="text-xs font-bold text-[#173d5b] flex items-center gap-2">
+                    <h4 className="text-sm font-bold text-[#173d5b] flex items-center gap-2">
                       <KeyRound size={15} className="text-[#287da6]" />
                       Change Account Password
                     </h4>
-                    <p className="text-[10px] text-slate-500 mt-1 mb-4">
+                    <p className="text-[13px] text-slate-500 mt-1 mb-4">
                       Use at least 6 characters including numbers and letters.
                     </p>
 
@@ -1350,7 +1350,7 @@ export default function ProfileSettings() {
                       <button
                         type="submit"
                         disabled={passwordSaving}
-                        className="rounded-lg bg-[#287da6] px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-[#1f6486] disabled:opacity-60 transition"
+                        className="rounded-lg bg-[#287da6] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1f6486] disabled:opacity-60 transition"
                       >
                         {passwordSaving ? "Updating Password..." : "Update Password"}
                       </button>
@@ -1359,7 +1359,7 @@ export default function ProfileSettings() {
 
                   {/* ACTIVE SESSIONS LIST */}
                   <div className="mt-8 border-t border-slate-100 pt-6">
-                    <h4 className="text-xs font-bold text-[#173d5b] mb-3">
+                    <h4 className="text-sm font-bold text-[#173d5b] mb-3">
                       Active Login Sessions
                     </h4>
                     <div className="space-y-3">
@@ -1380,16 +1380,16 @@ export default function ProfileSettings() {
                               </div>
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <p className="text-xs font-semibold text-[#173d5b]">
+                                  <p className="text-sm font-semibold text-[#173d5b]">
                                     {session.device}
                                   </p>
                                   {session.isCurrent && (
-                                    <span className="rounded bg-emerald-100 px-1.5 py-0.2 text-[9px] font-semibold text-emerald-800">
+                                    <span className="rounded bg-emerald-100 px-1.5 py-0.2 text-xs font-semibold text-emerald-800">
                                       This Device
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-[10px] text-slate-400">
+                                <p className="text-[13px] text-slate-400">
                                   {session.location} • Last active: {session.lastActive}
                                 </p>
                               </div>
@@ -1407,7 +1407,7 @@ export default function ProfileSettings() {
                                   }));
                                   setHasChanges(true);
                                 }}
-                                className="text-[11px] font-medium text-red-500 hover:text-red-700"
+                                className="text-sm font-medium text-red-500 hover:text-red-700"
                               >
                                 Revoke
                               </button>

@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface PartnerReport {
   id: string;
   title: string;
@@ -229,7 +230,7 @@ class PartnerReportService {
       if (filters?.status && filters.status !== "All statuses") params.append("status", filters.status);
 
       const url = params.toString() ? `${API_BASE_URL}?${params.toString()}` : API_BASE_URL;
-      const res = await fetch(url);
+      const res = await authFetch(url);
       if (!res.ok) {
         throw new Error(`Failed to fetch partner reports: ${res.statusText}`);
       }
@@ -267,7 +268,7 @@ class PartnerReportService {
 
   public async getAnalytics(): Promise<PartnerReportsAnalytics> {
     try {
-      const res = await fetch(`${API_BASE_URL}/analytics`);
+      const res = await authFetch(`${API_BASE_URL}/analytics`);
       if (!res.ok) {
         throw new Error(`Failed to fetch reports analytics: ${res.statusText}`);
       }
@@ -279,7 +280,7 @@ class PartnerReportService {
 
   public async getById(id: string): Promise<PartnerReport | null> {
     try {
-      const res = await fetch(`${API_BASE_URL}/${encodeURIComponent(id)}`);
+      const res = await authFetch(`${API_BASE_URL}/${encodeURIComponent(id)}`);
       if (!res.ok) {
         if (res.status === 404) return null;
         throw new Error(`Failed to fetch report ${id}`);
@@ -292,7 +293,7 @@ class PartnerReportService {
 
   public async create(payload: CreatePartnerReportPayload): Promise<PartnerReport> {
     try {
-      const res = await fetch(API_BASE_URL, {
+      const res = await authFetch(API_BASE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -322,7 +323,7 @@ class PartnerReportService {
 
   public async update(id: string, payload: UpdatePartnerReportPayload): Promise<PartnerReport> {
     try {
-      const res = await fetch(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -347,7 +348,7 @@ class PartnerReportService {
 
   public async updateStatus(id: string, status: string): Promise<PartnerReport> {
     try {
-      const res = await fetch(`${API_BASE_URL}/${encodeURIComponent(id)}/status`, {
+      const res = await authFetch(`${API_BASE_URL}/${encodeURIComponent(id)}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -372,7 +373,7 @@ class PartnerReportService {
 
   public async delete(id: string): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
+      const res = await authFetch(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
         method: "DELETE",
       });
       return res.ok;
@@ -388,7 +389,7 @@ class PartnerReportService {
 
   public async reset(): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE_URL}/reset`, {
+      const res = await authFetch(`${API_BASE_URL}/reset`, {
         method: "POST",
       });
       return res.ok;

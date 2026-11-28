@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 /**
  * Partner Organisations Service
  * Connects the Emergency Coordinator Partner Organisations view to the CareLink .NET backend.
@@ -300,7 +301,7 @@ export const partnerOrganisationService = {
         }
       }
 
-      const response = await fetch(url.toString(), {
+      const response = await authFetch(url.toString(), {
         headers: { Accept: "application/json" },
       });
 
@@ -339,7 +340,7 @@ export const partnerOrganisationService = {
 
   async getMetrics(): Promise<PartnerOrganisationsMetrics> {
     try {
-      const response = await fetch(`${ENDPOINT}/metrics`, {
+      const response = await authFetch(`${ENDPOINT}/metrics`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -354,7 +355,7 @@ export const partnerOrganisationService = {
 
   async getById(id: string): Promise<PartnerOrganisation> {
     try {
-      const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+      const response = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -369,7 +370,7 @@ export const partnerOrganisationService = {
   },
 
   async invitePartner(payload: CreatePartnerPayload): Promise<PartnerOrganisation> {
-    const response = await fetch(ENDPOINT, {
+    const response = await authFetch(ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -391,7 +392,7 @@ export const partnerOrganisationService = {
   },
 
   async update(id: string, payload: UpdatePartnerPayload): Promise<PartnerOrganisation> {
-    const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -414,7 +415,7 @@ export const partnerOrganisationService = {
     id: string,
     status: "Active" | "Inactive"
   ): Promise<PartnerOrganisation> {
-    const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}/status`, {
+    const response = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -437,7 +438,7 @@ export const partnerOrganisationService = {
     id: string,
     verification: "Verified" | "Pending" | "Rejected"
   ): Promise<PartnerOrganisation> {
-    const response = await fetch(
+    const response = await authFetch(
       `${ENDPOINT}/${encodeURIComponent(id)}/verification`,
       {
         method: "PATCH",
@@ -460,7 +461,7 @@ export const partnerOrganisationService = {
   },
 
   async delete(id: string): Promise<boolean> {
-    const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
       method: "DELETE",
     });
 
@@ -472,7 +473,7 @@ export const partnerOrganisationService = {
   },
 
   async reset(): Promise<void> {
-    const response = await fetch(`${ENDPOINT}/reset`, {
+    const response = await authFetch(`${ENDPOINT}/reset`, {
       method: "POST",
     });
     if (!response.ok) {

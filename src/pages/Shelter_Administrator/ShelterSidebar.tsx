@@ -1,4 +1,6 @@
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   HeartPulse,
   LayoutDashboard,
@@ -14,13 +16,18 @@ import {
   Megaphone,
   Bell,
   Settings,
-  ChevronRight,
+  LogOut,
   X,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
 } from "lucide-react";
-
 import type { LucideIcon } from "lucide-react";
+import { SIDEBAR_THEME, getUserInitials } from "../../constants/layoutTheme";
+import { CareLinkLogo } from "../../components/common/CareLinkLogo";
 
 interface AdminSidebarProps {
+  open?: boolean;
   onClose?: () => void;
 }
 
@@ -32,119 +39,266 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { name: "Dashboard", path: "/shelter-admin/dashboard", icon: LayoutDashboard },
-  { name: "Shelter Management", path: "/shelter-admin/shelters", icon: Building2 },
-  { name: "Occupancy Management", path: "/shelter-admin/occupancy", icon: ChartNoAxesColumn },
-  { name: "Accommodation Requests", path: "/shelter-admin/requests", icon: ClipboardList, badge: "12" },
-  { name: "Resident Management", path: "/shelter-admin/residents", icon: Users },
-  { name: "Room & Bed Management", path: "/shelter-admin/rooms", icon: BedDouble },
-  { name: "Resource & Inventory", path: "/shelter-admin/resources", icon: Package, badge: "5" },
+  {
+    name: "Dashboard",
+    path: "/shelter-admin/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    name: "Shelter Management",
+    path: "/shelter-admin/shelters",
+    icon: Building2,
+  },
+  {
+    name: "Occupancy Management",
+    path: "/shelter-admin/occupancy",
+    icon: ChartNoAxesColumn,
+  },
+  {
+    name: "Accommodation Requests",
+    path: "/shelter-admin/requests",
+    icon: ClipboardList,
+    badge: "12",
+  },
+  {
+    name: "Resident Management",
+    path: "/shelter-admin/residents",
+    icon: Users,
+  },
+  {
+    name: "Room & Bed Management",
+    path: "/shelter-admin/rooms",
+    icon: BedDouble,
+  },
+  {
+    name: "Resource & Inventory",
+    path: "/shelter-admin/resources",
+    icon: Package,
+    badge: "5",
+  },
   { name: "Staff Management", path: "/shelter-admin/staff", icon: UserRound },
-  { name: "Health & Safety", path: "/shelter-admin/health-safety", icon: HeartPulse },
-  { name: "Maintenance & Incidents", path: "/shelter-admin/maintenance", icon: Wrench, badge: "3" },
-  { name: "Reports & Analytics", path: "/shelter-admin/reports", icon: FileBarChart },
-  { name: "Disaster Updates", path: "/shelter-admin/disaster-updates", icon: Megaphone },
-  { name: "Notifications", path: "/shelter-admin/notifications", icon: Bell, badge: "8" },
+  {
+    name: "Health & Safety",
+    path: "/shelter-admin/health-safety",
+    icon: HeartPulse,
+  },
+  {
+    name: "Maintenance & Incidents",
+    path: "/shelter-admin/maintenance",
+    icon: Wrench,
+    badge: "3",
+  },
+  {
+    name: "Reports & Analytics",
+    path: "/shelter-admin/reports",
+    icon: FileBarChart,
+  },
+  {
+    name: "Disaster Updates",
+    path: "/shelter-admin/disaster-updates",
+    icon: Megaphone,
+  },
+  {
+    name: "Notifications",
+    path: "/shelter-admin/notifications",
+    icon: Bell,
+    badge: "8",
+  },
   { name: "Settings", path: "/shelter-admin/settings", icon: Settings },
 ];
 
-export default function AdminSidebar({ onClose }: AdminSidebarProps) {
+export default function AdminSidebar({
+  open = false,
+  onClose,
+}: AdminSidebarProps) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+  const [sectionOpen, setSectionOpen] = useState(true);
+
+  const displayName = user?.fullName || "Sanjana Amarasinghe";
+  const initials = getUserInitials(displayName, "SA");
+
   return (
-    <aside className="flex h-full w-[222px] shrink-0 flex-col bg-[#153f5e] text-white">
-      {/* LOGO */}
-      <div className="mx-4 flex h-[64px] shrink-0 items-center gap-3 border-b border-white/10">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#49bea7] text-[#123d5b]">
-          <HeartPulse size={23} />
-        </div>
-
-        <div>
-          <h1 className="text-[17px] font-bold">CareLink</h1>
-          <p className="text-[9px] text-blue-200">Shelter Operations</p>
-        </div>
-
+    <>
+      {open && (
         <button
           type="button"
-          onClick={onClose}
-          className="ml-auto lg:hidden"
           aria-label="Close sidebar"
-        >
-          <X size={19} />
-        </button>
-      </div>
+          onClick={onClose}
+          className={SIDEBAR_THEME.overlay}
+        />
+      )}
 
-      {/* ACTIVE OPERATION */}
-      <div className="mx-4 mt-3 shrink-0 rounded-xl border border-white/10 bg-white/10 p-3">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#49d4a8]" />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-[#70d9c2]">
-            Active Operation
-          </span>
+      <aside
+        className={`${SIDEBAR_THEME.asideBase} ${
+          collapsed ? SIDEBAR_THEME.widthCollapsed : SIDEBAR_THEME.widthExpanded
+        } h-full lg:static lg:h-screen lg:shrink-0 lg:translate-x-0 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* BRAND HEADER */}
+        <div className={SIDEBAR_THEME.header}>
+          <NavLink
+            to="/shelter-admin/dashboard"
+            onClick={onClose}
+            className="flex min-w-0 items-center gap-3 transition hover:opacity-90"
+          >
+            <CareLinkLogo size={collapsed ? "compact" : "sidebar"} />
+
+            {!collapsed && (
+              <div className="min-w-0">
+                <h1 className={SIDEBAR_THEME.brandTitle}>CareLink</h1>
+                <p className={SIDEBAR_THEME.brandSubtitle}>
+                  Connecting Help. Saving Lives.
+                </p>
+              </div>
+            )}
+          </NavLink>
+
+          <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            className={SIDEBAR_THEME.collapseBtn}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          </button>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className={SIDEBAR_THEME.mobileCloseBtn}
+            aria-label="Close sidebar"
+          >
+            <X size={18} />
+          </button>
         </div>
 
-        <h3 className="text-[11px] font-bold">Riverton Flood Response</h3>
-        <p className="mt-1 text-[9px] text-blue-200">
-          5 shelters · Greater Riverton
-        </p>
-      </div>
+        {/* ACTIVE OPERATION */}
+        {!collapsed && (
+          <div className={SIDEBAR_THEME.statusCardWrapper}>
+            <div className={SIDEBAR_THEME.statusCard}>
+              <div className={SIDEBAR_THEME.statusIndicatorRow}>
+                <div className="flex items-center gap-2">
+                  <span className={SIDEBAR_THEME.statusDot} />
+                  <span className={SIDEBAR_THEME.statusLabel}>
+                    ACTIVE OPERATION
+                  </span>
+                </div>
+              </div>
 
-      {/* SECTION TITLE */}
-      <div className="shrink-0 px-5 pb-2 pt-5">
-        <p className="text-[9px] font-bold uppercase tracking-[1px] text-blue-300/70">
-          Shelter Administration
-        </p>
-      </div>
+              <h3 className={SIDEBAR_THEME.statusTitle}>
+                Riverton Flood Response
+              </h3>
+              <p className={SIDEBAR_THEME.statusSubtitle}>
+                5 shelters · Greater Riverton
+              </p>
+            </div>
+          </div>
+        )}
 
-      {/* NAVIGATION - scrollbar hidden, scrolling remains enabled */}
-      <nav className="[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden min-h-0 flex-1 space-y-1 overflow-y-auto px-3 pb-4">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.name === "Dashboard"}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `group flex min-h-[39px] items-center gap-3 rounded-lg border-l-[3px] px-3 py-2 transition-all ${
-                  isActive
-                    ? "border-[#55d3b1] bg-[#23688e] text-white"
-                    : "border-transparent text-blue-100 hover:bg-white/10 hover:text-white"
-                }`
-              }
+        {/* NAVIGATION */}
+        <nav className={SIDEBAR_THEME.navScroll}>
+          {!collapsed && (
+            <button
+              type="button"
+              onClick={() => setSectionOpen((prev) => !prev)}
+              className={SIDEBAR_THEME.sectionHeadingBtn}
             >
-              <Icon size={16} strokeWidth={1.8} />
+              <span>SHELTER ADMINISTRATION</span>
+              <ChevronDown
+                size={12}
+                className={`transition-transform ${
+                  sectionOpen ? "rotate-0" : "-rotate-90"
+                }`}
+              />
+            </button>
+          )}
 
-              <span className="flex-1 text-[10px] font-medium">{item.name}</span>
+          {(sectionOpen || collapsed) && (
+            <div className={SIDEBAR_THEME.menuList}>
+              {navItems.map((item) => {
+                const Icon = item.icon;
 
-              {item.badge && (
-                <span className="flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
-                  {item.badge}
-                </span>
-              )}
-            </NavLink>
-          );
-        })}
-      </nav>
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    end={item.name === "Dashboard"}
+                    onClick={onClose}
+                    title={collapsed ? item.name : undefined}
+                    className={({ isActive }) =>
+                      `${SIDEBAR_THEME.menuItemBase} ${
+                        isActive
+                          ? SIDEBAR_THEME.menuItemActive
+                          : SIDEBAR_THEME.menuItemInactive
+                      } ${collapsed ? "justify-center px-0" : ""}`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <div className="flex min-w-0 items-center gap-3">
+                          <Icon
+                            size={17}
+                            strokeWidth={1.8}
+                            className={
+                              isActive
+                                ? SIDEBAR_THEME.iconActive
+                                : SIDEBAR_THEME.iconInactive
+                            }
+                          />
+                          {!collapsed && (
+                            <span className="truncate">{item.name}</span>
+                          )}
+                        </div>
 
-      {/* USER PROFILE */}
-      <div className="shrink-0 border-t border-white/10 p-3">
-        <button
-          type="button"
-          className="flex w-full items-center gap-2 rounded-lg p-1.5 text-left hover:bg-white/10"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#26749c] text-[10px] font-bold">
-            SA
+                        {!collapsed && item.badge && (
+                          <span className={SIDEBAR_THEME.badge}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </div>
+          )}
+        </nav>
+
+        {/* USER PROFILE FOOTER */}
+        <div className={SIDEBAR_THEME.footer}>
+          <div
+            className={`${SIDEBAR_THEME.profileRow} ${
+              collapsed ? "justify-center" : ""
+            }`}
+          >
+            <div className={SIDEBAR_THEME.avatar}>{initials}</div>
+
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className={SIDEBAR_THEME.userName}>{displayName}</p>
+                <p className={SIDEBAR_THEME.userRole}>Shelter Administrator</p>
+              </div>
+            )}
           </div>
 
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[10px] font-bold">Sanjana Amarasinghe</p>
-            <p className="text-[8px] text-blue-200">Shelter Administrator</p>
-          </div>
-
-          <ChevronRight size={15} />
-        </button>
-      </div>
-    </aside>
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              navigate("/login", { replace: true });
+            }}
+            title="Sign out"
+            className={SIDEBAR_THEME.signOutBtn}
+          >
+            <LogOut size={14} />
+            {!collapsed && <span>Sign out</span>}
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

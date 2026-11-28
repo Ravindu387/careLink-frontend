@@ -156,7 +156,7 @@ const statusColor: Record<DispatchStatus, string> = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-sky-500";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500";
 
 export default function DispatchTrackingPage() {
   const navigate = useNavigate();
@@ -498,21 +498,21 @@ export default function DispatchTrackingPage() {
             <Package size={23} />
           </div>
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">Resource Management</p>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">Resource Management</p>
           </div>
         </div>
 
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
-          <p className="mt-2 text-xs font-bold">Monsoon Floods 2025</p>
-          <p className="mt-1 text-[10px] text-sky-200">Greater Riverton · Level 4</p>
+          <p className="mt-2 text-sm font-bold">Monsoon Floods 2025</p>
+          <p className="mt-1 text-sm text-sky-200">Greater Riverton · Level 4</p>
         </div>
 
         <nav className="mt-5 flex-1 overflow-y-auto px-3">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -528,7 +528,7 @@ export default function DispatchTrackingPage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -537,7 +537,7 @@ export default function DispatchTrackingPage() {
                 <Icon size={17} />
                 <span className="flex-1">{item.label}</span>
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] text-white">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs text-white">
                     {item.count}
                   </span>
                 )}
@@ -551,8 +551,8 @@ export default function DispatchTrackingPage() {
             DP
           </div>
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">Resource Manager</p>
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">Resource Manager</p>
           </div>
           <ChevronRight size={18} />
         </div>
@@ -587,21 +587,21 @@ export default function DispatchTrackingPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
             {search && (
               <button onClick={() => setSearch("")} aria-label="Clear search">
                 <X size={14} className="text-slate-400 hover:text-slate-600" />
               </button>
             )}
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+            <span className="hidden rounded border bg-white px-2 py-1 text-xs text-slate-400 sm:block">
               ⌘ K
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Backend Connection Badge */}
-            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600">
+            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
               {isBackendConnected === true ? (
                 <>
                   <Wifi size={13} className="text-emerald-500" />
@@ -630,15 +630,15 @@ export default function DispatchTrackingPage() {
             </button>
 
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">Primary Hub</p>
-              <p className="text-[10px] font-bold">Central Logistics Hub</p>
+              <p className="text-xs uppercase text-slate-400">Primary Hub</p>
+              <p className="text-sm font-bold">Central Logistics Hub</p>
             </div>
             <button className="hidden rounded-lg border p-2.5 sm:block" aria-label="Security">
               <ShieldCheck size={18} />
             </button>
             <button className="relative rounded-lg border p-2.5" aria-label="Notifications">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -646,8 +646,8 @@ export default function DispatchTrackingPage() {
               DP
             </div>
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">Resource Manager</p>
+              <p className="text-sm font-bold">Daniel P.</p>
+              <p className="text-xs text-slate-400">Resource Manager</p>
             </div>
             <ChevronRight size={17} className="hidden sm:block" />
           </div>
@@ -655,7 +655,7 @@ export default function DispatchTrackingPage() {
 
         <div className="space-y-6 p-4 sm:p-6 lg:p-7">
           {/* HEADING */}
-          <div className="text-[10px] text-slate-400">
+          <div className="text-[13px] text-slate-400">
             Resource Operations <ChevronRight size={12} className="mx-1 inline" />
             <span className="font-semibold text-[#163d5c]">
               Dispatch & Tracking
@@ -674,13 +674,13 @@ export default function DispatchTrackingPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={exportCSV}
-                className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
+                className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
               >
                 <Download size={14} /> Export CSV
               </button>
               <button
                 onClick={() => setShowCreate(true)}
-                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
               >
                 <Plus size={15} /> Create Dispatch
               </button>
@@ -702,9 +702,9 @@ export default function DispatchTrackingPage() {
                     <Icon size={20} />
                   </div>
                   <div>
-                    <p className="text-[11px] text-slate-400">{card.label}</p>
+                    <p className="text-[13px] text-slate-400">{card.label}</p>
                     <p className="text-2xl font-bold text-slate-800">{card.value}</p>
-                    <p className="text-[10px] text-slate-400">{card.note}</p>
+                    <p className="text-[13px] text-slate-400">{card.note}</p>
                   </div>
                 </div>
               );
@@ -720,18 +720,18 @@ export default function DispatchTrackingPage() {
                   setActiveTab(tab);
                   setPage(1);
                 }}
-                className={`relative flex items-center gap-1.5 pb-3 text-xs font-medium transition ${
+                className={`relative flex items-center gap-1.5 pb-3 text-sm font-medium transition ${
                   activeTab === tab ? "font-bold text-sky-700" : "text-slate-500 hover:text-slate-700"
                 }`}
               >
                 {tab}
                 {tab === "All" && (
-                  <span className="rounded-full bg-sky-100 px-1.5 py-0.2 text-[10px] text-sky-800 font-semibold">
+                  <span className="rounded-full bg-sky-100 px-1.5 py-0.2 text-sm text-sky-800 font-semibold">
                     {dispatches.length}
                   </span>
                 )}
                 {tab === "Needs action" && (
-                  <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[10px] text-amber-800 font-semibold">
+                  <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-sm text-amber-800 font-semibold">
                     {needsActionCount}
                   </span>
                 )}
@@ -753,7 +753,7 @@ export default function DispatchTrackingPage() {
                   setPage(1);
                 }}
                 placeholder="Search dispatch, driver, vehicle..."
-                className="w-full py-2.5 text-xs outline-none"
+                className="w-full py-2.5 text-sm sm:text-[15px] outline-none"
               />
             </div>
 
@@ -806,7 +806,7 @@ export default function DispatchTrackingPage() {
 
             <button
               onClick={() => setShowMoreFilters(true)}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 text-xs font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 text-sm font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
             >
               <Filter size={14} /> More filters
             </button>
@@ -818,7 +818,7 @@ export default function DispatchTrackingPage() {
               activeTab !== "All") && (
               <button
                 onClick={resetFilters}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-200 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 transition"
               >
                 <RotateCcw size={13} /> Reset
               </button>
@@ -829,7 +829,7 @@ export default function DispatchTrackingPage() {
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1050px] text-left">
-                <thead className="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-wider">
+                <thead className="bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wider">
                   <tr>
                     <th className="px-4 py-3.5 font-semibold">Dispatch ID</th>
                     <th className="px-4 py-3.5 font-semibold">Route</th>
@@ -847,7 +847,7 @@ export default function DispatchTrackingPage() {
                   {visible.map((d) => (
                     <tr
                       key={d.id}
-                      className="border-t border-slate-100 text-xs hover:bg-slate-50/80 transition"
+                      className="border-t border-slate-100 text-sm hover:bg-slate-50/80 transition"
                     >
                       <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-800">
                         {d.id}
@@ -875,7 +875,7 @@ export default function DispatchTrackingPage() {
                       </td>
                       <td className="whitespace-nowrap px-4 py-3.5">
                         <span
-                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusColor[d.status]}`}
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusColor[d.status]}`}
                         >
                           {d.status}
                         </span>
@@ -910,7 +910,7 @@ export default function DispatchTrackingPage() {
 
             {/* PAGINATION */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 text-xs">
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[13px] text-slate-500">
                 Showing{" "}
                 <span className="font-semibold text-slate-700">
                   {filtered.length ? (currentPage - 1) * pageSize + 1 : 0}
@@ -929,7 +929,7 @@ export default function DispatchTrackingPage() {
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
                 >
                   Previous
                 </button>
@@ -949,7 +949,7 @@ export default function DispatchTrackingPage() {
                 <button
                   disabled={currentPage === pages}
                   onClick={() => setPage((p) => Math.min(pages, p + 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
                 >
                   Next
                 </button>
@@ -969,7 +969,7 @@ export default function DispatchTrackingPage() {
             <div className="flex items-center justify-between border-b pb-3">
               <div>
                 <h3 className="text-lg font-bold text-slate-800">Create Dispatch</h3>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[13px] text-slate-400">
                   Dispatch relief items to shelter, medical facility, or distribution point
                 </p>
               </div>
@@ -1114,13 +1114,13 @@ export default function DispatchTrackingPage() {
               <button
                 type="button"
                 onClick={() => setShowCreate(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-[#287ba5] px-4 py-2 text-xs font-bold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-4 py-2 text-sm font-bold text-white hover:bg-[#1c668d]"
               >
                 Create Dispatch
               </button>
@@ -1136,7 +1136,7 @@ export default function DispatchTrackingPage() {
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-800">Dispatch Details</h3>
-                <p className="mt-0.5 font-mono text-xs text-[#287ba5]">{selected.id}</p>
+                <p className="mt-0.5 font-mono text-sm text-[#287ba5]">{selected.id}</p>
               </div>
               <button
                 onClick={() => setSelected(null)}
@@ -1150,13 +1150,13 @@ export default function DispatchTrackingPage() {
               <div className="flex items-center justify-between">
                 <span className="font-bold text-slate-800">{selected.route}</span>
                 <span
-                  className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusColor[selected.status]}`}
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusColor[selected.status]}`}
                 >
                   {selected.status}
                 </span>
               </div>
               {selected.currentLocation && (
-                <p className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-600">
+                <p className="mt-2 flex items-center gap-1.5 text-sm text-slate-600">
                   <MapPin size={13} className="text-sky-600 shrink-0" />
                   <span>Current: {selected.currentLocation}</span>
                 </p>
@@ -1165,69 +1165,69 @@ export default function DispatchTrackingPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Resource</p>
+                <p className="text-[13px] text-slate-400">Resource</p>
                 <p className="font-bold text-slate-800 mt-0.5">{selected.resource}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Quantity</p>
+                <p className="text-[13px] text-slate-400">Quantity</p>
                 <p className="font-bold text-slate-800 mt-0.5">{selected.quantity}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Vehicle</p>
+                <p className="text-[13px] text-slate-400">Vehicle</p>
                 <p className="font-semibold text-slate-700 mt-0.5">{selected.vehicle}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Driver</p>
+                <p className="text-[13px] text-slate-400">Driver</p>
                 <p className="font-semibold text-slate-700 mt-0.5">{selected.driver}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Departed</p>
+                <p className="text-[13px] text-slate-400">Departed</p>
                 <p className="font-semibold text-slate-700 mt-0.5">{selected.departed}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">ETA</p>
+                <p className="text-[13px] text-slate-400">ETA</p>
                 <p className="font-semibold text-slate-700 mt-0.5">{selected.eta}</p>
               </div>
             </div>
 
             {selected.notes && (
               <div className="mt-2 rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Notes</p>
+                <p className="text-[13px] text-slate-400">Notes</p>
                 <p className="font-medium text-slate-700 mt-0.5">{selected.notes}</p>
               </div>
             )}
 
             {/* QUICK STATUS UPDATE ACTIONS */}
             <div className="mt-4 border-t pt-3">
-              <p className="text-[11px] font-semibold text-slate-600 mb-2">
+              <p className="text-sm font-semibold text-slate-600 mb-2">
                 Update Tracking Status:
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   disabled={actionInProgress === selected.id || selected.status === "In Transit"}
                   onClick={() => handleUpdateStatus(selected.id, "In Transit")}
-                  className="rounded-lg border border-sky-200 bg-sky-50 py-1.5 text-center text-xs font-semibold text-sky-700 hover:bg-sky-100 disabled:opacity-40"
+                  className="rounded-lg border border-sky-200 bg-sky-50 py-1.5 text-center text-sm font-semibold text-sky-700 hover:bg-sky-100 disabled:opacity-40"
                 >
                   Mark In Transit
                 </button>
                 <button
                   disabled={actionInProgress === selected.id || selected.status === "Delayed"}
                   onClick={() => handleUpdateStatus(selected.id, "Delayed")}
-                  className="rounded-lg border border-amber-200 bg-amber-50 py-1.5 text-center text-xs font-semibold text-amber-700 hover:bg-amber-100 disabled:opacity-40"
+                  className="rounded-lg border border-amber-200 bg-amber-50 py-1.5 text-center text-sm font-semibold text-amber-700 hover:bg-amber-100 disabled:opacity-40"
                 >
                   Mark Delayed
                 </button>
                 <button
                   disabled={actionInProgress === selected.id || selected.status === "Delivered"}
                   onClick={() => handleUpdateStatus(selected.id, "Delivered")}
-                  className="rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-center text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                  className="rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-center text-sm font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
                 >
                   Mark Delivered
                 </button>
                 <button
                   disabled={actionInProgress === selected.id}
                   onClick={() => handleDeleteDispatch(selected.id)}
-                  className="flex items-center justify-center gap-1 rounded-lg border border-rose-200 bg-rose-50 py-1.5 text-center text-xs font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-40"
+                  className="flex items-center justify-center gap-1 rounded-lg border border-rose-200 bg-rose-50 py-1.5 text-center text-sm font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-40"
                 >
                   <Trash2 size={13} /> Cancel
                 </button>
@@ -1236,7 +1236,7 @@ export default function DispatchTrackingPage() {
 
             <button
               onClick={() => setSelected(null)}
-              className="mt-4 w-full rounded-lg bg-[#287ba5] py-2.5 text-xs font-bold text-white hover:bg-[#1c668d] transition"
+              className="mt-4 w-full rounded-lg bg-[#287ba5] py-2.5 text-sm font-bold text-white hover:bg-[#1c668d] transition"
             >
               Close
             </button>
@@ -1316,7 +1316,7 @@ export default function DispatchTrackingPage() {
                   resetFilters();
                   setShowMoreFilters(false);
                 }}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 <RotateCcw size={13} /> Reset
               </button>
@@ -1325,7 +1325,7 @@ export default function DispatchTrackingPage() {
                   setPage(1);
                   setShowMoreFilters(false);
                 }}
-                className="rounded-lg bg-[#287ba5] px-5 py-2 text-xs font-semibold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1c668d]"
               >
                 Apply Filters
               </button>

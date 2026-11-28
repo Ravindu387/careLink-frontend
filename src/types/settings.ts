@@ -52,6 +52,8 @@ export interface UpdateSettingsPayload {
   dispatch?: DispatchPreferencesSettings;
   notifications?: NotificationPreferencesSettings;
   security?: SecuritySettings;
+}
+
 export interface SystemSettings {
   platformName: string;
   language: string;

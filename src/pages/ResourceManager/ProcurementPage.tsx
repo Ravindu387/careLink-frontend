@@ -143,7 +143,7 @@ const statusStyles: Record<OrderStatus, string> = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-sky-500";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500";
 
 export default function ProcurementPage() {
   const navigate = useNavigate();
@@ -468,21 +468,21 @@ export default function ProcurementPage() {
             <Package size={23} />
           </div>
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">Resource Management</p>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">Resource Management</p>
           </div>
         </div>
 
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
-          <p className="mt-2 text-xs font-bold">Monsoon Floods 2025</p>
-          <p className="mt-1 text-[10px] text-sky-200">Greater Riverton · Level 4</p>
+          <p className="mt-2 text-sm font-bold">Monsoon Floods 2025</p>
+          <p className="mt-1 text-sm text-sky-200">Greater Riverton · Level 4</p>
         </div>
 
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -499,7 +499,7 @@ export default function ProcurementPage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -508,7 +508,7 @@ export default function ProcurementPage() {
                 <Icon size={17} />
                 <span className="flex-1">{item.label}</span>
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px]">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs">
                     {item.count}
                   </span>
                 )}
@@ -522,8 +522,8 @@ export default function ProcurementPage() {
             DP
           </div>
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">Resource Manager</p>
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">Resource Manager</p>
           </div>
           <ChevronRight size={18} />
         </div>
@@ -558,21 +558,21 @@ export default function ProcurementPage() {
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
             {search && (
               <button onClick={() => setSearch("")} aria-label="Clear search">
                 <X size={14} className="text-slate-400 hover:text-slate-600" />
               </button>
             )}
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+            <span className="hidden rounded border bg-white px-2 py-1 text-xs text-slate-400 sm:block">
               ⌘ K
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Backend Connection Badge */}
-            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600">
+            <div className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
               {isBackendConnected === true ? (
                 <>
                   <Wifi size={13} className="text-emerald-500" />
@@ -601,8 +601,8 @@ export default function ProcurementPage() {
             </button>
 
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">Primary Hub</p>
-              <p className="text-[10px] font-bold">Central Logistics Hub</p>
+              <p className="text-xs uppercase text-slate-400">Primary Hub</p>
+              <p className="text-sm font-bold">Central Logistics Hub</p>
             </div>
 
             <button className="hidden rounded-lg border p-2.5 sm:block" aria-label="Security">
@@ -611,7 +611,7 @@ export default function ProcurementPage() {
 
             <button className="relative rounded-lg border p-2.5" aria-label="Notifications">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -621,8 +621,8 @@ export default function ProcurementPage() {
             </div>
 
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">Resource Manager</p>
+              <p className="text-sm font-bold">Daniel P.</p>
+              <p className="text-xs text-slate-400">Resource Manager</p>
             </div>
 
             <ChevronRight size={17} className="hidden sm:block" />
@@ -632,7 +632,7 @@ export default function ProcurementPage() {
         {/* PAGE CONTENT */}
         <div className="space-y-6 p-4 sm:p-6 lg:p-7">
           {/* BREADCRUMB */}
-          <div className="text-[10px] text-slate-400">
+          <div className="text-[13px] text-slate-400">
             Resource Operations <ChevronRight size={12} className="mx-1 inline" />
             <span className="font-semibold text-[#163d5c]">Procurement</span>
           </div>
@@ -649,14 +649,14 @@ export default function ProcurementPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleExport}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
               >
                 <Download size={14} /> Export CSV
               </button>
 
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
+                className="flex items-center gap-1.5 rounded-lg bg-[#287ba5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d] shadow-sm transition"
               >
                 <Plus size={15} /> Create Purchase Order
               </button>
@@ -680,9 +680,9 @@ export default function ProcurementPage() {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">{card.title}</p>
+                    <p className="text-[13px] text-slate-400">{card.title}</p>
                     <h3 className="text-2xl font-bold text-slate-800">{card.value}</h3>
-                    <p className="text-[10px] text-slate-400">{card.note}</p>
+                    <p className="text-[13px] text-slate-400">{card.note}</p>
                   </div>
                 </div>
               );
@@ -699,7 +699,7 @@ export default function ProcurementPage() {
                     setActiveTab(tab);
                     setCurrentPage(1);
                   }}
-                  className={`relative flex items-center gap-1.5 pb-3 text-xs font-medium transition ${
+                  className={`relative flex items-center gap-1.5 pb-3 text-sm font-medium transition ${
                     activeTab === tab
                       ? "font-bold text-sky-700"
                       : "text-slate-500 hover:text-slate-700"
@@ -708,13 +708,13 @@ export default function ProcurementPage() {
                   {tab}
 
                   {tab === "All" && (
-                    <span className="rounded-full bg-sky-100 px-1.5 py-0.2 text-[10px] text-sky-800 font-semibold">
+                    <span className="rounded-full bg-sky-100 px-1.5 py-0.2 text-sm text-sky-800 font-semibold">
                       {orders.length}
                     </span>
                   )}
 
                   {tab === "Needs action" && (
-                    <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[10px] text-amber-800 font-semibold">
+                    <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-sm text-amber-800 font-semibold">
                       {needsActionCount}
                     </span>
                   )}
@@ -738,7 +738,7 @@ export default function ProcurementPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search procurement by PO, supplier, item, value..."
-                className="w-full py-2.5 text-xs outline-none"
+                className="w-full py-2.5 text-sm sm:text-[15px] outline-none"
               />
             </div>
 
@@ -796,7 +796,7 @@ export default function ProcurementPage() {
 
             <button
               onClick={() => setShowMoreFilters(true)}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 text-xs font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 text-sm font-semibold text-sky-700 hover:bg-slate-50 shadow-sm"
             >
               <Filter size={14} /> More filters
             </button>
@@ -808,7 +808,7 @@ export default function ProcurementPage() {
               activeTab !== "All") && (
               <button
                 onClick={resetFilters}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-200 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 transition"
               >
                 <RotateCcw size={13} /> Reset
               </button>
@@ -819,7 +819,7 @@ export default function ProcurementPage() {
           <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[950px] text-left">
-                <thead className="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-wider">
+                <thead className="bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wider">
                   <tr>
                     <th className="px-4 py-3.5 font-semibold">Purchase Order</th>
                     <th className="px-4 py-3.5 font-semibold">Supplier</th>
@@ -837,7 +837,7 @@ export default function ProcurementPage() {
                   {displayedOrders.map((order) => (
                     <tr
                       key={order.id}
-                      className="border-t border-slate-100 text-xs hover:bg-slate-50/80 transition"
+                      className="border-t border-slate-100 text-sm hover:bg-slate-50/80 transition"
                     >
                       <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-800">
                         {order.id}
@@ -861,7 +861,7 @@ export default function ProcurementPage() {
 
                       <td className="px-4 py-3.5">
                         <span
-                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                             order.type === "Emergency"
                               ? "bg-amber-100 text-amber-800 border border-amber-200"
                               : "bg-slate-100 text-slate-700 border border-slate-200"
@@ -877,7 +877,7 @@ export default function ProcurementPage() {
 
                       <td className="px-4 py-3.5">
                         <span
-                          className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusStyles[order.status]}`}
+                          className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusStyles[order.status]}`}
                         >
                           {order.status}
                         </span>
@@ -912,7 +912,7 @@ export default function ProcurementPage() {
 
             {/* PAGINATION */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 text-xs">
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[13px] text-slate-500">
                 Showing{" "}
                 <span className="font-semibold text-slate-700">
                   {filteredOrders.length === 0 ? 0 : (safePage - 1) * pageSize + 1}
@@ -932,7 +932,7 @@ export default function ProcurementPage() {
                 <button
                   disabled={safePage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
                 >
                   Previous
                 </button>
@@ -954,7 +954,7 @@ export default function ProcurementPage() {
                 <button
                   disabled={safePage === totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40"
                 >
                   Next
                 </button>
@@ -976,7 +976,7 @@ export default function ProcurementPage() {
                 <h3 className="text-lg font-bold text-slate-800">
                   Create Purchase Order
                 </h3>
-                <p className="mt-0.5 text-[11px] text-slate-400">
+                <p className="mt-0.5 text-[13px] text-slate-400">
                   Procure essential goods from contracted vendors
                 </p>
               </div>
@@ -1092,14 +1092,14 @@ export default function ProcurementPage() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="rounded-lg bg-[#287ba5] px-4 py-2 text-xs font-bold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-4 py-2 text-sm font-bold text-white hover:bg-[#1c668d]"
               >
                 Create Purchase Order
               </button>
@@ -1117,7 +1117,7 @@ export default function ProcurementPage() {
                 <h3 className="text-lg font-bold text-slate-800">
                   Purchase Order Details
                 </h3>
-                <p className="mt-0.5 font-mono text-xs text-[#287ba5]">
+                <p className="mt-0.5 font-mono text-sm text-[#287ba5]">
                   {selectedOrder.id}
                 </p>
               </div>
@@ -1133,13 +1133,13 @@ export default function ProcurementPage() {
             <div className="mb-4 rounded-xl border border-sky-100 bg-sky-50/80 p-3.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">
+                  <span className="text-xs uppercase font-bold text-slate-400">
                     Supplier
                   </span>
                   <p className="font-bold text-slate-800">{selectedOrder.supplier}</p>
                 </div>
                 <span
-                  className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusStyles[selectedOrder.status]}`}
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusStyles[selectedOrder.status]}`}
                 >
                   {selectedOrder.status}
                 </span>
@@ -1148,27 +1148,27 @@ export default function ProcurementPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Items</p>
+                <p className="text-[13px] text-slate-400">Items</p>
                 <p className="font-bold text-slate-800 mt-0.5">{selectedOrder.items}</p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Quantity</p>
+                <p className="text-[13px] text-slate-400">Quantity</p>
                 <p className="font-bold text-slate-800 mt-0.5 font-mono">
                   {selectedOrder.quantity}
                 </p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Total Value</p>
+                <p className="text-[13px] text-slate-400">Total Value</p>
                 <p className="font-bold text-slate-900 mt-0.5 font-mono">
                   {selectedOrder.value}
                 </p>
               </div>
               <div className="rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Procurement Type</p>
+                <p className="text-[13px] text-slate-400">Procurement Type</p>
                 <p className="font-semibold text-slate-700 mt-0.5">{selectedOrder.type}</p>
               </div>
               <div className="col-span-2 rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Delivery Due</p>
+                <p className="text-[13px] text-slate-400">Delivery Due</p>
                 <p className="font-semibold text-slate-800 mt-0.5">
                   {selectedOrder.deliveryDue}
                 </p>
@@ -1177,42 +1177,42 @@ export default function ProcurementPage() {
 
             {selectedOrder.notes && (
               <div className="mt-2 rounded-lg bg-slate-50 p-2.5">
-                <p className="text-[10px] text-slate-400">Notes / Reasons</p>
+                <p className="text-[13px] text-slate-400">Notes / Reasons</p>
                 <p className="font-medium text-slate-700 mt-0.5">{selectedOrder.notes}</p>
               </div>
             )}
 
             {/* LIVE STATUS TRANSITIONS */}
             <div className="mt-4 border-t pt-3">
-              <p className="text-[11px] font-semibold text-slate-700 mb-2">
+              <p className="text-sm font-semibold text-slate-700 mb-2">
                 Order Status Actions:
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   disabled={actionInProgress === selectedOrder.id || selectedOrder.status === "Approved"}
                   onClick={() => handleUpdateStatus(selectedOrder.id, "Approved")}
-                  className="rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-center text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                  className="rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-center text-sm font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
                 >
                   Approve Order
                 </button>
                 <button
                   disabled={actionInProgress === selectedOrder.id || selectedOrder.status === "In Transit"}
                   onClick={() => handleUpdateStatus(selectedOrder.id, "In Transit")}
-                  className="rounded-lg border border-sky-200 bg-sky-50 py-1.5 text-center text-xs font-semibold text-sky-700 hover:bg-sky-100 disabled:opacity-40"
+                  className="rounded-lg border border-sky-200 bg-sky-50 py-1.5 text-center text-sm font-semibold text-sky-700 hover:bg-sky-100 disabled:opacity-40"
                 >
                   Mark In Transit
                 </button>
                 <button
                   disabled={actionInProgress === selectedOrder.id || selectedOrder.status === "Delivered"}
                   onClick={() => handleUpdateStatus(selectedOrder.id, "Delivered")}
-                  className="rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-center text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
+                  className="rounded-lg border border-emerald-200 bg-emerald-50 py-1.5 text-center text-sm font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-40"
                 >
                   Mark Delivered
                 </button>
                 <button
                   disabled={actionInProgress === selectedOrder.id || selectedOrder.status === "Rejected"}
                   onClick={() => handleUpdateStatus(selectedOrder.id, "Rejected")}
-                  className="rounded-lg border border-rose-200 bg-rose-50 py-1.5 text-center text-xs font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-40"
+                  className="rounded-lg border border-rose-200 bg-rose-50 py-1.5 text-center text-sm font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-40"
                 >
                   Reject Order
                 </button>
@@ -1223,14 +1223,14 @@ export default function ProcurementPage() {
               <button
                 disabled={actionInProgress === selectedOrder.id}
                 onClick={() => handleDeleteOrder(selectedOrder.id)}
-                className="flex items-center justify-center gap-1 rounded-lg border border-rose-200 bg-rose-50 py-2 px-3 text-xs font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-40"
+                className="flex items-center justify-center gap-1 rounded-lg border border-rose-200 bg-rose-50 py-2 px-3 text-sm font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-40"
               >
                 <Trash2 size={13} /> Cancel Order
               </button>
 
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="flex-1 rounded-lg bg-slate-100 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+                className="flex-1 rounded-lg bg-slate-100 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition"
               >
                 Close
               </button>
@@ -1316,7 +1316,7 @@ export default function ProcurementPage() {
                   resetFilters();
                   setShowMoreFilters(false);
                 }}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 <RotateCcw size={13} /> Reset
               </button>
@@ -1326,7 +1326,7 @@ export default function ProcurementPage() {
                   setCurrentPage(1);
                   setShowMoreFilters(false);
                 }}
-                className="rounded-lg bg-[#287ba5] px-5 py-2 text-xs font-semibold text-white hover:bg-[#1c668d]"
+                className="rounded-lg bg-[#287ba5] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1c668d]"
               >
                 Apply Filters
               </button>

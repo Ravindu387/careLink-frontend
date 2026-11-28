@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   VolunteerDashboardOverviewResponse,
   DashboardStatItem,
@@ -149,7 +149,7 @@ export const volunteerDashboardService = {
    */
   async exportSummary(): Promise<Blob> {
     try {
-      const res = await fetch(`${API_BASE_URL}/volunteer/dashboard/export`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer/dashboard/export`);
       if (res.ok) {
         return await res.blob();
       }

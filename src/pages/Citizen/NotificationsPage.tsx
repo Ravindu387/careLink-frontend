@@ -124,10 +124,10 @@ export default function NotificationsPage() {
         setSummary(sum);
       } catch {
         setSummary({
-          totalCount: data.length,
-          unreadCount: data.filter((n) => n.unread).length,
-          safetyAlertsCount: data.filter((n) => n.category === "Safety alerts").length,
-          myRequestsCount: data.filter((n) => n.category === "My requests").length,
+          totalCount: (data as any[]).length,
+          unreadCount: (data as any[]).filter((n: any) => n.unread).length,
+          safetyAlertsCount: (data as any[]).filter((n: any) => n.category === "Safety alerts").length,
+          myRequestsCount: (data as any[]).filter((n: any) => n.category === "My requests").length,
         });
       }
     } catch (err) {
@@ -325,7 +325,7 @@ export default function NotificationsPage() {
                 </h2>
 
                 {/* BACKEND STATUS BADGE */}
-                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] shadow-xs">
+                <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs shadow-xs">
                   {isBackendConnected === true ? (
                     <>
                       <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -356,7 +356,7 @@ export default function NotificationsPage() {
               <button
                 onClick={() => fetchNotifications()}
                 disabled={isRefreshing}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition"
                 title="Refresh notifications"
               >
                 <RefreshCw
@@ -369,7 +369,7 @@ export default function NotificationsPage() {
               <button
                 onClick={markAllAsRead}
                 disabled={unreadCount === 0}
-                className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-[#287da6] hover:bg-sky-50 disabled:opacity-50 transition shadow-xs"
+                className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-[#287da6] hover:bg-sky-50 disabled:opacity-50 transition shadow-xs"
               >
                 Mark all as read
               </button>
@@ -379,43 +379,43 @@ export default function NotificationsPage() {
           {/* KPI COUNTERS */}
           <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Total Updates
               </span>
               <p className="mt-1.5 text-xl font-bold text-[#173d5b]">
                 {summary.totalCount}
               </p>
-              <p className="text-[9px] text-slate-400">All notifications</p>
+              <p className="text-xs text-slate-400">All notifications</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
+              <span className="text-xs font-bold uppercase tracking-wider text-rose-600">
                 Unread Messages
               </span>
               <p className="mt-1.5 text-xl font-bold text-rose-600">
                 {unreadCount}
               </p>
-              <p className="text-[9px] text-slate-400">Awaiting your attention</p>
+              <p className="text-xs text-slate-400">Awaiting your attention</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
                 Safety Alerts
               </span>
               <p className="mt-1.5 text-xl font-bold text-amber-600">
                 {summary.safetyAlertsCount}
               </p>
-              <p className="text-[9px] text-slate-400">Hazard & shelter updates</p>
+              <p className="text-xs text-slate-400">Hazard & shelter updates</p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#287da6]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#287da6]">
                 My Requests
               </span>
               <p className="mt-1.5 text-xl font-bold text-[#287da6]">
                 {summary.myRequestsCount}
               </p>
-              <p className="text-[9px] text-slate-400">Dispatches & case notes</p>
+              <p className="text-xs text-slate-400">Dispatches & case notes</p>
             </div>
           </section>
 
@@ -430,7 +430,7 @@ export default function NotificationsPage() {
                     setActiveTab(tab.name);
                     setSelectedNotification(null);
                   }}
-                  className={`relative flex items-center gap-1.5 pb-2 text-xs font-semibold transition ${
+                  className={`relative flex items-center gap-1.5 pb-2 text-sm font-semibold transition ${
                     activeTab === tab.name
                       ? "text-[#287da6] font-bold"
                       : "text-slate-500 hover:text-[#287da6]"
@@ -440,7 +440,7 @@ export default function NotificationsPage() {
 
                   {tab.count !== null && (
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${
+                      className={`rounded-full px-2 py-0.5 text-xs font-bold ${
                         tab.name === "Unread" && unreadCount > 0
                           ? "bg-rose-100 text-rose-700"
                           : "bg-slate-100 text-slate-600"
@@ -467,7 +467,7 @@ export default function NotificationsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search notifications..."
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-7 text-xs outline-none focus:border-[#287da6] focus:bg-white"
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-7 text-sm sm:text-[15px] outline-none focus:border-[#287da6] focus:bg-white"
               />
               {search && (
                 <button
@@ -485,14 +485,14 @@ export default function NotificationsPage() {
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <RefreshCw size={28} className="animate-spin text-[#287da6]" />
-                <p className="mt-3 text-xs font-semibold text-slate-600">
+                <p className="mt-3 text-sm font-semibold text-slate-600">
                   Loading notifications...
                 </p>
               </div>
             ) : filteredNotifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center text-slate-500">
                 <Bell size={36} className="text-slate-300" />
-                <h3 className="mt-3 text-sm font-bold text-slate-700">
+                <h3 className="mt-3 text-base font-bold text-slate-700">
                   No notifications found
                 </h3>
                 <p className="mt-1 text-xs text-slate-400">
@@ -526,19 +526,19 @@ export default function NotificationsPage() {
                       {/* CONTENT */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="truncate text-xs font-bold text-[#173d5b] sm:text-sm">
+                          <h3 className="truncate text-base font-bold text-[#173d5b] sm:text-base">
                             {notification.title}
                           </h3>
-                          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[8px] font-semibold text-slate-500 uppercase">
+                          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-semibold text-slate-500 uppercase">
                             {notification.category}
                           </span>
                         </div>
 
-                        <p className="mt-0.5 truncate text-[11px] text-slate-500 sm:text-xs">
+                        <p className="mt-0.5 truncate text-[13px] text-slate-500 sm:text-xs">
                           {notification.description}
                         </p>
 
-                        <p className="mt-1 text-[9px] text-slate-400">
+                        <p className="mt-1 text-xs text-slate-400">
                           {notification.time}
                         </p>
                       </div>
@@ -577,10 +577,10 @@ export default function NotificationsPage() {
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-700">
+                  <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700">
                     Notification details
                   </span>
-                  <span className="text-[10px] text-slate-400">• {selectedNotification.category}</span>
+                  <span className="text-[13px] text-slate-400">• {selectedNotification.category}</span>
                 </div>
 
                 <button
@@ -609,11 +609,11 @@ export default function NotificationsPage() {
                     {selectedNotification.title}
                   </h4>
 
-                  <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
                     {selectedNotification.description}
                   </p>
 
-                  <p className="mt-2 text-[10px] text-slate-400">
+                  <p className="mt-2 text-[13px] text-slate-400">
                     Received {selectedNotification.time}
                   </p>
                 </div>
@@ -630,7 +630,7 @@ export default function NotificationsPage() {
                   {selectedNotification.actionUrl && (
                     <button
                       onClick={() => navigate(selectedNotification.actionUrl!)}
-                      className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#1e668e] transition"
+                      className="flex items-center gap-1.5 rounded-lg bg-[#287da6] px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-[#1e668e] transition"
                     >
                       <ExternalLink size={13} />
                       Open Related Page
@@ -639,7 +639,7 @@ export default function NotificationsPage() {
 
                   <button
                     onClick={() => handleDeleteNotification(selectedNotification.id)}
-                    className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-red-50 hover:text-red-600 transition"
+                    className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-red-50 hover:text-red-600 transition"
                   >
                     <Trash2 size={13} />
                     Dismiss
@@ -650,7 +650,7 @@ export default function NotificationsPage() {
           )}
 
           {/* FOOTER */}
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[10px] text-slate-400">
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-4 text-[13px] text-slate-400">
             <p>© 2026 ReliefOS Citizen Support · Notifications System</p>
             <p>Real-time civic alert dispatch</p>
           </footer>

@@ -293,22 +293,22 @@ export default function CrisisEvents() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-medium text-[#153f5e] sm:text-2xl">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
               Crisis Events
             </h1>
             {isLiveConnected ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold text-emerald-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Backend Live
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
                 <Activity size={10} />
                 Connecting...
               </span>
             )}
           </div>
-          <p className="mt-1 text-[10px] text-slate-500 sm:text-xs">
+          <p className="mt-1 text-[13px] text-slate-500 sm:text-xs">
             Create, monitor, and coordinate active humanitarian emergency operations.
           </p>
         </div>
@@ -317,7 +317,7 @@ export default function CrisisEvents() {
           <button
             onClick={handleManualRefresh}
             disabled={loading}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-[10px] font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
             title="Refresh events from server"
           >
             <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
@@ -326,7 +326,7 @@ export default function CrisisEvents() {
 
           <button
             onClick={handleResetData}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
             title="Reset data to baseline"
           >
             <RotateCcw size={12} />
@@ -335,7 +335,7 @@ export default function CrisisEvents() {
 
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-[10px] font-medium transition shadow-sm ${
+            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition shadow-sm ${
               showArchived
                 ? "border-sky-700 bg-sky-50 text-sky-800"
                 : "border-slate-300 bg-white text-sky-900 hover:bg-slate-50"
@@ -347,7 +347,7 @@ export default function CrisisEvents() {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-[10px] font-semibold text-white shadow-sm hover:bg-[#1e668b]"
+            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1e668b]"
           >
             <Plus size={14} />
             Create crisis event
@@ -360,11 +360,11 @@ export default function CrisisEvents() {
         <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
           <div className="flex items-center gap-2">
             <AlertTriangle size={16} />
-            <span className="text-[10px] font-medium">{error}</span>
+            <span className="text-sm font-medium">{error}</span>
           </div>
           <button
             onClick={handleManualRefresh}
-            className="rounded bg-red-600 px-2.5 py-1 text-[9px] font-semibold text-white hover:bg-red-700"
+            className="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
           >
             Retry Connection
           </button>
@@ -386,13 +386,13 @@ export default function CrisisEvents() {
               </div>
 
               <div className="min-w-0">
-                <p className="text-[9px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   {stat.title}
                 </p>
                 <h2 className="text-xl font-bold text-[#153f5e]">
                   {stat.value}
                 </h2>
-                <p className="text-[8px] text-slate-400">
+                <p className="text-xs text-slate-400">
                   {stat.description}
                 </p>
               </div>
@@ -409,7 +409,7 @@ export default function CrisisEvents() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search crisis name, operational area, or coordinator..."
-            className="w-full bg-transparent text-[10px] text-slate-700 outline-none placeholder:text-slate-400"
+            className="w-full bg-transparent text-sm sm:text-[15px] text-slate-700 outline-none placeholder:text-slate-400"
           />
           {search && (
             <button onClick={() => setSearch("")}>
@@ -422,7 +422,7 @@ export default function CrisisEvents() {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="min-w-0 rounded-lg border border-[#d6e5ec] bg-white px-2 py-2.5 text-[9px] text-slate-700 outline-none"
+            className="min-w-0 rounded-lg border border-[#d6e5ec] bg-white px-2 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none"
           >
             <option>All crisis types</option>
             <option>Flood</option>
@@ -434,7 +434,7 @@ export default function CrisisEvents() {
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="min-w-0 rounded-lg border border-[#d6e5ec] bg-white px-2 py-2.5 text-[9px] text-slate-700 outline-none"
+            className="min-w-0 rounded-lg border border-[#d6e5ec] bg-white px-2 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none"
           >
             <option>All severity levels</option>
             <option>Major</option>
@@ -446,7 +446,7 @@ export default function CrisisEvents() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="min-w-0 rounded-lg border border-[#d6e5ec] bg-white px-2 py-2.5 text-[9px] text-slate-700 outline-none"
+            className="min-w-0 rounded-lg border border-[#d6e5ec] bg-white px-2 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none"
           >
             <option>All statuses</option>
             <option>Active</option>
@@ -457,7 +457,7 @@ export default function CrisisEvents() {
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="min-w-0 rounded-lg border border-[#d6e5ec] bg-white px-2 py-2.5 text-[9px] text-slate-700 outline-none"
+            className="min-w-0 rounded-lg border border-[#d6e5ec] bg-white px-2 py-2.5 text-sm sm:text-[15px] text-slate-700 outline-none"
           >
             <option>Date range</option>
             <option>2025</option>
@@ -466,7 +466,7 @@ export default function CrisisEvents() {
 
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="col-span-2 flex items-center justify-center gap-2 rounded-lg border border-sky-600 bg-white px-3 py-2.5 text-[10px] font-medium text-sky-800 hover:bg-sky-50 sm:col-span-1"
+            className="col-span-2 flex items-center justify-center gap-2 rounded-lg border border-sky-600 bg-white px-3 py-2.5 text-sm font-medium text-sky-800 hover:bg-sky-50 sm:col-span-1"
           >
             <Filter size={13} />
             More filters
@@ -477,17 +477,17 @@ export default function CrisisEvents() {
       {showFilters && (
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d6e5ec] bg-white p-3">
           <div>
-            <p className="text-[10px] font-semibold text-sky-950">
+            <p className="text-sm font-semibold text-sky-950">
               Active filters
             </p>
-            <p className="mt-1 text-[9px] text-slate-400">
+            <p className="mt-1 text-xs text-slate-400">
               Filtering {filteredEvents.length} events matching query criteria.
             </p>
           </div>
 
           <button
             onClick={resetFilters}
-            className="text-[9px] font-medium text-sky-700 hover:underline"
+            className="text-sm font-medium text-sky-700 hover:underline"
           >
             Clear all filters
           </button>
@@ -514,7 +514,7 @@ export default function CrisisEvents() {
                 ].map((heading, index) => (
                   <th
                     key={index}
-                    className="whitespace-nowrap px-3 py-3 text-[8px] font-semibold text-slate-500"
+                    className="whitespace-nowrap px-3 py-3 text-[13px] font-semibold text-slate-500"
                   >
                     {heading}
                   </th>
@@ -537,32 +537,32 @@ export default function CrisisEvents() {
                     onClick={() => setSelectedEvent(event)}
                     className="cursor-pointer border-b border-slate-100 transition hover:bg-[#f0f6f8]"
                   >
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] font-semibold text-sky-950">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm font-semibold text-sky-950">
                       {event.id}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] font-medium text-sky-900">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm font-medium text-sky-900">
                       {event.name}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-600">
                       {event.type}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-600">
                       {event.severity}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-600">
                       {event.area}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-3.5 text-[9px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-3.5 text-sm text-slate-600">
                       {event.startDate}
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
-                      <span className={`rounded-md px-2 py-1 text-[8px] font-semibold ${
+                      <span className={`rounded-md px-2 py-1 text-xs font-semibold ${
                         event.status === "Active"
                           ? "bg-emerald-100 text-emerald-700"
                           : event.status === "Monitoring"
@@ -574,13 +574,13 @@ export default function CrisisEvents() {
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
-                      <span className="rounded-md bg-sky-100 px-2 py-1 text-[8px] font-semibold text-sky-700">
+                      <span className="rounded-md bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-700">
                         {event.requests}
                       </span>
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3.5">
-                      <span className="rounded-md bg-sky-100 px-2 py-1 text-[8px] font-medium text-sky-800">
+                      <span className="rounded-md bg-sky-100 px-2 py-1 text-xs font-medium text-sky-800">
                         {event.coordinator}
                       </span>
                     </td>
@@ -596,10 +596,10 @@ export default function CrisisEvents() {
                 <tr>
                   <td colSpan={10} className="py-14 text-center">
                     <Search size={25} className="mx-auto mb-2 text-slate-300" />
-                    <p className="text-xs font-medium text-slate-600">
+                    <p className="text-sm font-medium text-slate-600">
                       No crisis events found
                     </p>
-                    <p className="mt-1 text-[9px] text-slate-400">
+                    <p className="mt-1 text-xs text-slate-400">
                       Try changing your search or filters.
                     </p>
                   </td>
@@ -610,11 +610,11 @@ export default function CrisisEvents() {
         </div>
 
         <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3">
-          <p className="text-[9px] text-slate-500">
+          <p className="text-xs text-slate-500">
             Showing {filteredEvents.length} of {events.length} crisis events
           </p>
 
-          <span className="text-[9px] text-slate-400">
+          <span className="text-xs text-slate-400">
             Real-time emergency operations
           </span>
         </div>
@@ -629,10 +629,10 @@ export default function CrisisEvents() {
           >
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold text-sky-950">
+                <h2 className="text-lg sm:text-xl font-semibold text-sky-950">
                   Create crisis event
                 </h2>
-                <p className="mt-1 text-[9px] text-slate-500">
+                <p className="mt-1 text-xs text-slate-500">
                   Register a new humanitarian emergency in active operations.
                 </p>
               </div>
@@ -648,7 +648,7 @@ export default function CrisisEvents() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <label className="sm:col-span-2">
-                <span className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1.5 block text-sm font-medium text-slate-600">
                   Crisis name *
                 </span>
                 <input
@@ -656,18 +656,18 @@ export default function CrisisEvents() {
                   value={newEvent.name}
                   onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
                   placeholder="e.g. River Valley Flash Flood"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </label>
 
               <label>
-                <span className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1.5 block text-sm font-medium text-slate-600">
                   Crisis type
                 </span>
                 <select
                   value={newEvent.type}
                   onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
                 >
                   <option>Flood</option>
                   <option>Landslide</option>
@@ -679,13 +679,13 @@ export default function CrisisEvents() {
               </label>
 
               <label>
-                <span className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1.5 block text-sm font-medium text-slate-600">
                   Severity
                 </span>
                 <select
                   value={newEvent.severity}
                   onChange={(e) => setNewEvent({ ...newEvent, severity: e.target.value })}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
                 >
                   <option>Major · Level 4</option>
                   <option>Severe · Level 3</option>
@@ -695,7 +695,7 @@ export default function CrisisEvents() {
               </label>
 
               <label>
-                <span className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1.5 block text-sm font-medium text-slate-600">
                   Operational area *
                 </span>
                 <input
@@ -703,12 +703,12 @@ export default function CrisisEvents() {
                   value={newEvent.area}
                   onChange={(e) => setNewEvent({ ...newEvent, area: e.target.value })}
                   placeholder="e.g. Greater Riverton Basin"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </label>
 
               <label>
-                <span className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1.5 block text-sm font-medium text-slate-600">
                   Start date
                 </span>
                 <input
@@ -716,12 +716,12 @@ export default function CrisisEvents() {
                   type="date"
                   value={newEvent.startDate}
                   onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </label>
 
               <label className="sm:col-span-2">
-                <span className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1.5 block text-sm font-medium text-slate-600">
                   Assigned coordinator *
                 </span>
                 <input
@@ -729,12 +729,12 @@ export default function CrisisEvents() {
                   value={newEvent.coordinator}
                   onChange={(e) => setNewEvent({ ...newEvent, coordinator: e.target.value })}
                   placeholder="e.g. Amina Mensah"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-sky-500"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </label>
 
               <label className="sm:col-span-2">
-                <span className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                <span className="mb-1.5 block text-sm font-medium text-slate-600">
                   Situation Summary
                 </span>
                 <textarea
@@ -742,7 +742,7 @@ export default function CrisisEvents() {
                   onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                   placeholder="Brief summary of situational conditions and primary hazards..."
                   rows={2}
-                  className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500"
+                  className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </label>
             </div>
@@ -751,7 +751,7 @@ export default function CrisisEvents() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2.5 text-[10px] font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -759,7 +759,7 @@ export default function CrisisEvents() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-[10px] font-semibold text-white hover:bg-[#1e668b] disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1e668b] disabled:opacity-50"
               >
                 {submitting && <Loader2 size={12} className="animate-spin" />}
                 <Plus size={13} />
@@ -775,7 +775,7 @@ export default function CrisisEvents() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
           <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-sky-950">
+              <h2 className="text-lg sm:text-xl font-semibold text-sky-950">
                 Crisis event details
               </h2>
               <button onClick={() => setSelectedEvent(null)}>
@@ -783,7 +783,7 @@ export default function CrisisEvents() {
               </button>
             </div>
 
-            <p className="text-[9px] font-semibold text-sky-600">
+            <p className="text-xs font-semibold text-sky-600">
               {selectedEvent.id}
             </p>
 
@@ -792,7 +792,7 @@ export default function CrisisEvents() {
             </h3>
 
             {selectedEvent.description && (
-              <p className="mt-2 text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+              <p className="mt-2 text-sm text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                 {selectedEvent.description}
               </p>
             )}
@@ -808,8 +808,8 @@ export default function CrisisEvents() {
                 ["Coordinator", selectedEvent.coordinator],
               ].map(([label, value]) => (
                 <div key={label} className="flex justify-between gap-3 border-b border-slate-100 pb-1.5">
-                  <span className="text-[10px] text-slate-500">{label}</span>
-                  <span className="text-right text-[10px] font-medium text-sky-950">{value}</span>
+                  <span className="text-[13px] text-slate-500">{label}</span>
+                  <span className="text-right text-sm font-medium text-sky-950">{value}</span>
                 </div>
               ))}
             </div>
@@ -817,7 +817,7 @@ export default function CrisisEvents() {
             {/* Quick Status Change */}
             <div className="mt-4 rounded-lg bg-[#edf4f7] p-3 border border-sky-100">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold text-[#153f5e]">
+                <span className="text-sm font-semibold text-[#153f5e]">
                   Update Operational Status
                 </span>
                 {updatingStatus && <Loader2 size={11} className="animate-spin text-[#287da5]" />}
@@ -829,7 +829,7 @@ export default function CrisisEvents() {
                     key={st}
                     onClick={() => handleStatusChangeInModal(st)}
                     disabled={updatingStatus || selectedEvent.status === st}
-                    className={`flex-1 rounded px-2 py-1.5 text-[9px] font-medium transition ${
+                    className={`flex-1 rounded px-2 py-1.5 text-xs font-medium transition ${
                       selectedEvent.status === st
                         ? "bg-[#287da5] text-white font-semibold"
                         : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
@@ -843,7 +843,7 @@ export default function CrisisEvents() {
 
             <button
               onClick={() => setSelectedEvent(null)}
-              className="mt-4 w-full rounded-lg bg-sky-950 py-2.5 text-[10px] font-semibold text-white hover:bg-sky-900"
+              className="mt-4 w-full rounded-lg bg-sky-950 py-2.5 text-sm font-semibold text-white hover:bg-sky-900"
             >
               Close
             </button>

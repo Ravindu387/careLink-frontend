@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Menu,
   Search,
@@ -73,6 +74,13 @@ export default function SettingsPage() {
 
   const [showSaved, setShowSaved] = useState(false);
 
+  useEffect(() => {
+    apiClient.get<any>("/funding-settings").then((res) => {
+      if (res?.profile) setProfile((prev) => ({ ...prev, ...res.profile }));
+      if (res?.fundingControls) setFundingControls((prev) => ({ ...prev, ...res.fundingControls }));
+    }).catch(() => {});
+  }, []);
+
   const tabs = [
     {
       id: "profile" as TabType,
@@ -116,7 +124,11 @@ export default function SettingsPage() {
   };
 
   const handleSave = () => {
-    // Connect this function to your backend API when available.
+    apiClient.put("/funding-settings", {
+      profile,
+      fundingControls,
+      notifications,
+    }).catch(() => {});
     setShowSaved(true);
 
     window.setTimeout(() => {
@@ -133,7 +145,7 @@ export default function SettingsPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[11px] mb-10">
+        <div className="flex items-center gap-2 text-sm mb-10">
 
           <span className="text-slate-500">
             Operations
@@ -158,7 +170,7 @@ export default function SettingsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
 
           <div>
-            <h1 className="text-[30px] font-medium tracking-tight">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight">
               Settings
             </h1>
 
@@ -242,7 +254,7 @@ export default function SettingsPage() {
 
                 <div className="mb-5">
 
-                  <h2 className="text-[16px] font-medium">
+                  <h2 className="text-lg sm:text-xl font-semibold">
                     Profile
                   </h2>
 
@@ -259,7 +271,7 @@ export default function SettingsPage() {
                     {/* FULL NAME */}
 
                     <div>
-                      <label className="block text-[11px] font-semibold mb-2">
+                      <label className="block text-sm font-semibold mb-2">
                         Full name
                       </label>
 
@@ -269,14 +281,14 @@ export default function SettingsPage() {
                         onChange={(e) =>
                           updateProfile("fullName", e.target.value)
                         }
-                        className="w-full h-[53px] px-3 rounded-xl border border-[#d5e3e9] text-[12px] outline-none focus:border-[#287ba5]"
+                        className="w-full h-[53px] px-3 rounded-xl border border-[#d5e3e9] text-sm sm:text-[15px] outline-none focus:border-[#287ba5]"
                       />
                     </div>
 
                     {/* EMAIL */}
 
                     <div>
-                      <label className="block text-[11px] font-semibold mb-2">
+                      <label className="block text-sm font-semibold mb-2">
                         Email address
                       </label>
 
@@ -286,14 +298,14 @@ export default function SettingsPage() {
                         onChange={(e) =>
                           updateProfile("email", e.target.value)
                         }
-                        className="w-full h-[53px] px-3 rounded-xl border border-[#d5e3e9] text-[12px] outline-none focus:border-[#287ba5]"
+                        className="w-full h-[53px] px-3 rounded-xl border border-[#d5e3e9] text-sm sm:text-[15px] outline-none focus:border-[#287ba5]"
                       />
                     </div>
 
                     {/* CONTACT */}
 
                     <div>
-                      <label className="block text-[11px] font-semibold mb-2">
+                      <label className="block text-sm font-semibold mb-2">
                         Contact number
                       </label>
 
@@ -303,14 +315,14 @@ export default function SettingsPage() {
                         onChange={(e) =>
                           updateProfile("contact", e.target.value)
                         }
-                        className="w-full h-[53px] px-3 rounded-xl border border-[#d5e3e9] text-[12px] outline-none focus:border-[#287ba5]"
+                        className="w-full h-[53px] px-3 rounded-xl border border-[#d5e3e9] text-sm sm:text-[15px] outline-none focus:border-[#287ba5]"
                       />
                     </div>
 
                     {/* CURRENCY */}
 
                     <div>
-                      <label className="block text-[11px] font-semibold mb-2">
+                      <label className="block text-sm font-semibold mb-2">
                         Reporting currency
                       </label>
 
@@ -319,7 +331,7 @@ export default function SettingsPage() {
                         onChange={(e) =>
                           updateProfile("currency", e.target.value)
                         }
-                        className="w-full h-[53px] px-3 rounded-xl border border-[#d5e3e9] text-[12px] outline-none bg-white focus:border-[#287ba5]"
+                        className="w-full h-[53px] px-3 rounded-xl border border-[#d5e3e9] text-sm sm:text-[15px] outline-none bg-white focus:border-[#287ba5]"
                       >
                         <option value="USD">
                           USD · US Dollar
@@ -360,7 +372,7 @@ export default function SettingsPage() {
                 <div className="border-t border-[#d5e3e9] pt-5 space-y-6">
 
                   <div>
-                    <label className="block text-[11px] font-semibold mb-2">
+                    <label className="block text-sm font-semibold mb-2">
                       Approval threshold (USD)
                     </label>
 
@@ -374,10 +386,10 @@ export default function SettingsPage() {
                           approvalLimit: e.target.value,
                         }))
                       }
-                      className="w-full max-w-[400px] h-[48px] px-3 border border-[#d5e3e9] rounded-xl text-[12px] outline-none focus:border-[#287ba5]"
+                      className="w-full max-w-[400px] h-[48px] px-3 border border-[#d5e3e9] rounded-xl text-sm sm:text-[15px] outline-none focus:border-[#287ba5]"
                     />
 
-                    <p className="text-[10px] text-slate-400 mt-2">
+                    <p className="text-[13px] text-slate-400 mt-2">
                       Transactions above this amount require additional approval.
                     </p>
                   </div>
@@ -452,7 +464,7 @@ export default function SettingsPage() {
                 <div className="border-t border-[#d5e3e9] pt-5 space-y-6">
 
                   <div>
-                    <h3 className="text-[12px] font-semibold mb-4">
+                    <h3 className="text-base font-semibold mb-4">
                       Delivery channels
                     </h3>
 
@@ -484,7 +496,7 @@ export default function SettingsPage() {
 
                   <div className="border-t border-[#d5e3e9] pt-5">
 
-                    <h3 className="text-[12px] font-semibold mb-4">
+                    <h3 className="text-base font-semibold mb-4">
                       Notification categories
                     </h3>
 
@@ -550,7 +562,7 @@ export default function SettingsPage() {
                         Account security
                       </p>
 
-                      <p className="text-[10px] text-slate-500 mt-1">
+                      <p className="text-[13px] text-slate-500 mt-1">
                         Keep your funding account protected.
                       </p>
                     </div>
@@ -567,7 +579,7 @@ export default function SettingsPage() {
                           Password
                         </p>
 
-                        <p className="text-[10px] text-slate-500">
+                        <p className="text-[13px] text-slate-500">
                           Last updated recently
                         </p>
                       </div>
@@ -577,7 +589,7 @@ export default function SettingsPage() {
                       onClick={() =>
                         alert("Connect password change API here.")
                       }
-                      className="px-4 py-2 border border-[#b9cfda] rounded-lg text-[10px]"
+                      className="px-4 py-2 border border-[#b9cfda] rounded-lg text-sm"
                     >
                       Change password
                     </button>
@@ -594,13 +606,13 @@ export default function SettingsPage() {
                           Two-factor authentication
                         </p>
 
-                        <p className="text-[10px] text-slate-500">
+                        <p className="text-[13px] text-slate-500">
                           Additional protection for your account.
                         </p>
                       </div>
                     </div>
 
-                    <span className="bg-[#e5f6f0] text-[#159b79] px-3 py-2 rounded-lg text-[10px] font-semibold">
+                    <span className="bg-[#e5f6f0] text-[#159b79] px-3 py-2 rounded-lg text-sm font-semibold">
                       Enabled
                     </span>
 
@@ -608,7 +620,7 @@ export default function SettingsPage() {
 
                   <div className="pt-2">
 
-                    <h3 className="text-[12px] font-semibold mb-4">
+                    <h3 className="text-base font-semibold mb-4">
                       Active session
                     </h3>
 
@@ -621,18 +633,18 @@ export default function SettingsPage() {
                         </div>
 
                         <div>
-                          <p className="text-[11px] font-semibold">
+                          <p className="text-sm font-semibold">
                             Windows · Chrome
                           </p>
 
-                          <p className="text-[10px] text-slate-500 mt-1">
+                          <p className="text-[13px] text-slate-500 mt-1">
                             Current device · Active now
                           </p>
                         </div>
 
                       </div>
 
-                      <span className="text-[10px] text-[#159b79] font-semibold">
+                      <span className="text-sm text-[#159b79] font-semibold">
                         <Check size={13} className="inline mr-1" />
                         Current session
                       </span>
@@ -641,7 +653,7 @@ export default function SettingsPage() {
 
                   </div>
 
-                  <div className="flex items-center gap-2 text-[10px] text-slate-400 pt-2">
+                  <div className="flex items-center gap-2 text-[13px] text-slate-400 pt-2">
                     <Clock size={14} />
                     Security settings are managed by your account administrator.
                   </div>
@@ -667,7 +679,7 @@ export default function SettingsPage() {
                 Changes saved
               </p>
 
-              <p className="text-[10px] text-slate-300">
+              <p className="text-sm text-slate-300">
                 Your settings have been updated.
               </p>
             </div>
@@ -694,7 +706,7 @@ function SectionHeading({
 }) {
   return (
     <div className="mb-5">
-      <h2 className="text-[16px] font-medium">
+      <h2 className="text-lg sm:text-xl font-semibold">
         {title}
       </h2>
 
@@ -728,7 +740,7 @@ function SettingToggle({
           {title}
         </p>
 
-        <p className="text-[10px] text-slate-500 mt-1">
+        <p className="text-[13px] text-slate-500 mt-1">
           {description}
         </p>
       </div>

@@ -77,6 +77,8 @@ export interface AnalyticsDashboard {
   period: string;
   operation: string;
   warehouse: string;
+}
+
 export interface StatMetric {
   label: string;
   value: string;

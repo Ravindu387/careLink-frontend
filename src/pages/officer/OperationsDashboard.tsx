@@ -7,10 +7,10 @@ export default function OperationsDashboard() {
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#123B5C] text-[#42B99A]">
           <ShieldAlert size={26} />
         </div>
-        <span className="inline-block rounded-md bg-[#EFF6F7] px-3 py-1 text-[11px] font-semibold text-[#1D5F8A]">
+        <span className="inline-block rounded-md bg-[#EFF6F7] px-3 py-1 text-sm font-semibold text-[#1D5F8A]">
           FIELD OPERATIONS
         </span>
-        <h1 className="mt-3 text-2xl font-semibold tracking-tight text-[#123B5C]">
+        <h1 className="text-2xl sm:text-[28px] lg:text-[30px] mt-3 font-bold tracking-tight text-[#123B5C]">
           Operations Dashboard
         </h1>
         <p className="mt-2 text-sm text-slate-500">

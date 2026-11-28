@@ -1,5 +1,6 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -87,6 +88,26 @@ export default function DonorManagement() {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [toast, setToast] = useState("");
 
+  useEffect(() => {
+    apiClient.get<any>("/donors").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setDonors(
+          items.map((d: any) => ({
+            id: d.id || d.donorCode || "DNR-2000",
+            name: d.name || "Donor",
+            type: d.type || "Foundation",
+            contact: d.contact || d.email || "contact@donor.org",
+            scope: d.scope || "National",
+            verification: (d.verification as Donor["verification"]) || "Verified",
+            contributions: Number(d.contributions ?? d.lifetimeContributions ?? 0),
+            status: (d.status as Donor["status"]) || "Active",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
+
   const [newDonor, setNewDonor] = useState({
     name: "",
     type: "Foundation",
@@ -167,6 +188,13 @@ export default function DonorManagement() {
       notify("Please enter donor name and contact.");
       return;
     }
+
+    apiClient.post("/donors", {
+      name: newDonor.name,
+      type: newDonor.type,
+      contact: newDonor.contact,
+      scope: newDonor.scope,
+    }).catch(() => {});
 
     const donor: Donor = {
       id: `DNR-${Math.floor(2000 + Math.random() * 7999)}`,
@@ -279,7 +307,7 @@ export default function DonorManagement() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[8px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-500">Operations</span>
           <ChevronRight size={10} />
           <span className="text-slate-500">
@@ -294,11 +322,11 @@ export default function DonorManagement() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
 
           <div>
-            <h1 className="text-[21px] font-medium">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Donor Management
             </h1>
 
-            <p className="text-[9px] text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Manage donor profiles, verification,
               communication preferences, and contribution history.
             </p>
@@ -308,7 +336,7 @@ export default function DonorManagement() {
 
             <button
               onClick={handleExport}
-              className="h-[32px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[9px] text-[#23749e] flex items-center gap-2 hover:bg-slate-50"
+              className="h-[32px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-sm text-[#23749e] flex items-center gap-2 hover:bg-slate-50"
             >
               <Download size={13} />
               Export
@@ -316,7 +344,7 @@ export default function DonorManagement() {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="h-[32px] px-3 bg-[#23749e] text-white rounded-lg text-[9px] font-semibold flex items-center gap-2 hover:bg-[#175c80]"
+              className="h-[32px] px-3 bg-[#23749e] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#175c80]"
             >
               <Plus size={13} />
               Add donor
@@ -341,7 +369,7 @@ export default function DonorManagement() {
                 setCurrentPage(1);
               }}
               placeholder="Search donor name, ID, or contact..."
-              className="w-full h-[35px] bg-white border border-[#d5e3e9] rounded-lg pl-8 pr-3 text-[9px] outline-none focus:border-[#39ae90]"
+              className="w-full h-[35px] bg-white border border-[#d5e3e9] rounded-lg pl-8 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#39ae90]"
             />
           </div>
 
@@ -404,7 +432,7 @@ export default function DonorManagement() {
 
             <button
               onClick={() => setShowMoreFilters(!showMoreFilters)}
-              className="h-[35px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[9px] flex items-center justify-center gap-2 hover:bg-slate-50"
+              className="h-[35px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-slate-50"
             >
               <Filter size={12} />
               More filters
@@ -415,21 +443,21 @@ export default function DonorManagement() {
         {showMoreFilters && (
           <div className="bg-white rounded-lg border border-[#d5e3e9] p-3 mb-3 flex flex-wrap items-center gap-3">
             <div>
-              <p className="text-[8px] text-slate-500 mb-1">
+              <p className="text-xs text-slate-500 mb-1">
                 Minimum contribution
               </p>
               <input
                 type="number"
                 placeholder="Minimum USD"
-                className="border rounded-md px-2 py-2 text-[9px] outline-none"
+                className="border rounded-md px-2 py-2 text-sm sm:text-[15px] outline-none"
               />
             </div>
 
             <div>
-              <p className="text-[8px] text-slate-500 mb-1">
+              <p className="text-xs text-slate-500 mb-1">
                 Donor scope
               </p>
-              <select className="border rounded-md px-2 py-2 text-[9px]">
+              <select className="border rounded-md px-2 py-2 text-sm sm:text-[15px]">
                 <option>All scopes</option>
                 <option>International</option>
                 <option>National</option>
@@ -442,7 +470,7 @@ export default function DonorManagement() {
                 setShowMoreFilters(false);
                 notify("Filters applied.");
               }}
-              className="bg-[#23749e] text-white rounded-md px-3 py-2 text-[9px] mt-3"
+              className="bg-[#23749e] text-white rounded-md px-3 py-2 text-sm mt-3"
             >
               Apply
             </button>
@@ -458,11 +486,11 @@ export default function DonorManagement() {
           <div className="min-h-[52px] px-3 flex items-center justify-between border-b border-[#d7e4e9]">
 
             <div>
-              <h2 className="text-[10px] font-medium">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Donor Management
               </h2>
 
-              <p className="text-[8px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 {filteredDonors.length} demonstration records
               </p>
             </div>
@@ -470,7 +498,7 @@ export default function DonorManagement() {
             <div className="relative">
               <button
                 onClick={() => setShowBulkMenu(!showBulkMenu)}
-                className="h-[31px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-[8px] hover:bg-slate-50"
+                className="h-[31px] px-3 bg-white border border-[#b5cbd8] rounded-lg text-sm hover:bg-slate-50"
               >
                 Bulk actions
               </button>
@@ -479,14 +507,14 @@ export default function DonorManagement() {
                 <div className="absolute right-0 top-9 z-20 w-40 bg-white border border-slate-200 rounded-lg shadow-lg p-1">
                   <button
                     onClick={() => handleBulkAction("Activate")}
-                    className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50 rounded"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 rounded"
                   >
                     Activate selected
                   </button>
 
                   <button
                     onClick={() => handleBulkAction("Restrict")}
-                    className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50 rounded"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 rounded"
                   >
                     Restrict selected
                   </button>
@@ -502,7 +530,7 @@ export default function DonorManagement() {
             <table className="w-full min-w-[900px] text-left">
 
               <thead>
-                <tr className="h-[27px] bg-[#f5f8f9] border-b border-[#d5e3e9] text-[7px] text-slate-500">
+                <tr className="h-[27px] bg-[#f5f8f9] border-b border-[#d5e3e9] text-sm text-slate-500">
 
                   <th className="px-2.5 font-medium">
                     Donor ID
@@ -538,39 +566,39 @@ export default function DonorManagement() {
                     }`}
                   >
 
-                    <td className="px-2.5 text-[7px] font-semibold whitespace-nowrap">
+                    <td className="px-2.5 text-sm font-semibold whitespace-nowrap">
                       {donor.id}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       {donor.name}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       {donor.type}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       {donor.contact}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       {donor.scope}
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       <VerificationBadge
                         status={donor.verification}
                       />
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       <span className="bg-[#e7f2f8] text-[#23749e] rounded px-2 py-1 font-semibold">
                         ${donor.contributions.toLocaleString("en-US")}
                       </span>
                     </td>
 
-                    <td className="px-2 text-[7px] whitespace-nowrap">
+                    <td className="px-2 text-sm whitespace-nowrap">
                       <DonorStatus status={donor.status} />
                     </td>
 
@@ -596,7 +624,7 @@ export default function DonorManagement() {
                               notify(`Viewing ${donor.name}`);
                               setActiveMenu(null);
                             }}
-                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50"
                           >
                             View profile
                           </button>
@@ -607,7 +635,7 @@ export default function DonorManagement() {
                               notify("Donor selected.");
                               setActiveMenu(null);
                             }}
-                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50"
                           >
                             Select donor
                           </button>
@@ -631,7 +659,7 @@ export default function DonorManagement() {
                               setActiveMenu(null);
                               notify("Donor status updated.");
                             }}
-                            className="w-full text-left px-3 py-2 text-[9px] hover:bg-slate-50"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50"
                           >
                             {donor.status === "Restricted"
                               ? "Activate"
@@ -651,7 +679,7 @@ export default function DonorManagement() {
                   size={24}
                   className="mx-auto text-slate-300 mb-2"
                 />
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[13px] text-slate-400">
                   No donors found.
                 </p>
               </div>
@@ -662,7 +690,7 @@ export default function DonorManagement() {
 
           <div className="min-h-[43px] px-3 flex flex-wrap items-center justify-between gap-2">
 
-            <p className="text-[8px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Showing{" "}
               {filteredDonors.length === 0
                 ? 0
@@ -684,7 +712,7 @@ export default function DonorManagement() {
                 onClick={() =>
                   setCurrentPage((page) => Math.max(1, page - 1))
                 }
-                className="h-[25px] px-3 border border-[#d5e3e9] rounded-md text-[8px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-[25px] px-3 border border-[#d5e3e9] rounded-md text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Previous
               </button>
@@ -696,7 +724,7 @@ export default function DonorManagement() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-[24px] h-[25px] rounded-md border text-[8px] ${
+                  className={`w-[24px] h-[25px] rounded-md border text-sm ${
                     currentPage === page
                       ? "bg-[#23749e] border-[#23749e] text-white"
                       : "bg-white border-[#d5e3e9] hover:bg-slate-50"
@@ -713,7 +741,7 @@ export default function DonorManagement() {
                     Math.min(totalPages, page + 1)
                   )
                 }
-                className="h-[25px] px-3 border border-[#b5cbd8] rounded-md text-[8px] disabled:opacity-40 hover:bg-slate-50"
+                className="h-[25px] px-3 border border-[#b5cbd8] rounded-md text-sm disabled:opacity-40 hover:bg-slate-50"
               >
                 Next
               </button>
@@ -734,11 +762,11 @@ export default function DonorManagement() {
 
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-lg sm:text-xl font-semibold">
                   Register new donor
                 </h2>
 
-                <p className="text-[9px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Enter the donor information below.
                 </p>
               </div>
@@ -827,14 +855,14 @@ export default function DonorManagement() {
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-[10px]"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-[10px] font-semibold"
+                className="px-4 py-2 bg-[#23749e] text-white rounded-lg text-sm font-semibold"
               >
                 Register donor
               </button>
@@ -846,7 +874,7 @@ export default function DonorManagement() {
       {/* TOAST */}
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-[10px] flex items-center gap-3">
+        <div className="fixed bottom-5 right-5 z-[60] bg-[#123e60] text-white rounded-lg px-4 py-3 shadow-xl text-sm flex items-center gap-3">
           {toast}
           <button onClick={() => setToast("")}>
             <X size={13} />
@@ -875,7 +903,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none w-full lg:w-[110px] h-[35px] bg-white border border-[#d5e3e9] rounded-lg pl-2 pr-6 text-[8px] outline-none focus:border-[#39ae90] cursor-pointer"
+        className="appearance-none w-full lg:w-[110px] h-[35px] bg-white border border-[#d5e3e9] rounded-lg pl-2 pr-6 text-sm sm:text-[15px] outline-none focus:border-[#39ae90] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -906,7 +934,7 @@ function VerificationBadge({
   };
 
   return (
-    <span className={`px-2 py-1 rounded text-[7px] whitespace-nowrap ${styles[status]}`}>
+    <span className={`px-2 py-1 rounded text-xs whitespace-nowrap ${styles[status]}`}>
       {status}
     </span>
   );
@@ -928,7 +956,7 @@ function DonorStatus({
   };
 
   return (
-    <span className={`px-2 py-1 rounded text-[7px] font-semibold whitespace-nowrap ${styles[status]}`}>
+    <span className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${styles[status]}`}>
       {status}
     </span>
   );
@@ -947,7 +975,7 @@ function FormField({
 }) {
   return (
     <label className="block">
-      <span className="block text-[9px] font-medium mb-1.5">
+      <span className="block text-xs font-medium mb-1.5">
         {label}
       </span>
       {children}

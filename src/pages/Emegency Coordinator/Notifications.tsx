@@ -273,10 +273,10 @@ export default function Notifications() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-semibold text-[#153f5e]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
               Operational Notifications
             </h1>
-            <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-2.5 py-0.5 text-[10px] font-semibold text-[#153f5e]">
+            <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-semibold text-[#153f5e]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#287da5] animate-pulse" />
               Live Connected
             </span>
@@ -293,7 +293,7 @@ export default function Notifications() {
             onClick={() => loadNotifications(true)}
             disabled={refreshing || loading}
             title="Sync with server"
-            className="flex items-center gap-1.5 rounded-lg border border-[#c5d9e3] bg-white px-3 py-2 text-xs font-semibold text-[#175477] hover:bg-sky-50 disabled:opacity-50 transition"
+            className="flex items-center gap-1.5 rounded-lg border border-[#c5d9e3] bg-white px-3 py-2 text-sm font-semibold text-[#175477] hover:bg-sky-50 disabled:opacity-50 transition"
           >
             <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
             <span className="hidden sm:inline">Sync</span>
@@ -302,7 +302,7 @@ export default function Notifications() {
           {/* Dispatch Alert */}
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3.5 py-2 text-xs font-semibold text-white hover:bg-emerald-800 transition shadow-xs"
+            className="flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3.5 py-2 text-sm font-semibold text-white hover:bg-emerald-800 transition shadow-xs"
           >
             <Plus size={15} />
             <span>Dispatch Alert</span>
@@ -312,7 +312,7 @@ export default function Notifications() {
           <button
             onClick={markAllRead}
             disabled={counts.unread === 0}
-            className="rounded-lg border border-[#c5d9e3] bg-white px-3.5 py-2 text-xs font-semibold text-[#175477] hover:bg-sky-50 disabled:opacity-40 transition"
+            className="rounded-lg border border-[#c5d9e3] bg-white px-3.5 py-2 text-sm font-semibold text-[#175477] hover:bg-sky-50 disabled:opacity-40 transition"
           >
             Mark all read
           </button>
@@ -320,7 +320,7 @@ export default function Notifications() {
           {/* Preferences */}
           <button
             onClick={() => setShowPreferences(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#216789] transition shadow-xs"
+            className="flex items-center gap-1.5 rounded-lg bg-[#287da5] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#216789] transition shadow-xs"
           >
             <SlidersHorizontal size={14} />
             <span>Preferences</span>
@@ -355,7 +355,7 @@ export default function Notifications() {
               setPage(1);
             }}
             placeholder="Search alerts, reference IDs, or keywords..."
-            className="w-full bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400"
+            className="w-full bg-transparent text-sm sm:text-[15px] text-slate-800 outline-none placeholder:text-slate-400"
           />
           {search && (
             <button
@@ -373,7 +373,7 @@ export default function Notifications() {
         <button
           onClick={handleReset}
           title="Reset to default seed alerts"
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 hover:text-slate-700 shadow-2xs"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 hover:bg-slate-50 hover:text-slate-700 shadow-2xs"
         >
           Reset Demo
         </button>
@@ -389,7 +389,7 @@ export default function Notifications() {
             <button
               key={tab.value}
               onClick={() => changeTab(tab.value)}
-              className={`flex items-center gap-2 border-b-2 px-3 py-2.5 text-xs font-medium transition cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium transition cursor-pointer whitespace-nowrap ${
                 isActive
                   ? "border-[#287da5] font-semibold text-[#287da5]"
                   : "border-transparent text-slate-600 hover:text-[#287da5]"
@@ -397,7 +397,7 @@ export default function Notifications() {
             >
               <span>{tab.label}</span>
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                className={`rounded-full px-2 py-0.5 text-xs font-bold ${
                   isActive
                     ? "bg-[#e4f0f6] text-[#287da5]"
                     : "bg-[#e9eff2] text-slate-500"
@@ -446,24 +446,24 @@ export default function Notifications() {
                   {/* Body Content */}
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className={`text-xs font-semibold ${item.unread ? "text-[#153f5e]" : "text-slate-700"}`}>
+                      <h3 className={`text-base font-semibold ${item.unread ? "text-[#153f5e]" : "text-slate-700"}`}>
                         {item.title}
                       </h3>
                       {item.reference && (
-                        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-semibold text-slate-600">
+                        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-semibold text-slate-600">
                           {item.reference}
                         </span>
                       )}
-                      <span className="rounded bg-slate-50 border border-slate-200 px-1.5 py-0.5 text-[9px] font-medium capitalize text-slate-500">
+                      <span className="rounded bg-slate-50 border border-slate-200 px-1.5 py-0.5 text-xs font-medium capitalize text-slate-500">
                         {item.category}
                       </span>
                     </div>
 
-                    <p className="mt-1 text-[11px] text-slate-600 line-clamp-1">
+                    <p className="mt-1 text-sm text-slate-600 line-clamp-1">
                       {item.description}
                     </p>
 
-                    <p className="mt-1 text-[10px] text-slate-400">
+                    <p className="mt-1 text-[13px] text-slate-400">
                       {item.time}
                     </p>
                   </div>
@@ -493,7 +493,7 @@ export default function Notifications() {
                   <Bell size={26} className="text-[#287da5]" />
                 </div>
 
-                <h3 className="text-sm font-semibold text-[#153f5e]">
+                <h3 className="text-base font-semibold text-[#153f5e]">
                   No notifications found
                 </h3>
 
@@ -510,7 +510,7 @@ export default function Notifications() {
                       setActiveTab("all");
                       setPage(1);
                     }}
-                    className="mt-3 rounded-lg bg-[#153f5e] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#1d4f73]"
+                    className="mt-3 rounded-lg bg-[#153f5e] px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-[#1d4f73]"
                   >
                     View All Notifications
                   </button>
@@ -522,7 +522,7 @@ export default function Notifications() {
 
         {/* Pagination Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#dce7ec] bg-slate-50/50 px-4 py-3">
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[13px] text-slate-500">
             Showing{" "}
             <span className="font-semibold text-slate-700">
               {totalCount === 0 ? 0 : (page - 1) * pageSize + 1}
@@ -538,7 +538,7 @@ export default function Notifications() {
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#d4e2e9] bg-white px-3 py-1.5 text-xs font-medium text-[#287da5] hover:bg-sky-50 disabled:opacity-40 transition"
+              className="rounded-lg border border-[#d4e2e9] bg-white px-3 py-1.5 text-sm font-medium text-[#287da5] hover:bg-sky-50 disabled:opacity-40 transition"
             >
               Previous
             </button>
@@ -547,7 +547,7 @@ export default function Notifications() {
               <button
                 key={number}
                 onClick={() => setPage(number)}
-                className={`h-7 min-w-7 rounded-lg border text-xs font-medium transition ${
+                className={`h-7 min-w-7 rounded-lg border text-sm font-medium transition ${
                   page === number
                     ? "border-[#287da5] bg-[#287da5] text-white"
                     : "border-[#d4e2e9] bg-white text-slate-600 hover:bg-sky-50"
@@ -560,7 +560,7 @@ export default function Notifications() {
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#d4e2e9] bg-white px-3 py-1.5 text-xs font-medium text-[#287da5] hover:bg-sky-50 disabled:opacity-40 transition"
+              className="rounded-lg border border-[#d4e2e9] bg-white px-3 py-1.5 text-sm font-medium text-[#287da5] hover:bg-sky-50 disabled:opacity-40 transition"
             >
               Next
             </button>
@@ -584,10 +584,10 @@ export default function Notifications() {
             </div>
 
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-bold text-[#153f5e] leading-snug">
+              <h3 className="text-base font-bold text-[#153f5e] leading-snug">
                 {selected.title}
               </h3>
-              <p className="mt-0.5 text-[10px] text-slate-400">
+              <p className="mt-0.5 text-[13px] text-slate-400">
                 {selected.time}
               </p>
             </div>
@@ -599,10 +599,10 @@ export default function Notifications() {
             <Detail label="Status" value={selected.unread ? "Unread" : "Read"} />
 
             <div className="rounded-xl bg-slate-50 p-3.5 border border-slate-100">
-              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <p className="mb-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">
                 Operational Details
               </p>
-              <p className="text-xs leading-relaxed text-slate-700">
+              <p className="text-sm leading-relaxed text-slate-700">
                 {selected.details || selected.description}
               </p>
             </div>
@@ -621,7 +621,7 @@ export default function Notifications() {
 
             <button
               onClick={() => setSelected(null)}
-              className="flex-1 rounded-lg border border-slate-200 bg-white py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+              className="flex-1 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
             >
               Close
             </button>
@@ -662,7 +662,7 @@ export default function Notifications() {
                   type="checkbox"
                   checked={preferences[key]}
                   onChange={(e) =>
-                    setPreferences((prev) => ({
+                    setPreferences((prev: NotificationPreferences) => ({
                       ...prev,
                       [key]: e.target.checked,
                     }))
@@ -676,7 +676,7 @@ export default function Notifications() {
           <button
             onClick={handleSavePreferences}
             disabled={savingPreferences}
-            className="mt-5 w-full rounded-lg bg-[#287da5] py-2.5 text-xs font-semibold text-white hover:bg-[#216789] transition disabled:opacity-50"
+            className="mt-5 w-full rounded-lg bg-[#287da5] py-2.5 text-sm font-semibold text-white hover:bg-[#216789] transition disabled:opacity-50"
           >
             {savingPreferences ? "Saving Preferences..." : "Save Preferences"}
           </button>
@@ -695,7 +695,7 @@ export default function Notifications() {
 
           <form onSubmit={handleCreateNotification} className="space-y-3">
             <div>
-              <label className="block text-[11px] font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
                 Alert Title
               </label>
               <input
@@ -703,19 +703,19 @@ export default function Notifications() {
                 value={newAlert.title}
                 onChange={(e) => setNewAlert({ ...newAlert, title: e.target.value })}
                 placeholder="e.g. Flash Flood Evacuation Notice"
-                className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none focus:border-sky-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-1">
                   Category
                 </label>
                 <select
                   value={newAlert.category}
                   onChange={(e) => setNewAlert({ ...newAlert, category: e.target.value as NotificationType })}
-                  className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                  className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                 >
                   <option value="critical">Critical</option>
                   <option value="ai">AI</option>
@@ -727,20 +727,20 @@ export default function Notifications() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-1">
                   Reference ID
                 </label>
                 <input
                   value={newAlert.reference}
                   onChange={(e) => setNewAlert({ ...newAlert, reference: e.target.value })}
                   placeholder="e.g. REQ-2850"
-                  className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                  className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
                 Brief Description
               </label>
               <input
@@ -748,12 +748,12 @@ export default function Notifications() {
                 value={newAlert.description}
                 onChange={(e) => setNewAlert({ ...newAlert, description: e.target.value })}
                 placeholder="Brief single-line operational summary"
-                className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none"
+                className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
                 Full Details & Action Required
               </label>
               <textarea
@@ -761,7 +761,7 @@ export default function Notifications() {
                 value={newAlert.details}
                 onChange={(e) => setNewAlert({ ...newAlert, details: e.target.value })}
                 placeholder="Provide complete situational context and required action for duty coordinators."
-                className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 outline-none resize-none"
+                className="w-full rounded-lg border border-slate-200 p-2 text-sm sm:text-[15px] text-slate-800 outline-none resize-none"
               />
             </div>
 
@@ -769,14 +769,14 @@ export default function Notifications() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="rounded-lg border border-slate-200 px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={createLoading}
-                className="rounded-lg bg-emerald-700 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-800 disabled:opacity-50"
+                className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-50"
               >
                 {createLoading ? "Dispatching..." : "Dispatch Alert"}
               </button>
@@ -802,7 +802,7 @@ function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl animate-in zoom-in-95">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-bold text-[#153f5e]">{title}</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-[#153f5e]">{title}</h2>
           <button
             onClick={onClose}
             className="rounded-lg p-1 text-slate-500 hover:bg-slate-100"

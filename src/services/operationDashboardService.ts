@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 /**
  * Operation Dashboard Service
  * Connects the Emergency Operations Dashboard to the CareLink .NET backend.
@@ -210,7 +211,7 @@ const ENDPOINT = `${API_BASE}/api/operation-dashboard`;
 export const operationDashboardService = {
   async getDashboard(): Promise<OperationDashboardData> {
     try {
-      const response = await fetch(ENDPOINT, {
+      const response = await authFetch(ENDPOINT, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -225,7 +226,7 @@ export const operationDashboardService = {
 
   async getKpis(): Promise<DashboardKpi[]> {
     try {
-      const response = await fetch(`${ENDPOINT}/kpis`, {
+      const response = await authFetch(`${ENDPOINT}/kpis`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -239,7 +240,7 @@ export const operationDashboardService = {
 
   async getTrends(): Promise<WeeklyRequestTrend[]> {
     try {
-      const response = await fetch(`${ENDPOINT}/trends`, {
+      const response = await authFetch(`${ENDPOINT}/trends`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -253,7 +254,7 @@ export const operationDashboardService = {
 
   async getActivities(limit = 10): Promise<RecentActivity[]> {
     try {
-      const response = await fetch(`${ENDPOINT}/activities?limit=${limit}`, {
+      const response = await authFetch(`${ENDPOINT}/activities?limit=${limit}`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -266,7 +267,7 @@ export const operationDashboardService = {
   },
 
   async addActivity(payload: CreateActivityPayload): Promise<RecentActivity> {
-    const response = await fetch(`${ENDPOINT}/activities`, {
+    const response = await authFetch(`${ENDPOINT}/activities`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -283,7 +284,7 @@ export const operationDashboardService = {
   },
 
   async logQuickIncident(payload: LogIncidentPayload): Promise<RecentActivity> {
-    const response = await fetch(`${ENDPOINT}/incident`, {
+    const response = await authFetch(`${ENDPOINT}/incident`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -301,7 +302,7 @@ export const operationDashboardService = {
 
   async getBriefings(): Promise<UpcomingBriefing[]> {
     try {
-      const response = await fetch(`${ENDPOINT}/briefings`, {
+      const response = await authFetch(`${ENDPOINT}/briefings`, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -314,7 +315,7 @@ export const operationDashboardService = {
   },
 
   async reset(): Promise<boolean> {
-    const response = await fetch(`${ENDPOINT}/reset`, {
+    const response = await authFetch(`${ENDPOINT}/reset`, {
       method: "POST",
       headers: { Accept: "application/json" },
     });

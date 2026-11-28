@@ -35,6 +35,8 @@ export interface PriorityQueueQueryDto {
   dateRange?: string;
   pageNumber?: number;
   pageSize?: number;
+  sortBy?: string;
+  sortDescending?: boolean;
 }
 
 export interface ClaimPriorityCasesRequest {

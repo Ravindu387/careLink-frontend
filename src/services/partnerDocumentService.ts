@@ -1,3 +1,4 @@
+import { authFetch } from "./api";
 export interface DocumentItem {
   id: string;
   name: string;
@@ -71,7 +72,7 @@ export const partnerDocumentService = {
     }
 
     const query = params.toString() ? `?${params.toString()}` : "";
-    const response = await fetch(`${API_BASE}/api/documents${query}`);
+    const response = await authFetch(`${API_BASE}/api/documents${query}`);
     if (!response.ok) {
       throw new Error(`Failed to load documents: ${response.status} ${response.statusText}`);
     }
@@ -79,7 +80,7 @@ export const partnerDocumentService = {
   },
 
   async getMetrics(): Promise<DocumentMetrics> {
-    const response = await fetch(`${API_BASE}/api/documents/metrics`);
+    const response = await authFetch(`${API_BASE}/api/documents/metrics`);
     if (!response.ok) {
       throw new Error(`Failed to load document metrics: ${response.status}`);
     }
@@ -87,7 +88,7 @@ export const partnerDocumentService = {
   },
 
   async getById(id: string): Promise<DocumentItem> {
-    const response = await fetch(`${API_BASE}/api/documents/${encodeURIComponent(id)}`);
+    const response = await authFetch(`${API_BASE}/api/documents/${encodeURIComponent(id)}`);
     if (!response.ok) {
       throw new Error(`Failed to load document ${id}: ${response.status}`);
     }
@@ -95,7 +96,7 @@ export const partnerDocumentService = {
   },
 
   async upload(payload: CreateDocumentPayload): Promise<DocumentItem> {
-    const response = await fetch(`${API_BASE}/api/documents`, {
+    const response = await authFetch(`${API_BASE}/api/documents`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -111,7 +112,7 @@ export const partnerDocumentService = {
   },
 
   async updateStatus(id: string, status: string): Promise<DocumentItem> {
-    const response = await fetch(`${API_BASE}/api/documents/${encodeURIComponent(id)}/status`, {
+    const response = await authFetch(`${API_BASE}/api/documents/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -127,7 +128,7 @@ export const partnerDocumentService = {
   },
 
   async delete(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/api/documents/${encodeURIComponent(id)}`, {
+    const response = await authFetch(`${API_BASE}/api/documents/${encodeURIComponent(id)}`, {
       method: "DELETE",
     });
 
@@ -137,7 +138,7 @@ export const partnerDocumentService = {
   },
 
   async reset(): Promise<{ message: string; metrics: DocumentMetrics }> {
-    const response = await fetch(`${API_BASE}/api/documents/reset`, {
+    const response = await authFetch(`${API_BASE}/api/documents/reset`, {
       method: "POST",
     });
 

@@ -322,13 +322,13 @@ const TeamContacts = () => {
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold text-[#153e5b]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b]">
               Team & Contacts
             </h1>
 
             {/* Live Backend Connection Indicator */}
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
                 isLive
                   ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
                   : "border border-amber-200 bg-amber-50 text-amber-700"
@@ -352,7 +352,7 @@ const TeamContacts = () => {
           <button
             onClick={handleSync}
             disabled={isSyncing}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b9d0dc] bg-white px-3.5 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50 disabled:opacity-50"
             title="Refresh team contacts from server"
           >
             <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
@@ -361,7 +361,7 @@ const TeamContacts = () => {
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-2.5 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
           >
             <Download size={15} />
             Export
@@ -369,7 +369,7 @@ const TeamContacts = () => {
 
           <button
             onClick={() => setShowInviteModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+            className="flex items-center gap-2 rounded-lg bg-[#267ba4] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
           >
             <Plus size={16} />
             Invite Team Member
@@ -423,7 +423,7 @@ const TeamContacts = () => {
                 setActiveTab(tab);
                 setCurrentPage(1);
               }}
-              className={`relative whitespace-nowrap pb-4 text-xs ${
+              className={`relative whitespace-nowrap pb-4 text-sm ${
                 activeTab === tab
                   ? "font-semibold text-[#267ba4]"
                   : "text-slate-500 hover:text-[#267ba4]"
@@ -431,7 +431,7 @@ const TeamContacts = () => {
             >
               {tab}
               {count > 0 && (
-                <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-[9px] font-medium text-slate-700">
+                <span className="ml-1.5 rounded-full bg-[#e5eff4] px-1.5 py-0.5 text-xs font-medium text-slate-700">
                   {count}
                 </span>
               )}
@@ -457,7 +457,7 @@ const TeamContacts = () => {
               setCurrentPage(1);
             }}
             placeholder="Search team & contacts by ID, name, role, sector, location..."
-            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-xs outline-none focus:border-[#267ba4]"
+            className="w-full rounded-lg border border-[#d3e1e8] bg-white py-3 pl-10 pr-4 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
           />
         </div>
 
@@ -467,7 +467,7 @@ const TeamContacts = () => {
             setRoleFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All roles</option>
           <option>Partner Officer</option>
@@ -484,7 +484,7 @@ const TeamContacts = () => {
             setSectorFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All sectors</option>
           <option>Coordination</option>
@@ -501,7 +501,7 @@ const TeamContacts = () => {
             setLocationFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All locations</option>
           <option>Greater Riverton</option>
@@ -518,7 +518,7 @@ const TeamContacts = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-xs text-slate-600 outline-none"
+          className="rounded-lg border border-[#d3e1e8] bg-white px-3 py-3 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All statuses</option>
           <option>Active</option>
@@ -529,7 +529,7 @@ const TeamContacts = () => {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-xs font-medium text-[#267ba4] hover:bg-slate-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#b9d0dc] bg-white px-4 py-3 text-sm font-medium text-[#267ba4] hover:bg-slate-50"
         >
           <Filter size={15} />
           More filters
@@ -540,10 +540,10 @@ const TeamContacts = () => {
       {showFilters && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d3e1e8] bg-white p-4">
           <div>
-            <p className="text-xs font-semibold text-[#153e5b]">
+            <p className="text-sm font-semibold text-[#153e5b]">
               Additional options
             </p>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Refine team records, clear search queries, or reset sample data.
             </p>
           </div>
@@ -551,14 +551,14 @@ const TeamContacts = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={handleResetDefaults}
-              className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-800"
+              className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-800"
             >
               <RotateCcw size={13} />
               Reset Defaults
             </button>
             <button
               onClick={resetFilters}
-              className="text-xs font-semibold text-[#267ba4] hover:underline"
+              className="text-sm font-semibold text-[#267ba4] hover:underline"
             >
               Clear all filters
             </button>
@@ -571,7 +571,7 @@ const TeamContacts = () => {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1050px] text-left">
             <thead className="bg-[#f5f8fa]">
-              <tr className="border-b border-[#d7e5eb] text-[10px] text-slate-500">
+              <tr className="border-b border-[#d7e5eb] text-sm text-slate-500">
                 {[
                   "User ID",
                   "Name",
@@ -595,7 +595,7 @@ const TeamContacts = () => {
                 <tr
                   key={member.id}
                   onClick={() => setSelectedMember(member)}
-                  className="cursor-pointer border-b border-[#e2ebef] text-[10px] text-slate-600 transition hover:bg-[#f5fafc]"
+                  className="cursor-pointer border-b border-[#e2ebef] text-sm text-slate-600 transition hover:bg-[#f5fafc]"
                 >
                   <td className="whitespace-nowrap px-3 py-4 font-semibold text-[#153e5b]">
                     {member.id}
@@ -642,7 +642,7 @@ const TeamContacts = () => {
                 <tr>
                   <td
                     colSpan={9}
-                    className="py-12 text-center text-xs text-slate-400"
+                    className="py-12 text-center text-sm text-slate-400"
                   >
                     No team members found matching your search criteria.
                   </td>
@@ -654,7 +654,7 @@ const TeamContacts = () => {
 
         {/* Pagination */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[13px] text-slate-400">
             Showing{" "}
             {filteredMembers.length === 0
               ? 0
@@ -671,7 +671,7 @@ const TeamContacts = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Previous
             </button>
@@ -680,7 +680,7 @@ const TeamContacts = () => {
               <button
                 key={number}
                 onClick={() => setCurrentPage(number)}
-                className={`h-8 w-8 rounded-lg border text-[10px] ${
+                className={`h-8 w-8 rounded-lg border text-sm ${
                   currentPage === number
                     ? "border-[#267ba4] bg-[#267ba4] text-white"
                     : "border-[#d3e1e8] text-slate-600 hover:bg-slate-50"
@@ -693,7 +693,7 @@ const TeamContacts = () => {
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+              className="rounded-lg border border-[#d3e1e8] px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
             >
               Next
             </button>
@@ -749,9 +749,9 @@ function StatCard({
       </div>
 
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <p className="text-2xl font-bold text-[#153e5b]">{value}</p>
-        <p className="text-[9px] text-slate-400">{subtitle}</p>
+        <p className="text-xs text-slate-400">{subtitle}</p>
       </div>
     </div>
   );
@@ -768,7 +768,7 @@ function StatusBadge({ status }: { status: string }) {
   };
 
   return (
-    <span className={`rounded-md px-2 py-1 text-[9px] font-medium ${styles[status] || "bg-slate-100 text-slate-500"}`}>
+    <span className={`rounded-md px-2 py-1 text-xs font-medium ${styles[status] || "bg-slate-100 text-slate-500"}`}>
       {status}
     </span>
   );
@@ -784,8 +784,8 @@ function Detail({
 }) {
   return (
     <div>
-      <p className="text-[10px] text-slate-400">{label}</p>
-      <p className="mt-1 text-xs font-medium text-[#153e5b] break-words">{value || "—"}</p>
+      <p className="text-[13px] text-slate-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-[#153e5b] break-words">{value || "—"}</p>
     </div>
   );
 }
@@ -836,7 +836,7 @@ function MemberDetailsModal({
       <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-[#267ba4]">
+            <p className="text-sm font-semibold text-[#267ba4]">
               {member.id}
             </p>
             <h2 className="mt-1 text-lg font-semibold text-[#153e5b]">
@@ -856,7 +856,7 @@ function MemberDetailsModal({
 
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-[#153e5b]">
+              <h3 className="text-base font-semibold text-[#153e5b]">
                 {member.name}
               </h3>
               <StatusBadge status={member.status} />
@@ -876,14 +876,14 @@ function MemberDetailsModal({
 
         {member.description && (
           <div className="mt-4 rounded-lg bg-slate-50 p-3">
-            <p className="text-[10px] font-medium text-slate-400">Role & Assignment Notes</p>
-            <p className="mt-1 text-xs text-slate-600">{member.description}</p>
+            <p className="text-[13px] font-medium text-slate-400">Role & Assignment Notes</p>
+            <p className="mt-1 text-sm text-slate-600">{member.description}</p>
           </div>
         )}
 
         {/* Quick action buttons */}
         <div className="mt-5 border-t border-slate-100 pt-4">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
             Quick Actions
           </p>
           <div className="flex flex-wrap items-center gap-2">
@@ -891,7 +891,7 @@ function MemberDetailsModal({
               <button
                 disabled={updating}
                 onClick={() => handleUpdate("Active")}
-                className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
               >
                 <CheckCircle2 size={13} />
                 Set Active
@@ -902,7 +902,7 @@ function MemberDetailsModal({
               <button
                 disabled={updating}
                 onClick={() => handleUpdate("Needs Review")}
-                className="flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50"
               >
                 <Clock size={13} />
                 Request Review
@@ -913,7 +913,7 @@ function MemberDetailsModal({
               <button
                 disabled={updating}
                 onClick={() => handleUpdate("Archived")}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50"
               >
                 <Archive size={13} />
                 Archive
@@ -922,7 +922,7 @@ function MemberDetailsModal({
               <button
                 disabled={updating}
                 onClick={() => handleUpdate("Active")}
-                className="flex items-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
               >
                 <RotateCcw size={13} />
                 Restore
@@ -932,7 +932,7 @@ function MemberDetailsModal({
             <button
               disabled={updating}
               onClick={handleDelete}
-              className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-100 disabled:opacity-50 ml-auto"
+              className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100 disabled:opacity-50 ml-auto"
             >
               <Trash2 size={13} />
               Remove
@@ -942,7 +942,7 @@ function MemberDetailsModal({
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-[#267ba4] py-2.5 text-xs font-medium text-white hover:bg-[#1c668a]"
+          className="mt-6 w-full rounded-lg bg-[#267ba4] py-2.5 text-sm font-medium text-white hover:bg-[#1c668a]"
         >
           Close
         </button>
@@ -999,7 +999,7 @@ function InviteMemberModal({
             <h2 className="text-lg font-semibold text-[#153e5b]">
               Invite Team Member
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[13px] text-slate-500">
               Add a new member to your organisation team and sync across response operations.
             </p>
           </div>
@@ -1011,7 +1011,7 @@ function InviteMemberModal({
 
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Full Name *
             </label>
             <input
@@ -1019,13 +1019,13 @@ function InviteMemberModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Kasun Jayawardena"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Email Address *
               </label>
               <input
@@ -1034,12 +1034,12 @@ function InviteMemberModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="kasun.j@example.org"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Phone Number *
               </label>
               <input
@@ -1047,20 +1047,20 @@ function InviteMemberModal({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+94 77 123 4567"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#267ba4]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Role
               </label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>Field Team Lead</option>
                 <option>Partner Officer</option>
@@ -1072,13 +1072,13 @@ function InviteMemberModal({
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600">
                 Sector
               </label>
               <select
                 value={sector}
                 onChange={(e) => setSector(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
               >
                 <option>WASH</option>
                 <option>Coordination</option>
@@ -1091,13 +1091,13 @@ function InviteMemberModal({
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Operational Area
             </label>
             <select
               value={area}
               onChange={(e) => setArea(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>North Ward</option>
               <option>Greater Riverton</option>
@@ -1109,7 +1109,7 @@ function InviteMemberModal({
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600">
               Assignment Notes / Role Details
             </label>
             <textarea
@@ -1117,7 +1117,7 @@ function InviteMemberModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief note on duties, focal point assignments, or field station..."
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#267ba4]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#267ba4]"
             />
           </div>
         </div>
@@ -1127,7 +1127,7 @@ function InviteMemberModal({
             type="button"
             disabled={isSubmitting}
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"
           >
             Cancel
           </button>
@@ -1135,7 +1135,7 @@ function InviteMemberModal({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-xs font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-[#267ba4] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1c668a] disabled:opacity-50"
           >
             {isSubmitting && <RefreshCw size={13} className="animate-spin" />}
             Send Invitation

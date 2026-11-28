@@ -1,6 +1,7 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -152,6 +153,29 @@ export default function DisasterUpdatesPage() {
     useState<DisasterUpdate | null>(null);
 
   const [notification, setNotification] = useState("");
+
+  useEffect(() => {
+    apiClient.get<any>("/disaster-updates").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setUpdates(
+          items.map((u: any) => ({
+            id: u.id || u.updateCode || "DU-100",
+            type: (u.type as UpdateType) || "Announcement",
+            title: u.title || "Disaster Update",
+            description: u.description || "",
+            source: u.source || "CareLink Coordination",
+            date: u.date || "Today",
+            time: u.time || "12:00",
+            location: u.location || "Greater Riverton",
+            publishedBy: u.publishedBy || "CareLink Coordination",
+            instructions: u.instructions || u.description || "",
+            archived: Boolean(u.archived),
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
 
   const [drafts, setDrafts] = useState<DisasterUpdate[]>([]);
 
@@ -359,7 +383,7 @@ export default function DisasterUpdatesPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[8px] mb-6">
+        <div className="flex items-center gap-2 text-xs mb-6">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={10} className="text-slate-400" />
           <span className="text-slate-400">
@@ -374,11 +398,11 @@ export default function DisasterUpdatesPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
 
           <div>
-            <h1 className="text-[21px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Disaster Updates
             </h1>
 
-            <p className="text-[9px] text-slate-500 mt-1.5">
+            <p className="text-xs text-slate-500 mt-1.5">
               Publish and monitor verified disaster alerts, safety guidance, and announcements.
             </p>
           </div>
@@ -390,7 +414,7 @@ export default function DisasterUpdatesPage() {
                 setShowArchive(!showArchive);
                 setActiveTab("All updates");
               }}
-              className={`h-[31px] px-3 bg-white border border-[#aac4d2] rounded-md text-[9px] font-semibold flex items-center gap-2 hover:bg-slate-50 ${
+              className={`h-[31px] px-3 bg-white border border-[#aac4d2] rounded-md text-sm font-semibold flex items-center gap-2 hover:bg-slate-50 ${
                 showArchive ? "border-[#2785b7] text-[#2785b7]" : ""
               }`}
             >
@@ -400,7 +424,7 @@ export default function DisasterUpdatesPage() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-[31px] px-3 bg-[#1c638a] text-white rounded-md text-[9px] font-semibold hover:bg-[#144665] flex items-center gap-2"
+              className="h-[31px] px-3 bg-[#1c638a] text-white rounded-md text-sm font-semibold hover:bg-[#144665] flex items-center gap-2"
             >
               <Plus size={13} />
               Create announcement
@@ -419,19 +443,19 @@ export default function DisasterUpdatesPage() {
 
             <div className="flex-1 min-w-0">
 
-              <span className="inline-flex bg-[#fdebed] text-[#d83d4b] rounded px-2 py-1 text-[7px] font-bold mb-1">
+              <span className="inline-flex bg-[#fdebed] text-[#d83d4b] rounded px-2 py-1 text-xs font-bold mb-1">
                 CRITICAL ALERT
               </span>
 
-              <h2 className="text-[11px] font-semibold">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Immediate evacuation order - Riverside North
               </h2>
 
-              <p className="text-[8px] text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Residents in low-lying zones N2 and N3 must move to assigned shelters before 16:00.
               </p>
 
-              <p className="text-[7px] text-slate-400 mt-2">
+              <p className="text-xs text-slate-400 mt-2">
                 Published by National Disaster Authority · 22 Jun, 13:28
               </p>
             </div>
@@ -445,7 +469,7 @@ export default function DisasterUpdatesPage() {
                 if (critical) setSelectedUpdate(critical);
                 else setNotification("No active critical alert found.");
               }}
-              className="h-[30px] px-3 bg-white border border-[#aac4d2] rounded-md text-[8px] font-semibold whitespace-nowrap hover:bg-slate-50"
+              className="h-[30px] px-3 bg-white border border-[#aac4d2] rounded-md text-sm font-semibold whitespace-nowrap hover:bg-slate-50"
             >
               View instructions
             </button>
@@ -482,7 +506,7 @@ export default function DisasterUpdatesPage() {
                         setActiveTab(tab);
                         setShowArchive(false);
                       }}
-                      className={`px-2.5 py-2 rounded-md border text-[8px] whitespace-nowrap transition ${
+                      className={`px-2.5 py-2 rounded-md border text-sm whitespace-nowrap transition ${
                         activeTab === tab && !showArchive
                           ? "bg-[#1c638a] text-white border-[#1c638a]"
                           : "bg-white text-slate-500 border-[#d5e3e9] hover:border-[#45b99b]"
@@ -510,7 +534,7 @@ export default function DisasterUpdatesPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search disaster updates..."
-                className="w-full h-9 bg-white border border-[#d5e3e9] rounded-lg pl-9 pr-3 text-[9px] outline-none focus:border-[#45b99b]"
+                className="w-full h-9 bg-white border border-[#d5e3e9] rounded-lg pl-9 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
               />
             </div>
 
@@ -533,11 +557,11 @@ export default function DisasterUpdatesPage() {
                     className="mx-auto text-slate-300"
                   />
 
-                  <p className="text-xs font-semibold mt-3">
+                  <p className="text-sm font-semibold mt-3">
                     No updates found
                   </p>
 
-                  <p className="text-[9px] text-slate-400 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     Try changing your search or selected tab.
                   </p>
                 </div>
@@ -551,7 +575,7 @@ export default function DisasterUpdatesPage() {
 
             {/* EMERGENCY CONTACTS */}
 
-            <h2 className="text-[10px] font-semibold mb-3">
+            <h2 className="text-base sm:text-lg font-semibold mb-3">
               Emergency contacts
             </h2>
 
@@ -562,13 +586,13 @@ export default function DisasterUpdatesPage() {
                   key={contact.name}
                   className="py-2 flex items-center justify-between gap-2"
                 >
-                  <span className="text-[8px] text-slate-600">
+                  <span className="text-xs text-slate-600">
                     {contact.name}
                   </span>
 
                   <a
                     href={`tel:${contact.number.replace(/\s/g, "")}`}
-                    className="text-[8px] font-semibold text-[#1c638a] whitespace-nowrap hover:underline"
+                    className="text-xs font-semibold text-[#1c638a] whitespace-nowrap hover:underline"
                   >
                     {contact.number}
                   </a>
@@ -580,17 +604,17 @@ export default function DisasterUpdatesPage() {
 
             <div className="mt-3 pt-3 border-t border-slate-200">
 
-              <h2 className="text-[10px] font-semibold mb-3">
+              <h2 className="text-base sm:text-lg font-semibold mb-3">
                 Publishing controls
               </h2>
 
-              <p className="text-[8px] text-slate-500 leading-relaxed">
+              <p className="text-sm text-slate-500 leading-relaxed">
                 Only authorised administrators can publish critical alerts.
               </p>
 
               <button
                 onClick={() => setShowDrafts(true)}
-                className="mt-2 h-[29px] px-3 bg-white border border-[#aac4d2] rounded-md text-[8px] font-semibold hover:bg-slate-50 flex items-center gap-2"
+                className="mt-2 h-[29px] px-3 bg-white border border-[#aac4d2] rounded-md text-sm font-semibold hover:bg-slate-50 flex items-center gap-2"
               >
                 <FileText size={12} />
                 View {drafts.length} drafts
@@ -601,7 +625,7 @@ export default function DisasterUpdatesPage() {
 
             <div className="mt-4 pt-3 border-t border-slate-200">
 
-              <h2 className="text-[10px] font-semibold mb-3">
+              <h2 className="text-base sm:text-lg font-semibold mb-3">
                 Update summary
               </h2>
 
@@ -721,7 +745,7 @@ export default function DisasterUpdatesPage() {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="flex-1 h-10 border border-slate-200 rounded-lg text-xs font-semibold"
+                className="flex-1 h-10 border border-slate-200 rounded-lg text-sm font-semibold"
               >
                 Cancel
               </button>
@@ -729,14 +753,14 @@ export default function DisasterUpdatesPage() {
               <button
                 type="button"
                 onClick={saveDraft}
-                className="flex-1 h-10 border border-[#aac4d2] rounded-lg text-xs font-semibold"
+                className="flex-1 h-10 border border-[#aac4d2] rounded-lg text-sm font-semibold"
               >
                 Save draft
               </button>
 
               <button
                 type="submit"
-                className="flex-1 h-10 bg-[#1c638a] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1"
+                className="flex-1 h-10 bg-[#1c638a] text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-1"
               >
                 <Send size={13} />
                 Publish
@@ -783,7 +807,7 @@ export default function DisasterUpdatesPage() {
                 {selectedUpdate.title}
               </h3>
 
-              <p className="text-[10px] text-slate-400 mt-2">
+              <p className="text-[13px] text-slate-400 mt-2">
                 {selectedUpdate.id}
               </p>
             </div>
@@ -816,21 +840,21 @@ export default function DisasterUpdatesPage() {
             </div>
 
             <div className="mt-7">
-              <h3 className="text-xs font-semibold mb-2">
+              <h3 className="text-base font-semibold mb-2">
                 Update description
               </h3>
 
-              <p className="bg-[#f5f9fa] rounded-lg p-3 text-xs text-slate-600 leading-relaxed">
+              <p className="bg-[#f5f9fa] rounded-lg p-3 text-sm text-slate-600 leading-relaxed">
                 {selectedUpdate.description}
               </p>
             </div>
 
             <div className="mt-6">
-              <h3 className="text-xs font-semibold mb-2">
+              <h3 className="text-base font-semibold mb-2">
                 Safety instructions
               </h3>
 
-              <p className="bg-[#fff8ed] border border-[#f5dfb9] rounded-lg p-3 text-xs text-slate-600 leading-relaxed">
+              <p className="bg-[#fff8ed] border border-[#f5dfb9] rounded-lg p-3 text-sm text-slate-600 leading-relaxed">
                 {selectedUpdate.instructions}
               </p>
             </div>
@@ -841,7 +865,7 @@ export default function DisasterUpdatesPage() {
                 onClick={() => {
                   toggleArchive(selectedUpdate.id);
                 }}
-                className="w-full h-10 border border-slate-200 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 hover:bg-slate-50"
+                className="w-full h-10 border border-slate-200 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-slate-50"
               >
                 {selectedUpdate.archived ? (
                   <>
@@ -858,7 +882,7 @@ export default function DisasterUpdatesPage() {
 
               <button
                 onClick={() => setSelectedUpdate(null)}
-                className="w-full h-10 bg-[#1c638a] text-white rounded-lg text-xs font-semibold"
+                className="w-full h-10 bg-[#1c638a] text-white rounded-lg text-sm font-semibold"
               >
                 Close
               </button>
@@ -883,7 +907,7 @@ export default function DisasterUpdatesPage() {
                   size={28}
                   className="mx-auto text-slate-300"
                 />
-                <p className="text-xs font-semibold mt-3">
+                <p className="text-sm font-semibold mt-3">
                   No saved drafts
                 </p>
               </div>
@@ -894,11 +918,11 @@ export default function DisasterUpdatesPage() {
                 key={draft.id}
                 className="border border-slate-200 rounded-lg p-3"
               >
-                <h3 className="text-xs font-semibold">
+                <h3 className="text-base font-semibold">
                   {draft.title}
                 </h3>
 
-                <p className="text-[9px] text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   {draft.description}
                 </p>
 
@@ -906,7 +930,7 @@ export default function DisasterUpdatesPage() {
 
                   <button
                     onClick={() => publishDraft(draft)}
-                    className="flex-1 bg-[#1c638a] text-white rounded-md py-2 text-[9px] font-semibold"
+                    className="flex-1 bg-[#1c638a] text-white rounded-md py-2 text-sm font-semibold"
                   >
                     Publish
                   </button>
@@ -936,7 +960,7 @@ export default function DisasterUpdatesPage() {
 
           <CheckCircle2 size={16} />
 
-          <p className="text-xs">{notification}</p>
+          <p className="text-sm">{notification}</p>
 
           <button onClick={() => setNotification("")}>
             <X size={14} />
@@ -983,20 +1007,20 @@ function UpdateCard({
 
           <TypeBadge type={update.type} />
 
-          <span className="text-[7px] text-slate-400 whitespace-nowrap">
+          <span className="text-xs text-slate-400 whitespace-nowrap">
             {update.date} · {update.time}
           </span>
         </div>
 
-        <h3 className="text-[9px] font-semibold mt-2 truncate">
+        <h3 className="text-base font-semibold mt-2 truncate">
           {update.title}
         </h3>
 
-        <p className="text-[8px] text-slate-500 mt-1 leading-relaxed">
+        <p className="text-sm text-slate-500 mt-1 leading-relaxed">
           {update.description}
         </p>
 
-        <p className="text-[7px] text-slate-400 mt-2">
+        <p className="text-xs text-slate-400 mt-2">
           Source: {update.source}
         </p>
       </div>
@@ -1020,7 +1044,7 @@ function TypeBadge({ type }: { type: UpdateType }) {
   };
 
   return (
-    <span className={`inline-flex px-2 py-1 rounded text-[7px] font-semibold whitespace-nowrap ${styles[type]}`}>
+    <span className={`inline-flex px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${styles[type]}`}>
       {type}
     </span>
   );
@@ -1053,12 +1077,12 @@ function SummaryItem({
           {icon}
         </div>
 
-        <span className="text-[8px] text-slate-600">
+        <span className="text-xs text-slate-600">
           {label}
         </span>
       </div>
 
-      <span className="text-[9px] font-semibold">
+      <span className="text-xs font-semibold">
         {value}
       </span>
     </div>
@@ -1080,7 +1104,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1089,7 +1113,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );
@@ -1108,14 +1132,14 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -1138,7 +1162,7 @@ function FormTextarea({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1148,7 +1172,7 @@ function FormTextarea({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b] resize-none"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] resize-none"
       />
     </div>
   );
@@ -1175,7 +1199,7 @@ function Modal({
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[13px] text-slate-400 mt-1">
               {subtitle}
             </p>
           </div>
@@ -1212,8 +1236,8 @@ function DetailRow({
       <div className="text-[#2785b7]">{icon}</div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-sm font-semibold mt-1 break-words">
           {value}
         </p>
       </div>

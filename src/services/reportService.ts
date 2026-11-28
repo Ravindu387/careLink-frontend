@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   ReportItem,
   ReportSchedule,
@@ -41,7 +41,7 @@ export const reportService = {
     return response.data;
   },
 
-  async generateReport(payload: GenerateReportPayload): Promise<ReportItem> {
+  async createReport(payload: GenerateReportPayload): Promise<ReportItem> {
     const response = await request<ReportItem>("/reports/generate", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -136,6 +136,8 @@ export const reportService = {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  },
+
   async getOverview(filter?: ReportFilter): Promise<ReportOverview> {
     const params = new URLSearchParams();
     if (filter?.dateRange) params.append("dateRange", filter.dateRange);
@@ -212,7 +214,7 @@ export const reportService = {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_BASE_URL}/reports/${encodeURIComponent(reportId)}/export`, {
+    const response = await authFetch(`${API_BASE_URL}/reports/${encodeURIComponent(reportId)}/export`, {
       method: "POST",
       headers,
       body: JSON.stringify(data),

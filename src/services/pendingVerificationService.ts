@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   VolunteerApplication,
   VolunteerVerificationStatsDto,
@@ -518,7 +518,7 @@ export const pendingVerificationService = {
       if (query.status) params.append("status", query.status);
 
       const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5277/api";
-      const res = await fetch(`${API_BASE_URL}/volunteer-verifications/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer-verifications/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }

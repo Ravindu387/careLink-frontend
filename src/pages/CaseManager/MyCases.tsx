@@ -363,7 +363,7 @@ const MyCases: React.FC = () => {
             <button
               onClick={() => loadData(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
               title="Refresh case data"
             >
               <RefreshCw size={13} className={isRefreshing ? "animate-spin text-[#287da8]" : ""} />
@@ -410,7 +410,7 @@ const MyCases: React.FC = () => {
                 setActiveTab(tab.id);
                 setCurrentPage(1);
               }}
-              className={`relative flex items-center gap-2 py-4 text-xs transition ${
+              className={`relative flex items-center gap-2 py-4 text-sm transition ${
                 activeTab === tab.id
                   ? "font-semibold text-[#287da8]"
                   : "text-slate-500 hover:text-sky-700"
@@ -418,7 +418,7 @@ const MyCases: React.FC = () => {
             >
               {tab.label}
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                   activeTab === tab.id
                     ? "bg-sky-100 text-[#287da8]"
                     : "bg-slate-200 text-slate-600"
@@ -446,7 +446,7 @@ const MyCases: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
             {searchTerm && (
               <button onClick={() => setSearchTerm("")}>
@@ -462,7 +462,7 @@ const MyCases: React.FC = () => {
               setEventFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All crisis events</option>
             <option>Flood Response</option>
@@ -477,7 +477,7 @@ const MyCases: React.FC = () => {
               setPriorityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All priorities</option>
             <option>Critical</option>
@@ -493,7 +493,7 @@ const MyCases: React.FC = () => {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All categories</option>
             <option>Emergency shelter</option>
@@ -510,7 +510,7 @@ const MyCases: React.FC = () => {
               setStatusFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All statuses</option>
             <option>Under Review</option>
@@ -527,7 +527,7 @@ const MyCases: React.FC = () => {
               setDateFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>Date range</option>
             <option>Today</option>
@@ -538,7 +538,7 @@ const MyCases: React.FC = () => {
           {/* More Filters Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2.5 rounded-lg border px-4 py-3 text-xs font-semibold shadow-sm transition ${
+            className={`flex items-center gap-2.5 rounded-lg border px-4 py-3 text-sm font-semibold shadow-sm transition ${
               showFilters
                 ? "border-[#287da8] bg-sky-50 text-[#287da8]"
                 : "border-[#b9d0df] bg-white text-[#287da8] hover:bg-sky-50"
@@ -561,7 +561,7 @@ const MyCases: React.FC = () => {
 
             <button
               onClick={resetFilters}
-              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-100"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100"
             >
               Reset all filters
             </button>
@@ -573,7 +573,7 @@ const MyCases: React.FC = () => {
           {/* Table Header Row */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#d5e2eb] px-5 py-4">
             <div>
-              <h2 className="text-base font-medium text-[#173e5b]">Active Case Queue</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-[#173e5b]">Active Case Queue</h2>
               <p className="mt-1 text-xs text-slate-400">
                 {isLoading
                   ? "Loading cases..."
@@ -589,7 +589,7 @@ const MyCases: React.FC = () => {
                   showToast("Please select at least one case using the checkboxes.");
                 }
               }}
-              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-xs font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
+              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-sm font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
             >
               Bulk actions {selectedCases.length > 0 && `(${selectedCases.length})`}
             </button>
@@ -599,7 +599,7 @@ const MyCases: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1150px] text-left">
               <thead className="bg-[#f7f9fa]">
-                <tr className="border-b border-[#d5e2eb] text-[11px] font-semibold text-slate-500">
+                <tr className="border-b border-[#d5e2eb] text-sm font-semibold text-slate-500">
                   <th className="px-4 py-4">
                     <input
                       type="checkbox"
@@ -658,43 +658,43 @@ const MyCases: React.FC = () => {
                         />
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] font-bold text-[#173e5b]">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm font-bold text-[#173e5b]">
                         {item.id}
                       </td>
 
                       <td className="px-3 py-5">
-                        <p className="whitespace-nowrap text-[11px] font-semibold text-[#173e5b]">
+                        <p className="whitespace-nowrap text-sm font-semibold text-[#173e5b]">
                           {item.category}
                         </p>
-                        <p className="mt-1 whitespace-nowrap text-[10px] text-slate-500">
+                        <p className="mt-1 whitespace-nowrap text-[13px] text-slate-500">
                           {item.applicant}
                         </p>
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         {item.location}
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
-                        <span className="rounded-md bg-slate-100 px-2 py-1 text-[10px] font-medium text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
+                        <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
                           {item.event}
                         </span>
                       </td>
 
                       <td className="px-3 py-5">
                         <span
-                          className={`rounded-md px-2 py-0.5 text-[10px] font-semibold ${priorityStyle(
+                          className={`rounded-md px-2 py-0.5 text-xs font-semibold ${priorityStyle(
                             item.priority
                           )}`}
                         >
                           {item.priority}
                         </span>
-                        <p className="mt-1 text-[10px] text-slate-400">{item.confidence}</p>
+                        <p className="mt-1 text-[13px] text-slate-400">{item.confidence}</p>
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         <span
-                          className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium ${
+                          className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${
                             item.verification === "Verified"
                               ? "bg-emerald-50 text-emerald-700"
                               : "bg-amber-50 text-amber-700"
@@ -704,15 +704,15 @@ const MyCases: React.FC = () => {
                         </span>
                       </td>
 
-                      <td className="px-3 py-5 text-[11px] text-slate-600">{item.assigned}</td>
+                      <td className="px-3 py-5 text-sm text-slate-600">{item.assigned}</td>
 
-                      <td className="whitespace-nowrap px-3 py-5 text-[11px] text-slate-600">
+                      <td className="whitespace-nowrap px-3 py-5 text-sm text-slate-600">
                         {item.age}
                       </td>
 
                       <td className="px-3 py-5">
                         <span
-                          className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[10px] font-semibold ${statusStyle(
+                          className={`whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold ${statusStyle(
                             item.status
                           )}`}
                         >
@@ -754,7 +754,7 @@ const MyCases: React.FC = () => {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3.5 py-2 text-xs text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3.5 py-2 text-sm text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ChevronLeft size={14} />
                 Previous
@@ -764,7 +764,7 @@ const MyCases: React.FC = () => {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`h-8 w-8 rounded-lg border text-xs transition ${
+                  className={`h-8 w-8 rounded-lg border text-sm transition ${
                     currentPage === page
                       ? "border-[#287da8] bg-[#287da8] font-semibold text-white"
                       : "border-[#d5e2eb] bg-white text-slate-600 hover:bg-sky-50"
@@ -777,7 +777,7 @@ const MyCases: React.FC = () => {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3.5 py-2 text-xs font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3.5 py-2 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
                 <ChevronRight size={14} />
@@ -816,49 +816,49 @@ const MyCases: React.FC = () => {
             <form onSubmit={handleCreateCase} className="mt-5 space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Applicant / Family Name *</label>
+                  <label className="text-sm font-semibold text-slate-700">Applicant / Family Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. M. Senanayake"
                     value={newApplicant}
                     onChange={(e) => setNewApplicant(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">People Impacted *</label>
+                  <label className="text-sm font-semibold text-slate-700">People Impacted *</label>
                   <input
                     type="number"
                     min={1}
                     required
                     value={newPeopleCount}
                     onChange={(e) => setNewPeopleCount(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Location / Sector *</label>
+                <label className="text-sm font-semibold text-slate-700">Location / Sector *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Riverbank Lane, Ward 5"
                   value={newLocation}
                   onChange={(e) => setNewLocation(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Category</label>
+                  <label className="text-sm font-semibold text-slate-700">Category</label>
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   >
                     <option>Emergency shelter</option>
                     <option>Medical supplies</option>
@@ -869,11 +869,11 @@ const MyCases: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Crisis Event</label>
+                  <label className="text-sm font-semibold text-slate-700">Crisis Event</label>
                   <select
                     value={newEvent}
                     onChange={(e) => setNewEvent(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   >
                     <option>Flood Response</option>
                     <option>Storm Response</option>
@@ -882,11 +882,11 @@ const MyCases: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Initial Priority</label>
+                  <label className="text-sm font-semibold text-slate-700">Initial Priority</label>
                   <select
                     value={newPriority}
                     onChange={(e) => setNewPriority(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   >
                     <option>Critical</option>
                     <option>High</option>
@@ -897,13 +897,13 @@ const MyCases: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Description & Special Needs</label>
+                <label className="text-sm font-semibold text-slate-700">Description & Special Needs</label>
                 <textarea
                   rows={3}
                   placeholder="Details regarding urgent requirements, elderly/children, access conditions..."
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-xs outline-none focus:border-sky-500"
+                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </div>
 
@@ -911,14 +911,14 @@ const MyCases: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="rounded-lg border border-[#b9d0df] px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-[#b9d0df] px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingCreate}
-                  className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2 text-xs font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2 text-sm font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
                 >
                   {isSubmittingCreate ? "Creating..." : "Create & Assign"}
                 </button>
@@ -981,19 +981,19 @@ const MyCases: React.FC = () => {
 
               {selectedCase.description && (
                 <div className="rounded-lg border border-sky-100 bg-sky-50/50 p-3">
-                  <p className="text-[11px] font-semibold text-[#173e5b]">Case Description:</p>
-                  <p className="mt-1 text-xs text-slate-600">{selectedCase.description}</p>
+                  <p className="text-sm font-semibold text-[#173e5b]">Case Description:</p>
+                  <p className="mt-1 text-sm text-slate-600">{selectedCase.description}</p>
                 </div>
               )}
 
               {/* Status & Priority Controls */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Update Status</label>
+                  <label className="text-sm font-semibold text-slate-700">Update Status</label>
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   >
                     <option>Under Review</option>
                     <option>Assigned</option>
@@ -1004,11 +1004,11 @@ const MyCases: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Update Priority</label>
+                  <label className="text-sm font-semibold text-slate-700">Update Priority</label>
                   <select
                     value={editPriority}
                     onChange={(e) => setEditPriority(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   >
                     <option>Critical</option>
                     <option>High</option>
@@ -1019,7 +1019,7 @@ const MyCases: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">
+                <label className="text-sm font-semibold text-slate-700">
                   Coordinator & Response Notes
                 </label>
                 <textarea
@@ -1027,7 +1027,7 @@ const MyCases: React.FC = () => {
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
                   placeholder="Record verification notes, relief dispatch details, or escalation reason..."
-                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-xs outline-none focus:border-sky-500"
+                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </div>
 
@@ -1035,7 +1035,7 @@ const MyCases: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedCase(null)}
-                  className="rounded-lg border border-[#b9d0df] px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-[#b9d0df] px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
@@ -1043,7 +1043,7 @@ const MyCases: React.FC = () => {
                   type="button"
                   disabled={isSubmittingEdit}
                   onClick={handleUpdateStatus}
-                  className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2 text-xs font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2 text-sm font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
                 >
                   <Check size={14} />
                   {isSubmittingEdit ? "Saving..." : "Save Updates"}
@@ -1082,11 +1082,11 @@ const MyCases: React.FC = () => {
 
             <div className="mt-4 space-y-4">
               <div>
-                <label className="text-xs font-semibold text-slate-700">Action Type</label>
+                <label className="text-sm font-semibold text-slate-700">Action Type</label>
                 <select
                   value={bulkActionType}
                   onChange={(e) => setBulkActionType(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 >
                   <option value="Resolve">Mark as Resolved</option>
                   <option value="Escalate">Escalate to Emergency Team</option>
@@ -1097,25 +1097,25 @@ const MyCases: React.FC = () => {
 
               {bulkActionType === "Reassign" && (
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Reassign To</label>
+                  <label className="text-sm font-semibold text-slate-700">Reassign To</label>
                   <input
                     type="text"
                     value={bulkAssignTo}
                     onChange={(e) => setBulkAssignTo(e.target.value)}
                     placeholder="e.g. Field Team A, Coordinator West"
-                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-xs outline-none focus:border-sky-500"
+                    className="mt-1 w-full rounded-lg border border-[#d2e0e9] px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                   />
                 </div>
               )}
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Action Note / Log</label>
+                <label className="text-sm font-semibold text-slate-700">Action Note / Log</label>
                 <textarea
                   rows={3}
                   value={bulkNotes}
                   onChange={(e) => setBulkNotes(e.target.value)}
                   placeholder="Optional log message applied to all selected cases..."
-                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-xs outline-none focus:border-sky-500"
+                  className="mt-1 w-full rounded-lg border border-[#d2e0e9] p-3 text-sm sm:text-[15px] outline-none focus:border-sky-500"
                 />
               </div>
 
@@ -1123,7 +1123,7 @@ const MyCases: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowBulkModal(false)}
-                  className="rounded-lg border border-[#b9d0df] px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-[#b9d0df] px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
@@ -1131,7 +1131,7 @@ const MyCases: React.FC = () => {
                   type="button"
                   disabled={isSubmittingBulk}
                   onClick={handleBulkAction}
-                  className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2 text-xs font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2 text-sm font-semibold text-white hover:bg-[#17678f] disabled:opacity-50"
                 >
                   {isSubmittingBulk ? "Processing..." : `Execute on ${selectedCases.length} Cases`}
                 </button>

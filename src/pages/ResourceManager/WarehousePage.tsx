@@ -403,27 +403,27 @@ export default function WarehousePage() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold">ReliefOS</h1>
-            <p className="text-[10px] text-sky-200">Resource Management</p>
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">ReliefOS</h1>
+            <p className="text-sm text-sky-200">Resource Management</p>
           </div>
         </div>
 
         {/* Active Operation */}
         <div className="mx-4 mt-4 rounded-lg border border-white/10 bg-white/10 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">
             ● Active Operation
           </p>
 
-          <p className="mt-2 text-xs font-bold">Monsoon Floods 2025</p>
+          <p className="mt-2 text-sm font-bold">Monsoon Floods 2025</p>
 
-          <p className="mt-1 text-[10px] text-sky-200">
+          <p className="mt-1 text-sm text-sky-200">
             Greater Riverton · Level 4
           </p>
         </div>
 
         {/* Navigation */}
         <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-widest text-sky-300">
             Logistics Operations
           </p>
 
@@ -440,7 +440,7 @@ export default function WarehousePage() {
                     navigate(item.path);
                   }
                 }}
-                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[11px] transition ${
+                className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition ${
                   active
                     ? "border-l-[3px] border-[#62b7a8] bg-[#287ba5] font-semibold text-white"
                     : "text-sky-100 hover:bg-white/10"
@@ -451,7 +451,7 @@ export default function WarehousePage() {
                 <span className="flex-1">{item.label}</span>
 
                 {"count" in item && item.count && (
-                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px]">
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-xs">
                     {item.count}
                   </span>
                 )}
@@ -467,8 +467,8 @@ export default function WarehousePage() {
           </div>
 
           <div className="flex-1">
-            <p className="text-xs font-bold">Daniel Perera</p>
-            <p className="text-[10px] text-sky-200">Resource Manager</p>
+            <p className="text-sm font-bold">Daniel Perera</p>
+            <p className="text-sm text-sky-200">Resource Manager</p>
           </div>
 
           <ChevronRight size={18} />
@@ -505,18 +505,18 @@ export default function WarehousePage() {
                 setCurrentPage(1);
               }}
               placeholder="Search resources, requests, dispatches..."
-              className="w-full bg-transparent text-xs outline-none"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none"
             />
 
-            <span className="hidden rounded border bg-white px-2 py-1 text-[9px] text-slate-400 sm:block">
+            <span className="hidden rounded border bg-white px-2 py-1 text-xs text-slate-400 sm:block">
               ⌘ K
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="hidden border-r border-slate-200 pr-5 text-right md:block">
-              <p className="text-[9px] uppercase text-slate-400">Primary Hub</p>
-              <p className="text-[10px] font-bold">Central Logistics Hub</p>
+              <p className="text-xs uppercase text-slate-400">Primary Hub</p>
+              <p className="text-sm font-bold">Central Logistics Hub</p>
             </div>
 
             <button className="hidden rounded-lg border p-2.5 sm:block" title="Security Status">
@@ -525,7 +525,7 @@ export default function WarehousePage() {
 
             <button className="relative rounded-lg border p-2.5" title="Alerts">
               <Bell size={18} />
-              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-[9px] text-white">
+              <span className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white">
                 9
               </span>
             </button>
@@ -535,8 +535,8 @@ export default function WarehousePage() {
             </div>
 
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold">Daniel P.</p>
-              <p className="text-[9px] text-slate-400">Resource Manager</p>
+              <p className="text-sm font-bold">Daniel P.</p>
+              <p className="text-xs text-slate-400">Resource Manager</p>
             </div>
 
             <ChevronRight size={17} className="hidden sm:block text-slate-400" />
@@ -545,7 +545,7 @@ export default function WarehousePage() {
 
         <div className="space-y-6 p-4 sm:p-6 lg:p-7">
           {/* BREADCRUMB & API STATUS BADGE */}
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] text-slate-400">
             <div>
               Resource Operations
               <ChevronRight size={12} className="mx-1 inline" />
@@ -554,13 +554,13 @@ export default function WarehousePage() {
 
             <div className="flex items-center gap-2">
               {isBackendConnected === true && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-medium text-emerald-700 border border-emerald-200">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 border border-emerald-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   API Connected
                 </span>
               )}
               {isBackendConnected === false && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-medium text-amber-700 border border-amber-200">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 border border-amber-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                   Offline Mode
                 </span>
@@ -604,7 +604,7 @@ export default function WarehousePage() {
               <button
                 type="button"
                 onClick={handleExport}
-                className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 <Download size={15} />
                 Export
@@ -613,7 +613,7 @@ export default function WarehousePage() {
               <button
                 type="button"
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-3 text-xs font-semibold text-white hover:bg-[#1c668d]"
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-3 text-sm font-semibold text-white hover:bg-[#1c668d]"
               >
                 <Plus size={16} />
                 Add Warehouse
@@ -666,11 +666,11 @@ export default function WarehousePage() {
                   </div>
 
                   <div>
-                    <p className="text-[10px] text-slate-400">{card.title}</p>
+                    <p className="text-[13px] text-slate-400">{card.title}</p>
                     <h3 className="text-2xl font-bold text-slate-800">
                       {card.value}
                     </h3>
-                    <p className="text-[9px] text-slate-400">{card.note}</p>
+                    <p className="text-xs text-slate-400">{card.note}</p>
                   </div>
                 </div>
               );
@@ -702,7 +702,7 @@ export default function WarehousePage() {
                       setActiveTab(tab);
                       setCurrentPage(1);
                     }}
-                    className={`relative flex items-center gap-1.5 pb-4 text-[11px] transition ${
+                    className={`relative flex items-center gap-1.5 pb-4 text-sm transition ${
                       activeTab === tab
                         ? "font-bold text-sky-700"
                         : "text-slate-500 hover:text-sky-700"
@@ -711,7 +711,7 @@ export default function WarehousePage() {
                     {tab}
 
                     <span
-                      className={`rounded-full px-1.5 py-0.5 text-[9px] ${
+                      className={`rounded-full px-1.5 py-0.5 text-xs ${
                         activeTab === tab
                           ? "bg-sky-100 text-sky-700 font-semibold"
                           : "bg-slate-100 text-slate-600"
@@ -741,7 +741,7 @@ export default function WarehousePage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search warehouses..."
-                className="w-full text-xs outline-none bg-transparent"
+                className="w-full text-sm sm:text-[15px] outline-none bg-transparent"
               />
             </div>
 
@@ -751,7 +751,7 @@ export default function WarehousePage() {
                 setDistrict(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>All districts</option>
               {[...new Set(warehouses.map(w => w.location))].map((value) => (
@@ -765,7 +765,7 @@ export default function WarehousePage() {
                 setCapacityState(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>All capacity states</option>
               <option>Normal</option>
@@ -778,7 +778,7 @@ export default function WarehousePage() {
                 setStatus(e.target.value);
                 setCurrentPage(1);
               }}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] outline-none"
             >
               <option>All statuses</option>
               <option>Operational</option>
@@ -789,7 +789,7 @@ export default function WarehousePage() {
             <button
               type="button"
               onClick={resetFilters}
-              className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+              className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
               <Filter size={15} />
               Reset Filters
@@ -806,7 +806,7 @@ export default function WarehousePage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[850px] text-left">
-                  <thead className="bg-slate-50 text-[10px] text-slate-500">
+                  <thead className="bg-slate-50 text-[13px] text-slate-500">
                     <tr>
                       {[
                         "Warehouse ID",
@@ -830,7 +830,7 @@ export default function WarehousePage() {
                     {displayedWarehouses.map((warehouse) => (
                       <tr
                         key={warehouse.id}
-                        className="border-t border-slate-100 text-[11px] transition hover:bg-slate-50"
+                        className="border-t border-slate-100 text-sm transition hover:bg-slate-50"
                       >
                         <td className="px-3 py-4 font-bold text-slate-800">
                           {warehouse.id}
@@ -879,7 +879,7 @@ export default function WarehousePage() {
 
                         <td className="px-3 py-4">
                           <span
-                            className={`whitespace-nowrap rounded-md px-2 py-1 text-[10px] font-semibold ${
+                            className={`whitespace-nowrap rounded-md px-2 py-1 text-xs font-semibold ${
                               statusStyles[warehouse.status]
                             }`}
                           >
@@ -912,7 +912,7 @@ export default function WarehousePage() {
 
             {/* PAGINATION */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">
-              <p className="text-[10px] text-slate-400">
+              <p className="text-[13px] text-slate-400">
                 Showing{" "}
                 {filteredWarehouses.length === 0
                   ? 0
@@ -928,7 +928,7 @@ export default function WarehousePage() {
                   onClick={() =>
                     setCurrentPage((page) => Math.max(1, page - 1))
                   }
-                  className="rounded-lg border px-3 py-2 text-[10px] text-slate-500 disabled:opacity-40"
+                  className="rounded-lg border px-3 py-2 text-sm text-slate-500 disabled:opacity-40"
                 >
                   Previous
                 </button>
@@ -938,7 +938,7 @@ export default function WarehousePage() {
                     key={page}
                     type="button"
                     onClick={() => setCurrentPage(page)}
-                    className={`h-8 min-w-8 rounded-lg border px-2 text-[10px] ${
+                    className={`h-8 min-w-8 rounded-lg border px-2 text-xs ${
                       safePage === page
                         ? "border-sky-700 bg-sky-700 font-bold text-white"
                         : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -954,7 +954,7 @@ export default function WarehousePage() {
                   onClick={() =>
                     setCurrentPage((page) => Math.min(totalPages, page + 1))
                   }
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-[10px] text-slate-600 disabled:opacity-40"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600 disabled:opacity-40"
                 >
                   Next
                 </button>
@@ -962,7 +962,7 @@ export default function WarehousePage() {
             </div>
           </section>
 
-          <footer className="py-2 text-center text-[10px] text-slate-400">
+          <footer className="py-2 text-center text-[13px] text-slate-400">
             ReliefOS · Humanitarian Resource Management Platform
           </footer>
         </div>
@@ -993,7 +993,7 @@ export default function WarehousePage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold">
+              <label className="mb-1 block text-sm font-semibold">
                 Warehouse Name
               </label>
 
@@ -1007,12 +1007,12 @@ export default function WarehousePage() {
                   })
                 }
                 placeholder="Enter warehouse name"
-                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold">
+              <label className="mb-1 block text-sm font-semibold">
                 Location / District
               </label>
 
@@ -1026,12 +1026,12 @@ export default function WarehousePage() {
                   })
                 }
                 placeholder="Enter district or city"
-                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold">
+              <label className="mb-1 block text-sm font-semibold">
                 Storage Capacity (m²)
               </label>
 
@@ -1046,12 +1046,12 @@ export default function WarehousePage() {
                     capacity: e.target.value,
                   })
                 }
-                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold">
+              <label className="mb-1 block text-sm font-semibold">
                 Number of Staff
               </label>
 
@@ -1067,7 +1067,7 @@ export default function WarehousePage() {
                     staff: e.target.value,
                   })
                 }
-                className="w-full rounded-lg border border-slate-200 p-2.5 text-xs outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-200 p-2.5 text-sm sm:text-[15px] outline-none focus:border-sky-500"
               />
             </div>
 
@@ -1075,7 +1075,7 @@ export default function WarehousePage() {
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="rounded-lg border px-4 py-2 text-xs font-semibold hover:bg-slate-50"
+                className="rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -1083,7 +1083,7 @@ export default function WarehousePage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-[#287ba5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1c668d] disabled:opacity-50"
               >
                 {isSubmitting && <Loader2 size={14} className="animate-spin" />}
                 <span>Save Warehouse</span>
@@ -1131,7 +1131,7 @@ export default function WarehousePage() {
                 type="button"
                 onClick={() => handleDeleteWarehouse(selectedWarehouse.id)}
                 disabled={isSubmitting}
-                className="flex items-center gap-1 text-xs text-rose-600 hover:text-rose-800 p-1.5 rounded hover:bg-rose-50"
+                className="flex items-center gap-1 text-sm text-rose-600 hover:text-rose-800 p-1.5 rounded hover:bg-rose-50"
                 title="Delete warehouse"
               >
                 <Trash2 size={15} />
@@ -1149,14 +1149,14 @@ export default function WarehousePage() {
               ["Status", selectedWarehouse.status],
             ].map(([label, value]) => (
               <div key={label} className="rounded-lg bg-slate-50 p-3">
-                <p className="text-[10px] text-slate-400">{label}</p>
+                <p className="text-[13px] text-slate-400">{label}</p>
                 <p className="mt-1 text-sm font-semibold">{value}</p>
               </div>
             ))}
 
             {/* STATUS WORKFLOW ACTIONS */}
             <div className="pt-3 border-t border-slate-100 space-y-2">
-              <p className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider">
+              <p className="text-xs font-semibold uppercase text-slate-400 tracking-wider">
                 Operational Status
               </p>
               <div className="flex gap-2">
@@ -1167,7 +1167,7 @@ export default function WarehousePage() {
                     onClick={() =>
                       handleUpdateStatus(selectedWarehouse.id, "Operational")
                     }
-                    className="flex-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-50"
+                    className="flex-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 py-1.5 text-sm font-semibold hover:bg-emerald-100 disabled:opacity-50"
                   >
                     Set Operational
                   </button>
@@ -1179,7 +1179,7 @@ export default function WarehousePage() {
                     onClick={() =>
                       handleUpdateStatus(selectedWarehouse.id, "Near Capacity")
                     }
-                    className="flex-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 py-1.5 text-xs font-semibold hover:bg-amber-100 disabled:opacity-50"
+                    className="flex-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 py-1.5 text-sm font-semibold hover:bg-amber-100 disabled:opacity-50"
                   >
                     Set Near Capacity
                   </button>
@@ -1191,7 +1191,7 @@ export default function WarehousePage() {
                     onClick={() =>
                       handleUpdateStatus(selectedWarehouse.id, "Under Maintenance")
                     }
-                    className="flex-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 py-1.5 text-xs font-semibold hover:bg-rose-100 disabled:opacity-50"
+                    className="flex-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 py-1.5 text-sm font-semibold hover:bg-rose-100 disabled:opacity-50"
                   >
                     Under Maintenance
                   </button>
@@ -1202,7 +1202,7 @@ export default function WarehousePage() {
             <button
               type="button"
               onClick={() => setSelectedWarehouse(null)}
-              className="w-full rounded-lg bg-[#287ba5] py-2.5 text-xs font-semibold text-white hover:bg-[#1c668d]"
+              className="w-full rounded-lg bg-[#287ba5] py-2.5 text-sm font-semibold text-white hover:bg-[#1c668d]"
             >
               Close
             </button>

@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   ShelterReportsFilterDto,
   ShelterReportsOverviewDto,
@@ -232,7 +232,7 @@ export const shelterReportsService = {
       const headers: Record<string, string> = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(`${API_BASE_URL}/shelter/reports/export?${params.toString()}`, { headers });
+      const res = await authFetch(`${API_BASE_URL}/shelter/reports/export?${params.toString()}`, { headers });
       if (res.ok) {
         return await res.blob();
       }
@@ -281,7 +281,7 @@ export const shelterReportsService = {
       const headers: Record<string, string> = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(`${API_BASE_URL}/shelter/reports/export/item?${params.toString()}`, { headers });
+      const res = await authFetch(`${API_BASE_URL}/shelter/reports/export/item?${params.toString()}`, { headers });
       if (res.ok) {
         return await res.blob();
       }

@@ -1,37 +1,25 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
-
 import CaseManagerSidebar from "../pages/CaseManager/CaseManagerSidebar";
 import CaseManagerTopbar from "../pages/CaseManager/CaseManagerTopbar";
 
 export default function CaseManagerLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
+    <div className="flex h-screen w-full overflow-hidden bg-[#EFF6F7]">
+      <CaseManagerSidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-    <div className="min-h-screen bg-[#eff6f8]">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <CaseManagerTopbar onMenuClick={() => setSidebarOpen(true)} />
 
-      {/* SIDEBAR */}
-
-      <CaseManagerSidebar />
-
-      {/* MAIN AREA */}
-
-      <div className="ml-[295px] min-h-screen">
-
-        {/* TOPBAR */}
-
-        <CaseManagerTopbar />
-
-        {/* PAGE CONTENT */}
-
-        <main className="min-h-[calc(100vh-75px)]">
-
+        <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-[#EFF6F7]">
           <Outlet />
-
         </main>
-
       </div>
-
     </div>
-
   );
 }

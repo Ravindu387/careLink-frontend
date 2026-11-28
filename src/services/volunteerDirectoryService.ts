@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   VolunteerItem,
   VolunteerDirectoryStats,
@@ -408,7 +408,7 @@ export const volunteerDirectoryService = {
       if (query.availability && query.availability !== "Any availability") params.append("availability", query.availability);
       if (query.verification && query.verification !== "All verification states") params.append("verification", query.verification);
 
-      const res = await fetch(`${API_BASE_URL}/volunteer/directory/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer/directory/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }

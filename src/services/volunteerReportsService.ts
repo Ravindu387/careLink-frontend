@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request, authFetch } from "./api";
 import type {
   VolunteerReportsOverviewDto,
   VolunteerAnalyticsData,
@@ -168,7 +168,7 @@ export const volunteerReportsService = {
       if (query.skillGroup) params.append("skillGroup", query.skillGroup);
 
       const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5277/api";
-      const res = await fetch(`${API_BASE_URL}/volunteer/reports/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer/reports/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }
@@ -210,7 +210,7 @@ export const volunteerReportsService = {
       if (query.skillGroup) params.append("skillGroup", query.skillGroup);
 
       const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5277/api";
-      const res = await fetch(`${API_BASE_URL}/volunteer/reports/library/${id}/export?${params.toString()}`);
+      const res = await authFetch(`${API_BASE_URL}/volunteer/reports/library/${id}/export?${params.toString()}`);
       if (res.ok) {
         return await res.blob();
       }

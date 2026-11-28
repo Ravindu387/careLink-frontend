@@ -1,6 +1,7 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { apiClient } from "../../services/api";
 import {
   Search,
   Globe,
@@ -157,6 +158,27 @@ export default function StaffManagementPage() {
     useState<Staff | null>(null);
 
   const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    apiClient.get<any>("/staff").then((res) => {
+      const items = res?.items ?? (Array.isArray(res) ? res : null);
+      if (items?.length) {
+        setStaff(
+          items.map((s: any) => ({
+            id: s.id || s.staffCode || "ST-001",
+            name: s.name || s.fullName || "Staff Member",
+            designation: s.designation || s.role || "Shelter Manager",
+            contact: s.contact || s.phone || "077 000 0000",
+            email: s.email || "staff@carelink.org",
+            shelter: s.shelter || s.shelterName || "Riverton Central",
+            shift: s.shift || "Morning",
+            availability: (s.availability as Availability) || "Available",
+            status: (s.status as StaffStatus) || "Active",
+          }))
+        );
+      }
+    }).catch(() => {});
+  }, []);
 
   const [newStaff, setNewStaff] = useState({
     name: "",
@@ -337,7 +359,7 @@ export default function StaffManagementPage() {
 
         {/* BREADCRUMB */}
 
-        <div className="flex items-center gap-2 text-[9px] mb-7">
+        <div className="flex items-center gap-2 text-xs mb-7">
           <span className="text-slate-400">CareLink</span>
           <ChevronRight size={11} className="text-slate-400" />
           <span className="text-slate-400">
@@ -352,11 +374,11 @@ export default function StaffManagementPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
 
           <div>
-            <h1 className="text-[23px] md:text-[25px] font-normal">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold">
               Staff Management
             </h1>
 
-            <p className="text-[11px] text-slate-500 mt-2">
+            <p className="text-[13px] text-slate-500 mt-2">
               Manage shelter teams, roles, availability, shifts, and responsibilities.
             </p>
           </div>
@@ -365,14 +387,14 @@ export default function StaffManagementPage() {
 
             <button
               onClick={() => setShowShiftModal(true)}
-              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-[10px] font-semibold hover:bg-slate-50"
+              className="h-9 px-4 border border-[#aac4d2] bg-white rounded-lg text-sm font-semibold hover:bg-slate-50"
             >
               Manage shifts
             </button>
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2 hover:bg-[#144665]"
+              className="h-9 px-4 bg-[#1c638a] text-white rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#144665]"
             >
               <Plus size={14} />
               Add staff member
@@ -428,17 +450,17 @@ export default function StaffManagementPage() {
             <div className="px-3.5 py-3.5 border-b border-slate-200 flex items-center justify-between">
 
               <div>
-                <h2 className="text-xs font-semibold">
+                <h2 className="text-base sm:text-lg font-semibold">
                   Staff directory
                 </h2>
-                <p className="text-[8px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Verified shelter personnel · {filteredStaff.length} records
                 </p>
               </div>
 
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`h-9 px-3 border rounded-lg text-[10px] font-semibold flex items-center gap-2 ${
+                className={`h-9 px-3 border rounded-lg text-sm font-semibold flex items-center gap-2 ${
                   showFilters
                     ? "border-[#2785b7] text-[#2785b7]"
                     : "border-[#aac4d2]"
@@ -462,7 +484,7 @@ export default function StaffManagementPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search staff ID, name, designation..."
-                  className="w-full h-9 border border-slate-200 rounded-lg pl-9 pr-3 text-[10px] outline-none focus:border-[#45b99b]"
+                  className="w-full h-9 border border-slate-200 rounded-lg pl-9 pr-3 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
                 />
               </div>
             </div>
@@ -510,7 +532,7 @@ export default function StaffManagementPage() {
 
                 <button
                   onClick={resetFilters}
-                  className="text-[9px] text-[#267ca6] font-semibold mt-3"
+                  className="text-sm text-[#267ca6] font-semibold mt-3"
                 >
                   Clear all filters
                 </button>
@@ -523,7 +545,7 @@ export default function StaffManagementPage() {
               <table className="w-full min-w-[850px] text-left">
 
                 <thead className="bg-[#f5f9fa] border-b border-slate-200">
-                  <tr className="text-[8px] text-slate-500">
+                  <tr className="text-sm text-slate-500">
                     <th className="px-3 py-3 font-medium">Staff ID</th>
                     <th className="px-3 py-3 font-medium">Full Name</th>
                     <th className="px-3 py-3 font-medium">Designation</th>
@@ -542,7 +564,7 @@ export default function StaffManagementPage() {
                     <tr
                       key={member.id}
                       onClick={() => setSelectedStaff(member)}
-                      className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-[8px] transition"
+                      className="border-b border-slate-100 hover:bg-[#f5faf9] cursor-pointer text-sm transition"
                     >
 
                       <td className="px-3 py-3.5 font-semibold whitespace-nowrap">
@@ -580,7 +602,7 @@ export default function StaffManagementPage() {
                       </td>
 
                       <td className="px-3 py-3.5">
-                        <span className="px-2 py-1 rounded-md bg-[#e5f8f1] text-[#218d70] text-[8px] font-semibold">
+                        <span className="px-2 py-1 rounded-md bg-[#e5f8f1] text-[#218d70] text-xs font-semibold">
                           {member.status}
                         </span>
                       </td>
@@ -598,7 +620,7 @@ export default function StaffManagementPage() {
                     <tr>
                       <td
                         colSpan={10}
-                        className="text-center py-12 text-xs text-slate-400"
+                        className="text-center py-12 text-sm text-slate-400"
                       >
                         No staff members found.
                       </td>
@@ -609,13 +631,13 @@ export default function StaffManagementPage() {
             </div>
 
             <div className="px-3.5 py-3 border-t border-slate-100 flex justify-between items-center">
-              <p className="text-[9px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 Showing {filteredStaff.length} staff members
               </p>
 
               <button
                 onClick={() => setShowAddModal(true)}
-                className="text-[9px] font-semibold text-[#267ca6] flex items-center gap-1"
+                className="text-sm font-semibold text-[#267ca6] flex items-center gap-1"
               >
                 <Plus size={12} />
                 Add staff
@@ -628,11 +650,11 @@ export default function StaffManagementPage() {
           <div className="bg-white border border-[#d5e3e9] rounded-xl shadow-sm overflow-hidden">
 
             <div className="px-3.5 py-3.5 border-b border-slate-200">
-              <h2 className="text-xs font-semibold">
+              <h2 className="text-base sm:text-lg font-semibold">
                 Weekly shift coverage
               </h2>
 
-              <p className="text-[8px] text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Riverton Central · 22–28 June
               </p>
             </div>
@@ -650,10 +672,10 @@ export default function StaffManagementPage() {
                   >
 
                     <div className="w-10 shrink-0">
-                      <p className="text-[9px] font-semibold">
+                      <p className="text-xs font-semibold">
                         {day.day}
                       </p>
-                      <p className="text-[8px] text-slate-400">
+                      <p className="text-xs text-slate-400">
                         {day.date}
                       </p>
                     </div>
@@ -688,7 +710,7 @@ export default function StaffManagementPage() {
                           )
                         );
                       }}
-                      className="w-9 text-right text-[8px] font-medium hover:text-[#2785b7]"
+                      className="w-9 text-right text-sm font-medium hover:text-[#2785b7]"
                     >
                       {day.assigned}/{day.capacity}
                     </button>
@@ -717,13 +739,13 @@ export default function StaffManagementPage() {
                 )}
 
                 <div>
-                  <p className="text-[8px] font-semibold">
+                  <p className="text-xs font-semibold">
                     {adequateCoverage
                       ? "Coverage is adequate"
                       : "Staff coverage requires attention"}
                   </p>
 
-                  <p className="text-[8px] text-slate-500 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     {adequateCoverage
                       ? "All critical roles have assigned staff."
                       : "Some days have less than 75% staffing coverage."}
@@ -733,7 +755,7 @@ export default function StaffManagementPage() {
 
               <button
                 onClick={() => setShowShiftModal(true)}
-                className="w-full h-9 border border-slate-200 rounded-lg text-[9px] font-semibold hover:bg-slate-50 flex items-center justify-center gap-2"
+                className="w-full h-9 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2"
               >
                 <CalendarDays size={13} />
                 Manage weekly shifts
@@ -859,10 +881,10 @@ export default function StaffManagementPage() {
               >
                 <div className="flex justify-between items-center mb-3">
                   <div>
-                    <p className="text-xs font-semibold">
+                    <p className="text-sm font-semibold">
                       {day.day}, {day.date} June
                     </p>
-                    <p className="text-[9px] text-slate-400 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       Staff assigned
                     </p>
                   </div>
@@ -883,7 +905,7 @@ export default function StaffManagementPage() {
                   className="w-full accent-[#35b795]"
                 />
 
-                <div className="flex justify-between text-[8px] text-slate-400 mt-1">
+                <div className="flex justify-between text-xs text-slate-400 mt-1">
                   <span>0 staff</span>
                   <span>{day.capacity} staff</span>
                 </div>
@@ -895,7 +917,7 @@ export default function StaffManagementPage() {
                 setShowShiftModal(false);
                 setSuccessMessage("Weekly shift coverage updated.");
               }}
-              className="w-full bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+              className="w-full bg-[#1c638a] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#144665]"
             >
               Save shift coverage
             </button>
@@ -976,7 +998,7 @@ export default function StaffManagementPage() {
 
             <div className="mt-8 space-y-3">
 
-              <h3 className="text-xs font-semibold">
+              <h3 className="text-base font-semibold">
                 Update availability
               </h3>
 
@@ -1021,7 +1043,7 @@ export default function StaffManagementPage() {
 
               <button
                 onClick={() => setSelectedStaff(null)}
-                className="w-full bg-[#1c638a] text-white py-3 rounded-lg text-xs font-semibold hover:bg-[#144665]"
+                className="w-full bg-[#1c638a] text-white py-3 rounded-lg text-sm font-semibold hover:bg-[#144665]"
               >
                 Done
               </button>
@@ -1037,7 +1059,7 @@ export default function StaffManagementPage() {
 
           <CheckCircle2 size={17} className="shrink-0" />
 
-          <p className="text-xs">{successMessage}</p>
+          <p className="text-sm">{successMessage}</p>
 
           <button onClick={() => setSuccessMessage("")}>
             <X size={15} />
@@ -1077,11 +1099,11 @@ function KpiCard({
       </div>
 
       <div>
-        <p className="text-[9px] text-slate-500">{title}</p>
+        <p className="text-xs text-slate-500">{title}</p>
         <h3 className="text-[21px] font-bold leading-tight mt-0.5">
           {value}
         </h3>
-        <p className="text-[8px] text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-400 mt-0.5">
           {description}
         </p>
       </div>
@@ -1103,7 +1125,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-[9px] outline-none focus:border-[#45b99b] cursor-pointer"
+        className="w-full h-9 appearance-none bg-white border border-[#d5e3e9] rounded-lg pl-3 pr-8 text-sm sm:text-[15px] outline-none focus:border-[#45b99b] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -1131,7 +1153,7 @@ function AvailabilityBadge({
   };
 
   return (
-    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-[8px] font-semibold ${styles[availability]}`}>
+    <span className={`inline-flex whitespace-nowrap px-2 py-1 rounded-md text-xs font-semibold ${styles[availability]}`}>
       {availability}
     </span>
   );
@@ -1152,7 +1174,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
@@ -1162,7 +1184,7 @@ function FormInput({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       />
     </div>
   );
@@ -1181,14 +1203,14 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5">
+      <label className="block text-sm font-medium mb-1.5">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#45b99b]"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm sm:text-[15px] outline-none focus:border-[#45b99b]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -1219,7 +1241,7 @@ function Modal({
         <div className="flex justify-between items-start mb-5">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[13px] text-slate-400 mt-1">
               {subtitle}
             </p>
           </div>
@@ -1252,14 +1274,14 @@ function ModalActions({
       <button
         type="button"
         onClick={onCancel}
-        className="flex-1 border border-slate-200 rounded-lg py-3 text-xs font-semibold hover:bg-slate-50"
+        className="flex-1 border border-slate-200 rounded-lg py-3 text-sm font-semibold hover:bg-slate-50"
       >
         Cancel
       </button>
 
       <button
         type="submit"
-        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-xs font-semibold hover:bg-[#144665]"
+        className="flex-1 bg-[#1c638a] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#144665]"
       >
         {submitLabel}
       </button>
@@ -1282,8 +1304,8 @@ function DetailRow({
       <div className="text-[#2785b7]">{icon}</div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] text-slate-400">{label}</p>
-        <p className="text-xs font-semibold mt-1 break-words">
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-sm font-semibold mt-1 break-words">
           {value}
         </p>
       </div>

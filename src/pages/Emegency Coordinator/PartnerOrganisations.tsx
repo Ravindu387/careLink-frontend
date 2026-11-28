@@ -318,10 +318,10 @@ export default function PartnerOrganisations() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-medium text-[#153f5e]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153f5e]">
               Partner Organisations
             </h1>
-            <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-[10px] font-semibold text-sky-700">
+            <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-semibold text-sky-700">
               {partners.length} Registered
             </span>
           </div>
@@ -335,7 +335,7 @@ export default function PartnerOrganisations() {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center gap-1.5 rounded-lg border border-[#b8d0df] bg-white px-3.5 py-2.5 text-xs text-[#175477] hover:bg-sky-50 transition"
+            className="flex items-center gap-1.5 rounded-lg border border-[#b8d0df] bg-white px-3.5 py-2.5 text-sm text-[#175477] hover:bg-sky-50 transition"
             title="Refresh partner data from server"
           >
             <RefreshCw
@@ -347,7 +347,7 @@ export default function PartnerOrganisations() {
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-lg border border-[#b8d0df] bg-white px-4 py-2.5 text-xs text-[#175477] hover:bg-sky-50 transition"
+            className="flex items-center gap-2 rounded-lg border border-[#b8d0df] bg-white px-4 py-2.5 text-sm text-[#175477] hover:bg-sky-50 transition"
           >
             <Download size={15} />
             Export
@@ -355,7 +355,7 @@ export default function PartnerOrganisations() {
 
           <button
             onClick={() => setShowInvite(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#216789] transition shadow-sm"
+            className="flex items-center gap-2 rounded-lg bg-[#287da5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#216789] transition shadow-sm"
           >
             <Plus size={15} />
             Invite partner
@@ -422,7 +422,7 @@ export default function PartnerOrganisations() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, ID, role, region..."
-            className="w-full min-w-0 bg-transparent text-[11px] outline-none placeholder:text-slate-400"
+            className="w-full min-w-0 bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
           />
           {search && (
             <button onClick={() => setSearch("")} className="text-slate-400 hover:text-slate-600">
@@ -434,7 +434,7 @@ export default function PartnerOrganisations() {
         <select
           value={area}
           onChange={(e) => setArea(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[11px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All operational areas</option>
           <option>Greater Riverton</option>
@@ -448,7 +448,7 @@ export default function PartnerOrganisations() {
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[11px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>All statuses</option>
           <option>Active</option>
@@ -458,7 +458,7 @@ export default function PartnerOrganisations() {
         <select
           value={availability}
           onChange={(e) => setAvailability(e.target.value)}
-          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-[11px] text-slate-600 outline-none"
+          className="rounded-lg border border-[#d5e2e9] bg-white px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
         >
           <option>Any availability</option>
           <option>Verified</option>
@@ -468,7 +468,7 @@ export default function PartnerOrganisations() {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-[11px] font-medium transition ${
+          className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition ${
             showFilters
               ? "border-sky-700 bg-sky-50 text-sky-800"
               : "border-sky-600 bg-white text-sky-700 hover:bg-sky-50"
@@ -481,13 +481,13 @@ export default function PartnerOrganisations() {
 
       {showFilters && (
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#d5e2e9] bg-white p-3">
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[13px] text-slate-500">
             Active filters: Area: <strong>{area}</strong> · Status: <strong>{status}</strong> · Verification: <strong>{availability}</strong>
           </p>
 
           <button
             onClick={clearFilters}
-            className="text-[11px] font-semibold text-sky-700 hover:underline"
+            className="text-sm font-semibold text-sky-700 hover:underline"
           >
             Clear all filters
           </button>
@@ -513,7 +513,7 @@ export default function PartnerOrganisations() {
                 ].map((heading) => (
                   <th
                     key={heading}
-                    className="whitespace-nowrap px-3 py-3 text-[10px] font-semibold text-slate-500"
+                    className="whitespace-nowrap px-3 py-3 text-[13px] font-semibold text-slate-500"
                   >
                     {heading}
                   </th>
@@ -524,7 +524,7 @@ export default function PartnerOrganisations() {
             <tbody>
               {loading && partners.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-xs text-slate-500">
+                  <td colSpan={9} className="py-12 text-center text-sm text-slate-500">
                     <div className="flex items-center justify-center gap-2">
                       <Loader2 size={18} className="animate-spin text-sky-600" />
                       <span>Loading partner organisations...</span>
@@ -538,34 +538,34 @@ export default function PartnerOrganisations() {
                     onClick={() => setSelectedPartner(partner)}
                     className="cursor-pointer border-b border-slate-100 transition hover:bg-[#f0f6f8]"
                   >
-                    <td className="whitespace-nowrap px-3 py-4 text-[10px] font-semibold text-[#153f5e]">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm font-semibold text-[#153f5e]">
                       {partner.id}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-[10px] font-medium text-slate-700">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-slate-700">
                       <div>
                         {partner.name}
                         {partner.contactPerson && (
-                          <span className="block text-[9px] font-normal text-slate-400">
+                          <span className="block text-xs font-normal text-slate-400">
                             Attn: {partner.contactPerson}
                           </span>
                         )}
                       </div>
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-[10px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600">
                       {partner.type}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-[10px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600">
                       {partner.region}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-[10px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600">
                       {partner.role}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-[10px] text-slate-600">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600">
                       <span className="inline-flex items-center gap-1 rounded bg-sky-50 px-2 py-0.5 text-sky-700">
                         <Package size={11} />
                         {partner.sharedResourcesCount} items
@@ -574,7 +574,7 @@ export default function PartnerOrganisations() {
 
                     <td className="whitespace-nowrap px-3 py-4">
                       <span
-                        className={`rounded-md px-2 py-1 text-[9px] font-semibold ${
+                        className={`rounded-md px-2 py-1 text-xs font-semibold ${
                           verificationStyles[partner.verification] ||
                           "bg-slate-100 text-slate-600"
                         }`}
@@ -585,7 +585,7 @@ export default function PartnerOrganisations() {
 
                     <td className="whitespace-nowrap px-3 py-4">
                       <span
-                        className={`rounded-md px-2 py-1 text-[9px] font-semibold ${
+                        className={`rounded-md px-2 py-1 text-xs font-semibold ${
                           statusStyles[partner.status] ||
                           "bg-slate-100 text-slate-600"
                         }`}
@@ -611,11 +611,11 @@ export default function PartnerOrganisations() {
         )}
 
         <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3">
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[13px] text-slate-500">
             Showing {filteredPartners.length} of {partners.length} organisations
           </p>
           {refreshing && (
-            <span className="flex items-center gap-1 text-[10px] text-sky-600">
+            <span className="flex items-center gap-1 text-sm text-sky-600">
               <Loader2 size={12} className="animate-spin" /> Synchronizing...
             </span>
           )}
@@ -630,7 +630,7 @@ export default function PartnerOrganisations() {
               <h2 className="text-lg font-semibold text-[#153f5e]">
                 Organisation Details
               </h2>
-              <span className="text-[10px] text-slate-400">
+              <span className="text-[13px] text-slate-400">
                 System Reference: {selectedPartner.id}
               </span>
             </div>
@@ -654,7 +654,7 @@ export default function PartnerOrganisations() {
 
               <div className="flex flex-col items-end gap-1.5">
                 <span
-                  className={`rounded-md px-2.5 py-1 text-[10px] font-semibold ${
+                  className={`rounded-md px-2.5 py-1 text-xs font-semibold ${
                     verificationStyles[selectedPartner.verification] ||
                     "bg-slate-100 text-slate-600"
                   }`}
@@ -662,7 +662,7 @@ export default function PartnerOrganisations() {
                   {selectedPartner.verification}
                 </span>
                 <span
-                  className={`rounded-md px-2 py-0.5 text-[9px] font-medium ${
+                  className={`rounded-md px-2 py-0.5 text-xs font-medium ${
                     statusStyles[selectedPartner.status] ||
                     "bg-slate-100 text-slate-600"
                   }`}
@@ -719,17 +719,17 @@ export default function PartnerOrganisations() {
 
               {selectedPartner.notes && (
                 <div className="mt-2 rounded bg-white p-2.5 border border-slate-200/60">
-                  <p className="text-[10px] font-semibold text-slate-500 mb-1 flex items-center gap-1">
+                  <p className="text-[13px] font-semibold text-slate-500 mb-1 flex items-center gap-1">
                     <FileText size={12} /> Notes & Operational Capability:
                   </p>
-                  <p className="text-xs text-slate-600">{selectedPartner.notes}</p>
+                  <p className="text-sm text-slate-600">{selectedPartner.notes}</p>
                 </div>
               )}
             </div>
 
             {/* Quick coordinator action controls */}
             <div className="mt-4 pt-3 border-t border-slate-200">
-              <p className="text-[10px] font-medium text-slate-500 mb-2">
+              <p className="text-[13px] font-medium text-slate-500 mb-2">
                 Coordinator Controls
               </p>
               <div className="flex flex-wrap gap-2">
@@ -737,7 +737,7 @@ export default function PartnerOrganisations() {
                   <button
                     disabled={actionLoading}
                     onClick={() => handleUpdateVerification(selectedPartner.id, "Verified")}
-                    className="flex items-center gap-1.5 rounded bg-emerald-600 px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition"
+                    className="flex items-center gap-1.5 rounded bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition"
                   >
                     <CheckCircle2 size={13} />
                     Approve Verification
@@ -748,7 +748,7 @@ export default function PartnerOrganisations() {
                   <button
                     disabled={actionLoading}
                     onClick={() => handleUpdateVerification(selectedPartner.id, "Rejected")}
-                    className="flex items-center gap-1.5 rounded border border-red-300 bg-white px-3 py-1.5 text-[10px] font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
+                    className="flex items-center gap-1.5 rounded border border-red-300 bg-white px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
                   >
                     <ShieldAlert size={13} />
                     Reject
@@ -758,7 +758,7 @@ export default function PartnerOrganisations() {
                 <button
                   disabled={actionLoading}
                   onClick={() => handleToggleStatus(selectedPartner)}
-                  className={`rounded px-3 py-1.5 text-[10px] font-semibold transition ${
+                  className={`rounded px-3 py-1.5 text-sm font-semibold transition ${
                     selectedPartner.status === "Active"
                       ? "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
                       : "bg-[#153f5e] text-white hover:bg-[#205879]"
@@ -772,7 +772,7 @@ export default function PartnerOrganisations() {
 
           <button
             onClick={() => setSelectedPartner(null)}
-            className="mt-4 w-full rounded-lg bg-[#153f5e] py-2.5 text-xs font-semibold text-white hover:bg-[#205879] transition"
+            className="mt-4 w-full rounded-lg bg-[#153f5e] py-2.5 text-sm font-semibold text-white hover:bg-[#205879] transition"
           >
             Close Details
           </button>
@@ -787,7 +787,7 @@ export default function PartnerOrganisations() {
               <h2 className="text-lg font-semibold text-[#153f5e]">
                 Invite Partner Organisation
               </h2>
-              <p className="mt-0.5 text-[11px] text-slate-500">
+              <p className="mt-0.5 text-[13px] text-slate-500">
                 Register a new partner organisation into CareLink.
               </p>
             </div>
@@ -879,7 +879,7 @@ export default function PartnerOrganisations() {
             />
 
             <div>
-              <label className="mb-1 block text-[10px] font-medium text-slate-600">
+              <label className="mb-1 block text-sm font-medium text-slate-600">
                 Operational Notes (Optional)
               </label>
               <textarea
@@ -887,7 +887,7 @@ export default function PartnerOrganisations() {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Key equipment, fleet size, warehouse capacity, etc."
                 rows={2}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500 resize-none"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500 resize-none"
               />
             </div>
 
@@ -907,7 +907,7 @@ export default function PartnerOrganisations() {
             <button
               onClick={addPartner}
               disabled={submitting}
-              className="w-full rounded-lg bg-[#153f5e] py-3 text-xs font-semibold text-white hover:bg-[#205879] disabled:opacity-50 transition flex items-center justify-center gap-2"
+              className="w-full rounded-lg bg-[#153f5e] py-3 text-sm font-semibold text-white hover:bg-[#205879] disabled:opacity-50 transition flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -953,11 +953,11 @@ function SummaryCard({
         </div>
 
         <div>
-          <p className="text-[10px] text-slate-500">{title}</p>
+          <p className="text-[13px] text-slate-500">{title}</p>
           <h2 className="text-2xl font-semibold text-[#153f5e]">
             {value}
           </h2>
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[13px] text-slate-400">
             {description}
           </p>
         </div>
@@ -1004,7 +1004,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-[10px] font-medium text-slate-600">
+      <label className="mb-1 block text-sm font-medium text-slate-600">
         {label}
       </label>
 
@@ -1013,7 +1013,7 @@ function FormInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-sky-500"
+        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
       />
     </div>
   );
@@ -1033,14 +1033,14 @@ function FormSelect({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-[10px] font-medium text-slate-600">
+      <label className="mb-1 block text-sm font-medium text-slate-600">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-sky-500"
+        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-sky-500"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>

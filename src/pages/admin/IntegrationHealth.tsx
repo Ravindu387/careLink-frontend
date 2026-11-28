@@ -56,7 +56,7 @@ const healthStyles: Record<HealthStatus, string> = {
 function StatusBadge({ status }: { status: HealthStatus }) {
   return (
     <span
-      className={`inline-flex whitespace-nowrap rounded-md px-2.5 py-1.5 text-[9px] font-semibold ${healthStyles[status] || healthStyles.Operational}`}
+      className={`inline-flex whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-semibold ${healthStyles[status] || healthStyles.Operational}`}
     >
       {status}
     </span>
@@ -167,11 +167,11 @@ function IntegrationHealthModal({
         {/* MODAL HEADER */}
         <div className="flex items-center justify-between border-b border-[#D8E6EC] px-6 py-5">
           <div>
-            <p className="text-[9px] font-bold tracking-widest text-[#55BBA3]">
+            <p className="text-xs font-bold tracking-widest text-[#55BBA3]">
               SECURE ADMINISTRATIVE ACTION
             </p>
 
-            <h2 className="mt-2 text-lg font-medium text-[#183D59]">
+            <h2 className="mt-2 text-lg font-semibold text-[#183D59]">
               {isLogs
                 ? `Integration Logs: ${integration?.name}`
                 : type === "health-check"
@@ -198,10 +198,10 @@ function IntegrationHealthModal({
           {isLogs ? (
             <div className="space-y-3">
               <div className="rounded-lg bg-[#F2F7F9] p-4">
-                <p className="text-xs font-semibold text-[#183D59]">
+                <p className="text-sm font-semibold text-[#183D59]">
                   Recorded Telemetry Events
                 </p>
-                <p className="mt-1 text-[10px] text-slate-500">
+                <p className="mt-1 text-[13px] text-slate-500">
                   Live backend diagnostics and administrative actions for {integration?.name}.
                 </p>
               </div>
@@ -231,14 +231,14 @@ function IntegrationHealthModal({
                       }`}
                     />
                     <div className="flex-1">
-                      <p className="text-[11px] font-semibold text-[#183D59]">
+                      <p className="text-sm font-semibold text-[#183D59]">
                         {log.heading}
                       </p>
-                      <p className="mt-1 text-[10px] text-slate-500">
+                      <p className="mt-1 text-[13px] text-slate-500">
                         {log.description}
                       </p>
                     </div>
-                    <span className="text-[9px] text-slate-400">{log.timeAgo}</span>
+                    <span className="text-xs text-slate-400">{log.timeAgo}</span>
                   </div>
                 ))
               )}
@@ -247,33 +247,33 @@ function IntegrationHealthModal({
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 rounded-lg bg-[#F2F7F9] p-4">
                 <div>
-                  <span className="text-[9px] font-bold tracking-wider text-slate-400">SERVICE ID</span>
-                  <p className="text-xs font-semibold text-[#183D59]">{integration.id}</p>
+                  <span className="text-xs font-bold tracking-wider text-slate-400">SERVICE ID</span>
+                  <p className="text-sm font-semibold text-[#183D59]">{integration.id}</p>
                 </div>
                 <div>
-                  <span className="text-[9px] font-bold tracking-wider text-slate-400">CURRENT HEALTH</span>
+                  <span className="text-xs font-bold tracking-wider text-slate-400">CURRENT HEALTH</span>
                   <div className="mt-1">
                     <StatusBadge status={integration.health} />
                   </div>
                 </div>
                 <div>
-                  <span className="text-[9px] font-bold tracking-wider text-slate-400">AVAILABILITY</span>
-                  <p className="text-xs font-semibold text-[#183D59]">{integration.availability}</p>
+                  <span className="text-xs font-bold tracking-wider text-slate-400">AVAILABILITY</span>
+                  <p className="text-sm font-semibold text-[#183D59]">{integration.availability}</p>
                 </div>
                 <div>
-                  <span className="text-[9px] font-bold tracking-wider text-slate-400">LATENCY</span>
-                  <p className="text-xs font-semibold text-[#183D59]">{integration.latency}</p>
+                  <span className="text-xs font-bold tracking-wider text-slate-400">LATENCY</span>
+                  <p className="text-sm font-semibold text-[#183D59]">{integration.latency}</p>
                 </div>
                 {integration.endpoint && (
                   <div className="col-span-2">
-                    <span className="text-[9px] font-bold tracking-wider text-slate-400">ENDPOINT</span>
-                    <p className="break-all font-mono text-[11px] text-slate-700">{integration.endpoint}</p>
+                    <span className="text-xs font-bold tracking-wider text-slate-400">ENDPOINT</span>
+                    <p className="break-all font-mono text-sm text-slate-700">{integration.endpoint}</p>
                   </div>
                 )}
                 {integration.description && (
                   <div className="col-span-2">
-                    <span className="text-[9px] font-bold tracking-wider text-slate-400">DESCRIPTION</span>
-                    <p className="text-xs text-slate-600">{integration.description}</p>
+                    <span className="text-xs font-bold tracking-wider text-slate-400">DESCRIPTION</span>
+                    <p className="text-sm text-slate-600">{integration.description}</p>
                   </div>
                 )}
               </div>
@@ -283,26 +283,26 @@ function IntegrationHealthModal({
               {/* ACTION TITLE AND ENVIRONMENT */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#344C60]">
+                  <label className="mb-2 block text-sm font-semibold text-[#344C60]">
                     Action title <span className="text-red-500">*</span>
                   </label>
 
                   <input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="h-12 w-full rounded-lg border border-[#D6E5EC] px-3 text-[10px] text-[#29465A] outline-none focus:border-[#2785B2]"
+                    className="h-12 w-full rounded-lg border border-[#D6E5EC] px-3 text-sm sm:text-[15px] text-[#29465A] outline-none focus:border-[#2785B2]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#344C60]">
+                  <label className="mb-2 block text-sm font-semibold text-[#344C60]">
                     Environment
                   </label>
 
                   <select
                     value={environment}
                     onChange={(e) => setEnvironment(e.target.value)}
-                    className="h-12 w-full rounded-lg border border-[#D6E5EC] bg-white px-3 text-[10px] outline-none focus:border-[#2785B2]"
+                    className="h-12 w-full rounded-lg border border-[#D6E5EC] bg-white px-3 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                   >
                     <option>Production</option>
                     <option>Staging</option>
@@ -311,14 +311,14 @@ function IntegrationHealthModal({
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#344C60]">
+                  <label className="mb-2 block text-sm font-semibold text-[#344C60]">
                     Scope
                   </label>
 
                   <select
                     value={scope}
                     onChange={(e) => setScope(e.target.value)}
-                    className="h-12 w-full rounded-lg border border-[#D6E5EC] bg-white px-3 text-[10px] outline-none focus:border-[#2785B2]"
+                    className="h-12 w-full rounded-lg border border-[#D6E5EC] bg-white px-3 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                   >
                     <option>Selected record</option>
                     <option>All integrations</option>
@@ -328,14 +328,14 @@ function IntegrationHealthModal({
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[10px] font-semibold text-[#344C60]">
+                  <label className="mb-2 block text-sm font-semibold text-[#344C60]">
                     Approval type
                   </label>
 
                   <select
                     value={approval}
                     onChange={(e) => setApproval(e.target.value)}
-                    className="h-12 w-full rounded-lg border border-[#D6E5EC] bg-white px-3 text-[10px] outline-none focus:border-[#2785B2]"
+                    className="h-12 w-full rounded-lg border border-[#D6E5EC] bg-white px-3 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
                   >
                     <option>Standard administrator approval</option>
                     <option>Privileged administrator approval</option>
@@ -346,7 +346,7 @@ function IntegrationHealthModal({
 
               {/* RATIONALE */}
               <div>
-                <label className="mb-2 block text-[10px] font-semibold text-[#344C60]">
+                <label className="mb-2 block text-sm font-semibold text-[#344C60]">
                   Administrative rationale{" "}
                   <span className="text-red-500">*</span>
                 </label>
@@ -359,14 +359,14 @@ function IntegrationHealthModal({
                   }}
                   rows={4}
                   placeholder="Explain the authorised reason for this administrative intervention..."
-                  className="w-full resize-y rounded-lg border border-[#D6E5EC] p-3 text-[11px] outline-none placeholder:text-slate-400 focus:border-[#2785B2]"
+                  className="w-full resize-y rounded-lg border border-[#D6E5EC] p-3 text-sm sm:text-[15px] outline-none placeholder:text-slate-400 focus:border-[#2785B2]"
                 />
               </div>
 
               {/* WARNING */}
               <div className="flex items-center gap-3 rounded-lg bg-sky-50 px-4 py-3.5 text-[#185374]">
                 <ShieldCheck size={20} className="shrink-0 text-[#2785B2]" />
-                <p className="text-[10px] leading-5">
+                <p className="text-sm leading-5">
                   This operation is enforced by the ASP.NET Core backend and recorded in the permanent audit trail.
                 </p>
               </div>
@@ -374,7 +374,7 @@ function IntegrationHealthModal({
           )}
 
           {error && (
-            <p className="rounded-lg bg-red-50 p-3 text-[10px] text-red-600">
+            <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
               {error}
             </p>
           )}
@@ -384,7 +384,7 @@ function IntegrationHealthModal({
             <button
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-lg border border-[#BCD0DA] px-5 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+              className="rounded-lg border border-[#BCD0DA] px-5 py-3 text-sm font-semibold text-[#2785B2] hover:bg-sky-50"
             >
               {isLogs || isDetails ? "Close" : "Cancel"}
             </button>
@@ -393,7 +393,7 @@ function IntegrationHealthModal({
               <button
                 onClick={handleConfirm}
                 disabled={isSubmitting}
-                className="flex items-center justify-center gap-2 rounded-lg bg-[#2785B2] px-5 py-3 text-[10px] font-semibold text-white shadow-sm transition hover:bg-[#1D6F98] disabled:opacity-60"
+                className="flex items-center justify-center gap-2 rounded-lg bg-[#2785B2] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1D6F98] disabled:opacity-60"
               >
                 {isSubmitting ? (
                   <>
@@ -575,7 +575,7 @@ export default function IntegrationHealth() {
   return (
     <div className="min-h-screen bg-[#EFF6F7]">
       {/* BREADCRUMB */}
-      <div className="flex h-9 items-center gap-2 border-b border-[#55BBA3] bg-white px-5 text-[9px] text-slate-500">
+      <div className="flex h-9 items-center gap-2 border-b border-[#55BBA3] bg-white px-5 text-xs text-slate-500">
         <span>Administration</span>
         <ChevronRight size={12} />
         <span className="font-semibold text-[#123B5C]">
@@ -594,7 +594,7 @@ export default function IntegrationHealth() {
         {/* HEADING */}
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-2xl font-medium tracking-tight text-[#123B5C]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight text-[#123B5C]">
               Integration Health
             </h1>
             <p className="mt-2 text-xs text-slate-500">
@@ -614,7 +614,7 @@ export default function IntegrationHealth() {
 
             <button
               onClick={exportCSV}
-              className="flex items-center gap-1.5 rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#B9D1DD] bg-white px-4 py-3 text-sm font-semibold text-[#2785B2] hover:bg-sky-50"
             >
               <Download size={13} />
               Export status
@@ -623,7 +623,7 @@ export default function IntegrationHealth() {
             <button
               onClick={handleRunHealthCheck}
               disabled={isChecking}
-              className="flex items-center gap-2 rounded-lg bg-[#2785B2] px-4 py-3 text-[10px] font-semibold text-white shadow-sm hover:bg-[#1D6F98] disabled:opacity-60"
+              className="flex items-center gap-2 rounded-lg bg-[#2785B2] px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#1D6F98] disabled:opacity-60"
             >
               {isChecking ? (
                 <>
@@ -666,33 +666,33 @@ export default function IntegrationHealth() {
                     : "bg-[#55BBA3]"
                 }`}
               />
-              <p className="text-[9px] font-semibold text-[#8DDAC6]">
+              <p className="text-sm font-semibold text-[#8DDAC6]">
                 CORE PLATFORM
               </p>
             </div>
 
-            <h2 className="mt-1 text-sm font-bold">
+            <h2 className="mt-1 text-lg sm:text-xl font-bold">
               {overview?.corePlatformStatus || "Operational"}
             </h2>
 
-            <p className="mt-1 text-[9px] text-slate-300">
+            <p className="mt-1 text-sm text-slate-300">
               Last checked {overview?.lastChecked || "Just now"}
             </p>
           </div>
 
           <div className="border-l border-white/15 pl-4">
             <h3 className="text-lg font-bold">{healthyPercentage}%</h3>
-            <p className="text-[9px] text-slate-300">Services healthy</p>
+            <p className="text-sm text-slate-300">Services healthy</p>
           </div>
 
           <div className="border-l border-white/15 pl-4">
             <h3 className="text-lg font-bold">{overview?.apiAvailability || "99.94%"}</h3>
-            <p className="text-[9px] text-slate-300">API availability</p>
+            <p className="text-sm text-slate-300">API availability</p>
           </div>
 
           <div className="border-l border-white/15 pl-4">
             <h3 className="text-lg font-bold">{overview?.medianLatency || "248 ms"}</h3>
-            <p className="text-[9px] text-slate-300">Median latency</p>
+            <p className="text-sm text-slate-300">Median latency</p>
           </div>
         </section>
 
@@ -704,7 +704,7 @@ export default function IntegrationHealth() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search integration name or type..."
-              className="w-full bg-transparent text-[10px] outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
           </div>
 
@@ -712,7 +712,7 @@ export default function IntegrationHealth() {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="h-10 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-10 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All service types</option>
               <option>Authentication</option>
@@ -726,7 +726,7 @@ export default function IntegrationHealth() {
             <select
               value={healthFilter}
               onChange={(e) => setHealthFilter(e.target.value)}
-              className="h-10 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-10 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>All health states</option>
               <option>Operational</option>
@@ -737,7 +737,7 @@ export default function IntegrationHealth() {
             <select
               value={latencyFilter}
               onChange={(e) => setLatencyFilter(e.target.value)}
-              className="h-10 rounded-lg border border-[#D7E5EA] bg-white px-3 text-[10px] outline-none"
+              className="h-10 rounded-lg border border-[#D7E5EA] bg-white px-3 text-sm sm:text-[15px] outline-none"
             >
               <option>Any latency</option>
               <option>Below 500 ms</option>
@@ -747,7 +747,7 @@ export default function IntegrationHealth() {
 
           <button
             onClick={() => setMoreFilters(!moreFilters)}
-            className="h-10 rounded-lg border border-[#B9D1DD] bg-white px-4 text-[10px] font-semibold text-[#2785B2] hover:bg-sky-50"
+            className="h-10 rounded-lg border border-[#B9D1DD] bg-white px-4 text-sm font-semibold text-[#2785B2] hover:bg-sky-50"
           >
             More filters
           </button>
@@ -755,7 +755,7 @@ export default function IntegrationHealth() {
 
         {moreFilters && (
           <div className="flex items-center justify-between rounded-lg border border-[#D7E5EA] bg-white p-3">
-            <p className="text-[10px] text-slate-500">
+            <p className="text-[13px] text-slate-500">
               Showing {filteredIntegrations.length} matching integrations.
             </p>
 
@@ -766,7 +766,7 @@ export default function IntegrationHealth() {
                 setHealthFilter("All health states");
                 setLatencyFilter("Any latency");
               }}
-              className="text-[10px] font-semibold text-[#2785B2]"
+              className="text-sm font-semibold text-[#2785B2]"
             >
               Clear filters
             </button>
@@ -778,7 +778,7 @@ export default function IntegrationHealth() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-left">
               <thead>
-                <tr className="border-b border-[#D7E5EA] bg-[#F5F8F9] text-[9px] font-semibold text-slate-500">
+                <tr className="border-b border-[#D7E5EA] bg-[#F5F8F9] text-sm font-semibold text-slate-500">
                   <th className="px-3 py-4">Integration ID</th>
                   <th className="px-3 py-4">Service</th>
                   <th className="px-3 py-4">Type</th>
@@ -795,7 +795,7 @@ export default function IntegrationHealth() {
                   <tr
                     key={item.id}
                     onClick={() => openModal("details", item)}
-                    className="cursor-pointer border-b border-[#E5EDF1] text-[9px] text-slate-600 transition hover:bg-[#F5FAFC]"
+                    className="cursor-pointer border-b border-[#E5EDF1] text-sm text-slate-600 transition hover:bg-[#F5FAFC]"
                   >
                     <td className="px-3 py-4 font-bold text-[#123B5C]">
                       {item.id}
@@ -814,7 +814,7 @@ export default function IntegrationHealth() {
                     </td>
 
                     <td className="px-3 py-4">
-                      <span className="rounded-md bg-[#F0F4F6] px-2 py-1.5 text-[9px]">
+                      <span className="rounded-md bg-[#F0F4F6] px-2 py-1.5 text-xs">
                         {item.lastCheck}
                       </span>
                     </td>
@@ -838,7 +838,7 @@ export default function IntegrationHealth() {
                   <tr>
                     <td
                       colSpan={8}
-                      className="py-10 text-center text-xs text-slate-400"
+                      className="py-10 text-center text-sm text-slate-400"
                     >
                       No integrations found.
                     </td>
@@ -847,7 +847,7 @@ export default function IntegrationHealth() {
 
                 {isLoading && (
                   <tr>
-                    <td colSpan={8} className="py-8 text-center text-xs text-slate-400">
+                    <td colSpan={8} className="py-8 text-center text-sm text-slate-400">
                       <Loader2 size={18} className="mx-auto animate-spin text-[#2785B2]" />
                       <span className="mt-2 block">Loading integration telemetry...</span>
                     </td>
@@ -876,27 +876,27 @@ export default function IntegrationHealth() {
                   <StatusBadge status={item.health} />
                 </div>
 
-                <h3 className="mt-4 text-[11px] font-semibold text-[#123B5C]">
+                <h3 className="mt-4 text-base font-semibold text-[#123B5C]">
                   {item.name}
                 </h3>
 
-                <p className="mt-1 text-[9px] text-slate-400">
+                <p className="mt-1 text-xs text-slate-400">
                   {item.type} · checked {item.lastCheck.toLowerCase()}
                 </p>
 
                 <div className="mt-3 grid grid-cols-2 gap-3 border-t border-[#D7E5EA] pt-3">
                   <div>
-                    <p className="text-[9px] text-slate-500">
+                    <p className="text-xs text-slate-500">
                       Availability
                     </p>
-                    <p className="mt-1 text-[10px] font-bold text-[#123B5C]">
+                    <p className="mt-1 text-sm font-bold text-[#123B5C]">
                       {item.availability}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-[9px] text-slate-500">Latency</p>
-                    <p className="mt-1 text-[10px] font-bold text-[#123B5C]">
+                    <p className="text-xs text-slate-500">Latency</p>
+                    <p className="mt-1 text-sm font-bold text-[#123B5C]">
                       {item.latency}
                     </p>
                   </div>
@@ -905,14 +905,14 @@ export default function IntegrationHealth() {
                 <div className="mt-3 flex justify-end gap-3 border-t border-[#D7E5EA] pt-2">
                   <button
                     onClick={() => openModal("logs", item)}
-                    className="text-[9px] font-medium text-[#2785B2] hover:underline"
+                    className="text-sm font-medium text-[#2785B2] hover:underline"
                   >
                     View logs
                   </button>
 
                   <button
                     onClick={() => openModal("retry", item)}
-                    className="text-[9px] font-medium text-[#2785B2] hover:underline"
+                    className="text-sm font-medium text-[#2785B2] hover:underline"
                   >
                     Retry
                   </button>
@@ -923,7 +923,7 @@ export default function IntegrationHealth() {
         </section>
 
         {/* FOOTER */}
-        <footer className="flex flex-wrap items-center justify-between gap-2 py-3 text-[9px] text-slate-400">
+        <footer className="flex flex-wrap items-center justify-between gap-2 py-3 text-xs text-slate-400">
           <span>© 2026 Humanitarian Aid Platform · CareLink</span>
           <span>Integration monitoring dashboard</span>
         </footer>
@@ -933,7 +933,7 @@ export default function IntegrationHealth() {
       {notice && (
         <div className="fixed bottom-5 right-5 z-[120] flex max-w-sm items-center gap-3 rounded-lg border border-emerald-200 bg-white p-4 shadow-xl">
           <CheckCircle2 size={20} className="text-emerald-600" />
-          <p className="text-[10px] text-[#123B5C]">{notice}</p>
+          <p className="text-sm text-[#123B5C]">{notice}</p>
           <button onClick={() => setNotice("")}>
             <X size={15} className="text-slate-400" />
           </button>

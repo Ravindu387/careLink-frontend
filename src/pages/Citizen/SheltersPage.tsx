@@ -246,13 +246,13 @@ export default function SheltersPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
+                <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold tracking-tight">
                   Emergency Shelters
                 </h1>
 
                 {/* API Status Badge */}
                 <div
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium shadow-sm ${
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium shadow-sm ${
                     isOnline
                       ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
                       : "border border-amber-200 bg-amber-50 text-amber-700"
@@ -290,7 +290,7 @@ export default function SheltersPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate("/citizen/nearby-support")}
-                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-[#287da6] hover:bg-slate-50 shadow-sm"
+                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-[#287da6] hover:bg-slate-50 shadow-sm"
               >
                 <MapPin size={15} />
                 View on Map
@@ -328,7 +328,7 @@ export default function SheltersPage() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
             <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/80 to-white p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Available Spaces
                 </span>
                 <BedDouble size={16} className="text-emerald-600" />
@@ -336,14 +336,14 @@ export default function SheltersPage() {
               <p className="mt-2 text-2xl font-bold text-emerald-800">
                 {summary.totalAvailableSpaces}
               </p>
-              <p className="mt-0.5 text-[10px] text-slate-500">
+              <p className="mt-0.5 text-[13px] text-slate-500">
                 Ready for immediate intake
               </p>
             </div>
 
             <div className="rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50/80 to-white p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#287da6]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#287da6]">
                   Open Facilities
                 </span>
                 <Building2 size={16} className="text-[#287da6]" />
@@ -351,14 +351,14 @@ export default function SheltersPage() {
               <p className="mt-2 text-2xl font-bold text-[#173d5b]">
                 {summary.availableSheltersCount} of {summary.totalShelters}
               </p>
-              <p className="mt-0.5 text-[10px] text-slate-500">
+              <p className="mt-0.5 text-[13px] text-slate-500">
                 Operating 24/7 relief centres
               </p>
             </div>
 
             <div className="rounded-2xl border border-purple-100 bg-gradient-to-br from-purple-50/80 to-white p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-purple-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-purple-700">
                   Accessible Shelters
                 </span>
                 <AccessIcon size={16} className="text-purple-600" />
@@ -366,14 +366,14 @@ export default function SheltersPage() {
               <p className="mt-2 text-2xl font-bold text-purple-900">
                 {summary.accessibleCount}
               </p>
-              <p className="mt-0.5 text-[10px] text-slate-500">
+              <p className="mt-0.5 text-[13px] text-slate-500">
                 Wheelchair & elder equipped
               </p>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Total Shelter Capacity
                 </span>
                 <Users size={16} className="text-slate-400" />
@@ -381,7 +381,7 @@ export default function SheltersPage() {
               <p className="mt-2 text-2xl font-bold text-[#173d5b]">
                 {summary.totalOccupiedSpaces} / {summary.totalCapacity}
               </p>
-              <p className="mt-0.5 text-[10px] text-slate-500">
+              <p className="mt-0.5 text-[13px] text-slate-500">
                 {summary.totalCapacity > 0
                   ? Math.round((summary.totalOccupiedSpaces / summary.totalCapacity) * 100)
                   : 0}
@@ -400,11 +400,11 @@ export default function SheltersPage() {
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-emerald-400/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300">
+                    <span className="rounded-md bg-emerald-400/20 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-emerald-300">
                       ★ Recommended Nearest Shelter
                     </span>
                     {nearest.accessible && (
-                      <span className="rounded-md bg-sky-400/20 px-2 py-0.5 text-[10px] font-medium text-sky-200">
+                      <span className="rounded-md bg-sky-400/20 px-2 py-0.5 text-xs font-medium text-sky-200">
                         Accessible
                       </span>
                     )}
@@ -414,7 +414,7 @@ export default function SheltersPage() {
                     {nearest.name}
                   </h3>
 
-                  <p className="mt-1 text-xs text-sky-200">
+                  <p className="mt-1 text-sm text-sky-200">
                     {nearest.distance} km away · {nearest.area} ·{" "}
                     <span className="font-semibold text-emerald-300">
                       {nearest.availability} spaces remaining
@@ -427,7 +427,7 @@ export default function SheltersPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setSelectedShelter(nearest)}
-                  className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-xs font-semibold text-white hover:bg-white/20 transition"
+                  className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/20 transition"
                 >
                   View Details
                 </button>
@@ -436,7 +436,7 @@ export default function SheltersPage() {
                     setReservingShelter(nearest);
                     setBookingResult(null);
                   }}
-                  className="rounded-xl bg-[#287da6] px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#3692bb] transition"
+                  className="rounded-xl bg-[#287da6] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#3692bb] transition"
                 >
                   Reserve Space
                 </button>
@@ -456,7 +456,7 @@ export default function SheltersPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search shelters, areas, or addresses..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pl-9 pr-8 text-xs text-[#173d5b] outline-none transition focus:border-[#287da6] focus:bg-white focus:ring-2 focus:ring-sky-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pl-9 pr-8 text-sm sm:text-[15px] text-[#173d5b] outline-none transition focus:border-[#287da6] focus:bg-white focus:ring-2 focus:ring-sky-100"
               />
               {search && (
                 <button
@@ -472,7 +472,7 @@ export default function SheltersPage() {
             <select
               value={area}
               onChange={(e) => setArea(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
             >
               {AREA_OPTIONS.map((a) => (
                 <option key={a} value={a}>
@@ -485,7 +485,7 @@ export default function SheltersPage() {
             <select
               value={distance}
               onChange={(e) => setDistance(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
             >
               <option>Any distance</option>
               <option>Within 2 km</option>
@@ -497,7 +497,7 @@ export default function SheltersPage() {
             <select
               value={availability}
               onChange={(e) => setAvailability(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
             >
               <option>All statuses</option>
               <option>Space available</option>
@@ -508,7 +508,7 @@ export default function SheltersPage() {
             <select
               value={accessibility}
               onChange={(e) => setAccessibility(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
             >
               <option>All facilities</option>
               <option>Accessible only</option>
@@ -518,7 +518,7 @@ export default function SheltersPage() {
             <select
               value={service}
               onChange={(e) => setService(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none cursor-pointer hover:border-slate-300"
             >
               {SERVICE_OPTIONS.map((sv) => (
                 <option key={sv} value={sv}>
@@ -536,7 +536,7 @@ export default function SheltersPage() {
               service !== "All services") && (
               <button
                 onClick={handleResetFilters}
-                className="rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-semibold text-[#287da6] hover:bg-slate-50 transition"
+                className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold text-[#287da6] hover:bg-slate-50 transition"
               >
                 Reset
               </button>
@@ -547,8 +547,8 @@ export default function SheltersPage() {
           {viewMode === "table" ? (
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[800px] text-left text-xs">
-                  <thead className="border-b border-slate-100 bg-[#f7f9fa] text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <table className="w-full min-w-[800px] text-left text-sm">
+                  <thead className="border-b border-slate-100 bg-[#f7f9fa] text-[13px] font-bold uppercase tracking-wider text-slate-500">
                     <tr>
                       <th className="px-5 py-3.5">Shelter & Location</th>
                       <th className="px-4 py-3.5">Area</th>
@@ -585,7 +585,7 @@ export default function SheltersPage() {
                                 <p className="font-bold text-[#173d5b]">
                                   {shelter.name}
                                 </p>
-                                <p className="text-[11px] text-slate-400">
+                                <p className="text-[13px] text-slate-400">
                                   {shelter.address}
                                 </p>
                               </div>
@@ -602,7 +602,7 @@ export default function SheltersPage() {
 
                           <td className="px-4 py-4">
                             <div>
-                              <div className="flex justify-between text-[11px] mb-1">
+                              <div className="flex justify-between text-sm mb-1">
                                 <span className="font-bold text-[#173d5b]">
                                   {shelter.availability} spaces free
                                 </span>
@@ -630,7 +630,7 @@ export default function SheltersPage() {
                               {shelter.services.map((sv, idx) => (
                                 <span
                                   key={idx}
-                                  className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-600"
+                                  className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600"
                                 >
                                   {sv}
                                 </span>
@@ -640,7 +640,7 @@ export default function SheltersPage() {
 
                           <td className="px-4 py-4">
                             <span
-                              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${
                                 shelter.status === "Space available"
                                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                                   : "bg-red-50 text-red-700 border border-red-200"
@@ -672,7 +672,7 @@ export default function SheltersPage() {
                                   setReservingShelter(shelter);
                                   setBookingResult(null);
                                 }}
-                                className="rounded-lg bg-[#287da6] px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-[#1f6486] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 transition"
+                                className="rounded-lg bg-[#287da6] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#1f6486] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 transition"
                               >
                                 Reserve
                               </button>
@@ -686,7 +686,7 @@ export default function SheltersPage() {
                       <tr>
                         <td
                           colSpan={7}
-                          className="p-12 text-center text-xs text-slate-400"
+                          className="p-12 text-center text-sm text-slate-400"
                         >
                           <House className="mx-auto text-slate-300 mb-2" size={32} />
                           <p className="font-bold text-[#173d5b]">No shelters match your criteria</p>
@@ -729,7 +729,7 @@ export default function SheltersPage() {
                         </div>
 
                         <span
-                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                             shelter.status === "Space available"
                               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : "bg-red-50 text-red-700 border border-red-200"
@@ -739,13 +739,13 @@ export default function SheltersPage() {
                         </span>
                       </div>
 
-                      <h3 className="mt-3 text-sm font-bold text-[#173d5b]">
+                      <h3 className="mt-3 text-base font-bold text-[#173d5b]">
                         {shelter.name}
                       </h3>
                       <p className="mt-0.5 text-xs text-slate-500">
                         {shelter.area} · {shelter.distance} km away
                       </p>
-                      <p className="mt-1 text-[11px] text-slate-400">
+                      <p className="mt-1 text-[13px] text-slate-400">
                         {shelter.address}
                       </p>
 
@@ -778,7 +778,7 @@ export default function SheltersPage() {
                         {shelter.services.map((sv, idx) => (
                           <span
                             key={idx}
-                            className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600"
+                            className="rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600"
                           >
                             {sv}
                           </span>
@@ -790,7 +790,7 @@ export default function SheltersPage() {
                     <div className="mt-5 flex items-center gap-2 border-t border-slate-100 pt-3">
                       <button
                         onClick={() => setSelectedShelter(shelter)}
-                        className="flex-1 rounded-xl border border-slate-200 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                        className="flex-1 rounded-xl border border-slate-200 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
                       >
                         Details
                       </button>
@@ -800,7 +800,7 @@ export default function SheltersPage() {
                           setReservingShelter(shelter);
                           setBookingResult(null);
                         }}
-                        className="flex-1 rounded-xl bg-[#287da6] py-2 text-xs font-bold text-white hover:bg-[#1f6486] disabled:bg-slate-200 disabled:text-slate-400 transition"
+                        className="flex-1 rounded-xl bg-[#287da6] py-2 text-sm font-bold text-white hover:bg-[#1f6486] disabled:bg-slate-200 disabled:text-slate-400 transition"
                       >
                         Reserve
                       </button>
@@ -819,7 +819,7 @@ export default function SheltersPage() {
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div>
                     <span
-                      className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${
+                      className={`rounded-md px-2 py-0.5 text-xs font-bold ${
                         selectedShelter.status === "Space available"
                           ? "bg-emerald-50 text-emerald-700"
                           : "bg-red-50 text-red-700"
@@ -827,7 +827,7 @@ export default function SheltersPage() {
                     >
                       {selectedShelter.status}
                     </span>
-                    <h2 className="mt-1 text-base font-bold text-[#173d5b]">
+                    <h2 className="mt-1 text-lg sm:text-xl font-bold text-[#173d5b]">
                       {selectedShelter.name}
                     </h2>
                   </div>
@@ -844,24 +844,24 @@ export default function SheltersPage() {
                 <div className="mt-4 grid grid-cols-3 gap-3">
                   <div className="rounded-xl bg-slate-50 p-3 text-center">
                     <MapPin size={16} className="mx-auto text-[#287da6]" />
-                    <p className="mt-1 text-[10px] text-slate-400">Area</p>
-                    <p className="text-xs font-bold text-[#173d5b]">
+                    <p className="mt-1 text-[13px] text-slate-400">Area</p>
+                    <p className="text-sm font-bold text-[#173d5b]">
                       {selectedShelter.area}
                     </p>
                   </div>
 
                   <div className="rounded-xl bg-slate-50 p-3 text-center">
                     <BedDouble size={16} className="mx-auto text-[#287da6]" />
-                    <p className="mt-1 text-[10px] text-slate-400">Free Spaces</p>
-                    <p className="text-xs font-bold text-emerald-700">
+                    <p className="mt-1 text-[13px] text-slate-400">Free Spaces</p>
+                    <p className="text-sm font-bold text-emerald-700">
                       {selectedShelter.availability} beds
                     </p>
                   </div>
 
                   <div className="rounded-xl bg-slate-50 p-3 text-center">
                     <Clock size={16} className="mx-auto text-[#287da6]" />
-                    <p className="mt-1 text-[10px] text-slate-400">Distance</p>
-                    <p className="text-xs font-bold text-[#173d5b]">
+                    <p className="mt-1 text-[13px] text-slate-400">Distance</p>
+                    <p className="text-sm font-bold text-[#173d5b]">
                       {selectedShelter.distance} km
                     </p>
                   </div>
@@ -891,7 +891,7 @@ export default function SheltersPage() {
 
                 {/* Services list */}
                 <div className="mt-4">
-                  <p className="text-xs font-bold text-[#173d5b] mb-1.5">
+                  <p className="text-sm font-bold text-[#173d5b] mb-1.5">
                     Available Relief Services & Facilities
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -910,7 +910,7 @@ export default function SheltersPage() {
                 <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-3">
                   <button
                     onClick={() => setSelectedShelter(null)}
-                    className="text-xs font-medium text-slate-500 hover:text-slate-700"
+                    className="text-sm font-medium text-slate-500 hover:text-slate-700"
                   >
                     Close
                   </button>
@@ -922,7 +922,7 @@ export default function SheltersPage() {
                       setSelectedShelter(null);
                       setBookingResult(null);
                     }}
-                    className="rounded-xl bg-[#287da6] px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#1f6486] disabled:bg-slate-200 disabled:text-slate-400 transition"
+                    className="rounded-xl bg-[#287da6] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#1f6486] disabled:bg-slate-200 disabled:text-slate-400 transition"
                   >
                     Reserve Space
                   </button>
@@ -939,7 +939,7 @@ export default function SheltersPage() {
                   <form onSubmit={handleConfirmReservation} className="space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#287da6]">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#287da6]">
                           Reserve Shelter Space
                         </span>
                         <h3 className="text-base font-bold text-[#173d5b]">
@@ -963,19 +963,19 @@ export default function SheltersPage() {
                     )}
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#173d5b] mb-1">
+                      <label className="block text-sm font-semibold text-[#173d5b] mb-1">
                         Primary Household Contact
                       </label>
                       <input
                         type="text"
                         value={citizenName}
                         readOnly
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-600 outline-none"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm sm:text-[15px] text-slate-600 outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#173d5b] mb-1">
+                      <label className="block text-sm font-semibold text-[#173d5b] mb-1">
                         Contact Phone Number *
                       </label>
                       <input
@@ -984,12 +984,12 @@ export default function SheltersPage() {
                         value={contactPhone}
                         onChange={(e) => setContactPhone(e.target.value)}
                         placeholder="+94 77 123 4567"
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none focus:border-[#287da6]"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none focus:border-[#287da6]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#173d5b] mb-1">
+                      <label className="block text-sm font-semibold text-[#173d5b] mb-1">
                         Number of Persons Requiring Beds *
                       </label>
                       <div className="flex items-center gap-3">
@@ -1015,13 +1015,13 @@ export default function SheltersPage() {
                           +
                         </button>
                       </div>
-                      <p className="mt-1 text-[10px] text-slate-400">
+                      <p className="mt-1 text-[13px] text-slate-400">
                         Maximum {reservingShelter.availability} spaces currently available.
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#173d5b] mb-1">
+                      <label className="block text-sm font-semibold text-[#173d5b] mb-1">
                         Special Accommodations (Optional)
                       </label>
                       <input
@@ -1029,11 +1029,11 @@ export default function SheltersPage() {
                         value={specialNeeds}
                         onChange={(e) => setSpecialNeeds(e.target.value)}
                         placeholder="e.g. Wheelchair access, infant crib, pet dog"
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-[#173d5b] outline-none focus:border-[#287da6]"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm sm:text-[15px] text-[#173d5b] outline-none focus:border-[#287da6]"
                       />
                     </div>
 
-                    <div className="rounded-xl border border-slate-100 bg-sky-50 p-3 text-[11px] text-sky-800">
+                    <div className="rounded-xl border border-slate-100 bg-sky-50 p-3 text-sm text-sky-800">
                       Spaces are held for 3 hours from reservation time. Please present the booking reference code upon arrival at intake.
                     </div>
 
@@ -1041,14 +1041,14 @@ export default function SheltersPage() {
                       <button
                         type="button"
                         onClick={() => setReservingShelter(null)}
-                        className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                        className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
                         disabled={submittingBooking}
-                        className="rounded-xl bg-[#287da6] px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#1f6486] disabled:opacity-60 transition"
+                        className="rounded-xl bg-[#287da6] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#1f6486] disabled:opacity-60 transition"
                       >
                         {submittingBooking ? "Confirming..." : "Confirm Reservation"}
                       </button>
@@ -1071,7 +1071,7 @@ export default function SheltersPage() {
 
                     {/* Reference Card */}
                     <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Intake Reference Code
                       </p>
                       <div className="mt-1 flex items-center justify-center gap-2">
@@ -1090,7 +1090,7 @@ export default function SheltersPage() {
                           )}
                         </button>
                       </div>
-                      <p className="mt-1 text-[10px] text-slate-400">
+                      <p className="mt-1 text-[13px] text-slate-400">
                         Assigned for {bookingResult.numberOfPeople} person(s) at {bookingResult.shelterName}
                       </p>
                     </div>
@@ -1101,7 +1101,7 @@ export default function SheltersPage() {
                           setReservingShelter(null);
                           setBookingResult(null);
                         }}
-                        className="rounded-xl bg-[#287da6] px-6 py-2.5 text-xs font-bold text-white hover:bg-[#1f6486]"
+                        className="rounded-xl bg-[#287da6] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#1f6486]"
                       >
                         Done
                       </button>
@@ -1119,10 +1119,10 @@ export default function SheltersPage() {
                 <Phone size={20} />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-[#173d5b]">
+                <h4 className="text-sm font-bold text-[#173d5b]">
                   Need transport or emergency evacuation assistance?
                 </h4>
-                <p className="mt-0.5 text-[11px] text-slate-500">
+                <p className="mt-0.5 text-[13px] text-slate-500">
                   Call the municipal disaster coordination desk. High-water transport vehicles and ambulance escorts are on standby.
                 </p>
               </div>

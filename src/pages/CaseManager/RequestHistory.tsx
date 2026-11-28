@@ -196,7 +196,7 @@ const RequestHistory: React.FC = () => {
             <button
               onClick={() => loadData(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg border border-[#b9d0df] bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-sky-50 disabled:opacity-50"
               title="Refresh audit log"
             >
               <RefreshCw size={13} className={isRefreshing ? "animate-spin text-[#287da8]" : ""} />
@@ -217,7 +217,7 @@ const RequestHistory: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setShowRetentionPolicy(true)}
-              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-xs font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
+              className="rounded-lg border border-[#b9d0df] bg-white px-4 py-2.5 text-sm font-medium text-[#287da8] shadow-sm transition hover:bg-sky-50"
             >
               Retention policy
             </button>
@@ -225,7 +225,7 @@ const RequestHistory: React.FC = () => {
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#17678f] disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-[#287da8] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#17678f] disabled:opacity-50"
             >
               <Download size={16} />
               {isExporting ? "Exporting..." : "Export"}
@@ -260,14 +260,14 @@ const RequestHistory: React.FC = () => {
           <div className="flex items-center gap-3">
             <Clock size={21} className="shrink-0 text-[#587487]" />
             <div>
-              <p className="text-xs font-bold text-[#35566e]">Read-only operational record</p>
+              <p className="text-sm font-bold text-[#35566e]">Read-only operational record</p>
               <p className="mt-1 text-xs text-slate-500">
                 Case history events cannot be edited or deleted through this workspace.
               </p>
             </div>
           </div>
 
-          <span className="hidden whitespace-nowrap text-[10px] font-semibold text-slate-500 sm:block">
+          <span className="hidden whitespace-nowrap text-[13px] font-semibold text-slate-500 sm:block">
             Retention: 7 years
           </span>
         </div>
@@ -285,7 +285,7 @@ const RequestHistory: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm sm:text-[15px] outline-none placeholder:text-slate-400"
             />
             {searchTerm && (
               <button onClick={() => setSearchTerm("")}>
@@ -301,7 +301,7 @@ const RequestHistory: React.FC = () => {
               setEventTypeFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All event types</option>
             <option>Decision</option>
@@ -320,7 +320,7 @@ const RequestHistory: React.FC = () => {
               setActorFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All actors</option>
             {uniqueActors.map((actor) => (
@@ -337,7 +337,7 @@ const RequestHistory: React.FC = () => {
               setCaseFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>All cases</option>
             {uniqueCases.map((caseId) => (
@@ -354,7 +354,7 @@ const RequestHistory: React.FC = () => {
               setDateFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-xs outline-none shadow-sm focus:border-sky-500"
+            className="rounded-lg border border-[#d2e0e9] bg-white px-3 py-3 text-sm sm:text-[15px] outline-none shadow-sm focus:border-sky-500"
           >
             <option>Date range</option>
             <option>Today</option>
@@ -364,7 +364,7 @@ const RequestHistory: React.FC = () => {
           {/* More Filters */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2.5 rounded-lg border px-4 py-3 text-xs font-semibold shadow-sm transition ${
+            className={`flex items-center gap-2.5 rounded-lg border px-4 py-3 text-sm font-semibold shadow-sm transition ${
               showFilters
                 ? "border-[#287da8] bg-sky-50 text-[#287da8]"
                 : "border-[#b9d0df] bg-white text-[#287da8] hover:bg-sky-50"
@@ -387,7 +387,7 @@ const RequestHistory: React.FC = () => {
 
             <button
               onClick={resetFilters}
-              className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-100"
             >
               Clear all filters
             </button>
@@ -399,7 +399,7 @@ const RequestHistory: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1050px] text-left">
               <thead className="bg-[#f7f9fa]">
-                <tr className="border-b border-[#d5e2eb] text-[11px] font-semibold text-slate-500">
+                <tr className="border-b border-[#d5e2eb] text-sm font-semibold text-slate-500">
                   <th className="px-4 py-4">Event ID</th>
                   <th className="px-3 py-4">Case ID</th>
                   <th className="px-3 py-4">Event Type</th>
@@ -429,16 +429,16 @@ const RequestHistory: React.FC = () => {
                       className="cursor-pointer border-b border-[#e5edf2] transition hover:bg-[#f8fbfd]"
                     >
                       <td className="whitespace-nowrap px-4 py-4">
-                        <span className="text-[11px] font-bold text-[#173e5b]">{event.id}</span>
+                        <span className="text-sm font-bold text-[#173e5b]">{event.id}</span>
                       </td>
 
                       <td className="whitespace-nowrap px-3 py-4">
-                        <span className="text-[11px] font-semibold text-[#173e5b]">{event.caseId}</span>
+                        <span className="text-sm font-semibold text-[#173e5b]">{event.caseId}</span>
                       </td>
 
                       <td className="whitespace-nowrap px-3 py-4">
                         <span
-                          className={`rounded px-2 py-0.5 text-[10px] font-semibold ${getEventStyle(
+                          className={`rounded px-2 py-0.5 text-xs font-semibold ${getEventStyle(
                             event.eventType
                           )}`}
                         >
@@ -447,25 +447,25 @@ const RequestHistory: React.FC = () => {
                       </td>
 
                       <td className="px-3 py-4">
-                        <p className="whitespace-nowrap text-[11px] text-slate-700">{event.action}</p>
+                        <p className="whitespace-nowrap text-sm text-slate-700">{event.action}</p>
                       </td>
 
                       <td className="whitespace-nowrap px-3 py-4">
-                        <span className="text-[11px] text-slate-600">{event.actor}</span>
+                        <span className="text-sm text-slate-600">{event.actor}</span>
                       </td>
 
                       <td className="whitespace-nowrap px-3 py-4">
-                        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-700">
+                        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-700">
                           {event.change}
                         </span>
                       </td>
 
                       <td className="whitespace-nowrap px-3 py-4">
-                        <span className="text-[11px] text-slate-600">{event.rationale}</span>
+                        <span className="text-sm text-slate-600">{event.rationale}</span>
                       </td>
 
                       <td className="whitespace-nowrap px-4 py-4">
-                        <span className="text-[11px] text-slate-500">{event.timestamp}</span>
+                        <span className="text-[13px] text-slate-500">{event.timestamp}</span>
                       </td>
                     </tr>
                   ))
@@ -494,7 +494,7 @@ const RequestHistory: React.FC = () => {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3.5 py-2 text-xs text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#d5e2eb] px-3.5 py-2 text-sm text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ChevronLeft size={14} />
                 Previous
@@ -504,7 +504,7 @@ const RequestHistory: React.FC = () => {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`h-8 w-8 rounded-lg border text-xs transition ${
+                  className={`h-8 w-8 rounded-lg border text-sm transition ${
                     currentPage === page
                       ? "border-[#287da8] bg-[#287da8] font-semibold text-white"
                       : "border-[#d5e2eb] bg-white text-slate-600 hover:bg-sky-50"
@@ -517,7 +517,7 @@ const RequestHistory: React.FC = () => {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3.5 py-2 text-xs font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-lg border border-[#b9d0df] px-3.5 py-2 text-sm font-medium text-[#287da8] transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
                 <ChevronRight size={14} />
@@ -551,7 +551,7 @@ const RequestHistory: React.FC = () => {
             </div>
 
             <div className="mb-5 rounded-xl bg-sky-50 p-4">
-              <p className="text-xs font-semibold text-sky-800">Event Classification</p>
+              <p className="text-sm font-semibold text-sky-800">Event Classification</p>
               <span
                 className={`mt-2 inline-block rounded-md px-3 py-1.5 text-xs font-semibold ${getEventStyle(
                   selectedEvent.eventType
@@ -588,18 +588,18 @@ const RequestHistory: React.FC = () => {
               </div>
               <div className="pt-1">
                 <span className="text-slate-400">Rationale / Justification:</span>
-                <p className="mt-1 text-xs text-slate-700">{selectedEvent.rationale}</p>
+                <p className="mt-1 text-sm text-slate-700">{selectedEvent.rationale}</p>
               </div>
             </div>
 
             <div className="mt-5 flex items-center gap-2 rounded-lg bg-emerald-50 p-3 text-emerald-800">
               <ShieldCheck size={17} className="text-emerald-600" />
-              <p className="text-xs">Immutable, tamper-evident audit record.</p>
+              <p className="text-sm">Immutable, tamper-evident audit record.</p>
             </div>
 
             <button
               onClick={() => setSelectedEvent(null)}
-              className="mt-5 w-full rounded-lg bg-[#287da8] py-2.5 text-xs font-semibold text-white hover:bg-[#17678f]"
+              className="mt-5 w-full rounded-lg bg-[#287da8] py-2.5 text-sm font-semibold text-white hover:bg-[#17678f]"
             >
               Close
             </button>
@@ -659,7 +659,7 @@ const RequestHistory: React.FC = () => {
 
             <button
               onClick={() => setShowRetentionPolicy(false)}
-              className="mt-6 w-full rounded-lg bg-[#287da8] py-2.5 text-xs font-semibold text-white hover:bg-[#17678f]"
+              className="mt-6 w-full rounded-lg bg-[#287da8] py-2.5 text-sm font-semibold text-white hover:bg-[#17678f]"
             >
               Close policy
             </button>

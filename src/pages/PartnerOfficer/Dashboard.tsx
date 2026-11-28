@@ -18,7 +18,10 @@ import {
   CheckCircle2,
   Share2,
   ShieldCheck,
+  Phone,
+  Mail,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 import {
   partnerDashboardService,
   type PartnerDashboardData,
@@ -57,44 +60,16 @@ const initialFallbackData: PartnerDashboardData = {
       iconClass: "bg-violet-50 text-violet-600",
     },
   ],
-  activities: [
-    {
-      id: "ACT-1001",
-      title: "New assistance referral received",
-      description: "Flood relief support requested in Gampaha District",
-      time: "10 minutes ago",
-      icon: "ClipboardList",
-      color: "text-blue-600 bg-blue-50",
-      timestamp: new Date().toISOString(),
-    },
-    {
-      id: "ACT-1002",
-      title: "Resource sharing request updated",
-      description: "Medical supplies request status changed to In Review",
-      time: "35 minutes ago",
-      icon: "Package",
-      color: "text-emerald-600 bg-emerald-50",
-      timestamp: new Date().toISOString(),
-    },
-    {
-      id: "ACT-1003",
-      title: "Collaboration request received",
-      description: "Regional response coordination invitation",
-      time: "1 hour ago",
-      icon: "Handshake",
-      color: "text-violet-600 bg-violet-50",
-      timestamp: new Date().toISOString(),
-    },
-  ],
+  activities: [],
   organisation: {
-    name: "Global Relief Network",
-    type: "International NGO",
-    code: "ORG-027",
+    name: "Verified Partner",
+    type: "Humanitarian Partner",
+    code: "PARTNER-ORG",
     verificationStatus: "Verified",
     assignedRegion: "Western",
-    fieldLocationsCount: 5,
-    contactEmail: "contact@globalrelief.org",
-    contactPhone: "+94 11 234 5678",
+    fieldLocationsCount: 3,
+    contactEmail: "",
+    contactPhone: "",
   },
   lastUpdated: new Date().toISOString(),
 };
@@ -120,16 +95,45 @@ const getIconComponent = (iconName: string) => {
 
 export default function PartnerDashboard() {
   const navigate = useNavigate();
-  const [data, setData] = useState<PartnerDashboardData>(initialFallbackData);
+  const { user } = useAuth();
+  const [data, setData] = useState<PartnerDashboardData>(() => ({
+    ...initialFallbackData,
+    organisation: {
+      ...initialFallbackData.organisation,
+      name: user?.organizationName || "Verified Partner",
+      type: (user as any)?.organizationType || "Humanitarian Partner",
+    },
+  }));
   const [isLiveConnected, setIsLiveConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
+  const activeOrgName =
+    user?.organizationName ||
+    (data.organisation.name !== "Global Relief Network"
+      ? data.organisation.name
+      : "Verified Partner");
+
+  const activeOrgType =
+    (user as any)?.organizationType ||
+    (data.organisation.type !== "International NGO"
+      ? data.organisation.type
+      : "Humanitarian Partner");
+
+  const activeOrgStatus =
+    user?.organizationApprovalStatus ||
+    data.organisation.verificationStatus ||
+    "Verified";
+
   const loadDashboard = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await partnerDashboardService.getDashboard();
+      const partnerKey = user?.organizationName || user?.organizationId || undefined;
+      const res = await partnerDashboardService.getDashboard(partnerKey);
+      if (user?.organizationName && res.organisation) {
+        res.organisation.name = user.organizationName;
+      }
       setData(res);
       setIsLiveConnected(true);
     } catch (err) {
@@ -138,14 +142,18 @@ export default function PartnerDashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     let active = true;
     const init = async () => {
       try {
-        const res = await partnerDashboardService.getDashboard();
+        const partnerKey = user?.organizationName || user?.organizationId || undefined;
+        const res = await partnerDashboardService.getDashboard(partnerKey);
         if (!active) return;
+        if (user?.organizationName && res.organisation) {
+          res.organisation.name = user.organizationName;
+        }
         setData(res);
         setIsLiveConnected(true);
       } catch (err) {
@@ -158,21 +166,21 @@ export default function PartnerDashboard() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [user]);
 
   const handleCardClick = (label: string) => {
     switch (label) {
       case "Active Crisis Events":
-        navigate("/partner-officer/partner/shared-crisis-events");
+        navigate("/partner/shared-crisis-events");
         break;
       case "Assistance Referrals":
-        navigate("/partner-officer/partner/assistance-referrals");
+        navigate("/partner/assistance-referrals");
         break;
       case "Shared Resources":
-        navigate("/partner-officer/partner/resource-sharing");
+        navigate("/partner/resource-sharing");
         break;
       case "Active Team Members":
-        navigate("/partner-officer/partner/team-contacts");
+        navigate("/partner/team-contacts");
         break;
       default:
         break;
@@ -210,18 +218,20 @@ export default function PartnerDashboard() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] space-y-6">
+    <div className="mx-auto w-full max-w-[1440px] p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <p className="text-xs font-medium text-[#2785B2]">PARTNER WORKSPACE</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#2785B2]">
+            PARTNER WORKSPACE
+          </p>
           <div className="mt-1 flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-bold text-[#153e5b]">
+            <h1 className="text-2xl sm:text-[28px] lg:text-[30px] font-bold text-[#153e5b] tracking-tight">
               Partner Dashboard
             </h1>
 
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
                 isLiveConnected
                   ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
                   : "border border-slate-200 bg-slate-100 text-slate-600"
@@ -238,34 +248,34 @@ export default function PartnerDashboard() {
             </span>
           </div>
 
-          <p className="mt-1 text-sm text-slate-500">
-            Overview of your organisation&apos;s humanitarian response
-            activities and coordination state.
+          <p className="mt-1 text-xs sm:text-sm text-slate-500 max-w-2xl">
+            Overview of your organisation&apos;s humanitarian response activities
+            and coordination state.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <button
             onClick={loadDashboard}
             disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition cursor-pointer"
             title="Refresh dashboard data"
           >
-            <RefreshCw size={13} className={isLoading ? "animate-spin" : ""} />
-            Refresh
+            <RefreshCw size={13} className={isLoading ? "animate-spin text-[#2785B2]" : ""} />
+            <span>Refresh</span>
           </button>
 
           <button
             onClick={() => setShowLogModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-[#2785B2] px-3.5 py-2 text-xs font-medium text-white hover:bg-[#1f6b8f]"
+            className="flex items-center gap-1.5 rounded-lg bg-[#2785B2] px-3.5 py-2 text-sm font-medium text-white hover:bg-[#1f6b8f] transition shadow-xs cursor-pointer"
           >
             <Plus size={14} />
-            Log Activity
+            <span>Log Activity</span>
           </button>
 
-          <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
-            <CalendarDays size={15} className="text-[#2785B2]" />
-            <span>{data.activeCrisisName}</span>
+          <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 font-medium shadow-2xs">
+            <CalendarDays size={15} className="text-[#2785B2] shrink-0" />
+            <span className="truncate max-w-[180px]">{data.activeCrisisName}</span>
           </div>
         </div>
       </div>
@@ -287,22 +297,22 @@ export default function PartnerDashboard() {
             <article
               key={card.label}
               onClick={() => handleCardClick(card.label)}
-              className="group cursor-pointer rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#2785B2] hover:shadow-md"
+              className="group cursor-pointer rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#2785B2] hover:shadow-md flex flex-col justify-between min-h-[135px]"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-medium text-slate-500">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium text-slate-500 truncate" title={card.label}>
                     {card.label}
                   </p>
-                  <p className="mt-3 text-3xl font-bold text-[#153e5b] group-hover:text-[#2785B2] transition">
+                  <p className="mt-2.5 text-3xl font-extrabold text-[#153e5b] group-hover:text-[#2785B2] transition">
                     {card.value}
                   </p>
-                  <p className="mt-2 text-[11px] text-slate-500">
+                  <p className="mt-2 text-[13px] text-slate-500 truncate" title={card.detail}>
                     {card.detail}
                   </p>
                 </div>
                 <div
-                  className={`rounded-lg p-3 transition group-hover:scale-105 ${card.iconClass}`}
+                  className={`rounded-lg p-3 shrink-0 transition group-hover:scale-105 ${card.iconClass}`}
                 >
                   <Icon size={20} />
                 </div>
@@ -315,10 +325,10 @@ export default function PartnerDashboard() {
       {/* Main Grid: Recent Activity & Organisation Overview */}
       <section className="grid grid-cols-1 gap-5 xl:grid-cols-3">
         {/* Recent Activity */}
-        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
+        <article className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm xl:col-span-2">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-bold text-[#153e5b]">
+              <h2 className="text-base sm:text-lg font-bold text-[#153e5b]">
                 Recent Activity
               </h2>
               <p className="mt-1 text-xs text-slate-500">
@@ -328,11 +338,12 @@ export default function PartnerDashboard() {
             <button
               type="button"
               onClick={() =>
-                navigate("/partner-officer/partner/field-activities")
+                navigate("/partner/field-activities")
               }
-              className="inline-flex items-center gap-1 text-xs font-semibold text-[#2785B2] hover:text-[#153e5b]"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-[#2785B2] hover:text-[#153e5b] cursor-pointer"
             >
-              View all activities <ArrowRight size={14} />
+              <span>View all activities</span>
+              <ArrowRight size={14} />
             </button>
           </div>
 
@@ -349,13 +360,13 @@ export default function PartnerDashboard() {
                     <Icon size={17} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-[#153e5b]">
+                    <p className="text-sm font-semibold text-[#153e5b] break-words">
                       {activity.title}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-slate-500 break-words">
                       {activity.description}
                     </p>
-                    <p className="mt-2 text-[10px] text-slate-400">
+                    <p className="mt-2 text-[13px] text-slate-400">
                       {activity.time}
                     </p>
                   </div>
@@ -368,18 +379,23 @@ export default function PartnerDashboard() {
             })}
 
             {data.activities.length === 0 && (
-              <p className="py-6 text-center text-xs text-slate-400">
-                No recent activity records found.
-              </p>
+              <div className="py-8 text-center">
+                <p className="text-xs font-medium text-slate-500">
+                  No recent activities recorded yet for this organization.
+                </p>
+                <p className="mt-1 text-[13px] text-slate-400">
+                  Click &apos;+ Log Activity&apos; to record your team&apos;s first field action.
+                </p>
+              </div>
             )}
           </div>
         </article>
 
         {/* Organisation Overview */}
-        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col justify-between">
+        <article className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
             <div>
-              <h2 className="text-sm font-bold text-[#153e5b]">
+              <h2 className="text-base sm:text-lg font-bold text-[#153e5b]">
                 Organisation Overview
               </h2>
               <p className="mt-1 text-xs text-slate-500">
@@ -387,46 +403,49 @@ export default function PartnerDashboard() {
               </p>
             </div>
 
-            <div className="mt-5 flex items-center gap-3">
-              <div className="rounded-xl bg-[#eaf4f8] p-3 text-[#2785B2]">
+            <div className="mt-5 flex items-start gap-3">
+              <div className="rounded-xl bg-[#eaf4f8] p-3 text-[#2785B2] shrink-0">
                 <Building2 size={22} />
               </div>
-              <div>
-                <p className="text-xs font-bold text-[#153e5b]">
-                  {data.organisation.name}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-[#153e5b] break-words">
+                  {activeOrgName}
                 </p>
-                <p className="mt-1 text-[10px] text-slate-500">
-                  {data.organisation.type} · {data.organisation.code}
+                <p className="mt-0.5 text-[13px] text-slate-500 break-words">
+                  {activeOrgType}
+                  {data.organisation.code && data.organisation.code !== "ORG-027"
+                    ? ` · ${data.organisation.code}`
+                    : ""}
                 </p>
               </div>
             </div>
 
             <div className="mt-5 space-y-3 border-t border-slate-100 pt-4">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">Verification status</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
+              <div className="flex items-center justify-between text-xs gap-2">
+                <span className="text-slate-500 shrink-0">Verification status</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 shrink-0">
                   <ShieldCheck size={12} />
-                  {data.organisation.verificationStatus}
+                  {activeOrgStatus}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">Assigned region</span>
-                <span className="font-semibold text-[#153e5b]">
-                  {data.organisation.assignedRegion}
+              <div className="flex items-center justify-between text-xs gap-2">
+                <span className="text-slate-500 shrink-0">Assigned region</span>
+                <span className="font-semibold text-[#153e5b] truncate">
+                  {data.organisation.assignedRegion || "Western Province"}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">Field locations</span>
-                <span className="inline-flex items-center gap-1 font-semibold text-[#153e5b]">
-                  <MapPin size={12} /> {data.organisation.fieldLocationsCount}{" "}
+              <div className="flex items-center justify-between text-xs gap-2">
+                <span className="text-slate-500 shrink-0">Field locations</span>
+                <span className="inline-flex items-center gap-1 font-semibold text-[#153e5b] shrink-0">
+                  <MapPin size={12} /> {data.organisation.fieldLocationsCount || 1}{" "}
                   locations
                 </span>
               </div>
-              {data.organisation.contactPhone && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Direct phone</span>
-                  <span className="text-slate-700 font-mono text-[11px]">
-                    {data.organisation.contactPhone}
+              {(user?.phoneNumber || data.organisation.contactPhone) && (
+                <div className="flex items-center justify-between text-xs gap-2">
+                  <span className="text-slate-500 shrink-0">Direct phone</span>
+                  <span className="text-slate-700 font-mono text-sm truncate">
+                    {user?.phoneNumber || data.organisation.contactPhone}
                   </span>
                 </div>
               )}
@@ -436,11 +455,12 @@ export default function PartnerDashboard() {
           <button
             type="button"
             onClick={() =>
-              navigate("/partner-officer/partner/organisation-profile")
+              navigate("/partner/organisation-profile")
             }
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-[#2785B2] px-3 py-2.5 text-xs font-semibold text-[#2785B2] transition hover:bg-[#f0f8fb]"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-[#2785B2] px-3 py-2.5 text-sm font-semibold text-[#2785B2] transition hover:bg-[#f0f8fb] cursor-pointer"
           >
-            View organisation profile <ArrowRight size={14} />
+            <span>View organisation profile</span>
+            <ArrowRight size={14} />
           </button>
         </article>
       </section>
@@ -449,11 +469,11 @@ export default function PartnerDashboard() {
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-center gap-2">
           <Activity size={17} className="text-[#2785B2]" />
-          <h2 className="text-sm font-bold text-[#153e5b]">
+          <h2 className="text-base sm:text-lg font-bold text-[#153e5b]">
             Response coordination workspace
           </h2>
         </div>
-        <p className="mt-2 text-xs leading-5 text-slate-500">
+        <p className="mt-2 text-sm leading-5 text-slate-500">
           Use the Partner Workspace shortcuts below to manage active crisis
           events, assistance referrals, shared resources, collaboration
           requests, and accountability audit logs.
@@ -465,7 +485,7 @@ export default function PartnerDashboard() {
             subtitle="Incident tracking"
             icon={<AlertTriangle size={15} />}
             onClick={() =>
-              navigate("/partner-officer/partner/shared-crisis-events")
+              navigate("/partner/shared-crisis-events")
             }
           />
           <QuickLink
@@ -473,7 +493,7 @@ export default function PartnerDashboard() {
             subtitle="Needs assessment"
             icon={<ClipboardList size={15} />}
             onClick={() =>
-              navigate("/partner-officer/partner/assistance-referrals")
+              navigate("/partner/assistance-referrals")
             }
           />
           <QuickLink
@@ -481,7 +501,7 @@ export default function PartnerDashboard() {
             subtitle="Shared inventory"
             icon={<Package size={15} />}
             onClick={() =>
-              navigate("/partner-officer/partner/resource-sharing")
+              navigate("/partner/resource-sharing")
             }
           />
           <QuickLink
@@ -489,20 +509,20 @@ export default function PartnerDashboard() {
             subtitle="Joint response"
             icon={<Handshake size={15} />}
             onClick={() =>
-              navigate("/partner-officer/partner/collaboration-requests")
+              navigate("/partner/collaboration-requests")
             }
           />
           <QuickLink
             title="Field Teams"
             subtitle="Personnel rosters"
             icon={<Users size={15} />}
-            onClick={() => navigate("/partner-officer/partner/team-contacts")}
+            onClick={() => navigate("/partner/team-contacts")}
           />
           <QuickLink
             title="Audit Ledger"
             subtitle="Verified actions"
             icon={<Share2 size={15} />}
-            onClick={() => navigate("/partner-officer/partner/audit-log")}
+            onClick={() => navigate("/partner/audit-log")}
           />
         </div>
       </section>
@@ -536,7 +556,7 @@ function QuickLink({
     >
       <div className="text-[#2785B2] mb-1.5">{icon}</div>
       <span className="text-xs font-semibold text-[#153e5b]">{title}</span>
-      <span className="text-[10px] text-slate-400">{subtitle}</span>
+      <span className="text-[13px] text-slate-400">{subtitle}</span>
     </button>
   );
 }
@@ -592,13 +612,13 @@ function LogActivityModal({
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-sm font-medium text-slate-600">
               Activity Category
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#2785B2]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
             >
               <option value="Referral">Assistance Referral</option>
               <option value="Resource">Resource Sharing</option>
@@ -608,7 +628,7 @@ function LogActivityModal({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-sm font-medium text-slate-600">
               Title *
             </label>
             <input
@@ -616,12 +636,12 @@ function LogActivityModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Relief supplies dispatch initiated"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#2785B2]"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-sm font-medium text-slate-600">
               Description *
             </label>
             <textarea
@@ -630,7 +650,7 @@ function LogActivityModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief details regarding the progress or action taken..."
-              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#2785B2]"
+              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm sm:text-[15px] outline-none focus:border-[#2785B2]"
             />
           </div>
 
@@ -638,13 +658,13 @@ function LogActivityModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-[#2785B2] px-4 py-2 text-xs font-medium text-white hover:bg-[#1f6b8f]"
+              className="rounded-lg bg-[#2785B2] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f6b8f]"
             >
               Log Activity
             </button>
